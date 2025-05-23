@@ -32,6 +32,8 @@
 #include "src/lib/simulator_util.h"
 #include "src/lib/simulator_settings.h"
 
+#include "mainwindow.h"
+
 /* Internal functions */
 static void configure_simulator(int argc, char **argv);
 static void print_lvgl_version(void);
@@ -151,8 +153,16 @@ int main(int argc, char **argv)
 #endif
 
     /*Create a Demo*/
-    lv_demo_widgets();
-    lv_demo_widgets_start_slideshow();
+    // lv_demo_widgets();
+    // lv_demo_widgets_start_slideshow();
+
+    addTextBox();
+    addTextBox();
+    addTextArea();
+    addStatusMessage();
+    addLoaderArc();
+    addProgressBar();
+    addChart();
 
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();
