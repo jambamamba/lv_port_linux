@@ -134,7 +134,6 @@ static void configure_simulator(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-
     configure_simulator(argc, argv);
 
     /* Initialize LVGL. */
@@ -156,13 +155,15 @@ int main(int argc, char **argv)
     // lv_demo_widgets();
     // lv_demo_widgets_start_slideshow();
 
-    addTextBox();
-    addTextBox();
-    addTextArea();
-    addStatusMessage();
-    addLoaderArc();
-    addProgressBar();
-    addChart();
+    // addTextArea();
+    // addStatusMessage();
+    // addLoaderArc();
+    // addProgressBar();
+    // addChart();
+    LeleTabView tab_view;
+    LeleLabel label1("Label", tab_view._tabs.at(0));
+    LeleTextBox text_box("Textbox", tab_view._tabs.at(1));
+    
 
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();

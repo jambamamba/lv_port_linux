@@ -57,3 +57,4 @@ dkms.conf
 /Debug/
 wl_protocols
 x86-build
+.vscode
