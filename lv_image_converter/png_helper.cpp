@@ -158,10 +158,10 @@ bool PngHelper::readPngFile(
 
   if (_row_pointers) { myabort(); }
 
-  _row_bytes = png_get_rowbytes(png,info);
+  _stride = png_get_rowbytes(png,info);
   _row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * _height);
   for(int y = 0; y < _height; y++) {
-    _row_pointers[y] = (png_byte*)malloc(_row_bytes);
+    _row_pointers[y] = (png_byte*)malloc(_stride);
   }
 
   png_read_image(png, _row_pointers);
@@ -189,7 +189,7 @@ void PngHelper::writePngFile(
   _bitdepth = img_bitdepth;
   _channels = channels;
   size_t num_samples = width * channels;
-  _row_bytes = num_samples * _bitdepth/8;
+  _stride = num_samples * _bitdepth/8;
 
   int y;
 
@@ -274,10 +274,10 @@ void PngHelper::padToSize(
     int horizontal_padding,
     const std::string &tmpname) {
 
-  png_bytep data = (png_bytep)malloc(_row_bytes * _height);
+  png_bytep data = (png_bytep)malloc(_stride * _height);
   for(int y = 0; y < _height; y++) {
     png_bytep row = _row_pointers[y];
-    memcpy((png_byte*)&data[y * _row_bytes], _row_pointers[y], _row_bytes);
+    memcpy((png_byte*)&data[y * _stride], _row_pointers[y], _stride);
   }
 
   PngHelper png;
@@ -321,17 +321,12 @@ PngHelper PngHelper::convertTo64bpp(const std::string &filename) {
   return png3;
 }
 
-void PngHelper::processPngFile(std::function<bool(uint8_t byte0, uint8_t byte1, uint8_t byte2, uint8_t byte3)> bytecb) {
+void PngHelper::processPngFile(std::function<bool(uint8_t *row, size_t num_bytes)> scanline) {
   for(int y = 0; y < _height; y++) {
     png_bytep row = _row_pointers[y];
-    for(int x = 0; x < _width; x++) {
-      png_bytep px = &(row[x * 4]);
-      if(!bytecb(px[0], px[1], px[2], px[3])) {
+      if(!scanline(row, _stride)){
         break;
       }
-      // Do something awesome for each pixel here...
-      //dlog(__FILE__, __LINE__, "%4d, %4d = RGBA(%3d, %3d, %3d, %3d)\n", x, y, px[0], px[1], px[2], px[3]);
-    }
   }
 }
 
@@ -341,6 +336,10 @@ int PngHelper::width() const {
 
 int PngHelper::height() const {
   return _height;
+}
+
+size_t PngHelper::stride() const {
+  return _stride;
 }
 
 int PngHelper::bitdepth() const {
@@ -358,7 +357,7 @@ png_bytep PngHelper::rowPointer(int row) const {
 }
 
 png_byte PngHelper::data(int idx) const {
-  int num_samples_per_row = _row_bytes / _bitdepth * 8;
+  int num_samples_per_row = _stride / _bitdepth * 8;
   int row = idx / num_samples_per_row;
   int col = idx - (row * num_samples_per_row);
   if(row > -1 && row < _height) {
@@ -407,10 +406,6 @@ png_byte PngHelper::operator[](int idx) const {
   return data(idx);
 }
 
-size_t PngHelper::rowSize() const {
-  return _row_bytes;
-}
-
 bool PngHelper::operator==(const PngHelper &rhs) const {
 
   if(_width != rhs._width) {
@@ -421,15 +416,15 @@ bool PngHelper::operator==(const PngHelper &rhs) const {
     dlog(__FILE__, __LINE__, "height does not match: %i!=%i\n", _height, rhs._height);
     return false;
   }
-  else if(_row_bytes != rhs._row_bytes) {
-    dlog(__FILE__, __LINE__, "stride does not match: %i!=%i\n", _row_bytes, rhs._row_bytes);
+  else if(_stride != rhs._stride) {
+    dlog(__FILE__, __LINE__, "stride does not match: %i!=%i\n", _stride, rhs._stride);
     return false;
   }
 
 	for(int y = 0; y < _height; y++) {
-    if(memcmp(_row_pointers[y], rhs._row_pointers[y], _row_bytes) != 0 ) {
+    if(memcmp(_row_pointers[y], rhs._row_pointers[y], _stride) != 0 ) {
       dlog(__FILE__, __LINE__, "bytes at row %i do not match\n", y);
-      for(size_t x = 0; x < _row_bytes; ++x ){
+      for(size_t x = 0; x < _stride; ++x ){
         if( _row_pointers[y][x] != rhs._row_pointers[y][x]) {
           dlog(__FILE__, __LINE__, "offset %llu, 0x%02x!=0x%02x ", x, _row_pointers[y][x], rhs._row_pointers[y][x]);
           break;

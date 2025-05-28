@@ -1,0 +1,35 @@
+#include "img_helper.h"
+
+ImgHelper::~ImgHelper() {}
+
+void ImgHelper::processImgFile(const std::string &img_file_path, std::function<bool(uint8_t *row, size_t num_bytes)> scanline) {
+    if(_png.readPngFile(img_file_path.c_str())) {
+        _width = _png.width();
+        _height = _png.height();
+        _stride = _png.stride();
+        _png.processPngFile([scanline](uint8_t *row, size_t num_bytes){
+            return scanline(row, num_bytes);
+        });
+    }
+    else if(_jpeg.readJpegFile(img_file_path.c_str())) {
+        _width = _jpeg.width();
+        _height = _jpeg.height();
+        _stride = _jpeg.stride();
+        _jpeg.processJpegFile([scanline](uint8_t *row, size_t num_bytes){
+            return scanline(row, num_bytes);
+        });
+    }
+    else {
+        printf("Not a jpeg or _png, ignoring file!\n");
+    }
+}
+
+int ImgHelper::width() const{
+    return _width;
+}
+int ImgHelper::height() const{
+    return _height;
+}
+size_t ImgHelper::stride() const{
+    return _stride;
+}

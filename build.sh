@@ -24,16 +24,16 @@ function main() {
 
 function buildImageConverter() {
     pushd lv_image_converter
-    if [ ! -d libpng ]; then
-        git clone https://github.com/pnggroup/libpng.git -b v1.6.48 --depth 1
-    fi
+    # if [ ! -d libpng ]; then
+    #     git clone https://github.com/pnggroup/libpng.git -b v1.6.48 --depth 1
+    # fi
     mkdir -p build
     cd build
     cmake ..
     make -j
     popd
 
-    ./lv_image_converter/build/bin/lv_image_converter /home/oosman/Documents/NuGen/
+    ./lv_image_converter/build/bin/lv_image_converter /home/oosman/Documents/NuGen/ .res
 }
 buildImageConverter
 # main $@
