@@ -59,8 +59,8 @@ uint8_t img_lvgl_logo_map[] = {\n\
         return true;
     }
 
-    std::filesystem::create_directory("res");
-    std::string c_file_path("res/");
+    std::filesystem::create_directory(".res");
+    std::string c_file_path(".res/");
     c_file_path += img_path.stem();
     c_file_path += ".c";
     std::ofstream c_img_file(c_file_path);
