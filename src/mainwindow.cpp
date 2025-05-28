@@ -33,6 +33,12 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_image_set_src(logo, &img_lvgl_logo);
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
+    printf("@@@ data_size:%i,%i,%i,%i\n", 
+      img_lvgl_logo.data_size,
+      img_lvgl_logo.header.w,
+      img_lvgl_logo.header.stride,
+      img_lvgl_logo.header.h);
+
     lv_style_init(&_style_title);
     lv_style_set_text_font(&_style_title, font_large);
     lv_obj_t * label = lv_label_create(tab_bar);

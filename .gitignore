@@ -56,5 +56,9 @@ Mkfile.old
 dkms.conf
 /Debug/
 wl_protocols
+
 x86-build
 .vscode
+lv_image_converter/build
+lv_image_converter/libpng
+.res
