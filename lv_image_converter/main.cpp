@@ -10,6 +10,7 @@
 #include <iostream>
 #include <string>
 
+namespace {
 bool iterateDirectory(const std::string &base_path, 
     std::function<bool(const std::string &)> entry_callback) {
     // Directory iteration using filesystem:
@@ -115,6 +116,7 @@ const lv_img_dsc_t img_");
     printf("width:%i, height:%i\n", png.width(), png.height());
     return true;
 }
+}//namespace
 
 int main(int argc, char **argv) {
     printf("hello \n");
