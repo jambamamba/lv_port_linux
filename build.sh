@@ -33,7 +33,7 @@ function buildImageConverter() {
     make -j
     popd
 
-    ./lv_image_converter/build/bin/lv_image_converter /home/oosman/Documents/NuGen/ .res
+    #./lv_image_converter/build/bin/lv_image_converter /home/oosman/Documents/NuGen/ .res
 }
 buildImageConverter
 # main $@

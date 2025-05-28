@@ -145,3 +145,14 @@ install(TARGETS lvgl_linux
 )
 
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
+
+
+file(GLOB C_IMG_FILES "${CMAKE_BINARY_DIR}/res/*.c")
+add_custom_command(OUTPUT ${C_IMG_FILES}
+  COMMAND ${CMAKE_COMMAND} -E ${CMAKE_SOURCE_DIR}/lv_image_converter/build/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res"
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/res"
+  DEPENDS "${CMAKE_SOURCE_DIR}/res"
+  COMMENT "Converting image files to lv format..."
+  VERBATIM
+)
+add_custom_target(lvglsim DEPENDS ${C_IMG_FILES})
