@@ -321,7 +321,7 @@ PngHelper PngHelper::convertTo64bpp(const std::string &filename) {
   return png3;
 }
 
-void PngHelper::processPngFile(std::function<bool(uint8_t *row, size_t num_bytes)> scanline) {
+void PngHelper::processPngFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
   for(int y = 0; y < _height; y++) {
     png_bytep row = _row_pointers[y];
       if(!scanline(row, _stride)){

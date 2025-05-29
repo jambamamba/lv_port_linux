@@ -37,7 +37,7 @@ class PngHelper {
     void padToSize(
         int horizontal_padding,
         const std::string &tmpname = std::tmpnam(nullptr));
-    void processPngFile(std::function<bool(uint8_t *row, size_t num_bytes)> scanline);
+    void processPngFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
     int width() const;
     int height() const;
     size_t stride() const;

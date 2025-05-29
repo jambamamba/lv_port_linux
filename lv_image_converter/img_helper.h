@@ -5,12 +5,13 @@
 
 #include "jpeg_helper.h"
 #include "png_helper.h"
+#include "heif_helper.h"
 
 class ImgHelper {
 
     public:
     ~ImgHelper();
-    void processImgFile(const std::string &img_file_path, std::function<bool(uint8_t *row, size_t num_bytes)> scanline);
+    void processImgFile(const std::string &img_file_path, std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
     int width() const;
     int height() const;
     size_t stride() const;
@@ -18,6 +19,7 @@ class ImgHelper {
     protected:
     PngHelper _png;
     JpegHelper _jpeg;
+    HeifHelper _heif;
     int _width;
     int _height;
     int _stride;

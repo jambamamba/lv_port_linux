@@ -3,22 +3,22 @@
 #include <functional>
 #include <stdint.h>
 #include <stdio.h>
-#include <jpegsr9e/jpeglib.h>
+#include <libheif/heif.h>
 
-class JpegHelper {
+class HeifHelper {
 
     public:
-    ~JpegHelper();
-    bool readJpegFile(
+    ~HeifHelper();
+    bool readHeifFile(
         const char *filename
     );
-    void processJpegFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
+    void processHeifFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
     int width() const;
     int height() const;
     size_t stride() const;
 
     protected:
-    struct jpeg_decompress_struct _cinfo = {0};
+    heif_context *_ctx = nullptr;
     int _width;
     int _height;
     int _stride;

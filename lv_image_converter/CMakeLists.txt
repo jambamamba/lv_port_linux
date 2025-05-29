@@ -13,7 +13,12 @@ add_executable(${project} main.cpp
     img_helper.cpp img_helper.h
     png_helper.cpp png_helper.h
     jpeg_helper.cpp jpeg_helper.h
+    heif_helper.cpp heif_helper.h
     )
-target_include_directories(${project} PRIVATE ${CMAKE_SOURCE_DIR} /usr/local/src/)
+target_include_directories(${project} PRIVATE ${CMAKE_SOURCE_DIR} 
+    /usr/local/src/ 
+    /usr/local/src/libheif/libheif/api/
+    /usr/local/src/libheif/build/
+    )
 target_link_directories(${project} PRIVATE /usr/local/lib)
-target_link_libraries(${project} PRIVATE png jpeg)
+target_link_libraries(${project} PRIVATE png jpeg heif)

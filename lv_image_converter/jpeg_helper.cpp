@@ -56,7 +56,7 @@ bool JpegHelper::readJpegFile(const char *filename) {
     return true;
 }
 
-void JpegHelper::processJpegFile(std::function<bool(uint8_t *row, size_t num_bytes)> scanline) {
+void JpegHelper::processJpegFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
 
     JSAMPARRAY buffer = (*_cinfo.mem->alloc_sarray) ((j_common_ptr) &_cinfo, JPOOL_IMAGE, _stride, 1);
 

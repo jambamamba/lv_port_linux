@@ -2,12 +2,20 @@
 
 ImgHelper::~ImgHelper() {}
 
-void ImgHelper::processImgFile(const std::string &img_file_path, std::function<bool(uint8_t *row, size_t num_bytes)> scanline) {
+void ImgHelper::processImgFile(const std::string &img_file_path, std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
     if(_png.readPngFile(img_file_path.c_str())) {
         _width = _png.width();
         _height = _png.height();
         _stride = _png.stride();
-        _png.processPngFile([scanline](uint8_t *row, size_t num_bytes){
+        _png.processPngFile([scanline](const uint8_t *row, size_t num_bytes){
+            return scanline(row, num_bytes);
+        });
+    }
+    else if(_heif.readHeifFile(img_file_path.c_str())) {
+        _width = _heif.width();
+        _height = _heif.height();
+        _stride = _heif.stride();
+        _heif.processHeifFile([scanline](const uint8_t *row, size_t num_bytes){
             return scanline(row, num_bytes);
         });
     }
@@ -15,12 +23,12 @@ void ImgHelper::processImgFile(const std::string &img_file_path, std::function<b
         _width = _jpeg.width();
         _height = _jpeg.height();
         _stride = _jpeg.stride();
-        _jpeg.processJpegFile([scanline](uint8_t *row, size_t num_bytes){
+        _jpeg.processJpegFile([scanline](const uint8_t *row, size_t num_bytes){
             return scanline(row, num_bytes);
         });
     }
     else {
-        printf("Not a jpeg or _png, ignoring file!\n");
+        printf("Not a jpeg or png or heif, ignoring file!\n");
     }
 }
 

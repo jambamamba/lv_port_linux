@@ -70,7 +70,7 @@ uint8_t img_");
     c_img_file << c_file_begin;
 
     ImgHelper img;
-    img.processImgFile(img_file_path, [&c_img_file](uint8_t *row, size_t num_bytes){
+    img.processImgFile(img_file_path, [&c_img_file](const uint8_t *row, size_t num_bytes){
 
         const char index[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         for(size_t col = 0; col < num_bytes; ++col) {
