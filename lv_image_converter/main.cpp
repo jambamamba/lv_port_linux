@@ -24,7 +24,13 @@ bool iterateDirectory(const std::string &base_path,
 
 bool generateCImgFile(const std::string &img_file_path, const std::string &out_dir) {
 
-    const std::string c_file_begin("\n\
+    printf("[%s:%i] processing %s\n", __FILE__, __LINE__, img_file_path.c_str());
+    std::filesystem::path img_path(img_file_path);
+    if(!std::filesystem::is_regular_file(img_file_path)) {
+        return true;
+    }
+
+    std::string c_file_begin("\n\
     #ifdef __has_include\n\
     #if __has_include(\"lvgl.h\")\n\
         #ifndef LV_LVGL_H_INCLUDE_SIMPLE\n\
@@ -50,15 +56,10 @@ bool generateCImgFile(const std::string &img_file_path, const std::string &out_d
 \n\
 static const\n\
 LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST LV_ATTRIBUTE_IMAGE_IMG_LVGL_LOGO\n\
-uint8_t img_lvgl_logo_map[] = {\n\
-");
-
-    printf("[%s:%i] processing %s\n", __FILE__, __LINE__, img_file_path.c_str());
-
-    std::filesystem::path img_path(img_file_path);
-    if(!std::filesystem::is_regular_file(img_file_path)) {
-        return true;
-    }
+uint8_t img_");
+        c_file_begin += img_path.stem();
+        c_file_begin += "_map[] = {\n\
+";
 
     std::filesystem::create_directory(out_dir.c_str());
     std::string c_file_path(out_dir.c_str());
@@ -85,7 +86,7 @@ uint8_t img_lvgl_logo_map[] = {\n\
 \n\
 const lv_img_dsc_t img_");
     c_file_end += img_path.stem();
-    c_file_end += "{\n\
+    c_file_end += " = {\n\
   .header.magic = LV_IMAGE_HEADER_MAGIC,\n\
   .header.cf = LV_COLOR_FORMAT_ARGB8888,\n\
   .header.flags = 0,\n\
@@ -103,7 +104,7 @@ const lv_img_dsc_t img_");
     c_file_end +=",\n\
   .data = img_";
     c_file_end += img_path.stem();
-    c_file_end +=",\n\
+    c_file_end +="_map,\n\
 };\n\
 \n\
 #endif\n\

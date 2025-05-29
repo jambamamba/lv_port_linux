@@ -18,7 +18,6 @@ METHODDEF(void) my_error_exit (j_common_ptr _cinfo) {
 }
 
 JpegHelper::~JpegHelper() {
-    jpeg_finish_decompress(&_cinfo);
     jpeg_destroy_decompress(&_cinfo);
 }
 
@@ -50,6 +49,8 @@ bool JpegHelper::readJpegFile(const char *filename) {
     _height = _cinfo.output_height;
     _stride = _cinfo.output_width * _cinfo.output_components;
 
+    printf("@@@ w:%i, h:%i, s:%i\n", _width, _height, _stride);
+
     fclose(infile);
 
     return true;
@@ -60,9 +61,10 @@ void JpegHelper::processJpegFile(std::function<bool(uint8_t *row, size_t num_byt
     JSAMPARRAY buffer = (*_cinfo.mem->alloc_sarray) ((j_common_ptr) &_cinfo, JPOOL_IMAGE, _stride, 1);
 
     while (_cinfo.output_scanline < _cinfo.output_height) {
-        jpeg_read_scanlines(&_cinfo, buffer, 1);
-        if(!scanline(buffer[_cinfo.output_scanline], _stride)){
-            break;
+        if(1 == jpeg_read_scanlines(&_cinfo, buffer, 1)) {
+            if(!scanline(buffer[0], _stride)){
+                break;
+            }
         }
     }
 }
