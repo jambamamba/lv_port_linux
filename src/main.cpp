@@ -25,14 +25,16 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "lvgl/lvgl.h"
-#include "lvgl/demos/lv_demos.h"
+#include <lvgl/lvgl.h>
+#include <lvgl/demos/lv_demos.h>
+#include <res/lv_img_dsc.h>
 
 #include "src/lib/driver_backends.h"
 #include "src/lib/simulator_util.h"
 #include "src/lib/simulator_settings.h"
 
 #include "mainwindow.h"
+
 
 /* Internal functions */
 static void configure_simulator(int argc, char **argv);

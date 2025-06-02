@@ -11,14 +11,14 @@ void ImgHelper::processImgFile(const std::string &img_file_path, std::function<b
             return scanline(row, num_bytes);
         });
     }
-    else if(_heif.readHeifFile(img_file_path.c_str())) {
-        _width = _heif.width();
-        _height = _heif.height();
-        _stride = _heif.stride();
-        _heif.processHeifFile([scanline](const uint8_t *row, size_t num_bytes){
-            return scanline(row, num_bytes);
-        });
-    }
+    // else if(_heif.readHeifFile(img_file_path.c_str())) {
+    //     _width = _heif.width();
+    //     _height = _heif.height();
+    //     _stride = _heif.stride();
+    //     _heif.processHeifFile([scanline](const uint8_t *row, size_t num_bytes){
+    //         return scanline(row, num_bytes);
+    //     });
+    // }
     else if(_jpeg.readJpegFile(img_file_path.c_str())) {
         _width = _jpeg.width();
         _height = _jpeg.height();

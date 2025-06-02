@@ -1,68 +1,57 @@
+#include <fcntl.h>
+#include <fstream>
+#include <iostream>
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <setjmp.h>
+#include <sys/stat.h>
+#include <syslog.h>
+#include <unistd.h>
 
 #include "jpeg_helper.h"
 
-struct my_error_mgr {
-    struct jpeg_error_mgr pub;
-    jmp_buf setjmp_buffer;
-};
-
-typedef struct my_error_mgr * my_error_ptr;
-
-METHODDEF(void) my_error_exit (j_common_ptr _cinfo) {
-    my_error_ptr myerr = (my_error_ptr) _cinfo->err;
-    (*_cinfo->err->output_message) (_cinfo);
-    longjmp(myerr->setjmp_buffer, 1);
-}
-
 JpegHelper::~JpegHelper() {
+    jpeg_finish_decompress(&_cinfo);
     jpeg_destroy_decompress(&_cinfo);
 }
 
 bool JpegHelper::readJpegFile(const char *filename) {
-    struct my_error_mgr jerr;
-    FILE *infile = nullptr;
 
-    _cinfo.err = jpeg_std_error(&jerr.pub);
-    jerr.pub.error_exit = my_error_exit;
-    if (setjmp(jerr.setjmp_buffer)) {
-        jpeg_destroy_decompress(&_cinfo);
-        if(infile) fclose(infile);
-        return false;
-    }
+	struct stat file_info;
+	int rc = stat(filename, &file_info);
+	if (rc) {
+		printf("No such file: %s\n", filename);
+		return false;
+	}
+	_jpg_buffer = std::make_unique<char[]>(file_info.st_size);
 
-    jpeg_create_decompress(&_cinfo);
+	std::ifstream infile(filename, std::ios::binary);
+	infile.read(_jpg_buffer.get(), file_info.st_size);
 
-    if ((infile = fopen(filename, "rb")) == NULL) {
-        fprintf(stderr, "Can't open %s\n", filename);
-        return false;
-    }
-    jpeg_stdio_src(&_cinfo, infile);
-
-    jpeg_read_header(&_cinfo, TRUE);
-
-    jpeg_start_decompress(&_cinfo);
+	_cinfo.err = jpeg_std_error(&_jerr);	
+	jpeg_create_decompress(&_cinfo);
+	jpeg_mem_src(&_cinfo, reinterpret_cast<unsigned char*>(_jpg_buffer.get()), file_info.st_size);
+	rc = jpeg_read_header(&_cinfo, TRUE);
+	if (rc != 1) {
+		printf("Not a JPEG file\n");
+		return false;
+	}
+	jpeg_start_decompress(&_cinfo);
 
     _width = _cinfo.output_width;
     _height = _cinfo.output_height;
     _stride = _cinfo.output_width * _cinfo.output_components;
-
-    printf("@@@ w:%i, h:%i, s:%i\n", _width, _height, _stride);
-
-    fclose(infile);
 
     return true;
 }
 
 void JpegHelper::processJpegFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
 
-    JSAMPARRAY buffer = (*_cinfo.mem->alloc_sarray) ((j_common_ptr) &_cinfo, JPOOL_IMAGE, _stride, 1);
-
+	unsigned char *buffer_array[1];
+    buffer_array[0] = static_cast<unsigned char *>(malloc(_stride));
     while (_cinfo.output_scanline < _cinfo.output_height) {
-        if(1 == jpeg_read_scanlines(&_cinfo, buffer, 1)) {
-            if(!scanline(buffer[0], _stride)){
+        if(1 == jpeg_read_scanlines(&_cinfo, buffer_array, 1)) {
+            if(!scanline(buffer_array[0], _stride)){
                 break;
             }
         }

@@ -127,16 +127,16 @@ set(LV_LINUX_INC src/lib)
 
 #osm#################begin
 file(GLOB IMG_FILES ${CMAKE_SOURCE_DIR}/res/*.png ${CMAKE_SOURCE_DIR}/res/*.jpg)
-set(C_IMG_FILES)
-foreach(IMG_FILE ${IMG_FILES})
-    cmake_path(GET IMG_FILE STEM IMG_FILE_STEM)
-    set(C_IMG_FILES "${C_IMG_FILES}" "${CMAKE_BINARY_DIR}/res/${IMG_FILE_STEM}.c")
-endforeach()
-set(C_IMG_FILES ${C_IMG_FILES} "${CMAKE_BINARY_DIR}/res/.success")
+set(C_IMG_FILES "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h")
+# foreach(IMG_FILE ${IMG_FILES})
+#     cmake_path(GET IMG_FILE STEM IMG_FILE_STEM)
+#     set(C_IMG_FILES "${C_IMG_FILES}" "${CMAKE_BINARY_DIR}/res/${IMG_FILE_STEM}.c")
+# endforeach()
+# set(C_IMG_FILES ${C_IMG_FILES} "${CMAKE_BINARY_DIR}/res/.success")
 #osm#################end
 
 add_subdirectory(lvgl)
-target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/lib ${PKG_CONFIG_INC})
+target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/lib ${PKG_CONFIG_INC} ${CMAKE_BINARY_DIR})
 add_library(lvgl_linux STATIC ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC})
 target_include_directories(lvgl_linux PRIVATE ${LV_LINUX_INC} ${PROJECT_SOURCE_DIR})
 
@@ -171,4 +171,3 @@ COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
 add_custom_target(lv_image_convert DEPENDS lv_image_converter ${C_IMG_FILES})
 add_dependencies(lvglsim lv_image_convert)
 #osm#################end
-
