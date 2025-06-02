@@ -126,7 +126,7 @@ file(GLOB LV_LINUX_SRC src/lib/*.c)
 set(LV_LINUX_INC src/lib)
 
 #osm#################begin
-set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h" "${CMAKE_BINARY_DIR}/res/lv_img_dsc.cpp")
+set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/lv_img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h")
 file(GLOB C_IMG_FILES ${LV_IMG_DSC_SRC} ${CMAKE_BINARY_DIR}/res/*.c)
 #osm#################end
 

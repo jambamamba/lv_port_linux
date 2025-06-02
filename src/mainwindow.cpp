@@ -33,7 +33,7 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // LV_IMAGE_DECLARE(img_lvgl_logo);
     // lv_image_set_src(logo, &img_lvgl_logo);
-    lv_image_set_src(logo, _lv_img_dsc_map.at("qtcreator.jpg"));
+    lv_image_set_src(logo, _lv_img_dsc_map.at("qt.png"));
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
     // printf("@@@ data_size:%i,%i,%i,%i\n", 
