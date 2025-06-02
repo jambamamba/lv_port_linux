@@ -27,7 +27,7 @@
 
 #include <lvgl/lvgl.h>
 #include <lvgl/demos/lv_demos.h>
-#include <res/lv_img_dsc.h>
+#include <res/img_dsc.h>
 
 #include "src/lib/driver_backends.h"
 #include "src/lib/simulator_util.h"

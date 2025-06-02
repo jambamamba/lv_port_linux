@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "chart.h"
 
-#include <res/lv_img_dsc.h>
+#include <res/img_dsc.h>
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.

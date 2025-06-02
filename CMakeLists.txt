@@ -126,8 +126,8 @@ file(GLOB LV_LINUX_SRC src/lib/*.c)
 set(LV_LINUX_INC src/lib)
 
 #osm#################begin
-set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/lv_img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h")
-file(GLOB C_IMG_FILES ${LV_IMG_DSC_SRC} ${CMAKE_BINARY_DIR}/res/*.c)
+set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/img_dsc.h")
+# file(GLOB GENERATED_FILES CONFIGURE_DEPENDS C_IMG_FILES ${LV_IMG_DSC_SRC} ${CMAKE_BINARY_DIR}/res/*.c)
 #osm#################end
 
 add_subdirectory(lvgl)
@@ -135,7 +135,7 @@ target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DI
 add_library(lvgl_linux STATIC ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC})
 target_include_directories(lvgl_linux PRIVATE ${LV_LINUX_INC} ${PROJECT_SOURCE_DIR})
 
-add_executable(lvglsim src/main.cpp src/mainwindow.cpp src/chart.cpp ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC} ${C_IMG_FILES})
+add_executable(lvglsim src/main.cpp src/mainwindow.cpp src/chart.cpp ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC} ${LV_IMG_DSC_SRC})
 target_link_libraries(lvglsim lvgl_linux lvgl lvgl::examples lvgl::demos lvgl::thorvg m pthread ${PKG_CONFIG_LIB})
 
 # Install the lvgl_linux library and its headers
