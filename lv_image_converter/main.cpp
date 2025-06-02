@@ -124,7 +124,43 @@ const lv_img_dsc_t img_");
 
     c_img_file << c_file_end;
     printf("width:%i, height:%i\n", img.width(), img.height());
-    return std::pair<std::string, std::string>(img_path.stem(), img_path_hash);
+    return std::pair<std::string, std::string>(img_path.filename(), img_path_hash);
+}
+
+void writeLvImgDscHeader(const std::string &out_dir, const std::map<std::string, std::string> &img_file_hashes) {
+    std::string c_file_path(out_dir.c_str());
+    c_file_path += "/lv_img_dsc.h";
+    std::ofstream c_img_file(c_file_path);
+    c_img_file << "#pragma once\n";
+    c_img_file << "\n";
+    c_img_file << "#include <map>\n";
+    c_img_file << "#include <string>\n";
+    c_img_file << "#include <lvgl/lvgl.h>\n";
+    c_img_file << "\n";
+
+    for(const auto &[img_file_name, img_path_hash] : img_file_hashes) {
+        c_img_file << "extern const lv_img_dsc_t img_" << img_path_hash << ";\n";
+    }
+    c_img_file << "\n";
+    c_img_file << "extern const std::map<std::string, const lv_img_dsc_t*> _lv_img_dsc_map;\n";
+}
+void writeLvImgDscCpp(const std::string &out_dir, const std::map<std::string, std::string> &img_file_hashes) {
+    std::string c_file_path(out_dir.c_str());
+    c_file_path += "/lv_img_dsc.cpp";
+    std::ofstream c_img_file(c_file_path);
+    c_img_file << "#include <lvgl/lvgl.h>\n";
+    c_img_file << "#include <res/lv_img_dsc.h>\n";
+    c_img_file << "\n";
+    c_img_file << "const std::map<std::string, const lv_img_dsc_t*> _lv_img_dsc_map = {\n";
+    int idx = 0;
+    for(const auto &[img_file_name, img_path_hash] : img_file_hashes) {
+        if(idx > 0) {
+            c_img_file << ",";
+        }
+        c_img_file << "{\"" << img_file_name << "\", &img_" << img_path_hash << "}\n";
+        ++idx;
+    }
+    c_img_file << "};\n";
 }
 }//namespace
 
@@ -151,18 +187,8 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    std::string c_file_path(argv[2]);
-    c_file_path += "/lv_img_dsc.h";
-    std::ofstream c_img_file(c_file_path);
-    c_img_file << "#pragma once\n";
-    c_img_file << "\n";
-    c_img_file << "#include \"lvgl/lvgl.h\"\n";
-    c_img_file << "\n";
+    writeLvImgDscHeader(argv[2], img_file_hashes);
+    writeLvImgDscCpp(argv[2], img_file_hashes);
 
-    for(const auto &[img_path_stem, img_path_hash] : img_file_hashes) {
-        c_img_file << "extern const lv_img_dsc_t img_" << img_path_hash << ";\n";
-    }
-    c_img_file << "\n";
-    printf("@@@@ c_file_path:%s\n", c_file_path.c_str());
     return 0;
 }

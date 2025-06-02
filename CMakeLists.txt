@@ -126,13 +126,8 @@ file(GLOB LV_LINUX_SRC src/lib/*.c)
 set(LV_LINUX_INC src/lib)
 
 #osm#################begin
-file(GLOB IMG_FILES ${CMAKE_SOURCE_DIR}/res/*.png ${CMAKE_SOURCE_DIR}/res/*.jpg)
-set(C_IMG_FILES "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h")
-# foreach(IMG_FILE ${IMG_FILES})
-#     cmake_path(GET IMG_FILE STEM IMG_FILE_STEM)
-#     set(C_IMG_FILES "${C_IMG_FILES}" "${CMAKE_BINARY_DIR}/res/${IMG_FILE_STEM}.c")
-# endforeach()
-# set(C_IMG_FILES ${C_IMG_FILES} "${CMAKE_BINARY_DIR}/res/.success")
+set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/lv_img_dsc.h" "${CMAKE_BINARY_DIR}/res/lv_img_dsc.cpp")
+file(GLOB C_IMG_FILES ${LV_IMG_DSC_SRC} ${CMAKE_BINARY_DIR}/res/*.c)
 #osm#################end
 
 add_subdirectory(lvgl)
@@ -158,7 +153,7 @@ add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim
 
 #osm#################begin
 add_subdirectory(lv_image_converter)
-add_custom_command(OUTPUT ${C_IMG_FILES}
+add_custom_command(OUTPUT ${LV_IMG_DSC_SRC}
 COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
 COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
   COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res"
@@ -168,6 +163,6 @@ COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
   COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
   VERBATIM
 )
-add_custom_target(lv_image_convert DEPENDS lv_image_converter ${C_IMG_FILES})
+add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
 add_dependencies(lvglsim lv_image_convert)
 #osm#################end

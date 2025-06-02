@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "chart.h"
 
+#include <res/lv_img_dsc.h>
+
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
@@ -29,15 +31,16 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
     lv_obj_t *logo = lv_image_create(tab_bar);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    LV_IMAGE_DECLARE(img_lvgl_logo);
-    lv_image_set_src(logo, &img_lvgl_logo);
+    // LV_IMAGE_DECLARE(img_lvgl_logo);
+    // lv_image_set_src(logo, &img_lvgl_logo);
+    lv_image_set_src(logo, _lv_img_dsc_map.at("qtcreator.jpg"));
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
-    printf("@@@ data_size:%i,%i,%i,%i\n", 
-      img_lvgl_logo.data_size,
-      img_lvgl_logo.header.w,
-      img_lvgl_logo.header.stride,
-      img_lvgl_logo.header.h);
+    // printf("@@@ data_size:%i,%i,%i,%i\n", 
+    //   img_lvgl_logo.data_size,
+    //   img_lvgl_logo.header.w,
+    //   img_lvgl_logo.header.stride,
+    //   img_lvgl_logo.header.h);
 
     lv_style_init(&_style_title);
     lv_style_set_text_font(&_style_title, font_large);

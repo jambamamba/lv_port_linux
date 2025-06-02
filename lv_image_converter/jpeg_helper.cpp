@@ -11,7 +11,7 @@
 #include "jpeg_helper.h"
 
 JpegHelper::~JpegHelper() {
-    jpeg_finish_decompress(&_cinfo);
+    // jpeg_finish_decompress(&_cinfo);
     jpeg_destroy_decompress(&_cinfo);
 }
 

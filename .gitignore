@@ -61,4 +61,5 @@ x86-build
 .vscode
 lv_image_converter/build
 lv_image_converter/libpng
-.res
+qtcreator.jpg
+qt.png
