@@ -119,7 +119,7 @@ bool PngHelper::readPngFile(
   _width      = png_get_image_width(png, info);
   _height     = png_get_image_height(png, info);
   _bitdepth   = png_get_bit_depth(png, info);
-  png_byte color_type = png_get_color_type(png, info);
+  _color_type = png_get_color_type(png, info);
 
   // Read any color_type into 8bit depth, RGBA format.
   // See http://www.libpng.org/pub/png/libpng-manual.txt
@@ -128,12 +128,12 @@ bool PngHelper::readPngFile(
   //   png_set_strip_16(png);
   //   }
 
-  if(color_type == PNG_COLOR_TYPE_PALETTE) {
+  if(_color_type == PNG_COLOR_TYPE_PALETTE) {
     png_set_palette_to_rgb(png);
   }
 
   // PNG_COLOR_TYPE_GRAY_ALPHA is always 8 or 16bit depth.
-  if(color_type == PNG_COLOR_TYPE_GRAY && _bitdepth < 8) {
+  if(_color_type == PNG_COLOR_TYPE_GRAY && _bitdepth < 8) {
     png_set_expand_gray_1_2_4_to_8(png);
   }
 
@@ -142,14 +142,14 @@ bool PngHelper::readPngFile(
   }
 
   // These color_type don't have an alpha channel then fill it with 0xff.
-  if(color_type == PNG_COLOR_TYPE_RGB ||
-     color_type == PNG_COLOR_TYPE_GRAY ||
-     color_type == PNG_COLOR_TYPE_PALETTE) {
+  if(_color_type == PNG_COLOR_TYPE_RGB ||
+     _color_type == PNG_COLOR_TYPE_GRAY ||
+     _color_type == PNG_COLOR_TYPE_PALETTE) {
     png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
   }
 
-  if(color_type == PNG_COLOR_TYPE_GRAY ||
-     color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+  if(_color_type == PNG_COLOR_TYPE_GRAY ||
+     _color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
     png_set_gray_to_rgb(png);
   }
 
@@ -324,9 +324,22 @@ PngHelper PngHelper::convertTo64bpp(const std::string &filename) {
 void PngHelper::processPngFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
   for(int y = 0; y < _height; y++) {
     png_bytep row = _row_pointers[y];
-      if(!scanline(row, _stride)){
-        break;
-      }
+    for(int i = 0; i < _stride; i+=4) {//_color_type:PNG_COLOR_TYPE_RGBA
+        uint8_t red = row[i+0];//red
+        uint8_t green = row[i+1];//green
+        uint8_t blue = row[i+2];//blue
+        uint8_t alpha = row[i+3];//alpha
+        // if(i+3 == _stride-1) {
+        // printf("@@@ %x,%x,%x,%x\n", row[i], row[i+1], row[i+2], row[i+3]);
+        // }
+        row[i+0] = alpha;
+        row[i+1] = red;
+        row[i+2] = green;
+        row[i+3] = blue;
+    }
+    if(!scanline(row, _stride)){
+      break;
+    }
   }
 }
 

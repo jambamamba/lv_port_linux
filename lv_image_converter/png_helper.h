@@ -15,6 +15,7 @@ class PngHelper {
     int _stride;
     int _bitdepth;
     int _channels;
+    png_byte _color_type;
     uint8_t**_row_pointers = NULL;
 
     public:

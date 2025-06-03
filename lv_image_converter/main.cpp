@@ -63,7 +63,6 @@ uint8_t img_");
         }
         return true;
     });
-
     std::string c_file_end("\n\
 };\n\
 \n\
@@ -116,6 +115,9 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
     c_img_filestream << "const std::map<std::string, const lv_img_dsc_t*> _lv_img_dsc_map = {\n";
     int idx = 0;
     for(const auto &[img_file_name, img_path_hash] : img_file_hashes) {
+        if(img_file_name.empty()) {
+            continue;
+        }
         if(idx > 0) {
             c_img_filestream << ",";
         }
