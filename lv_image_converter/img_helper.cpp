@@ -23,9 +23,11 @@ void ImgHelper::processImgFile(const std::string &img_file_path, std::function<b
         _width = _jpeg.width();
         _height = _jpeg.height();
         _stride = _jpeg.stride();
+    	// printf("@@@[%s:%i] w:%i,h:%i,s:%i,bpp:%i\n", __FILE__, __LINE__, _width, _height, _stride, _stride/_width);
+        // exit(-1);
         _jpeg.processJpegFile([scanline](const uint8_t *row, size_t num_bytes){
             return scanline(row, num_bytes);
-        });
+            });
     }
     else {
         printf("Not a jpeg or png or heif, ignoring file!\n");

@@ -24,7 +24,7 @@ bool iterateDirectory(const std::string &base_path,
     return true;
 }
 
-std::string sha256(const std::string &input_str) {
+std::string sha256sum(const std::string &input_str) {
     unsigned char hash[SHA256_DIGEST_LENGTH] = {0};
     const unsigned char* data = (const unsigned char*)input_str.c_str();
     SHA256(data, input_str.size(), hash);
@@ -41,13 +41,15 @@ std::pair<std::string, std::string> generateCImgFile(std::ofstream &c_img_filest
     if(!std::filesystem::is_regular_file(img_file_path)) {
         return std::pair<std::string, std::string>("","");
     }
-    std::string img_path_hash = sha256(img_path.stem());
+    std::string img_path_hash = sha256sum(img_path.filename());
     printf("[%s:%i] processing %s, hash:%s\n", __FILE__, __LINE__, img_file_path.c_str(), img_path_hash.c_str());
 
-    std::string c_file_begin("\n\
+    std::string c_file_begin("\n//");
+    c_file_begin += img_path.filename();
+    c_file_begin += "\n\
 static const\n\
 LV_ATTRIBUTE_MEM_ALIGN LV_ATTRIBUTE_LARGE_CONST\n\
-uint8_t img_");
+uint8_t img_";
         c_file_begin += img_path_hash;
         c_file_begin += "_map[] = {\n\
 ";
@@ -63,15 +65,30 @@ uint8_t img_");
         }
         return true;
     });
+    int bpp = img.stride()/img.width();
+    std::string color_format;
+    switch(bpp) {
+        case 4: color_format = "LV_COLOR_FORMAT_ARGB8888"; break;
+        case 3: color_format = "LV_COLOR_FORMAT_RGB888"; break;
+        default: printf("invalid bpp, color format could not be determined from bpp:%i\n", bpp); exit(-1);
+    }
+    // printf("@@@[%s:%i] w:%i,h:%i,s:%i,bpp:%i,cf:%s\n", __FILE__, __LINE__, img.width(), img.height(), img.stride(), bpp, color_format.c_str());
+    // exit(-1);
+
     std::string c_file_end("\n\
 };\n\
 \n\
-static const lv_img_dsc_t img_");
+//");
+    c_file_end += img_path.filename();
+    c_file_end += "\n\
+static const lv_img_dsc_t img_";
     c_file_end += img_path_hash;
     c_file_end += " = {\n\
   .header = { \n\
     .magic = LV_IMAGE_HEADER_MAGIC,\n\
-    .cf = LV_COLOR_FORMAT_ARGB8888,\n\
+    .cf = ";
+    c_file_end += color_format;
+    c_file_end += ",\n\
     .flags = 0,\n\
     .w = ";
     c_file_end += std::to_string(img.width());
@@ -91,7 +108,6 @@ static const lv_img_dsc_t img_");
 };\n\
 \n\
 ";
-
     c_img_filestream << c_file_end;
     printf("width:%i, height:%i\n", img.width(), img.height());
     return std::pair<std::string, std::string>(img_path.filename(), img_path_hash);
@@ -118,7 +134,10 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
         if(img_file_name.empty()) {
             continue;
         }
-        if(idx > 0) {
+        if(idx == 0) {
+            c_img_filestream << " ";
+        } 
+        else {
             c_img_filestream << ",";
         }
         c_img_filestream << "{\"" << img_file_name << "\", &img_" << img_path_hash << "}\n";

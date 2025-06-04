@@ -325,17 +325,17 @@ void PngHelper::processPngFile(std::function<bool(const uint8_t *row, size_t num
   for(int y = 0; y < _height; y++) {
     png_bytep row = _row_pointers[y];
     for(int i = 0; i < _stride; i+=4) {//_color_type:PNG_COLOR_TYPE_RGBA
-        uint8_t red = row[i+0];//red
-        uint8_t green = row[i+1];//green
-        uint8_t blue = row[i+2];//blue
-        uint8_t alpha = row[i+3];//alpha
+        uint8_t red = row[i+0];
+        uint8_t green = row[i+1];
+        uint8_t blue = row[i+2];
+        uint8_t alpha = row[i+3];
         // if(i+3 == _stride-1) {
         // printf("@@@ %x,%x,%x,%x\n", row[i], row[i+1], row[i+2], row[i+3]);
         // }
-        row[i+0] = alpha;
-        row[i+1] = red;
-        row[i+2] = green;
-        row[i+3] = blue;
+        row[i+0] = blue;
+        row[i+1] = green;
+        row[i+2] = red;
+        row[i+3] = alpha;
     }
     if(!scanline(row, _stride)){
       break;

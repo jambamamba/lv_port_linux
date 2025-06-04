@@ -42,20 +42,33 @@ bool JpegHelper::readJpegFile(const char *filename) {
     _height = _cinfo.output_height;
     _stride = _cinfo.output_width * _cinfo.output_components;
 
+	// printf("@@@ w:%i,h:%i,s:%i,bpp:%i\n", _width, _height, _stride, _stride/_width);
+
     return true;
 }
 
 void JpegHelper::processJpegFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
 
-	unsigned char *buffer_array[1];
-    buffer_array[0] = static_cast<unsigned char *>(malloc(_stride));
+    unsigned char *row = static_cast<unsigned char *>(malloc(_stride));
+	unsigned char *rows[1];
+	rows[0] = row;
     while (_cinfo.output_scanline < _cinfo.output_height) {
-        if(1 == jpeg_read_scanlines(&_cinfo, buffer_array, 1)) {
-            if(!scanline(buffer_array[0], _stride)){
+        if(1 == jpeg_read_scanlines(&_cinfo, rows, 1)) {
+		    for(int i = 0; i < _stride; i+=_cinfo.output_components) {//_color_type:RGB
+				uint8_t red = row[i+0];
+				uint8_t green = row[i+1];
+				uint8_t blue = row[i+2];
+				row[i+0]=blue;
+				row[i+1]=green;
+				row[i+2]=red;
+			}
+            if(!scanline(row, _stride)){
                 break;
             }
         }
     }
+	// free(row);
+	free(rows[0]);
 }
 
 int JpegHelper::width() const{

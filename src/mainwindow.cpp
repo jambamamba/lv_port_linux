@@ -14,7 +14,7 @@ typedef enum {
 } disp_size_t;
 
 LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string> &tab_titles){
-    constexpr int32_t tab_h = 72;
+    constexpr int32_t tab_h = 75;
     _tab_view = lv_tabview_create(lv_screen_active());
     lv_tabview_set_tab_bar_size(_tab_view, tab_h);
     lv_obj_add_event_cb(_tab_view, TabViewDeleteEventCb, LV_EVENT_DELETE, this);
