@@ -14,7 +14,8 @@ void addChart();
 
 class LeleTabView {
   public:
-  LeleTabView(const std::string &title = "TabView", const std::vector<std::string> &tab_titles = {"Tab1", "Tab2", "Tab3"});
+  LeleTabView(const std::string &title = "TabView", const std::vector<std::string> &tab_titles = {"Tab0", "Tab1", "Tab2"});
+  lv_obj_t *obj() const { return _tab_view; }
   std::vector<lv_obj_t*> _tabs;
 
   protected:
@@ -26,7 +27,8 @@ class LeleTabView {
 
 class LeleLabel {
   public:
-  LeleLabel(const char *text, lv_obj_t *parent = lv_screen_active(), int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
+  LeleLabel(const char *text, lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
+  lv_obj_t *obj() const { return _text_box; }
   protected:
   lv_style_t _style;
   lv_obj_t *_text_box = nullptr;
@@ -35,8 +37,10 @@ class LeleLabel {
 
 class LeleTextBox {
   public:
-  LeleTextBox(const std::string &text = "Textbox", lv_obj_t *parent = lv_screen_active());
+  LeleTextBox(const std::string &text = "Textbox", lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
+  lv_obj_t *obj() const { return _text_area; }
   protected:
+  lv_style_t _style;
   lv_obj_t *_text_area = nullptr;
 
   static void TextAreaEventCallback(lv_event_t * e);

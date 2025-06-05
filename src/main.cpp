@@ -163,10 +163,11 @@ int main(int argc, char **argv)
     // addProgressBar();
     // addChart();
     LeleTabView tab_view;
-    LeleLabel label1("Label", tab_view._tabs.at(0));
-    LeleTextBox text_box("Textbox", tab_view._tabs.at(1));
-    
+    LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
+    LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
 
+    LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
+    
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();
 

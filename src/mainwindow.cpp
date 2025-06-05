@@ -50,14 +50,12 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
-    label = lv_label_create(tab_bar);
-    lv_label_set_text_static(label, title.c_str());
-    lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
-
     lv_style_init(&_style_text_muted);
     lv_style_set_text_opa(&_style_text_muted, LV_OPA_50);
-
+    label = lv_label_create(tab_bar);
     lv_obj_add_style(label, &_style_text_muted, 0);
+    lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_label_set_text_static(label, title.c_str());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 }
 
@@ -71,30 +69,43 @@ void LeleTabView::TabViewDeleteEventCb(lv_event_t * e) {
     }
 }
 
-LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int width, int height, int corner_radius) {
+LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
-    lv_style_set_width(&_style, 500);
-    lv_style_set_height(&_style, LV_SIZE_CONTENT);
+    lv_style_set_width(&_style, width);
+    lv_style_set_height(&_style, height);
     lv_style_set_pad_ver(&_style, 20);
     lv_style_set_pad_left(&_style, 5);
-    lv_style_set_x(&_style, lv_pct(10));
-    lv_style_set_y(&_style, 70);
+    lv_style_set_x(&_style, lv_pct(x));
+    lv_style_set_y(&_style, y);
 
     lv_obj_t *obj = lv_obj_create(parent);
+    lv_obj_set_pos(obj, x, y);
     lv_obj_add_style(obj, &_style, 0);
 
     _text_box = lv_label_create(obj);
     lv_label_set_text(_text_box, text);
 }
 
-LeleTextBox::LeleTextBox(const std::string &text, lv_obj_t *parent) {
+LeleTextBox::LeleTextBox(const std::string &text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
+    lv_style_init(&_style);
+    lv_style_set_radius(&_style, corner_radius);
+    lv_style_set_width(&_style, width);
+    lv_style_set_height(&_style, height);
+    lv_style_set_pad_ver(&_style, 20);
+    lv_style_set_pad_left(&_style, 5);
+    lv_style_set_x(&_style, lv_pct(x));
+    lv_style_set_y(&_style, y);
+
     _text_area = lv_textarea_create(parent);
+    lv_obj_add_style(_text_area, &_style, 0);
+    lv_obj_set_pos(_text_area, x, y);
+
     lv_textarea_set_text(_text_area, text.c_str());
-    lv_obj_align(_text_area, LV_ALIGN_TOP_MID, 0, 78);
-    lv_obj_set_size(_text_area, 330, 42);
-    lv_textarea_set_max_length(_text_area, 15);
+    // lv_obj_align(_text_area, LV_ALIGN_TOP_MID, x, y);
+    // lv_obj_set_size(_text_area, width, height);
     lv_textarea_set_text_selection(_text_area, true);
+    lv_textarea_set_max_length(_text_area, 15);
     lv_textarea_set_one_line(_text_area, true);
     lv_obj_add_event_cb(_text_area, TextAreaEventCallback, LV_EVENT_CLICKED, _text_area);//also triggered when Enter key is pressed
 }
