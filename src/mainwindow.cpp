@@ -31,31 +31,23 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
     lv_obj_t *logo = lv_image_create(tab_bar);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    // LV_IMAGE_DECLARE(img_lvgl_logo);
-    // lv_image_set_src(logo, &img_lvgl_logo);
     lv_image_set_src(logo, _lv_img_dsc_map.at("logo.jpg"));
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
-    // printf("@@@ data_size:%i,%i,%i,%i\n", 
-    //   img_lvgl_logo.data_size,
-    //   img_lvgl_logo.header.w,
-    //   img_lvgl_logo.header.stride,
-    //   img_lvgl_logo.header.h);
-
+    lv_obj_t *label = lv_label_create(tab_bar);
     lv_style_init(&_style_title);
     lv_style_set_text_font(&_style_title, font_large);
-    lv_obj_t * label = lv_label_create(tab_bar);
     lv_obj_add_style(label, &_style_title, 0);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
+    label = lv_label_create(tab_bar);
     lv_style_init(&_style_text_muted);
     lv_style_set_text_opa(&_style_text_muted, LV_OPA_50);
-    label = lv_label_create(tab_bar);
     lv_obj_add_style(label, &_style_text_muted, 0);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_label_set_text_static(label, title.c_str());
+    lv_label_set_text(label, title.c_str());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 }
 

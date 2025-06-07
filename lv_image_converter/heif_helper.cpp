@@ -14,8 +14,10 @@ HeifHelper::~HeifHelper(){
 bool HeifHelper::readHeifFile(const char *filename){
     resetCtx(_ctx);
     _ctx = heif_context_alloc();
-    heif_context_read_from_file(_ctx, filename, nullptr);
+    struct heif_error ret = heif_context_read_from_file(_ctx, filename, nullptr);
+    return ret.code == heif_error_Ok;
 }
+
 void HeifHelper::processHeifFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline){
     if(!_ctx) {
         return;

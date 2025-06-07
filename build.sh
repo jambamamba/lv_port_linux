@@ -15,8 +15,8 @@ function main() {
 
     mkdir -p x86-build
     pushd x86-build
-    cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
-    make -j
+    cmake -G Ninja -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=RelWithDebugInfo ..
+    ninja
     popd
 
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
