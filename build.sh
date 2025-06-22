@@ -13,9 +13,10 @@ function main() {
 	wayland-scanner client-header "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml" "wl_protocols/wayland_xdg_shell.h"
 	wayland-scanner private-code "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml" "wl_protocols/wayland_xdg_shell.c"
 
+    local cwd=$(pwd)
     mkdir -p x86-build
     pushd x86-build
-    cmake -G Ninja -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=RelWithDebugInfo ..
+    cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=RelWithDebugInfo ..
     ninja
     popd
 

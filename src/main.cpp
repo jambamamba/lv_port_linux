@@ -25,6 +25,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <debug_logger/debug_logger.h>
 #include <lvgl/lvgl.h>
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
@@ -128,6 +129,7 @@ static void configure_simulator(int argc, char **argv)
     }
 }
 
+
 /**
  * @brief entry point
  * @description start a demo
@@ -136,6 +138,10 @@ static void configure_simulator(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
+    LOG_INIT("/tmp");
+    LOG_CATEGORY(LVSIM, "LVSIM");
+
+    LOG(DEBUG, LVSIM, "configure simulator\n");
     configure_simulator(argc, argv);
 
     /* Initialize LVGL. */
@@ -162,6 +168,7 @@ int main(int argc, char **argv)
     // addLoaderArc();
     // addProgressBar();
     // addChart();
+    LOG(DEBUG, LVSIM, "create tab view\n");
     LeleTabView tab_view;
     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
     LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
