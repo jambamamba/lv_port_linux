@@ -26,6 +26,8 @@
 #include <ctype.h>
 
 #include <debug_logger/debug_logger.h>
+#include <json_utils/json_utils.h>
+
 #include <lvgl/lvgl.h>
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
@@ -169,6 +171,9 @@ int main(int argc, char **argv)
     // addProgressBar();
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
+
+    cJSON* cjson = readJson("data_json_file.json");
+
     LeleTabView tab_view;
     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
     LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
