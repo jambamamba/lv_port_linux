@@ -46,7 +46,7 @@ extern simulator_settings_t settings;
 namespace {
 std::vector<std::string> tabTitlesFromJsonConfig() {
     std::vector<std::string> tab_titles;
-    const char *config_json = "/repos/lv_port_linux/src/config.json";
+    const char *config_json = "config.json";
     const cJSON* root = readJson(config_json);
     if(!root) {
         LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json);
