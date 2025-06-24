@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <filesystem>
 
 #include <debug_logger/debug_logger.h>
 #include <json_utils/json_utils.h>
@@ -46,18 +47,19 @@ extern simulator_settings_t settings;
 namespace {
 std::vector<std::string> tabTitlesFromJsonConfig() {
     std::vector<std::string> tab_titles;
-    const char *config_json = "config.json";
-    const cJSON* root = readJson(config_json);
+    std::string config_json(std::filesystem::current_path());
+    config_json += "/config.json";
+    const cJSON* root = readJson(config_json.c_str());
     if(!root) {
-        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json);
+        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
     }
     const cJSON *tabview = objFromJson(root, "tabview");
     if(!tabview) {
-        LOG(FATAL, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json);
+        LOG(FATAL, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
     }
     const cJSON *tabs = objFromJson(tabview, "tabs");
     if(!tabs) {
-        LOG(FATAL, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json);
+        LOG(FATAL, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json.c_str());
     }
     if(cJSON_IsArray(tabs)) {
         cJSON *array = nullptr;

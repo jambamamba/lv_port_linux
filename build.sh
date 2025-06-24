@@ -22,7 +22,9 @@ function main() {
 
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
-    ./x86-build/bin/lvglsim
+    pushd x86-build/bin
+    ./lvglsim
+    popd
 }
 
 # function buildImageConverter() {

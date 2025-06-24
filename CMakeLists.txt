@@ -162,6 +162,7 @@ install(TARGETS lvgl_linux
     ARCHIVE DESTINATION lib
 )
 
+file(COPY "src/config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin")
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
 #osm#################begin
