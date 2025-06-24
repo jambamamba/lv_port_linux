@@ -38,19 +38,49 @@
 
 #include "mainwindow.h"
 
+LOG_CATEGORY(LVSIM, "LVSIM");
+
+/* Global simulator settings, defined in lv_linux_backend.c */
+extern simulator_settings_t settings;
+
+namespace {
+std::vector<std::string> tabTitlesFromJsonConfig() {
+    std::vector<std::string> tab_titles;
+    const char *config_json = "/repos/lv_port_linux/src/config.json";
+    const cJSON* root = readJson(config_json);
+    if(!root) {
+        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json);
+    }
+    const cJSON *tabview = objFromJson(root, "tabview");
+    if(!tabview) {
+        LOG(FATAL, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json);
+    }
+    const cJSON *tabs = objFromJson(tabview, "tabs");
+    if(!tabs) {
+        LOG(FATAL, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json);
+    }
+    if(cJSON_IsArray(tabs)) {
+        cJSON *array = nullptr;
+        cJSON_ArrayForEach(array, tabs) {
+            cJSON *item = nullptr;
+            cJSON_ArrayForEach(item, array) {
+                LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
+                if(strcmp(item->string, "name") == 0) {
+                    tab_titles.emplace_back(item->valuestring);
+                }
+            }
+        }
+    }
+    return tab_titles;
+}
 
 /* Internal functions */
-static void configure_simulator(int argc, char **argv);
 static void print_lvgl_version(void);
 static void print_usage(void);
 
 /* contains the name of the selected backend if user
  * has specified one on the command line */
 static char *selected_backend;
-
-/* Global simulator settings, defined in lv_linux_backend.c */
-extern simulator_settings_t settings;
-
 
 /**
  * @brief Print LVGL version
@@ -81,7 +111,7 @@ static void print_usage(void)
  * @param argc the count of arguments in argv
  * @param argv The arguments
  */
-static void configure_simulator(int argc, char **argv)
+static void configureSimulator(int argc, char **argv)
 {
     int opt = 0;
     char *backend_name;
@@ -130,7 +160,7 @@ static void configure_simulator(int argc, char **argv)
         }
     }
 }
-
+}//namespace
 
 /**
  * @brief entry point
@@ -141,10 +171,9 @@ static void configure_simulator(int argc, char **argv)
 int main(int argc, char **argv)
 {
     LOG_INIT("/tmp");
-    LOG_CATEGORY(LVSIM, "LVSIM");
 
     LOG(DEBUG, LVSIM, "configure simulator\n");
-    configure_simulator(argc, argv);
+    configureSimulator(argc, argv);
 
     /* Initialize LVGL. */
     lv_init();
@@ -172,16 +201,18 @@ int main(int argc, char **argv)
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
 
-    cJSON* cjson = readJson("data_json_file.json");
-
-    LeleTabView tab_view;
-    LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
-    LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
-
-    LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
+    std::vector<std::string> tab_titles = tabTitlesFromJsonConfig();
+    if(tab_titles.size() > 0) {
+        LeleTabView tab_view("tabview", tab_titles);
+        LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
+        LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
+        LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
+    }
     
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();
 
     return 0;
 }
+
+

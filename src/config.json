@@ -1,0 +1,11 @@
+{
+    "tabview":{
+        "name":"tabview",
+        "tabs":[
+            {"name":"tab0"},
+            {"name":"tab1"},
+            {"name":"tab2"},
+            {"name":"tab3"}
+        ]
+    }
+}
