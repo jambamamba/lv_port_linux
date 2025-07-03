@@ -11,7 +11,7 @@ class ImgHelper {
 
     public:
     ~ImgHelper();
-    void processImgFile(const std::string &img_file_path, std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
+    bool processImgFile(const std::string &img_file_path, std::function<bool(const uint8_t *row, size_t num_bytes)> scanline);
     int width() const;
     int height() const;
     size_t stride() const;
@@ -20,7 +20,7 @@ class ImgHelper {
     PngHelper _png;
     JpegHelper _jpeg;
     HeifHelper _heif;
-    int _width;
-    int _height;
-    int _stride;
+    int _width = 0;
+    int _height = 0;
+    int _stride = 0;
 };

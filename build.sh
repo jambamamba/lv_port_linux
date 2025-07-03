@@ -1,6 +1,9 @@
 #!/bin/bash
 set -xe
 
+source share/pins.txt
+source share/scripts/helper-functions.sh
+
 function main() {
 #    sudo apt-get install -y \
 #        libevdev-dev \
@@ -8,6 +11,9 @@ function main() {
 #        libxkbcommon-dev \
 #        libwayland-bin \
 #        wayland-protocols
+
+    local deps=(zlib debug_logger json_utils curl libssh2 utils)
+    installDeps $@ deps depsdir="/usr/local"
 
 	mkdir -p wl_protocols
 	wayland-scanner client-header "/usr/share/wayland-protocols/stable/xdg-shell/xdg-shell.xml" "wl_protocols/wayland_xdg_shell.h"

@@ -28,12 +28,22 @@ bool JpegHelper::readJpegFile(const char *filename) {
 	std::ifstream infile(filename, std::ios::binary);
 	infile.read(_jpg_buffer.get(), file_info.st_size);
 
+	const uint8_t* raw = reinterpret_cast<const uint8_t*>(_jpg_buffer.get());
+	if(!(raw[0] == 0xff && raw[1] == 0xd8 && raw[2] == 0xff && raw[3] == 0xe0 &&
+		raw[6] == 0x4a && raw[7] == 0x46 && raw[8] == 0x49 && raw[9] == 0x46)){
+		printf("Not a JPEG file: Missing JPEG markers\n");
+		// printf("0x%02x 0x%02x 0x%02x 0x%02x - 0x%02x 0x%02x 0x%02x 0x%02x\n",
+		// 	raw[0], raw[1], raw[2], raw[3], 
+		// 	raw[6], raw[7], raw[8], raw[9]);
+		return false;
+	}
+
 	_cinfo.err = jpeg_std_error(&_jerr);	
 	jpeg_create_decompress(&_cinfo);
 	jpeg_mem_src(&_cinfo, reinterpret_cast<unsigned char*>(_jpg_buffer.get()), file_info.st_size);
 	rc = jpeg_read_header(&_cinfo, TRUE);
 	if (rc != 1) {
-		printf("Not a JPEG file\n");
+		printf("libjpeg error: Not a JPEG file\n");
 		return false;
 	}
 	jpeg_start_decompress(&_cinfo);

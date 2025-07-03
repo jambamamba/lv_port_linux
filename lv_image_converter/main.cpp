@@ -9,6 +9,7 @@
 #include <string>
 #include <map>
 #include <openssl/sha.h>
+#include <optional>
 
 #include "img_helper.h"
 
@@ -35,11 +36,11 @@ std::string sha256sum(const std::string &input_str) {
     return ss.str();
 }
 
-std::pair<std::string, std::string> generateCImgFile(std::ofstream &c_img_filestream, const std::string &img_file_path) {
+std::optional<std::pair<std::string, std::string>> generateCImgFile(std::ofstream &c_img_filestream, const std::string &img_file_path) {
 
     std::filesystem::path img_path(img_file_path);
     if(!std::filesystem::is_regular_file(img_file_path)) {
-        return std::pair<std::string, std::string>("","");
+        return std::nullopt;
     }
     std::string img_path_hash = sha256sum(img_path.filename());
     printf("[%s:%i] processing %s, hash:%s\n", __FILE__, __LINE__, img_file_path.c_str(), img_path_hash.c_str());
@@ -53,18 +54,23 @@ uint8_t img_";
         c_file_begin += img_path_hash;
         c_file_begin += "_map[] = {\n\
 ";
-    c_img_filestream << c_file_begin;
 
+    std::string c_file_scanlines;
     ImgHelper img;
-    img.processImgFile(img_file_path, [&c_img_filestream](const uint8_t *row, size_t num_bytes){
+    if(!img.processImgFile(img_file_path, [&c_file_scanlines](const uint8_t *row, size_t num_bytes){
 
-        const char index[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+        const std::string index[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
         for(size_t col = 0; col < num_bytes; ++col) {
             uint8_t byte = row[col];
-            c_img_filestream << "0x" << index[((byte & 0xf0) >> 4)] << index[((byte & 0x0f))] << ",";
+            c_file_scanlines += "0x";
+            c_file_scanlines += index[((byte & 0xf0) >> 4)];
+            c_file_scanlines += index[((byte & 0x0f))];
+            c_file_scanlines += ",";
         }
         return true;
-    });
+    })) {
+        return std::nullopt;
+    }
     int bpp = img.stride()/img.width();
     std::string color_format;
     switch(bpp) {
@@ -108,6 +114,8 @@ static const lv_img_dsc_t img_";
 };\n\
 \n\
 ";
+    c_img_filestream << c_file_begin;
+    c_img_filestream << c_file_scanlines;
     c_img_filestream << c_file_end;
     printf("width:%i, height:%i\n", img.width(), img.height());
     return std::pair<std::string, std::string>(img_path.filename(), img_path_hash);
@@ -148,7 +156,6 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
 }//namespace
 
 int main(int argc, char **argv) {
-    printf("hello \n");
     if(argc < 3) {
         printf("syntax: ./lv_image_converter /input/dir /output/dir #where /input/dir can contain png or jpg files\n");
         return -1;
@@ -170,11 +177,17 @@ int main(int argc, char **argv) {
 
     std::map<std::string, std::string> img_file_hashes;
     if(std::filesystem::is_regular_file(path)) {
-        img_file_hashes.insert(generateCImgFile(c_img_filestream, argv[1]));
+        auto res = generateCImgFile(c_img_filestream, argv[1]);
+        if(res) {
+            img_file_hashes.insert(res.value());
+        }
     }
     else if(std::filesystem::is_directory(path)) {
         iterateDirectory(argv[1], [&c_img_filestream, &img_file_hashes](const std::string &filename){
-            img_file_hashes.insert(generateCImgFile(c_img_filestream, filename));
+            auto res = generateCImgFile(c_img_filestream, filename);
+            if(res) {
+                img_file_hashes.insert(res.value());
+            }
             return true;
         });
     }
@@ -182,6 +195,11 @@ int main(int argc, char **argv) {
         printf("bad path:%s\n", argv[1]);
         return -1;
     }
+
+    // printf("@@@ img_file_hashes.size:%li\n", img_file_hashes.size());
+    // for(const auto &[filename, filehash] : img_file_hashes) {
+    //     printf("@@@ %s\n", filename.c_str());
+    // }
 
     writeLvImgDscHeader(argv[2], img_file_hashes);
     writeLvImgDscCpp(c_img_filestream, img_file_hashes);
