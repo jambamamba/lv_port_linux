@@ -142,3 +142,4 @@ static void run_loop_wayland(void)
 }
 
 #endif /*#if LV_USE_WAYLAND*/
+

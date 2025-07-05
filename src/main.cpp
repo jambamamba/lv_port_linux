@@ -51,15 +51,18 @@ std::vector<std::string> tabTitlesFromJsonConfig() {
     config_json += "/config.json";
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
-        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
+        LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
+        return tab_titles;
     }
     const cJSON *tabview = objFromJson(root, "tabview");
     if(!tabview) {
-        LOG(FATAL, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
+        LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
+        return tab_titles;
     }
     const cJSON *tabs = objFromJson(tabview, "tabs");
     if(!tabs) {
-        LOG(FATAL, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json.c_str());
+        LOG(DEBUG, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json.c_str());
+        return tab_titles;        
     }
     if(cJSON_IsArray(tabs)) {
         cJSON *array = nullptr;
