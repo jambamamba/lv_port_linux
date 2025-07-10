@@ -1,6 +1,10 @@
 #!/bin/bash
 set -xe
 
+#todo:
+#load bgcolor of tabview from json
+#show icons in tabs
+
 source share/pins.txt
 source share/scripts/helper-functions.sh
 

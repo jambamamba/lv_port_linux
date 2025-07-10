@@ -45,38 +45,20 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 extern simulator_settings_t settings;
 
 namespace {
-std::vector<std::string> tabTitlesFromJsonConfig() {
-    std::vector<std::string> tab_titles;
+auto parseConfig() {
     std::string config_json(std::filesystem::current_path());
     config_json += "/config.json";
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
         LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
-        return tab_titles;
+        return std::unique_ptr<LeleTabView>();
     }
     const cJSON *tabview = objFromJson(root, "tabview");
     if(!tabview) {
         LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
-        return tab_titles;
+        return std::unique_ptr<LeleTabView>();
     }
-    const cJSON *tabs = objFromJson(tabview, "tabs");
-    if(!tabs) {
-        LOG(DEBUG, LVSIM, "Failed to load tabview/tabs from config_json:'%s'\n", config_json.c_str());
-        return tab_titles;        
-    }
-    if(cJSON_IsArray(tabs)) {
-        cJSON *array = nullptr;
-        cJSON_ArrayForEach(array, tabs) {
-            cJSON *item = nullptr;
-            cJSON_ArrayForEach(item, array) {
-                LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
-                if(strcmp(item->string, "name") == 0) {
-                    tab_titles.emplace_back(item->valuestring);
-                }
-            }
-        }
-    }
-    return tab_titles;
+    return LeleTabView::fromJson(tabview);
 }
 
 /* Internal functions */
@@ -206,13 +188,13 @@ int main(int argc, char **argv)
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
 
-    std::vector<std::string> tab_titles = tabTitlesFromJsonConfig();
-    if(tab_titles.size() > 0) {
-        LeleTabView tab_view("tabview", tab_titles);
-        LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
-        LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
-        LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
-    }
+    auto tab_view = parseConfig();
+    // if(tab_titles.size() > 0) {
+    //     LeleTabView tab_view("tabview", "logo.png", tab_titles);
+    //     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
+    //     LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
+    //     LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
+    // }
     
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();

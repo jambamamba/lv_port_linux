@@ -1,6 +1,9 @@
 #pragma once
 
+#include <debug_logger/debug_logger.h>
+#include <json_utils/json_utils.h>
 #include <lvgl/lvgl_private.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -14,8 +17,13 @@ void addChart();
 
 class LeleTabView {
   public:
-  LeleTabView(const std::string &title = "TabView", const std::vector<std::string> &tab_titles = {"Tab0", "Tab1", "Tab2"});
+  LeleTabView(
+    const std::string &title = "Title", 
+    const std::string &subtitle = "Subtitle",
+    const std::string &logo_img = "logo.png", 
+    const std::vector<std::string> &tab_titles = {"Tab0", "Tab1", "Tab2"});
   lv_obj_t *obj() const { return _tab_view; }
+  static std::unique_ptr<LeleTabView> fromJson(const cJSON *tabview);
   std::vector<lv_obj_t*> _tabs;
 
   protected:

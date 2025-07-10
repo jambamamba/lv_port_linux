@@ -1,11 +1,12 @@
 {
     "tabview":{
-        "name":"tabview",
+        "title":"ACME Weather Hub",
+        "subtitle":"Local Weather Station",
+        "img":"weather-hub-logo.png",
         "tabs":[
-            {"name":"tab0"},
-            {"name":"tab1"},
-            {"name":"tab2"},
-            {"name":"tab3"}
+            {"name":"Home","img":"home_icon.png"},
+            {"name":"History","img":"graph-icon.png"},
+            {"name":"Settings","img":"settings-hammer-wrench.png"}
         ]
     }
 }

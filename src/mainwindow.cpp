@@ -2,6 +2,9 @@
 #include "chart.h"
 
 #include <res/img_dsc.h>
+#include <string.h>
+
+LOG_CATEGORY(LVSIM, "LVSIM");
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
@@ -13,7 +16,7 @@ typedef enum {
     DISP_LARGE,
 } disp_size_t;
 
-LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string> &tab_titles){
+LeleTabView::LeleTabView(const std::string &title, const std::string &subtitle, const std::string &logo_img, const std::vector<std::string> &tab_titles){
     constexpr int32_t tab_h = 75;
     _tab_view = lv_tabview_create(lv_screen_active());
     lv_tabview_set_tab_bar_size(_tab_view, tab_h);
@@ -31,7 +34,7 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
     lv_obj_t *logo = lv_image_create(tab_bar);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_image_set_src(logo, _lv_img_dsc_map.at("logo.jpg"));
+    lv_image_set_src(logo, _lv_img_dsc_map.at(logo_img));
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
 
     lv_obj_t *label = lv_label_create(tab_bar);
@@ -39,7 +42,7 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_style_set_text_font(&_style_title, font_large);
     lv_obj_add_style(label, &_style_title, 0);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_label_set_text_fmt(label, "LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
+    lv_label_set_text_fmt(label, title.c_str());//"LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
 
     label = lv_label_create(tab_bar);
@@ -47,7 +50,7 @@ LeleTabView::LeleTabView(const std::string &title, const std::vector<std::string
     lv_style_set_text_opa(&_style_text_muted, LV_OPA_50);
     lv_obj_add_style(label, &_style_text_muted, 0);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_label_set_text(label, title.c_str());
+    lv_label_set_text(label, subtitle.c_str());
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 }
 
@@ -59,6 +62,51 @@ void LeleTabView::TabViewDeleteEventCb(lv_event_t * e) {
         lv_style_reset(&pthis->_style_text_muted);
         lv_style_reset(&pthis->_style_title);
     }
+}
+
+std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
+
+    const cJSON *title = objFromJson(tabview, "title");
+    if(!title) {
+      LOG(DEBUG, LVSIM, "tabview is missing title\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", title->string, title->valuestring);
+    std::string title_str = title->valuestring;
+
+    const cJSON *subtitle = objFromJson(tabview, "subtitle");
+    if(!subtitle) {
+      LOG(DEBUG, LVSIM, "tabview is missing subtitle\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", subtitle->string, subtitle->valuestring);
+    std::string subtitle_str = subtitle->valuestring;
+
+    const cJSON *img = objFromJson(tabview, "img");
+    if(!img) {
+      LOG(DEBUG, LVSIM, "tabview is missing img\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", img->string, img->valuestring);
+    std::string img_str = img->valuestring;
+    
+    const cJSON *tabs = objFromJson(tabview, "tabs");
+    if(!tabs) {
+        LOG(DEBUG, LVSIM, "tabview is missing tabs\n");
+        return std::unique_ptr<LeleTabView>();
+    }
+    std::vector<std::string> tab_titles;
+    if(cJSON_IsArray(tabs)) {
+        cJSON *array = nullptr;
+        cJSON_ArrayForEach(array, tabs) {
+            cJSON *item = nullptr;
+            cJSON_ArrayForEach(item, array) {
+                LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
+                if(strcmp(item->string, "name") == 0) {
+                    tab_titles.emplace_back(item->valuestring);
+                }
+            }
+        }
+    }
+
+    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, tab_titles);
 }
 
 LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
