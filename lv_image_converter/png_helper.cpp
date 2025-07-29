@@ -76,11 +76,12 @@ PngHelper::~PngHelper() {
   cleanup();
 }
 
+ 
 void PngHelper::cleanup() {
   if(!_row_pointers) {
     return;
   }
-  for(int y = 0; y < _height; y++) {
+  for(int y = 0; y < _mtd._height; y++) {
     if(_row_pointers[y]) {
       free(_row_pointers[y]);
     }
@@ -89,93 +90,88 @@ void PngHelper::cleanup() {
   _row_pointers = nullptr;
 }
 
-bool PngHelper::readPngFile(
-  const char *filename) {
-
+// AutoFreePtr<PngContext> 
+bool
+PngHelper::readPngFile(const char *filename) {
   FILE *fp = fopen(filename, "rb");
-  if(!fp) {
-    dlog(__FILE__, __LINE__, "FATAL ERROR: Failed to read file: %s\n", filename);
-    return false;
-  }
+  if(!fp) abort();
 
   png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  if(!png) {
-    return false;
-  }
+  if(!png) abort();
 
   png_infop info = png_create_info_struct(png);
-  if(!info) {
-    return false;
-  }
+  if(!info) abort();
 
-  if(setjmp(png_jmpbuf(png))) {
-    return false;
-  }
+  if(setjmp(png_jmpbuf(png))) abort();
 
   png_init_io(png, fp);
 
   png_read_info(png, info);
 
-  _width      = png_get_image_width(png, info);
-  _height     = png_get_image_height(png, info);
-  _bitdepth   = png_get_bit_depth(png, info);
-  _color_type = png_get_color_type(png, info);
+  _mtd._width      = png_get_image_width(png, info);
+  _mtd._height     = png_get_image_height(png, info);
+  _mtd._color_type = png_get_color_type(png, info);
+  _mtd._bit_depth  = png_get_bit_depth(png, info);
+  _mtd._stride = png_get_rowbytes(png,info);
 
   // Read any color_type into 8bit depth, RGBA format.
   // See http://www.libpng.org/pub/png/libpng-manual.txt
 
-  // if(_bitdepth == 16) {
-  //   png_set_strip_16(png);
-  //   }
+  if(_mtd._bit_depth == 16)
+    png_set_strip_16(png);
 
-  if(_color_type == PNG_COLOR_TYPE_PALETTE) {
+  if(_mtd._color_type == PNG_COLOR_TYPE_PALETTE)
     png_set_palette_to_rgb(png);
-  }
 
   // PNG_COLOR_TYPE_GRAY_ALPHA is always 8 or 16bit depth.
-  if(_color_type == PNG_COLOR_TYPE_GRAY && _bitdepth < 8) {
+  if(_mtd._color_type == PNG_COLOR_TYPE_GRAY && _mtd._bit_depth < 8)
     png_set_expand_gray_1_2_4_to_8(png);
-  }
 
-  if(png_get_valid(png, info, PNG_INFO_tRNS)) {
+  if(png_get_valid(png, info, PNG_INFO_tRNS))
     png_set_tRNS_to_alpha(png);
-  }
 
   // These color_type don't have an alpha channel then fill it with 0xff.
-  if(_color_type == PNG_COLOR_TYPE_RGB ||
-     _color_type == PNG_COLOR_TYPE_GRAY ||
-     _color_type == PNG_COLOR_TYPE_PALETTE) {
+  if(_mtd._color_type == PNG_COLOR_TYPE_RGB ||
+     _mtd._color_type == PNG_COLOR_TYPE_GRAY ||
+     _mtd._color_type == PNG_COLOR_TYPE_PALETTE)
     png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
-  }
 
-  if(_color_type == PNG_COLOR_TYPE_GRAY ||
-     _color_type == PNG_COLOR_TYPE_GRAY_ALPHA) {
+  if(_mtd._color_type == PNG_COLOR_TYPE_GRAY ||
+     _mtd._color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
     png_set_gray_to_rgb(png);
-  }
 
   png_read_update_info(png, info);
-  _channels   = png_get_channels(png, info);
 
-  if (_row_pointers) { myabort(); }
-
-  _stride = png_get_rowbytes(png,info);
-  _row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * _height);
-  for(int y = 0; y < _height; y++) {
-    _row_pointers[y] = (png_byte*)malloc(_stride);
+  _row_pointers = (png_byte**) malloc(sizeof(png_bytep) * _mtd._height);
+  // _row_pointers = std::make_unique<std::unique_ptr<png_byte[]>[]>(sizeof(png_bytep) * _mtd._height);
+  for(int y = 0; y < _mtd._height; y++) {
+    // row_pointers[y] = (png_byte *)&ctx->data[y * _mtd._stride];
+    _row_pointers[y] = (png_byte *)malloc(_mtd._stride);
+    // _row_pointers[y] = std::make_unique<png_byte[]>(_mtd._stride);
   }
-
   png_read_image(png, _row_pointers);
-
+  png_destroy_read_struct(&png, &info, NULL);
   fclose(fp);
 
-  png_destroy_read_struct(&png, &info, NULL);
   return true;
+
+  //////////////////////////////////////////////////////////////////////////////////
+  //osm todo: try to avoid memcpy:
+  // size_t nbytes = sizeof(PngContext) + sizeof(png_bytep) * _mtd.height * _mtd.bytes_per_row;
+  // AutoFreePtr<PngContext> ctx = AutoFreePtr<PngContext>::create(nbytes);
+  // ctx->init(_mtd, nbytes);
+  // for(int y = 0; y < _mtd.height; y++) {
+  //   _row_pointers[y] = std::make_unique<png_byte[]>(_mtd._stride);
+  //   memcpy((png_byte *)&ctx->data[y * _mtd._stride], _row_pointers[y], _mtd._stride);
+  // }
+
+  // return ctx;
 }
 
 void PngHelper::writePngFile(
   const char *filename, 
   int width, 
-  int  height, 
+  int height, 
   int img_bitdepth,
   int channels, 
   png_bytep data, 
@@ -184,12 +180,12 @@ void PngHelper::writePngFile(
   int horizontal_padding,
   int right_crop) {
 
-  _width = width + horizontal_padding;
-  _height = height;
-  _bitdepth = img_bitdepth;
-  _channels = channels;
-  size_t num_samples = width * channels;
-  _stride = num_samples * _bitdepth/8;
+  _mtd._width = width + horizontal_padding;
+  _mtd._height = height;
+  _mtd._bit_depth = img_bitdepth;
+  _mtd._channels = channels;
+  size_t num_samples = _mtd._width * _mtd._channels;
+  _mtd._stride = num_samples * _mtd._bit_depth/8;
 
   int y;
 
@@ -210,9 +206,9 @@ void PngHelper::writePngFile(
   png_set_IHDR(
     png,
     info,
-    _width - right_crop, 
-    _height,
-    _bitdepth,
+    _mtd._width - right_crop, 
+    _mtd._height,
+    _mtd._bit_depth,
     PNG_COLOR_TYPE_RGBA,
     PNG_INTERLACE_NONE,
     PNG_COMPRESSION_TYPE_DEFAULT,
@@ -226,10 +222,12 @@ void PngHelper::writePngFile(
     png_set_filler(png, 0, PNG_FILLER_AFTER);
   }
 
-  _row_pointers = (uint8_t**)malloc(sizeof(void*) * _height);
-  for(int y = 0; y < _height; y++) {
-    _row_pointers[y] = (uint8_t*)malloc((width + horizontal_padding) * channels * _bitdepth/8);
-    switch(_bitdepth) {
+  _row_pointers = (png_byte**) malloc(sizeof(png_bytep) * _mtd._height);
+  // _row_pointers = std::make_unique<std::unique_ptr<png_byte[]>[]>(sizeof(png_bytep) * _mtd.height);
+  for(int y = 0; y < _mtd._height; y++) {
+    // row_pointers.get()[y] = (uint8_t*)malloc((_mtd.width + horizontal_padding) * _mtd._channels * _mtd._bit_depth/8);
+    _row_pointers[y] = (png_byte*) malloc((_mtd._width + horizontal_padding) * _mtd._channels * _mtd._bit_depth/8);
+    switch(_mtd._bit_depth) {
       case 16: {
         uint16_t *data16 = (uint16_t *)data;
         for( size_t x = 0; x < num_samples; x+=4) {
@@ -240,8 +238,6 @@ void PngHelper::writePngFile(
           pixel[x + 1] = (data16[(y * num_samples) + x + 1] >> (data_bitdepth - 8)) | ((data16[(y * num_samples) + x + 1] & mask) << 8);
           pixel[x + 2] = (data16[(y * num_samples) + x + 2] >> (data_bitdepth - 8)) | ((data16[(y * num_samples) + x + 2] & mask) << 8);
           pixel[x + 3] = (data16[(y * num_samples) + x + 3] >> (data_bitdepth - 8)) | ((data16[(y * num_samples) + x + 3] & mask) << 8);
-          int debug = 0;
-          debug = 1;
         }
         break;
       }
@@ -250,53 +246,45 @@ void PngHelper::writePngFile(
         break;
       }
       default: {
-        dlog(__FILE__, __LINE__, "Unsupported bit depth of %i\n, only 8 and 16 are allowed\n", _bitdepth);
+        dlog(__FILE__, __LINE__, "Unsupported bit depth of %i\n, only 8 and 16 are allowed\n", _mtd._bit_depth);
         return;
       }
     }
   }
 
-  png_write_image(png, (png_bytep*)_row_pointers);
+  png_write_image(png, (png_byte **)_row_pointers);
   png_write_end(png, NULL);
 
   fclose(fp);
 
   png_destroy_write_struct(&png, &info);
-
-  for(int y = 0; y < _height; y++) {
-    free(_row_pointers[y]);
-  }
-  free(_row_pointers);
-  _row_pointers = nullptr;
 }
 
 void PngHelper::padToSize(
     int horizontal_padding,
     const std::string &tmpname) {
 
-  png_bytep data = (png_bytep)malloc(_stride * _height);
-  for(int y = 0; y < _height; y++) {
+  // png_bytep data = (png_bytep)malloc(_mtd._stride * _mtd._height);
+  auto data = std::make_unique<png_byte[]>(_mtd._stride * _mtd._height);
+  for(int y = 0; y < _mtd._height; y++) {
     png_bytep row = _row_pointers[y];
-    memcpy((png_byte*)&data[y * _stride], _row_pointers[y], _stride);
+    memcpy((png_byte*)&data.get()[y * _mtd._stride], _row_pointers[y], _mtd._stride);
   }
 
   PngHelper png;
 	
   png.writePngFile(
     tmpname.c_str(), 
-    _width, 
-    _height, 
-    _bitdepth,
-    _channels, 
-    data, 
+    _mtd._width, 
+    _mtd._height, 
+    _mtd._bit_depth,
+    _mtd._channels, 
+    data.get(), 
     8,
     false,
     horizontal_padding,
     0);
 
-  free(data);
-
-  cleanup();
   readPngFile(tmpname.c_str());
 }
 
@@ -322,9 +310,9 @@ PngHelper PngHelper::convertTo64bpp(const std::string &filename) {
 }
 
 void PngHelper::processPngFile(std::function<bool(const uint8_t *row, size_t num_bytes)> scanline) {
-  for(int y = 0; y < _height; y++) {
+  for(int y = 0; y < _mtd._height; y++) {
     png_bytep row = _row_pointers[y];
-    for(int i = 0; i < _stride; i+=4) {//_color_type:PNG_COLOR_TYPE_RGBA
+    for(int i = 0; i < _mtd._stride; i+=4) {//_color_type:PNG_COLOR_TYPE_RGBA
         uint8_t red = row[i+0];
         uint8_t green = row[i+1];
         uint8_t blue = row[i+2];
@@ -337,44 +325,44 @@ void PngHelper::processPngFile(std::function<bool(const uint8_t *row, size_t num
         row[i+2] = red;
         row[i+3] = alpha;
     }
-    if(!scanline(row, _stride)){
+    if(!scanline(row, _mtd._stride)){
       break;
     }
   }
 }
 
 int PngHelper::width() const {
-  return _width;
+  return _mtd._width;
 }
 
 int PngHelper::height() const {
-  return _height;
+  return _mtd._height;
 }
 
 size_t PngHelper::stride() const {
-  return _stride;
+  return _mtd._stride;
 }
 
 int PngHelper::bitdepth() const {
-  return _bitdepth;
+  return _mtd._bit_depth;
 }
 int PngHelper::channels() const {
-  return _channels;
+  return _mtd._channels;
 }
 
 png_bytep PngHelper::rowPointer(int row) const {
-  if(row > -1 && row < _height) {
+  if(row > -1 && row < _mtd._height) {
     return _row_pointers[row];
   }
   return nullptr;
 }
 
 png_byte PngHelper::data(int idx) const {
-  int num_samples_per_row = _stride / _bitdepth * 8;
+  int num_samples_per_row = _mtd._stride / _mtd._bit_depth * 8;
   int row = idx / num_samples_per_row;
   int col = idx - (row * num_samples_per_row);
-  if(row > -1 && row < _height) {
-    if(_bitdepth == 16) {
+  if(row > -1 && row < _mtd._height) {
+    if(_mtd._bit_depth == 16) {
       return ((uint16_t*)_row_pointers[row])[col];
     }
     return _row_pointers[row][col];
@@ -421,23 +409,23 @@ png_byte PngHelper::operator[](int idx) const {
 
 bool PngHelper::operator==(const PngHelper &rhs) const {
 
-  if(_width != rhs._width) {
-    dlog(__FILE__, __LINE__, "width does not match: %i!=%i\n", _width, rhs._width);
+  if(_mtd._width != rhs._mtd._width) {
+    dlog(__FILE__, __LINE__, "width does not match: %i!=%i\n", _mtd._width, rhs._mtd._width);
     return false;
   }
-  else if(_height != rhs._height) {
-    dlog(__FILE__, __LINE__, "height does not match: %i!=%i\n", _height, rhs._height);
+  else if(_mtd._height != rhs._mtd._height) {
+    dlog(__FILE__, __LINE__, "height does not match: %i!=%i\n", _mtd._height, rhs._mtd._height);
     return false;
   }
-  else if(_stride != rhs._stride) {
-    dlog(__FILE__, __LINE__, "stride does not match: %i!=%i\n", _stride, rhs._stride);
+  else if(_mtd._stride != rhs._mtd._stride) {
+    dlog(__FILE__, __LINE__, "stride does not match: %i!=%i\n", _mtd._stride, rhs._mtd._stride);
     return false;
   }
 
-	for(int y = 0; y < _height; y++) {
-    if(memcmp(_row_pointers[y], rhs._row_pointers[y], _stride) != 0 ) {
+	for(int y = 0; y < _mtd._height; y++) {
+    if(memcmp(_row_pointers[y], rhs._row_pointers[y], _mtd._stride) != 0 ) {
       dlog(__FILE__, __LINE__, "bytes at row %i do not match\n", y);
-      for(size_t x = 0; x < _stride; ++x ){
+      for(size_t x = 0; x < _mtd._stride; ++x ){
         if( _row_pointers[y][x] != rhs._row_pointers[y][x]) {
           dlog(__FILE__, __LINE__, "offset %llu, 0x%02x!=0x%02x ", x, _row_pointers[y][x], rhs._row_pointers[y][x]);
           break;
