@@ -170,7 +170,8 @@ add_subdirectory(lv_image_converter)
 add_custom_command(OUTPUT ${LV_IMG_DSC_SRC}
 COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
 COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
-  COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res"
+  #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
+  COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
   COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
   WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
   DEPENDS "${CMAKE_SOURCE_DIR}/res"

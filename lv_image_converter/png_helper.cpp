@@ -94,15 +94,31 @@ void PngHelper::cleanup() {
 bool
 PngHelper::readPngFile(const char *filename) {
   FILE *fp = fopen(filename, "rb");
-  if(!fp) abort();
+  if(!fp) {
+    abort();
+  }
+
+  uint8_t header[8] = {0};
+  fread(header, sizeof(header), 1, fp);
+  fseek(fp, 0, SEEK_SET);
+  uint8_t png_header[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+  if(memcmp(header, png_header, sizeof(header))!=0) {
+    return false;
+  }
 
   png_structp png = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-  if(!png) abort();
+  if(!png) {
+    return false;
+  }
 
   png_infop info = png_create_info_struct(png);
-  if(!info) abort();
+  if(!info) {
+    return false;
+  }
 
-  if(setjmp(png_jmpbuf(png))) abort();
+  if(setjmp(png_jmpbuf(png))) {
+    return false;
+  }
 
   png_init_io(png, fp);
 
@@ -117,31 +133,36 @@ PngHelper::readPngFile(const char *filename) {
   // Read any color_type into 8bit depth, RGBA format.
   // See http://www.libpng.org/pub/png/libpng-manual.txt
 
-  if(_mtd._bit_depth == 16)
+  if(_mtd._bit_depth == 16){
     png_set_strip_16(png);
+  }
 
-  if(_mtd._color_type == PNG_COLOR_TYPE_PALETTE)
+  if(_mtd._color_type == PNG_COLOR_TYPE_PALETTE){
     png_set_palette_to_rgb(png);
+  }
 
   // PNG_COLOR_TYPE_GRAY_ALPHA is always 8 or 16bit depth.
-  if(_mtd._color_type == PNG_COLOR_TYPE_GRAY && _mtd._bit_depth < 8)
+  if(_mtd._color_type == PNG_COLOR_TYPE_GRAY && _mtd._bit_depth < 8){
     png_set_expand_gray_1_2_4_to_8(png);
+  }
 
-  if(png_get_valid(png, info, PNG_INFO_tRNS))
+  if(png_get_valid(png, info, PNG_INFO_tRNS)){
     png_set_tRNS_to_alpha(png);
+  }
 
   // These color_type don't have an alpha channel then fill it with 0xff.
   if(_mtd._color_type == PNG_COLOR_TYPE_RGB ||
      _mtd._color_type == PNG_COLOR_TYPE_GRAY ||
-     _mtd._color_type == PNG_COLOR_TYPE_PALETTE)
+     _mtd._color_type == PNG_COLOR_TYPE_PALETTE){
     png_set_filler(png, 0xFF, PNG_FILLER_AFTER);
+     }
 
   if(_mtd._color_type == PNG_COLOR_TYPE_GRAY ||
-     _mtd._color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+     _mtd._color_type == PNG_COLOR_TYPE_GRAY_ALPHA){
     png_set_gray_to_rgb(png);
+     }
 
   png_read_update_info(png, info);
-
   _row_pointers = (png_byte**) malloc(sizeof(png_bytep) * _mtd._height);
   // _row_pointers = std::make_unique<std::unique_ptr<png_byte[]>[]>(sizeof(png_bytep) * _mtd._height);
   for(int y = 0; y < _mtd._height; y++) {

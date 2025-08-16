@@ -6,6 +6,7 @@
 template<class Type> class AutoFreePtr
 {
 public:
+    AutoFreePtr() {}
     ~AutoFreePtr() {
         if(_ptr) {
             _ptr->~Type();
@@ -44,8 +45,6 @@ public:
     }
 
 private:
-    AutoFreePtr() {}
-
     size_t _sz = 0;
     Type *_ptr = nullptr;
 };
@@ -54,6 +53,7 @@ private:
 template<class Type> class AutoFreeSharedPtr
 {
 public:
+    AutoFreeSharedPtr() {}
     ~AutoFreeSharedPtr() {
         _rc->_ref_cnt--;
         // int rc = _rc->_ref_cnt;
@@ -139,8 +139,6 @@ public:
     }
 
 private:
-    AutoFreeSharedPtr() {}
-
     struct RC {
         std::atomic<size_t> _ref_cnt = 1;
     };
