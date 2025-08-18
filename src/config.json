@@ -1,5 +1,7 @@
 {
     "tabview":{
+        "fgcolor":"ffffff",
+        "bgcolor":"444444",
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
         "img":"weather-hub-logo.png",

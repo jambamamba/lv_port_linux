@@ -4,6 +4,7 @@
 #include <json_utils/json_utils.h>
 #include <lvgl/lvgl_private.h>
 #include <memory>
+#include <res/img_dsc.h>
 #include <string>
 #include <vector>
 
@@ -32,15 +33,27 @@ class LeleTabView {
       void setLvObj(lv_obj_t *obj) {
         _lv_obj = obj;
       }
+      void setTabButton(lv_obj_t *button) {
+        _tab_button = button;
+        lv_obj_t *logo = lv_image_create(button);
+        lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+        lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+        lv_obj_center(logo);
+        lv_obj_t *label = lv_obj_get_child(button, 0);
+        lv_label_set_text(label, "");
+      }
     protected:
       std::string _title;
       std::string _img;
-      lv_obj_t* _lv_obj = nullptr;
+      lv_obj_t *_lv_obj = nullptr;
+      lv_obj_t *_tab_button = nullptr;
   };
   LeleTabView(
     const std::string &title = "Title", 
     const std::string &subtitle = "Subtitle",
-    const std::string &logo_img = "logo.png", 
+    const std::string &logo_img = "logo.png",
+    const std::string &fgcolor = "#ffffff",
+    const std::string &bgcolor = "#444444",
     const std::vector<Tab> &tabs = {{"Tab0"}, {"Tab1"}, {"Tab2"}}
   );
   lv_obj_t *obj() const { return _tab_view; }
@@ -55,6 +68,7 @@ class LeleTabView {
   lv_style_t _style_title;
   lv_style_t _style_text_muted;
   lv_obj_t *_tab_view = nullptr;
+  const std::string _bgcolor = "#ffffff";
 };
 
 class LeleLabel {

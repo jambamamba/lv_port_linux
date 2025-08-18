@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "chart.h"
 
-#include <res/img_dsc.h>
 #include <string.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -17,10 +16,15 @@ typedef enum {
 } disp_size_t;
 
 LeleTabView::LeleTabView(
-  const std::string &title, 
-  const std::string &subtitle, 
-  const std::string &logo_img, 
+  const std::string &title,
+  const std::string &subtitle,
+  const std::string &logo_img,
+  const std::string &fgcolor_str,
+  const std::string &bgcolor_str,
   const std::vector<LeleTabView::Tab> &tabs){
+
+    int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
+    int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
 
     constexpr int32_t tab_h = 75;
     _tab_view = lv_tabview_create(lv_screen_active());
@@ -29,16 +33,20 @@ LeleTabView::LeleTabView(
 
     const lv_font_t *font_normal = &lv_font_montserrat_16;
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
-
-    for(auto &tab: tabs) {
-      _tabs.emplace_back(tab);
-       _tabs[_tabs.size() - 1].setLvObj(
-          lv_tabview_add_tab(_tab_view, tab.title().c_str()));
-        //osm todo:
-        //get tab_bar->button for this tab, and add tab image to tab button.
-    }
+    lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(_tab_view, lv_color_hex(bgcolor), LV_PART_MAIN);
 
     lv_obj_t *tab_bar = lv_tabview_get_tab_bar(_tab_view);
+    lv_obj_set_style_text_color(tab_bar, lv_color_hex(fgcolor), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(tab_bar, lv_color_hex(bgcolor), LV_PART_MAIN);
+    for(auto &tab: tabs) {
+        _tabs.emplace_back(tab);
+        _tabs[_tabs.size() - 1].setLvObj(
+          lv_tabview_add_tab(_tab_view, tab.title().c_str()));
+        lv_obj_t *button = lv_obj_get_child(tab_bar, _tabs.size() - 1);
+        _tabs[_tabs.size() - 1].setTabButton(button);
+    }
+
     lv_obj_t *logo = setTabViewImg(tab_bar, logo_img);
     lv_obj_t *label = setTabViewTitle(tab_bar, title);
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
@@ -90,28 +98,42 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
 
     const cJSON *title = objFromJson(tabview, "title");
     if(!title) {
-      LOG(DEBUG, LVSIM, "tabview is missing title\n");
+      LOG(WARNING, LVSIM, "tabview is missing title\n");
     }
     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", title->string, title->valuestring);
     std::string title_str = title->valuestring;
 
     const cJSON *subtitle = objFromJson(tabview, "subtitle");
     if(!subtitle) {
-      LOG(DEBUG, LVSIM, "tabview is missing subtitle\n");
+      LOG(WARNING, LVSIM, "tabview is missing subtitle\n");
     }
     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", subtitle->string, subtitle->valuestring);
     std::string subtitle_str = subtitle->valuestring;
 
     const cJSON *img = objFromJson(tabview, "img");
     if(!img) {
-      LOG(DEBUG, LVSIM, "tabview is missing img\n");
+      LOG(WARNING, LVSIM, "tabview is missing img\n");
     }
     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", img->string, img->valuestring);
     std::string img_str = img->valuestring;
     
+    const cJSON *fgcolor = objFromJson(tabview, "fgcolor");
+    if(!fgcolor) {
+      LOG(WARNING, LVSIM, "tabview is missing fgcolor\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", fgcolor->string, fgcolor->valuestring);
+    std::string fgcolor_str = fgcolor->valuestring;
+
+    const cJSON *bgcolor = objFromJson(tabview, "bgcolor");
+    if(!bgcolor) {
+      LOG(WARNING, LVSIM, "tabview is missing bgcolor\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", bgcolor->string, bgcolor->valuestring);
+    std::string bgcolor_str = bgcolor->valuestring;
+
     const cJSON *json_tabs = objFromJson(tabview, "tabs");
     if(!json_tabs) {
-        LOG(DEBUG, LVSIM, "tabview is missing tabs\n");
+        LOG(WARNING, LVSIM, "tabview is missing tabs\n");
         return std::unique_ptr<LeleTabView>();
     }
     std::vector<LeleTabView::Tab> tabs;
@@ -134,7 +156,7 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
         }
     }
 
-    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, tabs);
+    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, fgcolor_str, bgcolor_str, tabs);
 }
 
 LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
