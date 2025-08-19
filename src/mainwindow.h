@@ -41,6 +41,11 @@ class LeleTabView {
         lv_obj_center(logo);
         lv_obj_t *label = lv_obj_get_child(button, 0);
         lv_label_set_text(label, "");
+
+        //osm todo: get these colors from json:
+        lv_obj_set_style_bg_color(button, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(button, lv_color_hex(0x00ff00), LV_PART_MAIN | LV_STATE_PRESSED);
+        lv_obj_set_style_border_color(button, lv_color_hex(0xffff00), LV_PART_MAIN | LV_STATE_CHECKED);
       }
     protected:
       std::string _title;

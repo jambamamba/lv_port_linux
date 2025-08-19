@@ -35,7 +35,7 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(_tab_view, lv_color_hex(bgcolor), LV_PART_MAIN);
-
+    
     lv_obj_t *tab_bar = lv_tabview_get_tab_bar(_tab_view);
     lv_obj_set_style_text_color(tab_bar, lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(tab_bar, lv_color_hex(bgcolor), LV_PART_MAIN);
@@ -45,6 +45,9 @@ LeleTabView::LeleTabView(
           lv_tabview_add_tab(_tab_view, tab.title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tab_bar, _tabs.size() - 1);
         _tabs[_tabs.size() - 1].setTabButton(button);
+        lv_obj_set_style_bg_color(button, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(button, lv_color_hex(0x00ff00), LV_PART_MAIN | LV_STATE_PRESSED);
+        lv_obj_set_style_border_color(button, lv_color_hex(0xffff00), LV_PART_MAIN | LV_STATE_CHECKED);
     }
 
     lv_obj_t *logo = setTabViewImg(tab_bar, logo_img);
