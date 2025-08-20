@@ -33,7 +33,7 @@ class LeleTabView {
       void setLvObj(lv_obj_t *obj) {
         _lv_obj = obj;
       }
-      void setTabButton(lv_obj_t *button) {
+      void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
         _tab_button = button;
         lv_obj_t *logo = lv_image_create(button);
         lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -43,9 +43,9 @@ class LeleTabView {
         lv_label_set_text(label, "");
 
         //osm todo: get these colors from json:
-        lv_obj_set_style_bg_color(button, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_CHECKED);
-        lv_obj_set_style_bg_color(button, lv_color_hex(0x00ff00), LV_PART_MAIN | LV_STATE_PRESSED);
-        lv_obj_set_style_border_color(button, lv_color_hex(0xffff00), LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+        lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
       }
     protected:
       std::string _title;
@@ -59,6 +59,8 @@ class LeleTabView {
     const std::string &logo_img = "logo.png",
     const std::string &fgcolor = "#ffffff",
     const std::string &bgcolor = "#444444",
+    const std::string &active_tab_bgcolor_str = "#ffffff",
+    const std::string &active_tab_bottom_border_color_str = "#121212",
     const std::vector<Tab> &tabs = {{"Tab0"}, {"Tab1"}, {"Tab2"}}
   );
   lv_obj_t *obj() const { return _tab_view; }

@@ -21,10 +21,14 @@ LeleTabView::LeleTabView(
   const std::string &logo_img,
   const std::string &fgcolor_str,
   const std::string &bgcolor_str,
+  const std::string &active_tab_bgcolor_str,
+  const std::string &active_tab_bottom_border_color_str,
   const std::vector<LeleTabView::Tab> &tabs){
 
     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
     int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
+    int active_tab_color = std::stoi(active_tab_bgcolor_str, nullptr, 16);
+    int active_tab_bottom_border_color = std::stoi(active_tab_bottom_border_color_str, nullptr, 16);
 
     constexpr int32_t tab_h = 75;
     _tab_view = lv_tabview_create(lv_screen_active());
@@ -44,10 +48,7 @@ LeleTabView::LeleTabView(
         _tabs[_tabs.size() - 1].setLvObj(
           lv_tabview_add_tab(_tab_view, tab.title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tab_bar, _tabs.size() - 1);
-        _tabs[_tabs.size() - 1].setTabButton(button);
-        lv_obj_set_style_bg_color(button, lv_color_hex(0xff0000), LV_PART_MAIN | LV_STATE_CHECKED);
-        lv_obj_set_style_bg_color(button, lv_color_hex(0x00ff00), LV_PART_MAIN | LV_STATE_PRESSED);
-        lv_obj_set_style_border_color(button, lv_color_hex(0xffff00), LV_PART_MAIN | LV_STATE_CHECKED);
+        _tabs[_tabs.size() - 1].setTabButton(button, active_tab_color, active_tab_bottom_border_color);
     }
 
     lv_obj_t *logo = setTabViewImg(tab_bar, logo_img);
@@ -134,6 +135,20 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", bgcolor->string, bgcolor->valuestring);
     std::string bgcolor_str = bgcolor->valuestring;
 
+    const cJSON *active_tab_bgcolor = objFromJson(tabview, "active_tab_bgcolor");
+    if(!bgcolor) {
+      LOG(WARNING, LVSIM, "tabview is missing active_tab_bgcolor\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
+    std::string active_tab_bgcolor_str = active_tab_bgcolor->valuestring;
+
+    const cJSON *active_tab_bottom_border_color = objFromJson(tabview, "active_tab_bottom_border_color");
+    if(!bgcolor) {
+      LOG(WARNING, LVSIM, "tabview is missing active_tab_bottom_border_color\n");
+    }
+    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", active_tab_bottom_border_color->string, active_tab_bottom_border_color->valuestring);
+    std::string active_tab_bottom_border_color_str = active_tab_bottom_border_color->valuestring;
+
     const cJSON *json_tabs = objFromJson(tabview, "tabs");
     if(!json_tabs) {
         LOG(WARNING, LVSIM, "tabview is missing tabs\n");
@@ -159,7 +174,7 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
         }
     }
 
-    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, fgcolor_str, bgcolor_str, tabs);
+    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, fgcolor_str, bgcolor_str, active_tab_bgcolor_str, active_tab_bottom_border_color_str, tabs);
 }
 
 LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
