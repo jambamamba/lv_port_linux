@@ -2,6 +2,7 @@
 #include "chart.h"
 
 #include <string.h>
+#include <vector>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -43,12 +44,55 @@ LeleTabView::LeleTabView(
     lv_obj_t *tab_bar = lv_tabview_get_tab_bar(_tab_view);
     lv_obj_set_style_text_color(tab_bar, lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(tab_bar, lv_color_hex(bgcolor), LV_PART_MAIN);
+
+    static std::vector<std::unique_ptr<LeleLabel>> labelx;
+    static std::vector<std::unique_ptr<LeleTextBox>> textx;
+
+    int idx = 0;
     for(auto &tab: tabs) {
         _tabs.emplace_back(tab);
         _tabs[_tabs.size() - 1].setLvObj(
           lv_tabview_add_tab(_tab_view, tab.title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tab_bar, _tabs.size() - 1);
         _tabs[_tabs.size() - 1].setTabButton(button, active_tab_color, active_tab_bottom_border_color);
+        lv_obj_t *lv_tab = _tabs[_tabs.size() - 1].getLvObj();
+    //     lv_obj_set_x(lv_tab, 0);
+    //     lv_obj_set_x(lv_tab, 0);
+    //    LOG(DEBUG, LVSIM, "adding label and textbox to tab:0x%p [(%i,%i),(%i,%i)]\n", 
+    //         lv_tab,
+    //         lv_obj_get_x(lv_tab),
+    //         lv_obj_get_y(lv_tab),
+    //         lv_obj_get_width(lv_tab),
+    //         lv_obj_get_height(lv_tab)
+    //     );
+ 
+        char buffer[32] = {0};
+        sprintf(buffer, "asdfafda%i", idx);
+        LOG(DEBUG, LVSIM, "num tabs: %i\n", _tabs.size());
+        labelx.emplace_back(std::make_unique<LeleLabel>(
+            buffer,
+            lv_tab, 
+            lv_obj_get_x(lv_tab), 
+            lv_obj_get_y(lv_tab),
+            lv_obj_get_width(lv_tab)/2, 
+            lv_obj_get_height(lv_tab)/4 
+        ));
+        textx.emplace_back(std::make_unique<LeleTextBox>(
+            buffer,
+            lv_tab,
+            lv_obj_get_x(lv_tab), 
+            lv_obj_get_y(lv_tab)+lv_obj_get_height(lv_tab)/4, 
+            lv_obj_get_width(lv_tab)/2, 
+            lv_obj_get_height(lv_tab)/4 
+        ));
+        LOG(DEBUG, LVSIM, "adding label and textbox to tab:0x%p [(%i,%i),(%i,%i)]\n", 
+            lv_tab,
+            lv_obj_get_x(lv_tab),
+            lv_obj_get_y(lv_tab),
+            lv_obj_get_width(lv_tab),
+            lv_obj_get_height(lv_tab)
+        );
+        idx++;
     }
 
     lv_obj_t *logo = setTabViewImg(tab_bar, logo_img);

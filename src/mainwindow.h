@@ -30,6 +30,9 @@ class LeleTabView {
       const std::string &img() const {
         return _img;
       }
+      lv_obj_t *getLvObj() const {
+        return _lv_obj;
+      }
       void setLvObj(lv_obj_t *obj) {
         _lv_obj = obj;
       }

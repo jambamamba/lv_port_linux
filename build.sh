@@ -26,7 +26,7 @@ function main() {
     local cwd=$(pwd)
     mkdir -p x86-build
     pushd x86-build
-    cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+    cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
     ninja
     popd
 
