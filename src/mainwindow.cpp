@@ -32,87 +32,68 @@ LeleTabView::LeleTabView(
     int active_tab_bottom_border_color = std::stoi(active_tab_bottom_border_color_str, nullptr, 16);
 
     constexpr int32_t tab_h = 75;
-    _tab_view = lv_tabview_create(lv_screen_active());
-    lv_tabview_set_tab_bar_size(_tab_view, tab_h);
-    lv_obj_add_event_cb(_tab_view, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
+    _lv_obj = lv_tabview_create(lv_screen_active());
+    lv_tabview_set_tab_bar_size(_lv_obj, tab_h);
+    lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
 
     const lv_font_t *font_normal = &lv_font_montserrat_16;
     lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
     lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(_tab_view, lv_color_hex(bgcolor), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(bgcolor), LV_PART_MAIN);
     
-    lv_obj_t *tab_bar = lv_tabview_get_tab_bar(_tab_view);
-    lv_obj_set_style_text_color(tab_bar, lv_color_hex(fgcolor), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(tab_bar, lv_color_hex(bgcolor), LV_PART_MAIN);
+    lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
+    lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
+    lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
     static std::vector<std::unique_ptr<LeleLabel>> labelx;
     static std::vector<std::unique_ptr<LeleTextBox>> textx;
 
-    int idx = 0;
     for(auto &tab: tabs) {
         _tabs.emplace_back(tab);
         _tabs[_tabs.size() - 1].setLvObj(
-          lv_tabview_add_tab(_tab_view, tab.title().c_str()));
-        lv_obj_t *button = lv_obj_get_child(tab_bar, _tabs.size() - 1);
+          lv_tabview_add_tab(_lv_obj, tab.title().c_str()));
+        lv_obj_t *button = lv_obj_get_child(tabview_header, _tabs.size() - 1);
         _tabs[_tabs.size() - 1].setTabButton(button, active_tab_color, active_tab_bottom_border_color);
         lv_obj_t *lv_tab = _tabs[_tabs.size() - 1].getLvObj();
-    //     lv_obj_set_x(lv_tab, 0);
-    //     lv_obj_set_x(lv_tab, 0);
-    //    LOG(DEBUG, LVSIM, "adding label and textbox to tab:0x%p [(%i,%i),(%i,%i)]\n", 
-    //         lv_tab,
-    //         lv_obj_get_x(lv_tab),
-    //         lv_obj_get_y(lv_tab),
-    //         lv_obj_get_width(lv_tab),
-    //         lv_obj_get_height(lv_tab)
-    //     );
- 
-        char buffer[32] = {0};
-        sprintf(buffer, "asdfafda%i", idx);
+
         LOG(DEBUG, LVSIM, "num tabs: %i\n", _tabs.size());
         labelx.emplace_back(std::make_unique<LeleLabel>(
-            buffer,
+            "asdfafda",
             lv_tab, 
-            lv_obj_get_x(lv_tab), 
-            lv_obj_get_y(lv_tab),
-            lv_obj_get_width(lv_tab)/2, 
-            lv_obj_get_height(lv_tab)/4 
+            lv_obj_get_x(tabview_content), 
+            lv_obj_get_y(tabview_content),
+            lv_obj_get_width(tabview_content)/2, 
+            lv_obj_get_height(tabview_content)/4 
         ));
         textx.emplace_back(std::make_unique<LeleTextBox>(
-            buffer,
+            "asdfafda",
             lv_tab,
-            lv_obj_get_x(lv_tab), 
-            lv_obj_get_y(lv_tab)+lv_obj_get_height(lv_tab)/4, 
-            lv_obj_get_width(lv_tab)/2, 
-            lv_obj_get_height(lv_tab)/4 
+            lv_obj_get_x(tabview_content), 
+            lv_obj_get_y(tabview_content)+lv_obj_get_height(tabview_content)/4, 
+            lv_obj_get_width(tabview_content)/2, 
+            lv_obj_get_height(tabview_content)/4 
         ));
-        LOG(DEBUG, LVSIM, "adding label and textbox to tab:0x%p [(%i,%i),(%i,%i)]\n", 
-            lv_tab,
-            lv_obj_get_x(lv_tab),
-            lv_obj_get_y(lv_tab),
-            lv_obj_get_width(lv_tab),
-            lv_obj_get_height(lv_tab)
-        );
-        idx++;
     }
 
-    lv_obj_t *logo = setTabViewImg(tab_bar, logo_img);
-    lv_obj_t *label = setTabViewTitle(tab_bar, title);
+    lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
+    lv_obj_t *label = setTabViewTitle(tabview_header, title);
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
-    label = setTabViewSubTitle(tab_bar, subtitle);
+    label = setTabViewSubTitle(tabview_header, subtitle);
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 }
 
-lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tab_bar, const std::string &logo_img) {
-    lv_obj_set_style_pad_left(tab_bar, LV_HOR_RES / 2, 0);
-    lv_obj_t *logo = lv_image_create(tab_bar);
+lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img) {
+    lv_obj_set_style_pad_left(tabview_header, LV_HOR_RES / 2, 0);
+    lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_image_set_src(logo, _lv_img_dsc_map.at(logo_img));
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
     return logo;
 }
 
-lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tab_bar, const std::string &title) {
-    lv_obj_t *label = lv_label_create(tab_bar);
+lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tabview_header, const std::string &title) {
+    lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_title);
     const lv_font_t *font_large = &lv_font_montserrat_24;
     lv_style_set_text_font(&_style_title, font_large);
@@ -122,8 +103,8 @@ lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tab_bar, const std::string &tit
     return label;
 }
 
-lv_obj_t *LeleTabView::setTabViewSubTitle(lv_obj_t *tab_bar, const std::string &subtitle) {
-    lv_obj_t *label = lv_label_create(tab_bar);
+lv_obj_t *LeleTabView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle) {
+    lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_text_muted);
     lv_style_set_text_opa(&_style_text_muted, LV_OPA_50);
     lv_obj_add_style(label, &_style_text_muted, 0);

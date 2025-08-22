@@ -66,18 +66,20 @@ class LeleTabView {
     const std::string &active_tab_bottom_border_color_str = "#121212",
     const std::vector<Tab> &tabs = {{"Tab0"}, {"Tab1"}, {"Tab2"}}
   );
-  lv_obj_t *obj() const { return _tab_view; }
+  lv_obj_t *getLvObj() const {
+    return _lv_obj;
+  }
   static std::unique_ptr<LeleTabView> fromJson(const cJSON *tabview);
   std::vector<Tab> _tabs;
 
   protected:
   static void tabViewDeleteEventCb(lv_event_t * e);
-  lv_obj_t *setTabViewImg(lv_obj_t *tab_bar, const std::string &logo_img);
-  lv_obj_t *setTabViewTitle(lv_obj_t *tab_bar, const std::string &title);
-  lv_obj_t *setTabViewSubTitle(lv_obj_t *tab_bar, const std::string &subtitle);
+  lv_obj_t *setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
+  lv_obj_t *setTabViewTitle(lv_obj_t *tabview_header, const std::string &title);
+  lv_obj_t *setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);
   lv_style_t _style_title;
   lv_style_t _style_text_muted;
-  lv_obj_t *_tab_view = nullptr;
+  lv_obj_t *_lv_obj = nullptr;
   const std::string _bgcolor = "#ffffff";
 };
 
