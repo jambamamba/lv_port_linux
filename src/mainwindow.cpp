@@ -46,34 +46,14 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
-    static std::vector<std::unique_ptr<LeleLabel>> labelx;
-    static std::vector<std::unique_ptr<LeleTextBox>> textx;
-
-    for(auto &tab: tabs) {
-        _tabs.emplace_back(tab);
-        _tabs[_tabs.size() - 1].setLvObj(
+    for(auto &&tab_: tabs) {
+        _tabs.emplace_back(tab_);
+        auto &tab = _tabs[_tabs.size() - 1];
+        tab.setLvObj(
           lv_tabview_add_tab(_lv_obj, tab.title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tabview_header, _tabs.size() - 1);
-        _tabs[_tabs.size() - 1].setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-        lv_obj_t *lv_tab = _tabs[_tabs.size() - 1].getLvObj();
-
-        LOG(DEBUG, LVSIM, "num tabs: %i\n", _tabs.size());
-        labelx.emplace_back(std::make_unique<LeleLabel>(
-            "asdfafda",
-            lv_tab, 
-            lv_obj_get_x(tabview_content), 
-            lv_obj_get_y(tabview_content),
-            lv_obj_get_width(tabview_content)/2, 
-            lv_obj_get_height(tabview_content)/4 
-        ));
-        textx.emplace_back(std::make_unique<LeleTextBox>(
-            "asdfafda",
-            lv_tab,
-            lv_obj_get_x(tabview_content), 
-            lv_obj_get_y(tabview_content)+lv_obj_get_height(tabview_content)/4, 
-            lv_obj_get_width(tabview_content)/2, 
-            lv_obj_get_height(tabview_content)/4 
-        ));
+        tab.setTabButton(button, active_tab_color, active_tab_bottom_border_color);
+        tab.loadTabContent();
     }
 
     lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
@@ -167,7 +147,8 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
     std::string active_tab_bgcolor_str = active_tab_bgcolor->valuestring;
 
-    const cJSON *active_tab_bottom_border_color = objFromJson(tabview, "active_tab_bottom_border_color");
+    const cJSON *active_tab_bottom_border_color = objFromJson(
+      tabview, "active_tab_bottom_border_color");
     if(!bgcolor) {
       LOG(WARNING, LVSIM, "tabview is missing active_tab_bottom_border_color\n");
     }
@@ -181,25 +162,95 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
     }
     std::vector<LeleTabView::Tab> tabs;
     if(cJSON_IsArray(json_tabs)) {
-        cJSON *array = nullptr;
-        cJSON_ArrayForEach(array, json_tabs) {
-            cJSON *item = nullptr;
-            std::string name; 
-            std::string img;
-            cJSON_ArrayForEach(item, array) {
-                LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
-                if(strcmp(item->string, "name") == 0) {
-                    name = item->valuestring;
-                }
-                else if(strcmp(item->string, "img") == 0) {
-                    img = item->valuestring;
-                }
-            }
-            tabs.emplace_back(name, img);
+        cJSON *json_tab = nullptr;
+        cJSON_ArrayForEach(json_tab, json_tabs) {
+            tabs.emplace_back(
+              LeleTabView::Tab::fromJson(json_tab));
         }
     }
 
-    return std::make_unique<LeleTabView>(title_str, subtitle_str, img_str, fgcolor_str, bgcolor_str, active_tab_bgcolor_str, active_tab_bottom_border_color_str, tabs);
+    return std::make_unique<LeleTabView>(
+      title_str, 
+      subtitle_str, 
+      img_str, 
+      fgcolor_str, 
+      bgcolor_str, 
+      active_tab_bgcolor_str, 
+      active_tab_bottom_border_color_str, 
+      tabs);
+}
+
+LeleTabView::Tab LeleTabView::Tab::fromJson(const cJSON *json_tab) {
+  std::string name; 
+  std::string img;
+  std::string content;
+  cJSON *item = nullptr;
+  cJSON_ArrayForEach(item, json_tab) {
+      LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
+      if(strcmp(item->string, "name")==0) {
+          name = cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "img")==0) {
+          img = cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "content")==0) {
+          content = cJSON_Print(item);//This has bug: cJSON_Duplicate(item, true);//dont forget to cJSON_Delete
+      }
+  }
+  return LeleTabView::Tab(name, img, content);
+}
+
+void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
+  _tab_button = button;
+  lv_obj_t *logo = lv_image_create(button);
+  lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+  lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+  lv_obj_center(logo);
+  lv_obj_t *label = lv_obj_get_child(button, 0);
+  lv_label_set_text(label, "");
+
+  lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
+  lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+  lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+}
+
+void LeleTabView::Tab::loadTabContent() {
+  if(_content.empty()) {
+    return;
+  }
+  cJSON *items = cJSON_Parse(_content.c_str());
+  cJSON *item = nullptr;
+  cJSON_ArrayForEach(item, items) {
+      // LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
+      if(strcmp(item->string, "label") == 0) {
+        LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
+        //osm todo: load LeleLabel from cJSON 'item' object, and insert it into the tab.
+        //osm todo: tab should have a list of all items.
+      }
+      if(strcmp(item->string, "textbox") == 0) {
+        LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
+        //osm todo: load LeleTextBox from cJSON 'item' object, and insert it into the tab.
+        //osm todo: tab should have a list of all items.
+      }
+  }
+    
+  // LOG(DEBUG, LVSIM, "num tabs: %i\n", _tabs.size());
+  // labelx.emplace_back(std::make_unique<LeleLabel>(
+  //     "asdfafda",
+  //     lv_tab,
+  //     lv_obj_get_x(tabview_content), 
+  //     lv_obj_get_y(tabview_content),
+  //     lv_obj_get_width(tabview_content)/2, 
+  //     lv_obj_get_height(tabview_content)/4 
+  // ));
+  // textx.emplace_back(std::make_unique<LeleTextBox>(
+  //     "asdfafda",
+  //     lv_tab,
+  //     lv_obj_get_x(tabview_content), 
+  //     lv_obj_get_y(tabview_content)+lv_obj_get_height(tabview_content)/4, 
+  //     lv_obj_get_width(tabview_content)/2, 
+  //     lv_obj_get_height(tabview_content)/4 
+  // ));
 }
 
 LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {

@@ -8,9 +8,28 @@
         "subtitle":"Local Weather Station",
         "img":"weather-hub-logo.png",
         "tabs":[
-            {"name":"Home","img":"home_icon.png"},
-            {"name":"History","img":"graph-icon.png"},
-            {"name":"Settings","img":"settings-hammer-wrench.png"}
+            {
+                "name":"Home",
+                "img":"home_icon.png",
+                "content":{
+                    "label":{
+                        "text":"hello world",
+                        "pos":{"x":"0","y":"0","width":"50%","height":"10%"}
+                    },
+                    "textbox":{
+                        "text":"hello world",
+                        "pos":{"x":"0","y":"10%","width":"50%","height":"10%"}
+                    }
+                }
+            },
+            {
+                "name":"History",
+                "img":"graph-icon.png"
+            },
+            {
+                "name":"Settings",
+                "img":"settings-hammer-wrench.png"
+            }
         ]
     }
 }

@@ -20,9 +20,11 @@ class LeleTabView {
   public:
   class Tab {
     public:
-      Tab(const std::string &title = "Tab", const std::string &img = "")
+      static Tab fromJson(const cJSON *tab);
+      Tab(const std::string &title = "Tab", const std::string &img = "", const std::string &content = "")
       : _title(title)
       , _img(img)
+      , _content(content)
       {};
       const std::string &title() const {
         return _title;
@@ -30,29 +32,21 @@ class LeleTabView {
       const std::string &img() const {
         return _img;
       }
+      const std::string &content() const {
+        return _content;
+      }
       lv_obj_t *getLvObj() const {
         return _lv_obj;
       }
       void setLvObj(lv_obj_t *obj) {
         _lv_obj = obj;
       }
-      void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
-        _tab_button = button;
-        lv_obj_t *logo = lv_image_create(button);
-        lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-        lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-        lv_obj_center(logo);
-        lv_obj_t *label = lv_obj_get_child(button, 0);
-        lv_label_set_text(label, "");
-
-        //osm todo: get these colors from json:
-        lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
-        lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
-        lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-      }
+      void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color);
+      void loadTabContent();
     protected:
       std::string _title;
       std::string _img;
+      std::string _content;
       lv_obj_t *_lv_obj = nullptr;
       lv_obj_t *_tab_button = nullptr;
   };
