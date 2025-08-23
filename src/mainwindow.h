@@ -77,9 +77,28 @@ class LeleTabView {
   const std::string _bgcolor = "#ffffff";
 };
 
+class LelePos {
+  public:
+  static LelePos fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
+  LelePos(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
+  int x() const;
+  int y() const;
+  int width() const;
+  int height() const;
+  protected:
+  int absFromPercent(int percent, int parent) const;
+  std::string _x = "0";
+  std::string _y = "0";
+  std::string _width = "0";
+  std::string _height = "0";
+  int _parent_width = 0;
+  int _parent_height = 0;
+};
+
 class LeleLabel {
   public:
-  LeleLabel(const char *text, lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
+  static LeleLabel fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  LeleLabel(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Label", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
   lv_obj_t *obj() const { return _text_box; }
   protected:
   lv_style_t _style;
@@ -89,7 +108,8 @@ class LeleLabel {
 
 class LeleTextBox {
   public:
-  LeleTextBox(const std::string &text = "Textbox", lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
+  static LeleTextBox fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  LeleTextBox(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Textbox", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
   lv_obj_t *obj() const { return _text_area; }
   protected:
   lv_style_t _style;

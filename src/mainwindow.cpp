@@ -109,42 +109,42 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
     if(!title) {
       LOG(WARNING, LVSIM, "tabview is missing title\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", title->string, title->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", title->string, title->valuestring);
     std::string title_str = title->valuestring;
 
     const cJSON *subtitle = objFromJson(tabview, "subtitle");
     if(!subtitle) {
       LOG(WARNING, LVSIM, "tabview is missing subtitle\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", subtitle->string, subtitle->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", subtitle->string, subtitle->valuestring);
     std::string subtitle_str = subtitle->valuestring;
 
     const cJSON *img = objFromJson(tabview, "img");
     if(!img) {
       LOG(WARNING, LVSIM, "tabview is missing img\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", img->string, img->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", img->string, img->valuestring);
     std::string img_str = img->valuestring;
     
     const cJSON *fgcolor = objFromJson(tabview, "fgcolor");
     if(!fgcolor) {
       LOG(WARNING, LVSIM, "tabview is missing fgcolor\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", fgcolor->string, fgcolor->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", fgcolor->string, fgcolor->valuestring);
     std::string fgcolor_str = fgcolor->valuestring;
 
     const cJSON *bgcolor = objFromJson(tabview, "bgcolor");
     if(!bgcolor) {
       LOG(WARNING, LVSIM, "tabview is missing bgcolor\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", bgcolor->string, bgcolor->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", bgcolor->string, bgcolor->valuestring);
     std::string bgcolor_str = bgcolor->valuestring;
 
     const cJSON *active_tab_bgcolor = objFromJson(tabview, "active_tab_bgcolor");
     if(!bgcolor) {
       LOG(WARNING, LVSIM, "tabview is missing active_tab_bgcolor\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
     std::string active_tab_bgcolor_str = active_tab_bgcolor->valuestring;
 
     const cJSON *active_tab_bottom_border_color = objFromJson(
@@ -152,7 +152,7 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
     if(!bgcolor) {
       LOG(WARNING, LVSIM, "tabview is missing active_tab_bottom_border_color\n");
     }
-    LOG(DEBUG, LVSIM, "@@@ %s:%s\n", active_tab_bottom_border_color->string, active_tab_bottom_border_color->valuestring);
+    LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bottom_border_color->string, active_tab_bottom_border_color->valuestring);
     std::string active_tab_bottom_border_color_str = active_tab_bottom_border_color->valuestring;
 
     const cJSON *json_tabs = objFromJson(tabview, "tabs");
@@ -186,7 +186,7 @@ LeleTabView::Tab LeleTabView::Tab::fromJson(const cJSON *json_tab) {
   std::string content;
   cJSON *item = nullptr;
   cJSON_ArrayForEach(item, json_tab) {
-      LOG(DEBUG, LVSIM, "@@@ %s:%s\n", item->string, item->valuestring);
+      LOG(DEBUG, LVSIM, "%s:%s\n", item->string, item->valuestring);
       if(strcmp(item->string, "name")==0) {
           name = cJSON_GetStringValue(item);
       }
@@ -221,39 +221,107 @@ void LeleTabView::Tab::loadTabContent() {
   cJSON *items = cJSON_Parse(_content.c_str());
   cJSON *item = nullptr;
   cJSON_ArrayForEach(item, items) {
-      // LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
+      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
       if(strcmp(item->string, "label") == 0) {
-        LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
-        //osm todo: load LeleLabel from cJSON 'item' object, and insert it into the tab.
+        LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
         //osm todo: tab should have a list of all items.
+        static auto label = LeleLabel::fromJson(_lv_obj, item);
       }
       if(strcmp(item->string, "textbox") == 0) {
-        LOG(DEBUG, LVSIM, "@@@ tab content: %s\n", item->string);
-        //osm todo: load LeleTextBox from cJSON 'item' object, and insert it into the tab.
+        LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
         //osm todo: tab should have a list of all items.
+        static auto textbox = LeleTextBox::fromJson(_lv_obj, item);
       }
   }
-    
-  // LOG(DEBUG, LVSIM, "num tabs: %i\n", _tabs.size());
-  // labelx.emplace_back(std::make_unique<LeleLabel>(
-  //     "asdfafda",
-  //     lv_tab,
-  //     lv_obj_get_x(tabview_content), 
-  //     lv_obj_get_y(tabview_content),
-  //     lv_obj_get_width(tabview_content)/2, 
-  //     lv_obj_get_height(tabview_content)/4 
-  // ));
-  // textx.emplace_back(std::make_unique<LeleTextBox>(
-  //     "asdfafda",
-  //     lv_tab,
-  //     lv_obj_get_x(tabview_content), 
-  //     lv_obj_get_y(tabview_content)+lv_obj_get_height(tabview_content)/4, 
-  //     lv_obj_get_width(tabview_content)/2, 
-  //     lv_obj_get_height(tabview_content)/4 
-  // ));
 }
 
-LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
+LelePos LelePos::fromJson(int parent_width, int parent_height, const cJSON *json) {
+  std::string x, y, width, height;
+  cJSON *item = nullptr;
+  cJSON_ArrayForEach(item, json) {
+      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
+      if(strcmp(item->string, "x") == 0) {
+        x = cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "y") == 0) {
+        y= cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "width") == 0) {
+        width= cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "height") == 0) {
+        height= cJSON_GetStringValue(item);
+      }
+    }
+    return LelePos(parent_width, parent_height, x, y, width, height);
+}
+
+LelePos::LelePos(int parent_width, int parent_height, const std::string &x, const std::string &y, const std::string &width, const std::string &height) 
+: _parent_width(parent_width)
+, _parent_height(parent_height) 
+, _x(x)
+, _y(y)
+, _width(width)
+, _height(height) {
+}
+int LelePos::absFromPercent(int percent, int parent) const {
+    return percent * parent / 100;
+}
+int LelePos::x() const {
+    if(_x.size() > 0 && _x.c_str()[_x.size() - 1] == '%' && _parent_width > 0) {
+        return absFromPercent(std::atoi(_x.c_str()), _parent_width);
+    }
+    else if(_x.size() > 0) {
+        return std::atoi(_x.c_str());
+    }
+    return 0;
+}
+int LelePos::y() const {
+    if(_y.size() > 0 && _y.c_str()[_y.size() - 1] == '%' && _parent_height > 0) {
+        return absFromPercent(std::atoi(_y.c_str()), _parent_height);
+    }
+    else if(_y.size() > 0) {
+        return std::atoi(_y.c_str());
+    }
+    return 0;
+}
+int LelePos::width() const {
+    if(_width.size() > 0 && _width.c_str()[_width.size() - 1] == '%' && _parent_width > 0) {
+        return absFromPercent(std::atoi(_width.c_str()), _parent_width);
+    }
+    else if(_width.size() > 0) {
+        return std::atoi(_width.c_str());
+    }
+    return 0;
+}
+int LelePos::height() const {
+    if(_height.size() > 0 && _height.c_str()[_height.size() - 1] == '%' && _parent_height > 0) {
+        return absFromPercent(std::atoi(_height.c_str()), _parent_height);
+    }
+    else if(_height.size() > 0) {
+        return std::atoi(_height.c_str());
+    }
+    return 0;
+}
+
+LeleLabel LeleLabel::fromJson(lv_obj_t *parent, const cJSON *json) {
+  cJSON *item = nullptr;
+  std::string text;
+  LelePos pos;
+  cJSON_ArrayForEach(item, json) {
+      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
+      if(strcmp(item->string, "text") == 0) {
+        text= cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "pos") == 0) {
+        pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
+      }
+    }
+    return LeleLabel(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
+}
+
+
+LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
     lv_style_set_width(&_style, width);
@@ -268,10 +336,26 @@ LeleLabel::LeleLabel(const char *text, lv_obj_t *parent, int x, int y, int width
     lv_obj_add_style(obj, &_style, 0);
 
     _text_box = lv_label_create(obj);
-    lv_label_set_text(_text_box, text);
+    lv_label_set_text(_text_box, text.c_str());
 }
 
-LeleTextBox::LeleTextBox(const std::string &text, lv_obj_t *parent, int x, int y, int width, int height, int corner_radius) {
+LeleTextBox LeleTextBox::fromJson(lv_obj_t *parent, const cJSON *json) {
+  cJSON *item = nullptr;
+  std::string text;
+  LelePos pos;
+  cJSON_ArrayForEach(item, json) {
+      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
+      if(strcmp(item->string, "text") == 0) {
+        text= cJSON_GetStringValue(item);
+      }
+      else if(strcmp(item->string, "pos") == 0) {
+        pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
+      }
+    }
+    return LeleTextBox(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
+}
+
+LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
     lv_style_set_width(&_style, width);
