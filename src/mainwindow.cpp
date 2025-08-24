@@ -24,7 +24,8 @@ LeleTabView::LeleTabView(
   const std::string &bgcolor_str,
   const std::string &active_tab_bgcolor_str,
   const std::string &active_tab_bottom_border_color_str,
-  const std::vector<LeleTabView::Tab> &tabs){
+  std::vector<std::unique_ptr<LeleTabView::Tab>> &tabs)
+  : LeleBase() {
 
     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
     int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
@@ -46,14 +47,15 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
-    for(auto &&tab_: tabs) {
-        _tabs.emplace_back(tab_);
-        auto &tab = _tabs[_tabs.size() - 1];
-        tab.setLvObj(
-          lv_tabview_add_tab(_lv_obj, tab.title().c_str()));
+    _tabs = std::move(tabs);
+    for(auto &tab: _tabs) {
+        // _tabs.emplace_back(std::move(tab_));
+        // auto &tab = _tabs[_tabs.size() - 1];
+        tab->setLvObj(
+          lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tabview_header, _tabs.size() - 1);
-        tab.setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-        tab.loadTabContent();
+        tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
+        tab->loadTabContent();
     }
 
     lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
@@ -103,7 +105,7 @@ void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
     }
 }
 
-std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
+std::optional<std::unique_ptr<LeleTabView>> LeleTabView::fromJson(const cJSON *tabview) {
 
     const cJSON *title = objFromJson(tabview, "title");
     if(!title) {
@@ -157,10 +159,10 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
 
     const cJSON *json_tabs = objFromJson(tabview, "tabs");
     if(!json_tabs) {
-        LOG(WARNING, LVSIM, "tabview is missing tabs\n");
-        return std::unique_ptr<LeleTabView>();
+        LOG(WARNING, LVSIM, "tabviewtabs is missing tabs\n");
+        return std::nullopt;
     }
-    std::vector<LeleTabView::Tab> tabs;
+    std::vector<std::unique_ptr<LeleTabView::Tab>> tabs;
     if(cJSON_IsArray(json_tabs)) {
         cJSON *json_tab = nullptr;
         cJSON_ArrayForEach(json_tab, json_tabs) {
@@ -180,7 +182,7 @@ std::unique_ptr<LeleTabView> LeleTabView::fromJson(const cJSON *tabview) {
       tabs);
 }
 
-LeleTabView::Tab LeleTabView::Tab::fromJson(const cJSON *json_tab) {
+std::unique_ptr<LeleTabView::Tab> LeleTabView::Tab::fromJson(const cJSON *json_tab) {
   std::string name; 
   std::string img;
   std::string content;
@@ -197,7 +199,7 @@ LeleTabView::Tab LeleTabView::Tab::fromJson(const cJSON *json_tab) {
           content = cJSON_Print(item);//This has bug: cJSON_Duplicate(item, true);//dont forget to cJSON_Delete
       }
   }
-  return LeleTabView::Tab(name, img, content);
+  return std::make_unique<LeleTabView::Tab>(name, img, content);
 }
 
 void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
@@ -225,12 +227,12 @@ void LeleTabView::Tab::loadTabContent() {
       if(strcmp(item->string, "label") == 0) {
         LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
         //osm todo: tab should have a list of all items.
-        static auto label = LeleLabel::fromJson(_lv_obj, item);
+        addChild(LeleLabel::fromJson(_lv_obj, item));
       }
       if(strcmp(item->string, "textbox") == 0) {
         LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
         //osm todo: tab should have a list of all items.
-        static auto textbox = LeleTextBox::fromJson(_lv_obj, item);
+        addChild(LeleTextBox::fromJson(_lv_obj, item));
       }
   }
 }
@@ -304,7 +306,7 @@ int LelePos::height() const {
     return 0;
 }
 
-LeleLabel LeleLabel::fromJson(lv_obj_t *parent, const cJSON *json) {
+std::unique_ptr<LeleLabel> LeleLabel::fromJson(lv_obj_t *parent, const cJSON *json) {
   cJSON *item = nullptr;
   std::string text;
   LelePos pos;
@@ -317,11 +319,12 @@ LeleLabel LeleLabel::fromJson(lv_obj_t *parent, const cJSON *json) {
         pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
       }
     }
-    return LeleLabel(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
+    return std::make_unique<LeleLabel>(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
 }
 
 
-LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) {
+LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius)
+  : LeleBase() {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
     lv_style_set_width(&_style, width);
@@ -335,11 +338,11 @@ LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, in
     lv_obj_set_pos(obj, x, y);
     lv_obj_add_style(obj, &_style, 0);
 
-    _text_box = lv_label_create(obj);
-    lv_label_set_text(_text_box, text.c_str());
+    _lv_obj = lv_label_create(obj);
+    lv_label_set_text(_lv_obj, text.c_str());
 }
 
-LeleTextBox LeleTextBox::fromJson(lv_obj_t *parent, const cJSON *json) {
+std::unique_ptr<LeleTextBox> LeleTextBox::fromJson(lv_obj_t *parent, const cJSON *json) {
   cJSON *item = nullptr;
   std::string text;
   LelePos pos;
@@ -352,10 +355,11 @@ LeleTextBox LeleTextBox::fromJson(lv_obj_t *parent, const cJSON *json) {
         pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
       }
     }
-    return LeleTextBox(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
+    return std::make_unique<LeleTextBox>(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
 }
 
-LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) {
+LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) 
+  : LeleBase() {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
     lv_style_set_width(&_style, width);
@@ -365,17 +369,17 @@ LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y
     lv_style_set_x(&_style, lv_pct(x));
     lv_style_set_y(&_style, y);
 
-    _text_area = lv_textarea_create(parent);
-    lv_obj_add_style(_text_area, &_style, 0);
-    lv_obj_set_pos(_text_area, x, y);
+    _lv_obj = lv_textarea_create(parent);
+    lv_obj_add_style(_lv_obj, &_style, 0);
+    lv_obj_set_pos(_lv_obj, x, y);
 
-    lv_textarea_set_text(_text_area, text.c_str());
-    // lv_obj_align(_text_area, LV_ALIGN_TOP_MID, x, y);
-    // lv_obj_set_size(_text_area, width, height);
-    lv_textarea_set_text_selection(_text_area, true);
-    lv_textarea_set_max_length(_text_area, 15);
-    lv_textarea_set_one_line(_text_area, true);
-    lv_obj_add_event_cb(_text_area, TextAreaEventCallback, LV_EVENT_CLICKED, _text_area);//also triggered when Enter key is pressed
+    lv_textarea_set_text(_lv_obj, text.c_str());
+    // lv_obj_align(_lv_obj, LV_ALIGN_TOP_MID, x, y);
+    // lv_obj_set_size(_lv_obj, width, height);
+    lv_textarea_set_text_selection(_lv_obj, true);
+    lv_textarea_set_max_length(_lv_obj, 15);
+    lv_textarea_set_one_line(_lv_obj, true);
+    lv_obj_add_event_cb(_lv_obj, TextAreaEventCallback, LV_EVENT_CLICKED, _lv_obj);//also triggered when Enter key is pressed
 }
 
 void LeleTextBox::TextAreaEventCallback(lv_event_t * e){

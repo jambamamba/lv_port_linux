@@ -25,6 +25,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <filesystem>
+#include <optional>
 
 #include <debug_logger/debug_logger.h>
 #include <json_utils/json_utils.h>
@@ -45,18 +46,18 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 extern simulator_settings_t settings;
 
 namespace {
-auto parseConfig() {
+std::optional<std::unique_ptr<LeleTabView>> parseConfig() {
     std::string config_json(std::filesystem::current_path());
     config_json += "/config.json";
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
         LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
-        return std::unique_ptr<LeleTabView>();
+        return std::nullopt;
     }
     const cJSON *tabview = objFromJson(root, "tabview");
     if(!tabview) {
         LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
-        return std::unique_ptr<LeleTabView>();
+        return std::nullopt;
     }
     return LeleTabView::fromJson(tabview);
 }

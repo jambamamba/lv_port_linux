@@ -7,6 +7,7 @@
 #include <res/img_dsc.h>
 #include <string>
 #include <vector>
+#include <optional>
 
 void addTextBox();
 void addTextArea();
@@ -15,12 +16,30 @@ void addLoaderArc();
 void addProgressBar();
 void addChart();
 
-
-class LeleTabView {
+class LeleBase {
   public:
-  class Tab {
+  LeleBase() = default;
+  virtual ~LeleBase() = default;
+
+  lv_obj_t *getLvObj() const {
+    return _lv_obj;
+  }
+  void setLvObj(lv_obj_t *obj) {
+    _lv_obj = obj;
+  }
+  void addChild(std::unique_ptr<LeleBase> &&child) {
+    _children.emplace_back(std::move(child));
+  }
+  protected:
+  lv_obj_t *_lv_obj = nullptr;
+  std::vector<std::unique_ptr<LeleBase>> _children;
+};
+
+class LeleTabView : public LeleBase {
+  public:
+  class Tab : public LeleBase {
     public:
-      static Tab fromJson(const cJSON *tab);
+      static std::unique_ptr<Tab> fromJson(const cJSON *tab);
       Tab(const std::string &title = "Tab", const std::string &img = "", const std::string &content = "")
       : _title(title)
       , _img(img)
@@ -35,19 +54,12 @@ class LeleTabView {
       const std::string &content() const {
         return _content;
       }
-      lv_obj_t *getLvObj() const {
-        return _lv_obj;
-      }
-      void setLvObj(lv_obj_t *obj) {
-        _lv_obj = obj;
-      }
       void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color);
       void loadTabContent();
     protected:
       std::string _title;
       std::string _img;
       std::string _content;
-      lv_obj_t *_lv_obj = nullptr;
       lv_obj_t *_tab_button = nullptr;
   };
   LeleTabView(
@@ -58,13 +70,10 @@ class LeleTabView {
     const std::string &bgcolor = "#444444",
     const std::string &active_tab_bgcolor_str = "#ffffff",
     const std::string &active_tab_bottom_border_color_str = "#121212",
-    const std::vector<Tab> &tabs = {{"Tab0"}, {"Tab1"}, {"Tab2"}}
+    std::vector<std::unique_ptr<Tab>> &tabs //= {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
   );
-  lv_obj_t *getLvObj() const {
-    return _lv_obj;
-  }
-  static std::unique_ptr<LeleTabView> fromJson(const cJSON *tabview);
-  std::vector<Tab> _tabs;
+  static std::optional<std::unique_ptr<LeleTabView>> fromJson(const cJSON *tabview);
+  std::vector<std::unique_ptr<Tab>> _tabs;
 
   protected:
   static void tabViewDeleteEventCb(lv_event_t * e);
@@ -73,7 +82,6 @@ class LeleTabView {
   lv_obj_t *setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);
   lv_style_t _style_title;
   lv_style_t _style_text_muted;
-  lv_obj_t *_lv_obj = nullptr;
   const std::string _bgcolor = "#ffffff";
 };
 
@@ -95,25 +103,21 @@ class LelePos {
   int _parent_height = 0;
 };
 
-class LeleLabel {
+class LeleLabel : public LeleBase  {
   public:
-  static LeleLabel fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  static std::unique_ptr<LeleLabel> fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
   LeleLabel(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Label", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
-  lv_obj_t *obj() const { return _text_box; }
   protected:
   lv_style_t _style;
-  lv_obj_t *_text_box = nullptr;
 };
 
 
-class LeleTextBox {
+class LeleTextBox : public LeleBase  {
   public:
-  static LeleTextBox fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  static std::unique_ptr<LeleTextBox> fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
   LeleTextBox(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Textbox", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
-  lv_obj_t *obj() const { return _text_area; }
   protected:
   lv_style_t _style;
-  lv_obj_t *_text_area = nullptr;
 
   static void TextAreaEventCallback(lv_event_t * e);
 };
