@@ -24,7 +24,17 @@
             },
             {
                 "name":"History",
-                "img":"graph-icon.png"
+                "img":"graph-icon.png",
+                "content":{
+                    "label":{
+                        "text":"hello world2",
+                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                    },
+                    "textbox":{
+                        "text":"hello world",
+                        "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                    }
+                }
             },
             {
                 "name":"Settings",

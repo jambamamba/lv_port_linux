@@ -24,7 +24,7 @@ LeleTabView::LeleTabView(
   const std::string &bgcolor_str,
   const std::string &active_tab_bgcolor_str,
   const std::string &active_tab_bottom_border_color_str,
-  std::vector<std::unique_ptr<LeleTabView::Tab>> &tabs)
+  std::vector<std::unique_ptr<LeleTabView::Tab>> &&tabs)
   : LeleBase() {
 
     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
@@ -47,15 +47,14 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
-    _tabs = std::move(tabs);
-    for(auto &tab: _tabs) {
-        // _tabs.emplace_back(std::move(tab_));
-        // auto &tab = _tabs[_tabs.size() - 1];
+    int idx = 0;
+    for(auto &tab: tabs) {
         tab->setLvObj(
           lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
-        lv_obj_t *button = lv_obj_get_child(tabview_header, _tabs.size() - 1);
+        lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
         tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
         tab->loadTabContent();
+        ++idx;
     }
 
     lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
@@ -63,6 +62,8 @@ LeleTabView::LeleTabView(
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
     label = setTabViewSubTitle(tabview_header, subtitle);
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+
+    _tabs = std::move(tabs);
 }
 
 lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img) {
@@ -81,7 +82,7 @@ lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tabview_header, const std::stri
     lv_style_set_text_font(&_style_title, font_large);
     lv_obj_add_style(label, &_style_title, 0);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_label_set_text_fmt(label, title.c_str());//"LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
+    lv_label_set_text_fmt(label, "%s", title.c_str());//"LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
     return label;
 }
 
@@ -179,7 +180,7 @@ std::optional<std::unique_ptr<LeleTabView>> LeleTabView::fromJson(const cJSON *t
       bgcolor_str, 
       active_tab_bgcolor_str, 
       active_tab_bottom_border_color_str, 
-      tabs);
+      std::move(tabs));
 }
 
 std::unique_ptr<LeleTabView::Tab> LeleTabView::Tab::fromJson(const cJSON *json_tab) {
@@ -226,12 +227,10 @@ void LeleTabView::Tab::loadTabContent() {
       // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
       if(strcmp(item->string, "label") == 0) {
         LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
-        //osm todo: tab should have a list of all items.
         addChild(LeleLabel::fromJson(_lv_obj, item));
       }
       if(strcmp(item->string, "textbox") == 0) {
         LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
-        //osm todo: tab should have a list of all items.
         addChild(LeleTextBox::fromJson(_lv_obj, item));
       }
   }
@@ -325,7 +324,7 @@ std::unique_ptr<LeleLabel> LeleLabel::fromJson(lv_obj_t *parent, const cJSON *js
 
 LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius)
   : LeleBase() {
-    lv_style_init(&_style);
+    lv_style_init(&_style); 
     lv_style_set_radius(&_style, corner_radius);
     lv_style_set_width(&_style, width);
     lv_style_set_height(&_style, height);

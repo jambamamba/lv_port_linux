@@ -70,7 +70,7 @@ class LeleTabView : public LeleBase {
     const std::string &bgcolor = "#444444",
     const std::string &active_tab_bgcolor_str = "#ffffff",
     const std::string &active_tab_bottom_border_color_str = "#121212",
-    std::vector<std::unique_ptr<Tab>> &tabs //= {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
+    std::vector<std::unique_ptr<Tab>> &&tabs = {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
   );
   static std::optional<std::unique_ptr<LeleTabView>> fromJson(const cJSON *tabview);
   std::vector<std::unique_ptr<Tab>> _tabs;

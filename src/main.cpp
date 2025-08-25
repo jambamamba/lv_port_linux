@@ -173,7 +173,8 @@ int main(int argc, char **argv)
 
     /* Enable for EVDEV support */
 #if LV_USE_EVDEV
-    if (driver_backends_init_backend("EVDEV") == -1) {
+    char evdev[] = "EVDEV";
+    if (driver_backends_init_backend(evdev) == -1) {
         die("Failed to initialize evdev");
     }
 #endif
