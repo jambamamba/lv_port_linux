@@ -53,7 +53,7 @@ LeleTabView::LeleTabView(
           lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
         lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
         tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-        tab->loadTabContent();
+        tab->setTabContent(lv_tabview_get_content(_lv_obj));
         ++idx;
     }
 
@@ -217,21 +217,18 @@ void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, in
   lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
 }
 
-void LeleTabView::Tab::loadTabContent() {
-  if(_content.empty()) {
+void LeleTabView::Tab::setTabContent(lv_obj_t *content) {
+  if(_content.empty() || !content) {
     return;
   }
   cJSON *items = cJSON_Parse(_content.c_str());
   cJSON *item = nullptr;
   cJSON_ArrayForEach(item, items) {
-      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
       if(strcmp(item->string, "label") == 0) {
-        LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
-        addChild(LeleLabel::fromJson(_lv_obj, item));
+        addChild(LeleLabel::fromJson(_lv_obj, lv_obj_get_width(content), lv_obj_get_height(content), item));
       }
       if(strcmp(item->string, "textbox") == 0) {
-        LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
-        addChild(LeleTextBox::fromJson(_lv_obj, item));
+        addChild(LeleTextBox::fromJson(_lv_obj, lv_obj_get_width(content), lv_obj_get_height(content), item));
       }
   }
 }
@@ -305,7 +302,7 @@ int LelePos::height() const {
     return 0;
 }
 
-std::unique_ptr<LeleLabel> LeleLabel::fromJson(lv_obj_t *parent, const cJSON *json) {
+std::unique_ptr<LeleLabel> LeleLabel::fromJson(lv_obj_t *parent, int container_width, int container_height, const cJSON *json) {
   cJSON *item = nullptr;
   std::string text;
   LelePos pos;
@@ -315,7 +312,7 @@ std::unique_ptr<LeleLabel> LeleLabel::fromJson(lv_obj_t *parent, const cJSON *js
         text= cJSON_GetStringValue(item);
       }
       else if(strcmp(item->string, "pos") == 0) {
-        pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
+        pos = LelePos::fromJson(container_width, container_height, item);
       }
     }
     return std::make_unique<LeleLabel>(parent, text, pos.x(), pos.y(), pos.width(), pos.height());
@@ -341,7 +338,7 @@ LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, in
     lv_label_set_text(_lv_obj, text.c_str());
 }
 
-std::unique_ptr<LeleTextBox> LeleTextBox::fromJson(lv_obj_t *parent, const cJSON *json) {
+std::unique_ptr<LeleTextBox> LeleTextBox::fromJson(lv_obj_t *parent, int container_width, int container_height, const cJSON *json) {
   cJSON *item = nullptr;
   std::string text;
   LelePos pos;
@@ -351,7 +348,7 @@ std::unique_ptr<LeleTextBox> LeleTextBox::fromJson(lv_obj_t *parent, const cJSON
         text= cJSON_GetStringValue(item);
       }
       else if(strcmp(item->string, "pos") == 0) {
-        pos = LelePos::fromJson(lv_obj_get_width(parent), lv_obj_get_height(parent), item);
+        pos = LelePos::fromJson(container_width, container_height, item);
       }
     }
     return std::make_unique<LeleTextBox>(parent, text, pos.x(), pos.y(), pos.width(), pos.height());

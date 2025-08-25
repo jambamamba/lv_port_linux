@@ -55,7 +55,7 @@ class LeleTabView : public LeleBase {
         return _content;
       }
       void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color);
-      void loadTabContent();
+      void setTabContent(lv_obj_t *content);
     protected:
       std::string _title;
       std::string _img;
@@ -105,7 +105,7 @@ class LelePos {
 
 class LeleLabel : public LeleBase  {
   public:
-  static std::unique_ptr<LeleLabel> fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  static std::unique_ptr<LeleLabel> fromJson(lv_obj_t *parent = lv_screen_active(), int container_width = 0, int container_height = 0, const cJSON *json = nullptr);
   LeleLabel(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Label", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
   protected:
   lv_style_t _style;
@@ -114,7 +114,7 @@ class LeleLabel : public LeleBase  {
 
 class LeleTextBox : public LeleBase  {
   public:
-  static std::unique_ptr<LeleTextBox> fromJson(lv_obj_t *parent = lv_screen_active(), const cJSON *json = nullptr);
+  static std::unique_ptr<LeleTextBox> fromJson(lv_obj_t *parent = lv_screen_active(), int container_width = 0, int container_height = 0, const cJSON *json = nullptr);
   LeleTextBox(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Textbox", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
   protected:
   lv_style_t _style;
