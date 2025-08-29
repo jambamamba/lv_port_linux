@@ -14,7 +14,9 @@ LeleTabView::LeleTabView(
   const std::string &bgcolor_str,
   const std::string &active_tab_bgcolor_str,
   const std::string &active_tab_bottom_border_color_str,
-  std::vector<std::unique_ptr<LeleTabView::Tab>> &&tabs)
+  std::map<std::string /*widget_type*/, std::string /*json_str*/> &tabs
+  // std::vector<std::unique_ptr<LeleBase>> &&tabs
+)
   : LeleBase() {
 
     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
@@ -38,13 +40,18 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
     int idx = 0;
-    for(auto &tab: tabs) {
-        tab->setLvObj(
-          lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
-        lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-        tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-        tab->setTabContent(lv_tabview_get_content(_lv_obj));
-        ++idx;
+    for(const auto &[widget_type, json_str]: tabs) {
+      if(widget_type != "LeleTabView::Tab") {
+        continue;
+      }
+      auto tab_obj = fromJson(json_str);
+      auto *tab = dynamic_cast<LeleTabView::Tab*>(tab_obj.get());
+      tab->setLvObj(
+        lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
+      lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
+      tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
+      tab->setTabContent(lv_tabview_get_content(_lv_obj));
+      ++idx;
     }
 
     lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
@@ -96,102 +103,102 @@ void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
     }
 }
 
-std::optional<std::unique_ptr<LeleTabView>> LeleTabView::fromJson(const cJSON *tabview) {
+// std::optional<std::unique_ptr<LeleTabView>> LeleTabView::fromJson(const cJSON *tabview) {
 
-    const cJSON *title = objFromJson(tabview, "title");
-    if(!title) {
-      LOG(WARNING, LVSIM, "tabview is missing title\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", title->string, title->valuestring);
-    std::string title_str = title->valuestring;
+//     const cJSON *title = objFromJson(tabview, "title");
+//     if(!title) {
+//       LOG(WARNING, LVSIM, "tabview is missing title\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", title->string, title->valuestring);
+//     std::string title_str = title->valuestring;
 
-    const cJSON *subtitle = objFromJson(tabview, "subtitle");
-    if(!subtitle) {
-      LOG(WARNING, LVSIM, "tabview is missing subtitle\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", subtitle->string, subtitle->valuestring);
-    std::string subtitle_str = subtitle->valuestring;
+//     const cJSON *subtitle = objFromJson(tabview, "subtitle");
+//     if(!subtitle) {
+//       LOG(WARNING, LVSIM, "tabview is missing subtitle\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", subtitle->string, subtitle->valuestring);
+//     std::string subtitle_str = subtitle->valuestring;
 
-    const cJSON *img = objFromJson(tabview, "img");
-    if(!img) {
-      LOG(WARNING, LVSIM, "tabview is missing img\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", img->string, img->valuestring);
-    std::string img_str = img->valuestring;
+//     const cJSON *img = objFromJson(tabview, "img");
+//     if(!img) {
+//       LOG(WARNING, LVSIM, "tabview is missing img\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", img->string, img->valuestring);
+//     std::string img_str = img->valuestring;
     
-    const cJSON *fgcolor = objFromJson(tabview, "fgcolor");
-    if(!fgcolor) {
-      LOG(WARNING, LVSIM, "tabview is missing fgcolor\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", fgcolor->string, fgcolor->valuestring);
-    std::string fgcolor_str = fgcolor->valuestring;
+//     const cJSON *fgcolor = objFromJson(tabview, "fgcolor");
+//     if(!fgcolor) {
+//       LOG(WARNING, LVSIM, "tabview is missing fgcolor\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", fgcolor->string, fgcolor->valuestring);
+//     std::string fgcolor_str = fgcolor->valuestring;
 
-    const cJSON *bgcolor = objFromJson(tabview, "bgcolor");
-    if(!bgcolor) {
-      LOG(WARNING, LVSIM, "tabview is missing bgcolor\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", bgcolor->string, bgcolor->valuestring);
-    std::string bgcolor_str = bgcolor->valuestring;
+//     const cJSON *bgcolor = objFromJson(tabview, "bgcolor");
+//     if(!bgcolor) {
+//       LOG(WARNING, LVSIM, "tabview is missing bgcolor\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", bgcolor->string, bgcolor->valuestring);
+//     std::string bgcolor_str = bgcolor->valuestring;
 
-    const cJSON *active_tab_bgcolor = objFromJson(tabview, "active_tab_bgcolor");
-    if(!bgcolor) {
-      LOG(WARNING, LVSIM, "tabview is missing active_tab_bgcolor\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
-    std::string active_tab_bgcolor_str = active_tab_bgcolor->valuestring;
+//     const cJSON *active_tab_bgcolor = objFromJson(tabview, "active_tab_bgcolor");
+//     if(!bgcolor) {
+//       LOG(WARNING, LVSIM, "tabview is missing active_tab_bgcolor\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bgcolor->string, active_tab_bgcolor->valuestring);
+//     std::string active_tab_bgcolor_str = active_tab_bgcolor->valuestring;
 
-    const cJSON *active_tab_bottom_border_color = objFromJson(
-      tabview, "active_tab_bottom_border_color");
-    if(!bgcolor) {
-      LOG(WARNING, LVSIM, "tabview is missing active_tab_bottom_border_color\n");
-    }
-    LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bottom_border_color->string, active_tab_bottom_border_color->valuestring);
-    std::string active_tab_bottom_border_color_str = active_tab_bottom_border_color->valuestring;
+//     const cJSON *active_tab_bottom_border_color = objFromJson(
+//       tabview, "active_tab_bottom_border_color");
+//     if(!bgcolor) {
+//       LOG(WARNING, LVSIM, "tabview is missing active_tab_bottom_border_color\n");
+//     }
+//     LOG(DEBUG, LVSIM, "%s:%s\n", active_tab_bottom_border_color->string, active_tab_bottom_border_color->valuestring);
+//     std::string active_tab_bottom_border_color_str = active_tab_bottom_border_color->valuestring;
 
-    const cJSON *json_tabs = objFromJson(tabview, "tabs");
-    if(!json_tabs) {
-        LOG(WARNING, LVSIM, "tabviewtabs is missing tabs\n");
-        return std::nullopt;
-    }
-    std::vector<std::unique_ptr<LeleTabView::Tab>> tabs;
-    if(cJSON_IsArray(json_tabs)) {
-        cJSON *json_tab = nullptr;
-        cJSON_ArrayForEach(json_tab, json_tabs) {
-            tabs.emplace_back(
-              LeleTabView::Tab::fromJson(json_tab));
-        }
-    }
+//     const cJSON *json_tabs = objFromJson(tabview, "tabs");
+//     if(!json_tabs) {
+//         LOG(WARNING, LVSIM, "tabviewtabs is missing tabs\n");
+//         return std::nullopt;
+//     }
+//     std::vector<std::unique_ptr<LeleTabView::Tab>> tabs;
+//     if(cJSON_IsArray(json_tabs)) {
+//         cJSON *json_tab = nullptr;
+//         cJSON_ArrayForEach(json_tab, json_tabs) {
+//             tabs.emplace_back(
+//               LeleTabView::Tab::fromJson(json_tab));
+//         }
+//     }
 
-    return std::make_unique<LeleTabView>(
-      title_str, 
-      subtitle_str, 
-      img_str, 
-      fgcolor_str, 
-      bgcolor_str, 
-      active_tab_bgcolor_str, 
-      active_tab_bottom_border_color_str, 
-      std::move(tabs));
-}
+//     return std::make_unique<LeleTabView>(
+//       title_str, 
+//       subtitle_str, 
+//       img_str, 
+//       fgcolor_str, 
+//       bgcolor_str, 
+//       active_tab_bgcolor_str, 
+//       active_tab_bottom_border_color_str, 
+//       std::move(tabs));
+// }
 
-std::unique_ptr<LeleTabView::Tab> LeleTabView::Tab::fromJson(const cJSON *json_tab) {
-  std::string name; 
-  std::string img;
-  std::string content;
-  cJSON *item = nullptr;
-  cJSON_ArrayForEach(item, json_tab) {
-      LOG(DEBUG, LVSIM, "%s:%s\n", item->string, item->valuestring);
-      if(strcmp(item->string, "name")==0) {
-          name = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "img")==0) {
-          img = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "content")==0) {
-          content = cJSON_Print(item);//This has bug: cJSON_Duplicate(item, true);//dont forget to cJSON_Delete
-      }
-  }
-  return std::make_unique<LeleTabView::Tab>(name, img, content);
-}
+// std::unique_ptr<LeleTabView::Tab> LeleTabView::Tab::fromJson(const cJSON *json_tab) {
+//   std::string name; 
+//   std::string img;
+//   std::string content;
+//   cJSON *item = nullptr;
+//   cJSON_ArrayForEach(item, json_tab) {
+//       LOG(DEBUG, LVSIM, "%s:%s\n", item->string, item->valuestring);
+//       if(strcmp(item->string, "name")==0) {
+//           name = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "img")==0) {
+//           img = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "tab_content")==0) {
+//           content = cJSON_Print(item);//This has bug: cJSON_Duplicate(item, true);//dont forget to cJSON_Delete
+//       }
+//   }
+//   return std::make_unique<LeleTabView::Tab>(name, img, content);
+// }
 
 void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
   _tab_button = button;
@@ -207,18 +214,18 @@ void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, in
   lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
 }
 
-void LeleTabView::Tab::setTabContent(lv_obj_t *content) {
-  if(_content.empty() || !content) {
+void LeleTabView::Tab::setTabContent(lv_obj_t *tab_content) {
+  if(_json.empty() || !tab_content) {
     return;
   }
-  cJSON *items = cJSON_Parse(_content.c_str());
+  cJSON *items = cJSON_Parse(_json.c_str());
   cJSON *item = nullptr;
   cJSON_ArrayForEach(item, items) {
       if(strcmp(item->string, "label") == 0) {
-        addChild(LeleBase::fromJson<LeleLabel>(_lv_obj, lv_obj_get_width(content), lv_obj_get_height(content), item));
+        addChild(LeleBase::fromJson<LeleLabel>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
       }
       if(strcmp(item->string, "textbox") == 0) {
-        addChild(LeleBase::fromJson<LeleTextBox>(_lv_obj, lv_obj_get_width(content), lv_obj_get_height(content), item));
+        addChild(LeleBase::fromJson<LeleTextbox>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
       }
   }
 }

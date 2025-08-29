@@ -9,45 +9,57 @@
         "img":"weather-hub-logo.png",
         "tabs":[
             {
-                "name":"Home",
-                "img":"home_icon.png",
-                "content":{
-                    "label":{
-                        "text":"hello world1",
-                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"},
-                        "bgcolor":"444444"
+                "tab":{
+                    "tab_button":{
+                        "name":"Home",
+                        "img":"home_icon.png"
                     },
-                    "textbox":{
-                        "text":"hello world1",
-                        "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                    "tab_content":{
+                        "label":{
+                            "text":"hello world1",
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"},
+                            "bgcolor":"444444"
+                        },
+                        "textbox":{
+                            "text":"hello world1",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                        }
                     }
                 }
             },
             {
-                "name":"History",
-                "img":"graph-icon.png",
-                "content":{
-                    "label":{
-                        "text":"hello world2",
-                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
-                    },  
-                    "textbox":{
-                        "text":"hello world2",
-                        "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                "tab":{
+                    "tab_button":{
+                        "name":"History",
+                        "img":"graph-icon.png"
+                    },
+                    "tab_content":{
+                        "label":{
+                            "text":"hello world2",
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                        },  
+                        "textbox":{
+                            "text":"hello world2",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                        }
                     }
                 }
             },
             {
-                "name":"Settings",
-                "img":"settings-hammer-wrench.png",
-                "content":{
-                    "label":{
-                        "text":"hello world3",
-                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
-                    },  
-                    "textbox":{
-                        "text":"hello world3",
-                        "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                "tab":{
+                    "tab_button":{
+                        "name":"Settings",
+                        "img":"settings-hammer-wrench.png"
+                    },
+                    "tab_content":{
+                        "label":{
+                            "text":"hello world3",
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                        },  
+                        "textbox":{
+                            "text":"hello world3",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                        }
                     }
                 }
             }

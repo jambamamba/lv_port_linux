@@ -139,10 +139,12 @@ add_library(lvgl_linux STATIC ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC})
 target_include_directories(lvgl_linux PRIVATE ${LV_LINUX_INC} ${PROJECT_SOURCE_DIR})
 
 set(LELE_WIDGETS
+    src/lelewidgets/lelenullwidget.cpp
     src/lelewidgets/lelelabel.cpp
     src/lelewidgets/leletextbox.cpp
     src/lelewidgets/lelepos.cpp
     src/lelewidgets/leletabview.cpp
+    src/lelewidgets/lelewidgetfactory.cpp
 )
 add_executable(lvglsim 
     src/main.cpp 

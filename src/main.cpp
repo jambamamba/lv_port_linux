@@ -46,7 +46,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 extern simulator_settings_t settings;
 
 namespace {
-std::optional<std::unique_ptr<LeleTabView>> parseConfig() {
+std::unique_ptr<LeleBase> parseConfig() {
     std::string config_json(std::filesystem::current_path());
     config_json += "/config.json";
     const cJSON* root = readJson(config_json.c_str());
@@ -54,12 +54,13 @@ std::optional<std::unique_ptr<LeleTabView>> parseConfig() {
         LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
         return std::nullopt;
     }
-    const cJSON *tabview = objFromJson(root, "tabview");
-    if(!tabview) {
-        LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
-        return std::nullopt;
-    }
-    return LeleTabView::fromJson(tabview);
+    // const cJSON *tabview = objFromJson(root, "tabview");
+    // if(!tabview) {
+    //     LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
+    //     return std::nullopt;
+    // }
+    LeleBase base;
+    return base.fromJson(cJSON_Print(root));
 }
 
 /* Internal functions */
@@ -194,7 +195,7 @@ int main(int argc, char **argv)
     // if(tab_titles.size() > 0) {
     //     LeleTabView tab_view("tabview", "logo.png", tab_titles);
     //     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
-    //     LeleTextBox text_box1("Textbox1", label1.obj(), 100, 0, 300);
+    //     LeleTextbox text_box1("Textbox1", label1.obj(), 100, 0, 300);
     //     LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
     // }
     

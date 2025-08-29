@@ -6,11 +6,17 @@ class LeleTabView : public LeleBase {
   public:
   class Tab : public LeleBase {
     public:
-      static std::unique_ptr<Tab> fromJson(const cJSON *tab);
-      Tab(const std::string &title = "Tab", const std::string &img = "", const std::string &content = "")
+      // static std::unique_ptr<Tab> fromJson(const cJSON *tab);
+      Tab(
+        const std::string &title = "Tab", 
+        const std::string &img = "", 
+        const std::string &tab_button_json = "",
+        const std::string &tab_content_json = ""
+      )
       : _title(title)
       , _img(img)
-      , _content(content)
+      , _tab_button_json(tab_button_json)
+      , _tab_content_json(tab_content_json)
       {};
       const std::string &title() const {
         return _title;
@@ -18,15 +24,13 @@ class LeleTabView : public LeleBase {
       const std::string &img() const {
         return _img;
       }
-      const std::string &content() const {
-        return _content;
-      }
       void setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color);
-      void setTabContent(lv_obj_t *content);
+      void setTabContent(lv_obj_t *tab_content);
     protected:
       std::string _title;
       std::string _img;
-      std::string _content;
+      std::string _tab_button_json;
+      std::string _tab_content_json;
       lv_obj_t *_tab_button = nullptr;
   };
   LeleTabView(
@@ -37,10 +41,11 @@ class LeleTabView : public LeleBase {
     const std::string &bgcolor = "#444444",
     const std::string &active_tab_bgcolor_str = "#ffffff",
     const std::string &active_tab_bottom_border_color_str = "#121212",
-    std::vector<std::unique_ptr<Tab>> &&tabs = {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
+    std::map<std::string /*widget_type*/, std::string /*json_str*/> &tabs = {}
+    // std::vector<std::unique_ptr<LeleBase>> &&tabs = {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
   );
-  static std::optional<std::unique_ptr<LeleTabView>> fromJson(const cJSON *tabview);
-  std::vector<std::unique_ptr<Tab>> _tabs;
+  // static std::optional<std::unique_ptr<LeleTabView>> fromJson(const cJSON *tabview);
+  std::vector<std::unique_ptr<LeleBase>> _tabs;
 
   protected:
   static void tabViewDeleteEventCb(lv_event_t * e);

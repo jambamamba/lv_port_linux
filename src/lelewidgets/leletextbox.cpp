@@ -4,7 +4,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) 
+LeleTextbox::LeleTextbox(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius) 
   : LeleBase() {
     lv_style_init(&_style);
     lv_style_set_radius(&_style, corner_radius);
@@ -28,7 +28,7 @@ LeleTextBox::LeleTextBox(lv_obj_t *parent, const std::string &text, int x, int y
     lv_obj_add_event_cb(_lv_obj, TextAreaEventCallback, LV_EVENT_CLICKED, _lv_obj);//also triggered when Enter key is pressed
 }
 
-void LeleTextBox::TextAreaEventCallback(lv_event_t * e){
+void LeleTextbox::TextAreaEventCallback(lv_event_t * e){
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * _ta = (lv_obj_t *)e->user_data;
 
