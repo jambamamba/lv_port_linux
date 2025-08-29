@@ -13,11 +13,12 @@
                 "img":"home_icon.png",
                 "content":{
                     "label":{
-                        "text":"hello world",
-                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                        "text":"hello world1",
+                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"},
+                        "bgcolor":"444444"
                     },
                     "textbox":{
-                        "text":"hello world",
+                        "text":"hello world1",
                         "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
                     }
                 }
@@ -29,16 +30,26 @@
                     "label":{
                         "text":"hello world2",
                         "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
-                    },
+                    },  
                     "textbox":{
-                        "text":"hello world",
+                        "text":"hello world2",
                         "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
                     }
                 }
             },
             {
                 "name":"Settings",
-                "img":"settings-hammer-wrench.png"
+                "img":"settings-hammer-wrench.png",
+                "content":{
+                    "label":{
+                        "text":"hello world3",
+                        "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                    },  
+                    "textbox":{
+                        "text":"hello world3",
+                        "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                    }
+                }
             }
         ]
     }

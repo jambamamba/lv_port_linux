@@ -38,7 +38,7 @@
 #include "src/lib/simulator_util.h"
 #include "src/lib/simulator_settings.h"
 
-#include "mainwindow.h"
+#include "src/lelewidgets/leletabview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 

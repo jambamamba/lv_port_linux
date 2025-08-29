@@ -138,7 +138,21 @@ target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DI
 add_library(lvgl_linux STATIC ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC})
 target_include_directories(lvgl_linux PRIVATE ${LV_LINUX_INC} ${PROJECT_SOURCE_DIR})
 
-add_executable(lvglsim src/main.cpp src/mainwindow.cpp src/chart.cpp ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC} ${LV_IMG_DSC_SRC})
+set(LELE_WIDGETS
+    src/lelewidgets/lelelabel.cpp
+    src/lelewidgets/leletextbox.cpp
+    src/lelewidgets/lelepos.cpp
+    src/lelewidgets/leletabview.cpp
+)
+add_executable(lvglsim 
+    src/main.cpp 
+    # src/mainwindow.cpp 
+    # src/chart.cpp 
+    ${LELE_WIDGETS}
+    ${LV_LINUX_SRC} 
+    ${LV_LINUX_BACKEND_SRC} 
+    ${LV_IMG_DSC_SRC}
+)
 target_link_libraries(lvglsim 
     lvgl_linux 
     lvgl 
