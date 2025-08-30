@@ -14,10 +14,8 @@ LeleTabView::LeleTabView(
   const std::string &bgcolor_str,
   const std::string &active_tab_bgcolor_str,
   const std::string &active_tab_bottom_border_color_str,
-  std::map<std::string /*widget_type*/, std::string /*json_str*/> &tabs
-  // std::vector<std::unique_ptr<LeleBase>> &&tabs
-)
-  : LeleBase() {
+  const std::vector<std::string> &tabs_json_str
+) : LeleBase() {
 
     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
     int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
@@ -40,17 +38,7 @@ LeleTabView::LeleTabView(
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
     int idx = 0;
-    for(const auto &[widget_type, json_str]: tabs) {
-      if(widget_type != "LeleTabView::Tab") {
-        continue;
-      }
-      auto tab_obj = fromJson(json_str);
-      auto *tab = dynamic_cast<LeleTabView::Tab*>(tab_obj.get());
-      tab->setLvObj(
-        lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
-      lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-      tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-      tab->setTabContent(lv_tabview_get_content(_lv_obj));
+    for(const auto &tab_json_str: tabs_json_str) {
       ++idx;
     }
 
@@ -59,8 +47,6 @@ LeleTabView::LeleTabView(
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
     label = setTabViewSubTitle(tabview_header, subtitle);
     lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
-
-    _tabs = std::move(tabs);
 }
 
 lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img) {
@@ -215,17 +201,17 @@ void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, in
 }
 
 void LeleTabView::Tab::setTabContent(lv_obj_t *tab_content) {
-  if(_json.empty() || !tab_content) {
-    return;
-  }
-  cJSON *items = cJSON_Parse(_json.c_str());
-  cJSON *item = nullptr;
-  cJSON_ArrayForEach(item, items) {
-      if(strcmp(item->string, "label") == 0) {
-        addChild(LeleBase::fromJson<LeleLabel>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
-      }
-      if(strcmp(item->string, "textbox") == 0) {
-        addChild(LeleBase::fromJson<LeleTextbox>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
-      }
-  }
+  // if(_json.empty() || !tab_content) {
+  //   return;
+  // }
+  // cJSON *items = cJSON_Parse(_json.c_str());
+  // cJSON *item = nullptr;
+  // cJSON_ArrayForEach(item, items) {
+  //     if(strcmp(item->string, "label") == 0) {
+  //       addChild(LeleBase::fromJson<LeleLabel>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
+  //     }
+  //     if(strcmp(item->string, "textbox") == 0) {
+  //       addChild(LeleBase::fromJson<LeleTextbox>(item, _lv_obj, lv_obj_get_width(tab_content), lv_obj_get_height(tab_content)));
+  //     }
+  // }
 }

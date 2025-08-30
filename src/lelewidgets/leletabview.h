@@ -6,18 +6,12 @@ class LeleTabView : public LeleBase {
   public:
   class Tab : public LeleBase {
     public:
-      // static std::unique_ptr<Tab> fromJson(const cJSON *tab);
-      Tab(
-        const std::string &title = "Tab", 
-        const std::string &img = "", 
-        const std::string &tab_button_json = "",
-        const std::string &tab_content_json = ""
-      )
-      : _title(title)
-      , _img(img)
-      , _tab_button_json(tab_button_json)
-      , _tab_content_json(tab_content_json)
-      {};
+      Tab(const std::vector<std::string> &json_str = {""})
+      : _json_str(json_str) 
+      {
+        // auto tab_obj = fromJson(tab_json_str);
+        // auto *tab = dynamic_cast<LeleTabView::Tab*>(tab_obj.get());
+      }
       const std::string &title() const {
         return _title;
       } 
@@ -29,8 +23,7 @@ class LeleTabView : public LeleBase {
     protected:
       std::string _title;
       std::string _img;
-      std::string _tab_button_json;
-      std::string _tab_content_json;
+      std::vector<std::string> _json_str;
       lv_obj_t *_tab_button = nullptr;
   };
   LeleTabView(
@@ -41,8 +34,7 @@ class LeleTabView : public LeleBase {
     const std::string &bgcolor = "#444444",
     const std::string &active_tab_bgcolor_str = "#ffffff",
     const std::string &active_tab_bottom_border_color_str = "#121212",
-    std::map<std::string /*widget_type*/, std::string /*json_str*/> &tabs = {}
-    // std::vector<std::unique_ptr<LeleBase>> &&tabs = {std::make_unique<Tab>("Tab0"), std::make_unique<Tab>("Tab1"), std::make_unique<Tab>("Tab2")}
+    const std::vector<std::string> &tabs_json_str = {""}
   );
   // static std::optional<std::unique_ptr<LeleTabView>> fromJson(const cJSON *tabview);
   std::vector<std::unique_ptr<LeleBase>> _tabs;

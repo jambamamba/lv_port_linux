@@ -11,7 +11,7 @@ namespace LeleWidgetFactory {
     LelePos _pos;
     std::string _text, _title, _subtitle, _name, _img, _fgcolor, _bgcolor, 
         _active_tab_bgcolor, _active_tab_bottom_border_color, _json_str;
-    std::map<std::string /*widget_type*/, std::string /*json_str*/> _widget; 
+    std::vector<std::pair<std::string /*widget_type*/, std::string /*json_str*/>> _widgets;
     // mutable std::vector<std::unique_ptr<LeleBase>> _tabs;
 
     FactoryInput(
