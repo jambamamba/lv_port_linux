@@ -49,135 +49,192 @@ namespace LeleWidgetFactory {
 // LelePos FactoryInput::lastPos() const {
 //     return _pos.empty() ? LelePos() : _pos.back();
 // }
-FactoryInput::FactoryInput(
-    const std::string &json_str,
-    int container_width,
-    int container_height
-){
+std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
     const cJSON *json = readJson(json_str.c_str());
     cJSON *item = nullptr;
+    std::vector<std::pair<std::string, std::string>> res;
     cJSON_ArrayForEach(item, json) {
-      // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
-      if(strcmp(item->string, "text") == 0) {
-          _text = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "pos") == 0) {
-          _pos = LelePos::fromJson(container_width, container_height, item);
-      }
-      else if(strcmp(item->string, "title") == 0) {
-          _title = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "subtitle") == 0) {
-          _subtitle = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "name") == 0) {
-          _name = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "img") == 0) {
-          _img = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "fgcolor") == 0) {
-          _fgcolor = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "bgcolor") == 0) {
-          _bgcolor = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "active_tab_bgcolor") == 0) {
-          _active_tab_bgcolor = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "active_tab_bottom_border_color") == 0) {
-          _active_tab_bottom_border_color = cJSON_GetStringValue(item);
-      }
-      else if(strcmp(item->string, "tabview") == 0) {
-        _widgets.emplace_back(
-            std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
-      }
-      else if(strcmp(item->string, "tabs") == 0) {
-        if(cJSON_IsArray(item)) {
-            cJSON *subitem = nullptr;
-            cJSON_ArrayForEach(subitem, item) {
-                if(strcmp(subitem->string, "tab") == 0) {
-                    _widgets.emplace_back(
-                        std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
-                }
-            }
-        }
-      }
-      else if(strcmp(item->string, "tab") == 0) {
-        _widgets.emplace_back(
-            std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
-      }
-      else if(strcmp(item->string, "tab_button") == 0) {
-        _widgets.emplace_back(
-            std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
-      }
-      else if(strcmp(item->string, "tab_content") == 0) {
-        _widgets.emplace_back(
-            std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
-      }
-      else {
-        LOG(WARNING, LVSIM, "Ignoring json item: %s\n", item->string);
-      }
-    }
-}
-
-std::vector<std::unique_ptr<LeleBase>> createLeleWidget(
-    const std::string &json_str,
-    lv_obj_t *parent,
-    int container_width, 
-    int container_height) {
-
-    std::vector<std::unique_ptr<LeleBase>> res;
-    LeleWidgetFactory::FactoryInput fi(
-        json_str, container_width, container_height);
-    for(const auto &[widget_type, json_str]: fi._widgets) {
-        if(widget_type != "tabview") {
-            LeleWidgetFactory::FactoryInput fi(json_str);
-            res.emplace_back(std::make_unique<LeleTabView>(
-                fi._title,
-                fi._subtitle,
-                fi._img,
-                fi._fgcolor, 
-                fi._bgcolor, 
-                fi._active_tab_bgcolor, 
-                fi._active_tab_bottom_border_color, 
-                fi._widgets
-            ));
-        }
-        else if(widget_type == "tab") {
-            return std::make_unique<LeleTabView::Tab>(
-                fi._widgets);
-        }
-        else if(widget_type == "tab_button") {
-            // return std::make_unique<LeleTabView::Tab>(
-            //     fi._widgets);
-        }    
-        else if(widget_type == "tab_content") {
-            // return std::make_unique<LeleTabView::Tab>(
-            //     fi._widgets);
-        }    
-        else if(widget_type == "LeleLabel") {
-            return std::make_unique<LeleLabel>(
-                parent, 
-                fi._text, 
-                fi._pos.x(), 
-                fi._pos.y(), 
-                fi._pos.width(), 
-                fi._pos.height()
+        if(cJSON_IsString(item)){
+            res.emplace_back(std::pair<std::string, std::string>
+                {item->string, cJSON_GetStringValue(item)}
             );
         }
-        else if(widget_type == "LeleTextbox") {
-            return std::make_unique<LeleTextbox>(
-                parent, 
-                fi._text, 
-                fi._pos.x(), 
-                fi._pos.y(), 
-                fi._pos.width(), 
-                fi._pos.height()
+        else if(cJSON_IsNumber(item) || cJSON_IsTrue(item) || cJSON_IsFalse(item) ||
+            cJSON_IsBool(item) || cJSON_IsNull(item)){
+            res.emplace_back(std::pair<std::string, std::string>
+                {item->string, std::to_string(cJSON_GetNumberValue(item))}
             );
-        }    
+        }
+        else if(cJSON_IsObject(item) || cJSON_IsArray(item)){
+            res.emplace_back(std::pair<std::string, std::string>
+                {item->string, cJSON_Print(item)}
+            );
+        }
+        else {
+            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", item->string);
+        }
     }
-
-    return std::make_unique<LeleNullWidget>();
+    return res;
 }
+
+std::map<std::string, std::vector<Token>> fromJson(const std::string &json_str) {
+    std::map<std::string, std::vector<Token>> res;
+    const cJSON *json = readJson(json_str.c_str());
+    auto tokens = tokenize(json_str);
+    for(const auto &[key, value]: tokens) {
+        Token token;
+        if(key == "tabview") {
+            token = std::make_unique<LeleTabView>(value.json_str);
+        }
+        else if(key == "tabs") {
+            token = std::make_unique<LeleTabView::Tabs>(value.json_str);
+        }
+        else if(key == "tab") {
+            token = std::make_unique<LeleTabView::Tab>(value.json_str);
+        }
+        if(key == "tab_button") {
+            token = std::make_unique<LeleTabView::TabButton>(value.json_str);
+        }
+        else if(key == "tab_content") {
+            token = std::make_unique<LeleTabView::TabContent>(value.json_str);
+        }
+        else {
+            token = value.json_str;
+        }
+        res[key].emplace_back(token);
+    }
+    return res;
+}
+
+// FactoryInput::FactoryInput(
+//     const std::string &json_str,
+//     int container_width,
+//     int container_height
+// ){
+//     const cJSON *json = readJson(json_str.c_str());
+//     cJSON *item = nullptr;
+//     cJSON_ArrayForEach(item, json) {
+//       // LOG(DEBUG, LVSIM, "tab content: %s\n", item->string);
+//       if(strcmp(item->string, "text") == 0) {
+//           _text = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "pos") == 0) {
+//           _pos = LelePos::fromJson(container_width, container_height, item);
+//       }
+//       else if(strcmp(item->string, "title") == 0) {
+//           _title = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "subtitle") == 0) {
+//           _subtitle = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "name") == 0) {
+//           _name = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "img") == 0) {
+//           _img = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "fgcolor") == 0) {
+//           _fgcolor = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "bgcolor") == 0) {
+//           _bgcolor = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "active_tab_bgcolor") == 0) {
+//           _active_tab_bgcolor = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "active_tab_bottom_border_color") == 0) {
+//           _active_tab_bottom_border_color = cJSON_GetStringValue(item);
+//       }
+//       else if(strcmp(item->string, "tabview") == 0) {
+//         _widgets.emplace_back(
+//             std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
+//       }
+//       else if(strcmp(item->string, "tabs") == 0) {
+//         if(cJSON_IsArray(item)) {
+//             cJSON *subitem = nullptr;
+//             cJSON_ArrayForEach(subitem, item) {
+//                 if(strcmp(subitem->string, "tab") == 0) {
+//                     _widgets.emplace_back(
+//                         std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
+//                 }
+//             }
+//         }
+//       }
+//       else if(strcmp(item->string, "tab") == 0) {
+//         _widgets.emplace_back(
+//             std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
+//       }
+//       else if(strcmp(item->string, "tab_button") == 0) {
+//         _widgets.emplace_back(
+//             std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
+//       }
+//       else if(strcmp(item->string, "tab_content") == 0) {
+//         _widgets.emplace_back(
+//             std::pair<std::string, std::string>{item->string, cJSON_Print(item)});
+//       }
+//       else {
+//         LOG(WARNING, LVSIM, "Ignoring json item: %s\n", item->string);
+//       }
+//     }
+// }
+
+// std::vector<std::unique_ptr<LeleBase>> createLeleWidget(
+//     const std::string &json_str,
+//     lv_obj_t *parent,
+//     int container_width, 
+//     int container_height) {
+
+//     std::vector<std::unique_ptr<LeleBase>> res;
+//     LeleWidgetFactory::FactoryInput fi(
+//         json_str, container_width, container_height);
+//     for(const auto &[widget_type, json_str]: fi._widgets) {
+//         if(widget_type != "tabview") {
+//             LeleWidgetFactory::FactoryInput fi(json_str);
+//             res.emplace_back(std::make_unique<LeleTabView>(
+//                 fi._title,
+//                 fi._subtitle,
+//                 fi._img,
+//                 fi._fgcolor, 
+//                 fi._bgcolor, 
+//                 fi._active_tab_bgcolor, 
+//                 fi._active_tab_bottom_border_color, 
+//                 fi._widgets
+//             ));
+//         }
+//         else if(widget_type == "tab") {
+//             return std::make_unique<LeleTabView::Tab>(
+//                 fi._widgets);
+//         }
+//         else if(widget_type == "tab_button") {
+//             // return std::make_unique<LeleTabView::Tab>(
+//             //     fi._widgets);
+//         }    
+//         else if(widget_type == "tab_content") {
+//             // return std::make_unique<LeleTabView::Tab>(
+//             //     fi._widgets);
+//         }    
+//         else if(widget_type == "LeleLabel") {
+//             return std::make_unique<LeleLabel>(
+//                 parent, 
+//                 fi._text, 
+//                 fi._pos.x(), 
+//                 fi._pos.y(), 
+//                 fi._pos.width(), 
+//                 fi._pos.height()
+//             );
+//         }
+//         else if(widget_type == "LeleTextbox") {
+//             return std::make_unique<LeleTextbox>(
+//                 parent, 
+//                 fi._text, 
+//                 fi._pos.x(), 
+//                 fi._pos.y(), 
+//                 fi._pos.width(), 
+//                 fi._pos.height()
+//             );
+//         }    
+//     }
+
+//     return std::make_unique<LeleNullWidget>();
+// }
 }//LeleWidgetFactory

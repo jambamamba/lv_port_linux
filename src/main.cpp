@@ -46,7 +46,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 extern simulator_settings_t settings;
 
 namespace {
-std::unique_ptr<LeleBase> parseConfig() {
+auto parseConfig() {
     std::string config_json(std::filesystem::current_path());
     config_json += "/config.json";
     const cJSON* root = readJson(config_json.c_str());
@@ -59,8 +59,7 @@ std::unique_ptr<LeleBase> parseConfig() {
     //     LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
     //     return std::nullopt;
     // }
-    LeleBase base;
-    return base.fromJson(cJSON_Print(root));
+    return LeleWidgetFactory::fromJson(cJSON_Print(root));
 }
 
 /* Internal functions */

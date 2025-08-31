@@ -3,50 +3,142 @@
 #include "lelelabel.h"
 #include "leletextbox.h"
 #include "lelepos.h"
+#include "lelewidgetfactory.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleTabView::LeleTabView(
-  const std::string &title,
-  const std::string &subtitle,
-  const std::string &logo_img,
-  const std::string &fgcolor_str,
-  const std::string &bgcolor_str,
-  const std::string &active_tab_bgcolor_str,
-  const std::string &active_tab_bottom_border_color_str,
-  const std::vector<std::string> &tabs_json_str
-) : LeleBase() {
+// LeleTabView::LeleTabView(
+//   const std::string &title,
+//   const std::string &subtitle,
+//   const std::string &logo_img,
+//   const std::string &fgcolor_str,
+//   const std::string &bgcolor_str,
+//   const std::string &active_tab_bgcolor_str,
+//   const std::string &active_tab_bottom_border_color_str,
+//   const std::vector<std::string> &tabs_json_str
+// ) : LeleBase() {
 
-    int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
-    int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
-    int active_tab_color = std::stoi(active_tab_bgcolor_str, nullptr, 16);
-    int active_tab_bottom_border_color = std::stoi(active_tab_bottom_border_color_str, nullptr, 16);
+//     int fgcolor = std::stoi(fgcolor_str, nullptr, 16);
+//     int bgcolor = std::stoi(bgcolor_str, nullptr, 16);
+//     int active_tab_color = std::stoi(active_tab_bgcolor_str, nullptr, 16);
+//     int active_tab_bottom_border_color = std::stoi(active_tab_bottom_border_color_str, nullptr, 16);
 
-    constexpr int32_t tab_h = 75;
-    _lv_obj = lv_tabview_create(lv_screen_active());
-    lv_tabview_set_tab_bar_size(_lv_obj, tab_h);
-    lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
+    // constexpr int32_t tab_h = 75;
+    // _lv_obj = lv_tabview_create(lv_screen_active());
+    // lv_tabview_set_tab_bar_size(_lv_obj, tab_h);
+    // lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
 
-    const lv_font_t *font_normal = &lv_font_montserrat_16;
-    lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
-    lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(bgcolor), LV_PART_MAIN);
+    // const lv_font_t *font_normal = &lv_font_montserrat_16;
+    // lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
+    // lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
+    // lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(bgcolor), LV_PART_MAIN);
     
-    lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
-    lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
-    lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
-    lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
+    // lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
+    // lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
+    // lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
+    // lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
-    int idx = 0;
-    for(const auto &tab_json_str: tabs_json_str) {
-      ++idx;
+//     int idx = 0;
+//     for(const auto &tab_json_str: tabs_json_str) {
+//       ++idx;
+//     }
+
+    // lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
+    // lv_obj_t *label = setTabViewTitle(tabview_header, title);
+    // lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+    // label = setTabViewSubTitle(tabview_header, subtitle);
+    // lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+// }
+
+LeleTabView::Tabs::Tabs(const std::string &json_str) {
+  auto tokens = LeleWidgetFactory::fromJson(json_str);
+  for (const auto &[key, value]: tokens) {
+    if(key == "tabs") {
+      _tab = LeleWidgetFactory::fromJson(value);
     }
+  }
+}
+LeleTabView::Tab::Tab(const std::string &json_str) {
+  auto tokens = LeleWidgetFactory::fromJson(json_str);
+  for (const auto &[key, value]: tokens) {
+    if(key == "tab_button") {
+      _tab_button = LeleWidgetFactory::fromJson(value);
+    }
+    else if(key == "tab_content") {
+      _tab_content = LeleWidgetFactory::fromJson(value);
+    }
+  }
+}
+LeleTabView::TabButton::TabButton(const std::string &json_str) {
+  auto tokens = LeleWidgetFactory::fromJson(json_str);
+  for (const auto &[key, value]: tokens) {
+    if(key == "name") {
+      _name = value;
+    }
+    else if(key == "img") {
+      _img = value;
+    }
+  }
+}
+LeleTabView::TabContent::TabContent(const std::string &json_str) {
+  _widget = LeleWidgetFactory::fromJson(json_str);
+}
+LeleTabView::LeleTabView(const std::string &json_str) {
+  int fgcolor, bgcolor, active_tab_color, active_tab_bottom_border_color;
+  const std::string title, subtitle, logo_img;
 
-    lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
-    lv_obj_t *label = setTabViewTitle(tabview_header, title);
-    lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
-    label = setTabViewSubTitle(tabview_header, subtitle);
-    lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+  auto tokens = LeleWidgetFactory::fromJson(json_str);
+  for (const auto &[key, value]: tokens) {
+    if(key == "tabs") {
+      for(const auto &obj:value){
+        if (std::holds_alternative<std::unique_ptr<LeleBase>>(obj)) {
+          _tabs.emplace_back(LeleWidgetFactory::fromJson(obj));
+      }
+    }
+    else if(key == "fgcolor") {
+      fgcolor = std::stoi(value, nullptr, 16);
+    }
+    else if(key == "bgcolor") {
+      bgcolor = std::stoi(value, nullptr, 16);
+    }
+    else if(key == "active_tab_color") {
+      active_tab_color = std::stoi(value, nullptr, 16);
+    }
+    else if(key == "active_tab_bottom_border_color") {
+      active_tab_bottom_border_color = std::stoi(value, nullptr, 16);
+    }
+    else if(key == "title") {
+      title = value;
+    }
+    else if(key == "subtitle") {
+      subtitle = value;
+    }
+    else if(key == "logo_img") {
+      logo_img = value;
+    }
+  }
+
+  //osm todo: get the hard coded values from config.json:
+  constexpr int32_t tab_h = 75;
+  _lv_obj = lv_tabview_create(lv_screen_active());
+  lv_tabview_set_tab_bar_size(_lv_obj, tab_h);
+  lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
+
+  const lv_font_t *font_normal = &lv_font_montserrat_16;
+  lv_obj_set_style_text_font(lv_screen_active(), font_normal, 0);
+  lv_obj_set_style_text_color(lv_screen_active(), lv_color_hex(fgcolor), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(bgcolor), LV_PART_MAIN);
+  
+  lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
+  lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
+  lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
+
+  lv_obj_t *logo = setTabViewImg(tabview_header, logo_img);
+  lv_obj_t *label = setTabViewTitle(tabview_header, title);
+  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+  label = setTabViewSubTitle(tabview_header, subtitle);
+  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 }
 
 lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img) {

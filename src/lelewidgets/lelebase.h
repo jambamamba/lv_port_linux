@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lelepos.h"
-#include "lelewidgetfactory.h"
 
 #include <typeinfo>
 
@@ -28,15 +27,6 @@ class LeleBase {
   }
   void addChild(std::unique_ptr<LeleBase> &&child) {
     _children.emplace_back(std::move(child));
-  }
-
-  std::vector<std::unique_ptr<LeleBase>> fromJson(
-    const std::string &json_str,
-    lv_obj_t *parent = lv_screen_active(), 
-    int container_width = lv_obj_get_width(lv_screen_active()), 
-    int container_height = lv_obj_get_height(lv_screen_active())) const {
-
-    return LeleWidgetFactory::createLeleWidget(json_str, parent, container_width, container_height);
   }
   protected:
   lv_obj_t *_lv_obj = nullptr;
