@@ -28,6 +28,6 @@ namespace LeleWidgetFactory {
   //   int container_height = lv_obj_get_height(lv_screen_active())
   // );
   using Token = std::variant<std::string, std::unique_ptr<LeleBase>>;
-  std::map<std::string, std::vector<Token>> fromJson(const std::string &json_str);
+  std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str);
 
 }//LeleWidgetFactory

@@ -52,7 +52,7 @@ auto parseConfig() {
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
         LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
-        return std::nullopt;
+        return std::vector<std::pair<std::string, LeleWidgetFactory::Token>>();
     }
     // const cJSON *tabview = objFromJson(root, "tabview");
     // if(!tabview) {
@@ -190,7 +190,7 @@ int main(int argc, char **argv)
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
 
-    auto tab_view = parseConfig();
+    auto tokens = parseConfig();
     // if(tab_titles.size() > 0) {
     //     LeleTabView tab_view("tabview", "logo.png", tab_titles);
     //     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);

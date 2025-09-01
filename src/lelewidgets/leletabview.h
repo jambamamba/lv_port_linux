@@ -1,21 +1,15 @@
 #pragma once
 
 #include "lelebase.h"
+#include "lelewidgetfactory.h"
 
 class LeleTabView : public LeleBase {
   public:
-  class Tabs : public LeleBase {
+  class TabContent : public LeleBase {
     public:
-    Tabs(const std::string &json_str);
+    TabContent(const std::string &json_str);
     protected:
-    std::map<std::string, std::vector<LeleWidgetFactory::Token>> _tab;
-  }; 
-  class Tab : public LeleBase {
-    public:
-    Tab(const std::string &json_str);
-    protected:
-    std::map<std::string, std::vector<LeleWidgetFactory::Token>> _tab_button;
-    std::map<std::string, std::vector<LeleWidgetFactory::Token>> _tab_content;
+    std::vector<std::unique_ptr<LeleBase>> _widgets;
   };
   class TabButton : public LeleBase {
     public:
@@ -24,12 +18,19 @@ class LeleTabView : public LeleBase {
     std::string _name;
     std::string _img;
   };
-  class TabContent : public LeleBase {
+  class Tab : public LeleBase {
     public:
-    TabContent(const std::string &json_str);
+    Tab(const std::string &json_str);
     protected:
-    std::map<std::string, std::vector<LeleWidgetFactory::Token>> _widget;
+    std::vector<std::unique_ptr<LeleBase>> _tab_button;
+    std::vector<std::unique_ptr<LeleBase>> _tab_content;
   };
+  class Tabs : public LeleBase {
+    public:
+    Tabs(const std::string &json_str);
+    protected:
+    std::vector<std::unique_ptr<LeleBase>> _tab;
+  }; 
   // class Tab : public LeleBase {
   //   public:
   //     Tab(const std::vector<std::string> &json_str = {""})

@@ -166,6 +166,8 @@ target_link_libraries(lvglsim
     ${PKG_CONFIG_LIB}
     utils::utils
 )
+# target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
+
 
 # Install the lvgl_linux library and its headers
 install(DIRECTORY src/lib/

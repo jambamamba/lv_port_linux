@@ -77,31 +77,33 @@ std::vector<std::pair<std::string, std::string>> tokenize(const std::string &jso
     return res;
 }
 
-std::map<std::string, std::vector<Token>> fromJson(const std::string &json_str) {
-    std::map<std::string, std::vector<Token>> res;
+std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str) {
+    std::vector<std::pair<std::string, Token>> res;
     const cJSON *json = readJson(json_str.c_str());
     auto tokens = tokenize(json_str);
-    for(const auto &[key, value]: tokens) {
+    for(const auto &[lhs, rhs]: tokens) {
         Token token;
-        if(key == "tabview") {
-            token = std::make_unique<LeleTabView>(value.json_str);
+        if(lhs == "tabview") {
+            token = std::make_unique<LeleTabView>(rhs);
         }
-        else if(key == "tabs") {
-            token = std::make_unique<LeleTabView::Tabs>(value.json_str);
+        else if(lhs == "tabs") {
+            token = std::make_unique<LeleTabView::Tabs>(rhs);
         }
-        else if(key == "tab") {
-            token = std::make_unique<LeleTabView::Tab>(value.json_str);
+        else if(lhs == "tab") {
+            token = std::make_unique<LeleTabView::Tab>(rhs);
         }
-        if(key == "tab_button") {
-            token = std::make_unique<LeleTabView::TabButton>(value.json_str);
+        if(lhs == "tab_button") {
+            token = std::make_unique<LeleTabView::TabButton>(rhs);
         }
-        else if(key == "tab_content") {
-            token = std::make_unique<LeleTabView::TabContent>(value.json_str);
+        else if(lhs == "tab_content") {
+            token = std::make_unique<LeleTabView::TabContent>(rhs);
         }
         else {
-            token = value.json_str;
+            token = rhs;
         }
-        res[key].emplace_back(token);
+        res.emplace_back(
+            std::make_pair<std::string, Token>(
+                std::string(lhs), std::move(token)));
     }
     return res;
 }
