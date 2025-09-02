@@ -1,9 +1,18 @@
 #pragma once
 
-#include "lelepos.h"
-
+#include <debug_logger/debug_logger.h>
+#include <filesystem>
+#include <json_utils/json_utils.h>
+#include <lvgl/lvgl_private.h>
+#include <memory>
+#include <optional>
+#include <res/img_dsc.h>
+#include <string.h>
+#include <string>
 #include <typeinfo>
 #include <variant>
+#include <vector>
+
 
 class LeleBase;
 namespace LeleWidgetFactory {
@@ -28,6 +37,9 @@ namespace LeleWidgetFactory {
   //   int container_height = lv_obj_get_height(lv_screen_active())
   // );
   using Token = std::variant<std::string, std::unique_ptr<LeleBase>>;
-  std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str);
+  std::vector<std::pair<std::string, Token>> fromConfig(
+    const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
+  std::vector<std::pair<std::string, Token>> fromJson(
+    const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
 
 }//LeleWidgetFactory

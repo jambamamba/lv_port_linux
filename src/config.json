@@ -18,7 +18,8 @@
                         "label":{
                             "text":"hello world1",
                             "pos":{"x":"0","y":"0","width":"50%","height":"20%"},
-                            "bgcolor":"444444"
+                            "bgcolor":"444444",
+                            "corner_radius":"5"
                         },
                         "textbox":{
                             "text":"hello world1",

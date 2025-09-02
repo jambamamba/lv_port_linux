@@ -4,8 +4,46 @@
 #include "leletabview.h"
 #include "lelelabel.h"
 #include "leletextbox.h"
+#include "lelepos.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
+
+namespace {
+static std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
+    const cJSON *json = cJSON_Parse(json_str.c_str());
+    cJSON *item = nullptr;
+    std::vector<std::pair<std::string, std::string>> res;
+    cJSON_ArrayForEach(item, json) {
+        LOG(DEBUG, LVSIM, "Process item: %s\n", item->string);
+        std::string key = !item->string ? "" : item->string;
+        if(cJSON_IsString(item)) {
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, cJSON_GetStringValue(item)}
+            );
+        }
+        else if(cJSON_IsNumber(item) || cJSON_IsTrue(item) || cJSON_IsFalse(item) ||
+            cJSON_IsBool(item) || cJSON_IsNull(item)){
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, std::to_string(cJSON_GetNumberValue(item))}
+            );
+        }
+        else if(cJSON_IsObject(item)) {
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, cJSON_Print(item)}
+            );
+        }
+        else if(cJSON_IsArray(item)) {
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, cJSON_Print(item)}
+            );
+        }
+        else {
+            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key);
+        }
+    }
+    return res;
+}
+}//namespace
 
 namespace LeleWidgetFactory {
 
@@ -49,54 +87,33 @@ namespace LeleWidgetFactory {
 // LelePos FactoryInput::lastPos() const {
 //     return _pos.empty() ? LelePos() : _pos.back();
 // }
-std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
-    const cJSON *json = readJson(json_str.c_str());
-    cJSON *item = nullptr;
-    std::vector<std::pair<std::string, std::string>> res;
-    cJSON_ArrayForEach(item, json) {
-        if(cJSON_IsString(item)){
-            res.emplace_back(std::pair<std::string, std::string>
-                {item->string, cJSON_GetStringValue(item)}
-            );
-        }
-        else if(cJSON_IsNumber(item) || cJSON_IsTrue(item) || cJSON_IsFalse(item) ||
-            cJSON_IsBool(item) || cJSON_IsNull(item)){
-            res.emplace_back(std::pair<std::string, std::string>
-                {item->string, std::to_string(cJSON_GetNumberValue(item))}
-            );
-        }
-        else if(cJSON_IsObject(item) || cJSON_IsArray(item)){
-            res.emplace_back(std::pair<std::string, std::string>
-                {item->string, cJSON_Print(item)}
-            );
-        }
-        else {
-            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", item->string);
-        }
-    }
-    return res;
-}
 
-std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str) {
+
+std::vector<std::pair<std::string, Token>> fromJson(
+    const std::string &json_str, lv_obj_t *parent) {
+
     std::vector<std::pair<std::string, Token>> res;
-    const cJSON *json = readJson(json_str.c_str());
+    // const cJSON *json = readJson(json_str.c_str());
     auto tokens = tokenize(json_str);
     for(const auto &[lhs, rhs]: tokens) {
         Token token;
         if(lhs == "tabview") {
-            token = std::make_unique<LeleTabView>(rhs);
+            token = std::make_unique<LeleTabView>(rhs, parent);
         }
         else if(lhs == "tabs") {
-            token = std::make_unique<LeleTabView::Tabs>(rhs);
+            token = std::make_unique<LeleTabView::Tabs>(rhs, parent);
         }
         else if(lhs == "tab") {
-            token = std::make_unique<LeleTabView::Tab>(rhs);
+            token = std::make_unique<LeleTabView::Tab>(rhs, parent);
         }
-        if(lhs == "tab_button") {
-            token = std::make_unique<LeleTabView::TabButton>(rhs);
+        else if(lhs == "tab_button") {
+            token = std::make_unique<LeleTabView::TabButton>(rhs, parent);
         }
         else if(lhs == "tab_content") {
-            token = std::make_unique<LeleTabView::TabContent>(rhs);
+            token = std::make_unique<LeleTabView::TabContent>(rhs, parent);
+        }
+        else if(lhs == "pos") {
+            token = std::make_unique<LelePos>(rhs, parent);
         }
         else {
             token = rhs;
@@ -108,6 +125,14 @@ std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str)
     return res;
 }
 
+std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_json) {
+    const cJSON* root = readJson(config_json.c_str());
+    if(!root) {
+        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
+        return std::vector<std::pair<std::string, LeleWidgetFactory::Token>>();
+    }
+    return LeleWidgetFactory::fromJson(cJSON_Print(root));
+}
 // FactoryInput::FactoryInput(
 //     const std::string &json_str,
 //     int container_width,

@@ -46,21 +46,6 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 extern simulator_settings_t settings;
 
 namespace {
-auto parseConfig() {
-    std::string config_json(std::filesystem::current_path());
-    config_json += "/config.json";
-    const cJSON* root = readJson(config_json.c_str());
-    if(!root) {
-        LOG(DEBUG, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
-        return std::vector<std::pair<std::string, LeleWidgetFactory::Token>>();
-    }
-    // const cJSON *tabview = objFromJson(root, "tabview");
-    // if(!tabview) {
-    //     LOG(DEBUG, LVSIM, "Failed to load tabview from config_json:'%s'\n", config_json.c_str());
-    //     return std::nullopt;
-    // }
-    return LeleWidgetFactory::fromJson(cJSON_Print(root));
-}
 
 /* Internal functions */
 static void print_lvgl_version(void);
@@ -190,7 +175,7 @@ int main(int argc, char **argv)
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
 
-    auto tokens = parseConfig();
+    auto tokens = LeleWidgetFactory::fromConfig();
     // if(tab_titles.size() > 0) {
     //     LeleTabView tab_view("tabview", "logo.png", tab_titles);
     //     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);

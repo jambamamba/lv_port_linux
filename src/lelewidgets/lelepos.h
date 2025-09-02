@@ -1,19 +1,12 @@
 #pragma once
 
-#include <debug_logger/debug_logger.h>
-#include <json_utils/json_utils.h>
-#include <lvgl/lvgl_private.h>
-#include <memory>
-#include <optional>
-#include <res/img_dsc.h>
-#include <string.h>
-#include <string>
-#include <vector>
+#include "lelebase.h"
 
-class LelePos {
+class LelePos : public LeleBase {
   public:
-  static LelePos fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
-  LelePos(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
+  // static LelePos fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
+  // LelePos(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
+  LelePos(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
   int x() const;
   int y() const;
   int width() const;

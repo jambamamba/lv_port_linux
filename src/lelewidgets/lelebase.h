@@ -1,7 +1,9 @@
 #pragma once
 
-#include "lelepos.h"
+#include "lelewidgetfactory.h"
 
+#include <json_utils/json_utils.h>
+#include <lvgl/lvgl_private.h>
 #include <typeinfo>
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
@@ -16,7 +18,7 @@ typedef enum {
 
 class LeleBase {
   public:
-  LeleBase() = default;
+  LeleBase(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
   virtual ~LeleBase() = default;
 
   lv_obj_t *getLvObj() const {
@@ -30,5 +32,7 @@ class LeleBase {
   }
   protected:
   lv_obj_t *_lv_obj = nullptr;
+  lv_obj_t *_lv_parent_obj = nullptr;
   std::vector<std::unique_ptr<LeleBase>> _children;
+  std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
 };
