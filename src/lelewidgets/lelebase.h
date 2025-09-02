@@ -16,6 +16,7 @@ typedef enum {
     DISP_LARGE,
 } disp_size_t;
 
+class LelePos;
 class LeleBase {
   public:
   LeleBase(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
@@ -27,13 +28,15 @@ class LeleBase {
   void setLvObj(lv_obj_t *obj) {
     _lv_obj = obj;
   }
+  virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 0, int height = 0, const std::string &corner_radius = "") const;
   void addChild(std::unique_ptr<LeleBase> &&child) {
     _children.emplace_back(std::move(child));
   }
   protected:
   lv_obj_t *_lv_obj = nullptr;
-  lv_obj_t *_lv_parent_obj = nullptr;
+  // lv_obj_t *_lv_parent_obj = nullptr;
   lv_style_t _style = {0};
   std::vector<std::unique_ptr<LeleBase>> _children;
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
+  LelePos *_pos = nullptr;
 };

@@ -155,6 +155,18 @@ LeleTabView::TabContent::TabContent(const std::string &json_str, lv_obj_t *paren
   : LeleBase(json_str, parent) {
 }
 
+lv_obj_t *LeleTabView::TabContent::createLvObj(lv_obj_t *parent, int x, int y, int width, int height, const std::string &corner_radius) const {
+  for (const auto &[key, token]: _tokens) {
+    LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      lv_obj_t *child = value.createLvObj(parent, x, y, width, height, corner_radius);
+      //osm todo: child needs tracked
+    }
+  }
+  return _lv_obj;
+}
+
 LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
   int fgcolor, bgcolor, active_tab_color, active_tab_bottom_border_color;
@@ -218,6 +230,7 @@ LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
         lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()));
       lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
       tab->getTabButton()->setStyle(button, active_tab_color, active_tab_bottom_border_color);
+      tab->getTabContent()->createLvObj(lv_tabview_get_content(_lv_obj));
       // tab->setTabContent(lv_tabview_get_content(_lv_obj));
   }
 
