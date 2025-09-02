@@ -10,12 +10,19 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
 static std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
+    std::vector<std::pair<std::string, std::string>> res;
+    if(json_str.empty()) {
+        return res;
+    }
     const cJSON *json = cJSON_Parse(json_str.c_str());
     cJSON *item = nullptr;
-    std::vector<std::pair<std::string, std::string>> res;
+    int idx = 0;
     cJSON_ArrayForEach(item, json) {
-        LOG(DEBUG, LVSIM, "Process item: %s\n", item->string);
-        std::string key = !item->string ? "" : item->string;
+        std::string item_num = std::string("@") + std::to_string(idx);
+        // LOG(DEBUG, LVSIM, "Process item: %s:%s\n", item_num.c_str(), item->string);
+        std::string key = !item->string ? 
+            item_num : 
+            item->string;
         if(cJSON_IsString(item)) {
             res.emplace_back(std::pair<std::string, std::string>
                 {key, cJSON_GetStringValue(item)}
@@ -27,67 +34,33 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
                 {key, std::to_string(cJSON_GetNumberValue(item))}
             );
         }
-        else if(cJSON_IsObject(item)) {
-            res.emplace_back(std::pair<std::string, std::string>
-                {key, cJSON_Print(item)}
-            );
-        }
-        else if(cJSON_IsArray(item)) {
-            res.emplace_back(std::pair<std::string, std::string>
-                {key, cJSON_Print(item)}
-            );
+        else if(cJSON_IsObject(item) || cJSON_IsArray(item)) {
+            if(item->string) {
+                res.emplace_back(std::pair<std::string, std::string>
+                    {key, cJSON_Print(item)}
+                );
+            }
+            else {
+                std::vector<std::pair<std::string, std::string>> subtokens = tokenize(cJSON_Print(item));
+                res.insert( res.end(), subtokens.begin(), subtokens.end() );
+                // for(const auto &pair: subtokens) {
+                //     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", pair.first.c_str(), pair.second.c_str());
+                // }
+            }
         }
         else {
             LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key);
         }
+        ++idx;
     }
+    // for(const auto &pair: res) {
+    //     LOG(DEBUG, LVSIM, "Processed token %s:%s\n", pair.first.c_str(), pair.second.c_str());
+    // }
     return res;
 }
 }//namespace
 
 namespace LeleWidgetFactory {
-
-// std::string FactoryInput::lastValue(const std::string &key) const {
-//     if(key == "text") {
-//         return _text.empty() ? "" : _text.back();
-//     }
-//     else if(key == "title") {
-//         return _title.empty() ? "" : _title.back();
-//     }
-//     else if(key == "subtitle") {
-//         return _subtitle.empty() ? "" : _subtitle.back();
-//     }
-//     else if(key == "name") {
-//         return _name.empty() ? "" : _name.back();
-//     }
-//     else if(key == "img") {
-//         return _img.empty() ? "" : _img.back();
-//     }
-//     else if(key == "fgcolor") {
-//         return _fgcolor.empty() ? "" : _fgcolor.back();
-//     }
-//     else if(key == "bgcolor") {
-//         return _bgcolor.empty() ? "" : _bgcolor.back();
-//     }
-//     else if(key == "active_tab_bgcolor") {
-//         return _active_tab_bgcolor.empty() ? "" : _active_tab_bgcolor.back();
-//     }
-//     else if(key == "active_tab_bottom_border_color") {
-//         return _active_tab_bottom_border_color.empty() ? "" : _active_tab_bottom_border_color.back();
-//     }
-//     else if(key == "json_str") {
-//         return _json_str.empty() ? "" : _json_str.back();
-//     }
-//     else if(key == "widget_type") {
-//         return _widget_type.empty() ? "" : _widget_type.back();
-//     }
-//     return "";
-// }
-
-// LelePos FactoryInput::lastPos() const {
-//     return _pos.empty() ? LelePos() : _pos.back();
-// }
-
 
 std::vector<std::pair<std::string, Token>> fromJson(
     const std::string &json_str, lv_obj_t *parent) {

@@ -90,7 +90,7 @@ static void configureSimulator(int argc, char **argv)
     char *backend_name;
 
     selected_backend = NULL;
-    driver_backends_register();
+    driver_backends_register();//connect to wayland server
 
     /* Default values */
     settings.window_width = atoi(getenv("LV_SIM_WINDOW_WIDTH") ? : "800");
@@ -144,6 +144,11 @@ static void configureSimulator(int argc, char **argv)
 int main(int argc, char **argv)
 {
     LOG_INIT("/tmp");
+    //osm: temporary:
+    LOG(DEBUG, LVSIM, "create tab view\n");
+    auto tokens1 = LeleWidgetFactory::fromConfig();
+    LOG(DEBUG, LVSIM, "PARSING DONE!\n");
+    exit(0);
 
     LOG(DEBUG, LVSIM, "configure simulator\n");
     configureSimulator(argc, argv);
@@ -174,7 +179,6 @@ int main(int argc, char **argv)
     // addProgressBar();
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
-
     auto tokens = LeleWidgetFactory::fromConfig();
     // if(tab_titles.size() > 0) {
     //     LeleTabView tab_view("tabview", "logo.png", tab_titles);

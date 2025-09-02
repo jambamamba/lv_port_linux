@@ -51,10 +51,77 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleTabView::Tabs::Tabs(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
+    // for(const auto &pair: _tokens) {
+    //     LOG(DEBUG, LVSIM, "Tabs token %s:%s\n", pair.first.c_str(), typeid(pair.second).name());
+    //     _tab.emplace_back(std::move(pair.second));
+    // }
 }
+int LeleTabView::Tabs::numTabs() const {
+    int idx = 0;
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "tab") {
+          LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
+          if(tab) {
+            ++idx;        }        
+          }
+      }
+    }
+    return idx;
+}
+LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
+    int idx = 0;
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "tab") {
+          LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
+          if(tab) {
+            if(index == idx) {
+              return tab;
+            }
+            ++idx;
+          }
+        }
+        // LOG(DEBUG, LVSIM, "Tabs token %s:%s\n", pair.first.c_str(), typeid(pair.second).name());
+      }
+    }
+    return nullptr;
+}
+
 LeleTabView::Tab::Tab(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
 }
+LeleTabView::TabButton *LeleTabView::Tab::getTabButton() const {
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "tab_button") {
+          LeleTabView::TabButton *ptr = dynamic_cast<LeleTabView::TabButton*> (value.get());
+          if(ptr) {
+            return ptr;
+          }
+        }
+      }
+    }
+    return nullptr;
+}
+LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "tab_content") {
+          LeleTabView::TabContent *ptr = dynamic_cast<LeleTabView::TabContent*> (value.get());
+          if(ptr) {
+            return ptr;
+          }
+        }
+      }
+    }
+    return nullptr;
+}
+
 LeleTabView::TabButton::TabButton(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
   for (const auto &[key, token]: _tokens) {
@@ -69,6 +136,21 @@ LeleTabView::TabButton::TabButton(const std::string &json_str, lv_obj_t *parent)
     }
   }
 }
+
+void LeleTabView::TabButton::setStyle(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
+  _lv_obj = button;
+  lv_obj_t *logo = lv_image_create(button);
+  lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+  lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+  lv_obj_center(logo);
+  lv_obj_t *label = lv_obj_get_child(button, 0);
+  lv_label_set_text(label, "");
+
+  lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
+  lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+  lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+}
+
 LeleTabView::TabContent::TabContent(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
 }
@@ -84,7 +166,6 @@ LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       if(key == "tabs") {
-          //osm _tabs.emplace_back(std::move(value));
           tabs = dynamic_cast<Tabs*> (value.get());
       }
     }
@@ -131,15 +212,14 @@ LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
   lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
   //osm:
-  // int idx = 0;
-  // for(auto &tab: tabs) {
-  //     tab->setLvObj(
-  //       lv_tabview_add_tab(_lv_obj, tab->title().c_str()));
-  //     lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-  //     tab->setTabButton(button, active_tab_color, active_tab_bottom_border_color);
-  //     tab->setTabContent(lv_tabview_get_content(_lv_obj));
-  //     ++idx;
-  // }
+  for(int idx = 0; idx < tabs->numTabs(); ++idx) {
+    LeleTabView::Tab *tab = tabs->getAt(idx);
+      tab->setLvObj(
+        lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()));
+      lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
+      tab->getTabButton()->setStyle(button, active_tab_color, active_tab_bottom_border_color);
+      // tab->setTabContent(lv_tabview_get_content(_lv_obj));
+  }
 
   lv_obj_t *logo = setTabViewImg(tabview_header, img);
   lv_obj_t *label = setTabViewTitle(tabview_header, title);
@@ -187,20 +267,6 @@ void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
         //osm lv_style_reset(&pthis->_style_title);
     }
 }
-
-// void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
-  // _tab_button = button;
-  // lv_obj_t *logo = lv_image_create(button);
-  // lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-  // lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-  // lv_obj_center(logo);
-  // lv_obj_t *label = lv_obj_get_child(button, 0);
-  // lv_label_set_text(label, "");
-
-  // lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
-  // lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
-  // lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-// }
 
 // void LeleTabView::Tab::setTabContent(lv_obj_t *tab_content) {
   // if(_json.empty() || !tab_content) {

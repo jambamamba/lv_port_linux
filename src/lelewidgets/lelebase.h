@@ -19,7 +19,7 @@ typedef enum {
 class LeleBase {
   public:
   LeleBase(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
-  virtual ~LeleBase() = default;
+  virtual ~LeleBase();
 
   lv_obj_t *getLvObj() const {
     return _lv_obj;
@@ -33,6 +33,7 @@ class LeleBase {
   protected:
   lv_obj_t *_lv_obj = nullptr;
   lv_obj_t *_lv_parent_obj = nullptr;
+  lv_style_t _style = {0};
   std::vector<std::unique_ptr<LeleBase>> _children;
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
 };

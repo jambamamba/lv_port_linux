@@ -14,13 +14,18 @@ class LeleTabView : public LeleBase {
   class TabButton : public LeleBase {
     public:
     TabButton(const std::string &json_str, lv_obj_t *parent = lv_screen_active());
+    const std::string &name() const { return _name; }
+    const std::string &img() const { return _img; }
+    void setStyle(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color);
     protected:
     std::string _name;
     std::string _img;
   };
   class Tab : public LeleBase {
     public:
-    Tab(const std::string &json_str, lv_obj_t *parent = lv_screen_active());
+    Tab(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+    TabButton *getTabButton() const;
+    TabContent *getTabContent() const;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _tab_button;
     std::vector<std::unique_ptr<LeleBase>> _tab_content;
@@ -28,8 +33,10 @@ class LeleTabView : public LeleBase {
   class Tabs : public LeleBase {
     public:
     Tabs(const std::string &json_str, lv_obj_t *parent = lv_screen_active());
+    int numTabs() const;
+    LeleTabView::Tab* getAt(int idx) const;
     protected:
-    std::vector<std::unique_ptr<LeleBase>> _tab;
+    // std::vector<std::unique_ptr<LeleBase>> _tab;
   }; 
   // class Tab : public LeleBase {
   //   public:
