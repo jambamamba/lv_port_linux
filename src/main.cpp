@@ -144,11 +144,6 @@ static void configureSimulator(int argc, char **argv)
 int main(int argc, char **argv)
 {
     LOG_INIT("/tmp");
-    //osm: temporary:
-    LOG(DEBUG, LVSIM, "create tab view\n");
-    auto tokens1 = LeleWidgetFactory::fromConfig();
-    LOG(DEBUG, LVSIM, "PARSING DONE!\n");
-    exit(0);
 
     LOG(DEBUG, LVSIM, "configure simulator\n");
     configureSimulator(argc, argv);

@@ -1,45 +1,24 @@
 #include "lelelabel.h"
 
-#include "lelepos.h"
-
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleLabel::LeleLabel(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
 
   for (const auto &[key, token]: _tokens) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      if(key == "pos") {
-        _pos = dynamic_cast<LelePos*> (value.get());
-      }
-    }
-    else if (std::holds_alternative<std::string>(token)) {
+    if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "text") {
         _text = value;
-      }
-      else if(key == "corner_radius") {
-        _corner_radius = value;
-      }
-      else if(key == "bgcolor") {
-        _bgcolor = value;
       }
     }
   }
 }
 
-lv_obj_t *LeleLabel::createLvObj(lv_obj_t *parent, int x, int y, int width, int height, const std::string &corner_radius) const {
+lv_obj_t *LeleLabel::createLvObj(lv_obj_t *parent) {
 
-  lv_obj_t *obj = LeleBase::createLvObj(
-    parent,
-    x == -1 ? _pos->x() : x,
-    y == -1 ? _pos->y() : y,
-    width == -1 ? _pos->width() : width,
-    height == -1 ? _pos->height() : height,
-    corner_radius.empty() ? _corner_radius : corner_radius
-  );
-  obj = lv_label_create(obj);
+  lv_obj_t *obj = lv_label_create(
+    LeleBase::createLvObj(parent));
   lv_label_set_text(obj, _text.c_str());
   return obj;
 }

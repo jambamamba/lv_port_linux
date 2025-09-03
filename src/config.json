@@ -17,13 +17,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world1",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"},
-                            "bgcolor":"444444",
-                            "corner_radius":"5"
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                         },
                         "textbox":{
                             "text":"hello world1",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                            "max_length":"15",
+                            "multiline":"false",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }
@@ -37,11 +37,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world2",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world2",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                            "max_length":"15",
+                            "multiline":"false",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }
@@ -55,11 +57,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world3",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%"}
+                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world3",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%"}
+                            "max_length":"15",
+                            "multiline":"false",
+                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }

@@ -4,7 +4,6 @@
 #include "leletabview.h"
 #include "lelelabel.h"
 #include "leletextbox.h"
-#include "lelepos.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 

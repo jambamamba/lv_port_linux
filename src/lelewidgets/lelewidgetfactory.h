@@ -13,7 +13,7 @@
 #include <variant>
 #include <vector>
 
-
+#include "lelepos.h"
 class LeleBase;
 namespace LeleWidgetFactory {
 
@@ -36,7 +36,7 @@ namespace LeleWidgetFactory {
   //   int container_width = lv_obj_get_width(lv_screen_active()),
   //   int container_height = lv_obj_get_height(lv_screen_active())
   // );
-  using Token = std::variant<std::string, std::unique_ptr<LeleBase>>;
+  using Token = std::variant<std::string, std::unique_ptr<LeleBase>, std::unique_ptr<LelePos>>;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
   std::vector<std::pair<std::string, Token>> fromJson(

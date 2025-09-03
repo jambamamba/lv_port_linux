@@ -2,16 +2,13 @@
 
 #include "lelebase.h"
 
-
 class LeleLabel : public LeleBase  {
   public:
   // static std::unique_ptr<LeleLabel> fromJson(lv_obj_t *parent = lv_screen_active(), int container_width = 0, int container_height = 0, const cJSON *json = nullptr);
   // LeleLabel(lv_obj_t *parent = lv_screen_active(), const std::string &text = "Label", int x = 0, int y = 0, int width = 500, int height = LV_SIZE_CONTENT, int corner_radius = 5);
   LeleLabel(const std::string &json_str, lv_obj_t *parent = lv_screen_active());
-  virtual lv_obj_t *createLvObj(lv_obj_t *parent = _lv_parent_obj, int x = -1, int y = -1, int width = -1, int height = -1, const std::string &corner_radius = "") const override;
+  virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active()) override;
   protected:
   std::string _text;
-  std::string _corner_radius;
-  std::string _bgcolor;  
 };
 

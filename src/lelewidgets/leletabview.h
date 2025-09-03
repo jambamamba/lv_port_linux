@@ -36,7 +36,6 @@ class LeleTabView : public LeleBase {
     int numTabs() const;
     LeleTabView::Tab* getAt(int idx) const;
     protected:
-    // std::vector<std::unique_ptr<LeleBase>> _tab;
   }; 
   // class Tab : public LeleBase {
   //   public:

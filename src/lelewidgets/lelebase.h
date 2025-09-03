@@ -6,6 +6,8 @@
 #include <lvgl/lvgl_private.h>
 #include <typeinfo>
 
+#include "lelepos.h"
+
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
@@ -16,7 +18,6 @@ typedef enum {
     DISP_LARGE,
 } disp_size_t;
 
-class LelePos;
 class LeleBase {
   public:
   LeleBase(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
@@ -28,7 +29,7 @@ class LeleBase {
   void setLvObj(lv_obj_t *obj) {
     _lv_obj = obj;
   }
-  virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active(), int x = 0, int y = 0, int width = 0, int height = 0, const std::string &corner_radius = "") const;
+  virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active());
   void addChild(std::unique_ptr<LeleBase> &&child) {
     _children.emplace_back(std::move(child));
   }
@@ -38,5 +39,6 @@ class LeleBase {
   lv_style_t _style = {0};
   std::vector<std::unique_ptr<LeleBase>> _children;
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
-  LelePos *_pos = nullptr;
+  LelePos _null_pos;
+  LelePos *_pos = &_null_pos;
 };

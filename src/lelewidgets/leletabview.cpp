@@ -136,35 +136,27 @@ LeleTabView::TabButton::TabButton(const std::string &json_str, lv_obj_t *parent)
     }
   }
 }
-
 void LeleTabView::TabButton::setStyle(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
-  _lv_obj = button;
-  lv_obj_t *logo = lv_image_create(button);
-  lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-  lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-  lv_obj_center(logo);
-  lv_obj_t *label = lv_obj_get_child(button, 0);
-  lv_label_set_text(label, "");
+  // _tab_button = button;
+  if(!_img.empty()) {
+    lv_obj_t *logo = lv_image_create(button);
+    lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+    lv_obj_center(logo);
+    lv_obj_t *label = lv_obj_get_child(button, 0);
+    lv_label_set_text(label, "");
+  }
+  else {
+    lv_obj_t *label = lv_obj_get_child(button, 0);
+    lv_label_set_text(label, _name.c_str());
+  }
 
   lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
   lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
   lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
 }
-
 LeleTabView::TabContent::TabContent(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
-}
-
-lv_obj_t *LeleTabView::TabContent::createLvObj(lv_obj_t *parent, int x, int y, int width, int height, const std::string &corner_radius) const {
-  for (const auto &[key, token]: _tokens) {
-    LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      lv_obj_t *child = value.createLvObj(parent, x, y, width, height, corner_radius);
-      //osm todo: child needs tracked
-    }
-  }
-  return _lv_obj;
 }
 
 LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
@@ -230,7 +222,6 @@ LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
         lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()));
       lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
       tab->getTabButton()->setStyle(button, active_tab_color, active_tab_bottom_border_color);
-      tab->getTabContent()->createLvObj(lv_tabview_get_content(_lv_obj));
       // tab->setTabContent(lv_tabview_get_content(_lv_obj));
   }
 
@@ -280,6 +271,20 @@ void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
         //osm lv_style_reset(&pthis->_style_title);
     }
 }
+
+// void LeleTabView::Tab::setTabButton(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
+  // _tab_button = button;
+  // lv_obj_t *logo = lv_image_create(button);
+  // lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+  // lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+  // lv_obj_center(logo);
+  // lv_obj_t *label = lv_obj_get_child(button, 0);
+  // lv_label_set_text(label, "");
+
+  // lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
+  // lv_obj_set_style_bg_color(button, lv_color_hex(active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+  // lv_obj_set_style_border_color(button, lv_color_hex(active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+// }
 
 // void LeleTabView::Tab::setTabContent(lv_obj_t *tab_content) {
   // if(_json.empty() || !tab_content) {
