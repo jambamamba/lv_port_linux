@@ -137,7 +137,7 @@ LeleTabView::TabButton::TabButton(const std::string &json_str, lv_obj_t *parent)
   }
 }
 void LeleTabView::TabButton::setStyle(lv_obj_t *button, int active_tab_bgcolor, int active_tab_bottom_border_color) {
-  // _tab_button = button;
+  _lv_obj = button;
   if(!_img.empty()) {
     lv_obj_t *logo = lv_image_create(button);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
