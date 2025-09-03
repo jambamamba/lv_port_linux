@@ -158,6 +158,16 @@ void LeleTabView::TabButton::setStyle(lv_obj_t *button, int active_tab_bgcolor, 
 LeleTabView::TabContent::TabContent(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
 }
+lv_obj_t *LeleTabView::TabContent::createLvObj(lv_obj_t *parent) {
+  for (const auto &[key, token]: _tokens) {
+    LOG(DEBUG, LVSIM, "LeleTabView::TabContent::createLvObj: token with key: %s\n", key.c_str());
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      value->createLvObj(parent);
+    }
+  }
+  return _lv_obj;
+}
 
 LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
   : LeleBase(json_str, parent) {
@@ -215,14 +225,12 @@ LeleTabView::LeleTabView(const std::string &json_str, lv_obj_t *parent)
   lv_obj_set_style_text_color(tabview_header, lv_color_hex(fgcolor), LV_PART_MAIN);
   lv_obj_set_style_bg_color(tabview_header, lv_color_hex(bgcolor), LV_PART_MAIN);
 
-  //osm:
   for(int idx = 0; idx < tabs->numTabs(); ++idx) {
     LeleTabView::Tab *tab = tabs->getAt(idx);
-      tab->setLvObj(
-        lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()));
+      tab->setLvObj(lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()));
       lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
       tab->getTabButton()->setStyle(button, active_tab_color, active_tab_bottom_border_color);
-      // tab->setTabContent(lv_tabview_get_content(_lv_obj));
+      tab->getTabContent()->createLvObj(tab->getLvObj());
   }
 
   lv_obj_t *logo = setTabViewImg(tabview_header, img);

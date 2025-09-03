@@ -24,16 +24,16 @@ LeleTextbox::LeleTextbox(const std::string &json_str, lv_obj_t *parent)
 
 lv_obj_t *LeleTextbox::createLvObj(lv_obj_t *parent) {
 
-  lv_obj_t *obj = lv_textarea_create(
+  _lv_obj = lv_textarea_create(
     LeleBase::createLvObj(parent));
-  lv_textarea_set_text(obj, _text.c_str());
+  lv_textarea_set_text(_lv_obj, _text.c_str());
   // lv_obj_align(_lv_obj, LV_ALIGN_TOP_MID, x, y);
-  lv_textarea_set_text_selection(obj, true);
-  lv_textarea_set_max_length(obj, _max_length);
-  lv_textarea_set_one_line(obj, _multiline);
-  lv_obj_add_event_cb(obj, TextAreaEventCallback, LV_EVENT_CLICKED, obj);//also triggered when Enter key is pressed
+  lv_textarea_set_text_selection(_lv_obj, true);
+  lv_textarea_set_max_length(_lv_obj, _max_length);
+  lv_textarea_set_one_line(_lv_obj, _multiline);
+  lv_obj_add_event_cb(_lv_obj, TextAreaEventCallback, LV_EVENT_CLICKED, _lv_obj);//also triggered when Enter key is pressed
 
-  return obj;
+  return _lv_obj;
 }
 
 

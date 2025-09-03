@@ -84,6 +84,12 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "tab_content") {
             token = std::make_unique<LeleTabView::TabContent>(rhs, parent);
         }
+        else if(lhs == "label") {
+            token = std::make_unique<LeleLabel>(rhs, parent);
+        }
+        else if(lhs == "textbox") {
+            token = std::make_unique<LeleTextbox>(rhs, parent);
+        }
         else if(lhs == "pos") {
             token = std::make_unique<LelePos>(rhs, parent);
         }

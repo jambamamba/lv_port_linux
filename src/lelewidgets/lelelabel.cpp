@@ -17,10 +17,10 @@ LeleLabel::LeleLabel(const std::string &json_str, lv_obj_t *parent)
 
 lv_obj_t *LeleLabel::createLvObj(lv_obj_t *parent) {
 
-  lv_obj_t *obj = lv_label_create(
+  _lv_obj = lv_label_create(
     LeleBase::createLvObj(parent));
-  lv_label_set_text(obj, _text.c_str());
-  return obj;
+  lv_label_set_text(_lv_obj, _text.c_str());
+  return _lv_obj;
 }
 
 // LeleLabel::LeleLabel(lv_obj_t *parent, const std::string &text, int x, int y, int width, int height, int corner_radius)

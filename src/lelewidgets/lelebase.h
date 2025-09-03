@@ -30,14 +30,9 @@ class LeleBase {
     _lv_obj = obj;
   }
   virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active());
-  void addChild(std::unique_ptr<LeleBase> &&child) {
-    _children.emplace_back(std::move(child));
-  }
   protected:
   lv_obj_t *_lv_obj = nullptr;
-  // lv_obj_t *_lv_parent_obj = nullptr;
   lv_style_t _style = {0};
-  std::vector<std::unique_ptr<LeleBase>> _children;
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
   LelePos _null_pos;
   LelePos *_pos = &_null_pos;

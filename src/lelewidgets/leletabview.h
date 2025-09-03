@@ -8,6 +8,7 @@ class LeleTabView : public LeleBase {
   class TabContent : public LeleBase {
     public:
     TabContent(const std::string &json_str, lv_obj_t *parent = lv_screen_active());
+    virtual lv_obj_t *createLvObj(lv_obj_t *parent = lv_screen_active()) override;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _widgets;
   };
