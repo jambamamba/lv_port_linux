@@ -175,12 +175,6 @@ int main(int argc, char **argv)
     // addChart();
     LOG(DEBUG, LVSIM, "create tab view\n");
     auto tokens = LeleWidgetFactory::fromConfig();
-    // if(tab_titles.size() > 0) {
-    //     LeleTabView tab_view("tabview", "logo.png", tab_titles);
-    //     LeleLabel label1("Label1", tab_view._tabs.at(0), 10, 70, 500);
-    //     LeleTextbox text_box1("Textbox1", label1.obj(), 100, 0, 300);
-    //     LeleLabel label2("Label2", tab_view._tabs.at(1), 10, 70, 500);
-    // }
     
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();
