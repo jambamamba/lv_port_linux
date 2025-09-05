@@ -122,7 +122,7 @@ int LelePos::bgColor() const {
   return _bgcolor;
 }
 int LelePos::fgColor() const {
-      printf("@@@@ fgColor typeid:%s\n", typeid(_lele_parent).name());//osm todo: get color from parent class
+      printf("@@@@ fgColor typeid:%s\n", _lele_parent->getId().c_str());//osm todo: get color from parent class
   if(_fgcolor == -1) {
     if(_lele_parent) {
       return _lele_parent->pos()->fgColor();

@@ -8,6 +8,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleTabView::Tabs::Tabs(const std::string &json_str)
   : LeleBase(json_str) {
+    _id = typeid(this).name();
 }
 lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent) {
   _lele_parent = lele_parent;
@@ -49,6 +50,7 @@ LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
 
 LeleTabView::Tab::Tab(const std::string &json_str)
   : LeleBase(json_str) {
+    _id = typeid(this).name();
 }
 lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent) {
   _lele_parent = lele_parent;
@@ -86,6 +88,7 @@ LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
 
 LeleTabView::TabButton::TabButton(const std::string &json_str)
   : LeleBase(json_str) {
+    _id = typeid(this).name();
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -118,6 +121,7 @@ lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent) {
 }
 LeleTabView::TabContent::TabContent(const std::string &json_str)
   : LeleBase(json_str) {
+    _id = typeid(this).name();
 }
 lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent) {
   _lv_obj = lele_parent->getLvObj();
@@ -133,7 +137,7 @@ lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent) {
 
 LeleTabView::LeleTabView(const std::string &json_str)
   : LeleBase(json_str) {
-
+    _id = typeid(this).name();
   for (const auto &[key, token]: _tokens) {
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {

@@ -5,5 +5,7 @@
 class LeleNullWidget : public LeleBase  {
   public:
   LeleNullWidget(const std::string &json_str = "")
-  : LeleBase(json_str) {}
+  : LeleBase(json_str) {
+    _id = typeid(this).name();
+  }
 };

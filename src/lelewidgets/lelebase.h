@@ -23,6 +23,9 @@ class LeleBase {
   LeleBase(const std::string &json_str = "");
   virtual ~LeleBase();
 
+  const std::string &getId() const {
+    return _id;
+  }
   lv_obj_t *getLvObj() const {
     return _lv_obj;
   }
@@ -34,6 +37,7 @@ class LeleBase {
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
   protected:
+  std::string _id;
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};
