@@ -5,20 +5,21 @@ project(lvgl)
 set(CONF_PATH "${PROJECT_SOURCE_DIR}/lv_conf.h")
 
 #osm#################################
-set(EXTERNAL_LIB_NAME "Python")
-set(EXTERNAL_LIB_MAJOR_MINOR "3.13")
-set(EXTERNAL_LIB_VERSION "${EXTERNAL_LIB_MAJOR_MINOR}.3")
-set(EXTERNAL_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
-set(EXTERNAL_LIB_URL "https://www.python.org/ftp/python/${EXTERNAL_LIB_VERSION}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
-set(EXTERNAL_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}")
+set(PYTHON_LIB_NAME "Python")
+set(PYTHON_LIB_MAJOR_MINOR "3.13")
+set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.3")
+set(PYTHON_LIB_OUTPUT "${PYTHON_LIB_SOURCE_DIR}/libpython${PYTHON_LIB_MAJOR_MINOR}.so")
+set(PYTHON_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
+set(PYTHON_LIB_URL "https://www.python.org/ftp/python/${PYTHON_LIB_VERSION}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
+set(PYTHON_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}")
 
 add_custom_command(
-    OUTPUT ${EXTERNAL_LIB_SOURCE_DIR}/libpython${EXTERNAL_LIB_MAJOR_MINOR}.so
-    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} curl -L "${EXTERNAL_LIB_URL}" -o "${EXTERNAL_LIB_ARCHIVE}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_COMMAND} -E tar xzf ${EXTERNAL_LIB_ARCHIVE}
-    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS=-Wno-error=coverage-mismatch ./configure --enable-optimizations --enable-shared
-    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} make -j
-    WORKING_DIRECTORY ${EXTERNAL_LIB_SOURCE_DIR}
+    OUTPUT ${PYTHON_LIB_OUTPUT}
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} curl -L "${PYTHON_LIB_URL}" -o "${PYTHON_LIB_ARCHIVE}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_COMMAND} -E tar xzf ${PYTHON_LIB_ARCHIVE}
+    COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS=-Wno-error=coverage-mismatch ./configure --enable-optimizations --enable-shared
+    COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} make -j
+    WORKING_DIRECTORY ${PYTHON_LIB_SOURCE_DIR}
     COMMENT "Building python library"
     VERBATIM
 )
@@ -175,7 +176,7 @@ add_executable(lvglsim
     ${LV_LINUX_SRC} 
     ${LV_LINUX_BACKEND_SRC} 
     ${LV_IMG_DSC_SRC}
-    ${EXTERNAL_LIB_SOURCE_DIR}/libpython${EXTERNAL_LIB_MAJOR_MINOR}.so
+    ${PYTHON_LIB_OUTPUT}
 )
 target_link_libraries(lvglsim 
     lvgl_linux 
@@ -187,7 +188,6 @@ target_link_libraries(lvglsim
     pthread 
     ${PKG_CONFIG_LIB}
     utils::utils
-    # ${EXTERNAL_LIB_NAME}_imported
 )
 # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
@@ -221,7 +221,5 @@ add_custom_command(OUTPUT ${LV_IMG_DSC_SRC}
 )
 add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
 ###
-add_dependencies(lvglsim lv_image_convert 
-# Build_${EXTERNAL_LIB_NAME}
-)
+add_dependencies(lvglsim lv_image_convert)
 #osm#################end
