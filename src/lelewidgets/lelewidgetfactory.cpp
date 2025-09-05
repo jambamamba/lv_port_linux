@@ -104,6 +104,8 @@ std::vector<std::pair<std::string, Token>> fromJson(
 }
 
 std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_json) {
+    static LeleBase _root_widget;
+    _root_widget.setLvObj(lv_screen_active());
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
         LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
@@ -114,7 +116,7 @@ std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_
         LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
         if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
             auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-            value->createLvObj(lv_screen_active(), nullptr);
+            value->createLvObj(&_root_widget);
         }
     }
     return tokens;

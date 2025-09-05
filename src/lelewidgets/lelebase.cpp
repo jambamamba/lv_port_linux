@@ -19,7 +19,7 @@ LeleBase::~LeleBase() {
     lv_style_reset(&_style);
 }
 
-lv_obj_t *LeleBase::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
+lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent) {
 
   _pos->setLeleParent(lele_parent);
   lv_style_init(&_style);
@@ -35,7 +35,7 @@ lv_obj_t *LeleBase::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
     lv_obj_del(_lv_obj);
   }
   _lele_parent = lele_parent;
-  _lv_obj = lv_obj_create(lv_parent);
+  _lv_obj = lv_obj_create(lele_parent->getLvObj());
   lv_obj_set_pos(_lv_obj, _pos->x(), _pos->y());
   lv_obj_add_style(_lv_obj, &_style, 0);
   lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_pos->fgColor()), LV_PART_MAIN);

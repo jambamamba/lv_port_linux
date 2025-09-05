@@ -32,7 +32,7 @@ class LeleBase {
   const LelePos *pos() const {
     return _pos;
   }
-  virtual lv_obj_t *createLvObj(lv_obj_t *lv_parent = lv_screen_active(), LeleBase *lele_parent = nullptr);
+  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
   protected:
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;

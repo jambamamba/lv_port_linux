@@ -9,9 +9,8 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleTabView::Tabs::Tabs(const std::string &json_str)
   : LeleBase(json_str) {
 }
-lv_obj_t *LeleTabView::Tabs::createLvObj(lv_obj_t *lv_obj, LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent) {
   _lele_parent = lele_parent;
-  _lv_obj = lv_obj;
   return _lv_obj;
 }
 int LeleTabView::Tabs::numTabs() const {
@@ -51,9 +50,9 @@ LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
 LeleTabView::Tab::Tab(const std::string &json_str)
   : LeleBase(json_str) {
 }
-lv_obj_t *LeleTabView::Tab::createLvObj(lv_obj_t *lv_obj, LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent) {
   _lele_parent = lele_parent;
-  _lv_obj = lv_obj;
+  _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabButton()->name().c_str());
   return _lv_obj;
 }
 LeleTabView::TabButton *LeleTabView::Tab::getTabButton() const {
@@ -99,32 +98,33 @@ LeleTabView::TabButton::TabButton(const std::string &json_str)
     }
   }
 }
-lv_obj_t *LeleTabView::TabButton::createLvObj(lv_obj_t *lv_obj, LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent) {
   if(!_img.empty()) {
-    lv_obj_t *logo = lv_image_create(lv_obj);
+    lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
     lv_obj_center(logo);
-    lv_obj_t *label = lv_obj_get_child(lv_obj, 0);
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
     lv_label_set_text(label, "");
   }
   else {
-    lv_obj_t *label = lv_obj_get_child(lv_obj, 0);
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
     lv_label_set_text(label, _name.c_str());
   }
 
   _lele_parent = lele_parent;
-  _lv_obj = lv_obj;
+  _lv_obj = lele_parent->getLvObj();
   return _lv_obj;
 }
 LeleTabView::TabContent::TabContent(const std::string &json_str)
   : LeleBase(json_str) {
 }
-lv_obj_t *LeleTabView::TabContent::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent) {
+  _lv_obj = lele_parent->getLvObj();
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      value->createLvObj(lv_parent, this);
+      value->createLvObj(this);
     }
   }
   _lele_parent = lele_parent;
@@ -166,9 +166,9 @@ LeleTabView::LeleTabView(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleTabView::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent) {
 
-  _lv_obj = lv_tabview_create(lv_parent);
+  _lv_obj = lv_tabview_create(lele_parent->getLvObj());
 
   lv_tabview_set_tab_bar_size(_lv_obj, _tabbar_height);
   lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
@@ -183,18 +183,19 @@ lv_obj_t *LeleTabView::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
   lv_obj_set_style_text_color(tabview_header, lv_color_hex(_pos->fgColor()), LV_PART_MAIN);
   lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_pos->bgColor()), LV_PART_MAIN);
 
-  _tabs->createLvObj(nullptr, this);
+  _tabs->createLvObj(this);
+  _tabs->setLvObj(_lv_obj);
   for(int idx = 0; idx < _tabs->numTabs(); ++idx) {
     LeleTabView::Tab *tab = _tabs->getAt(idx);
-    tab->createLvObj(lv_tabview_add_tab(_lv_obj, tab->getTabButton()->name().c_str()), _tabs);
+    tab->createLvObj(_tabs);
+    tab->getTabContent()->createLvObj(tab);
 
     lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-    tab->getTabButton()->createLvObj(button, tab);
+    tab->setLvObj(button);
+    tab->getTabButton()->createLvObj(tab);
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
     lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-
-    tab->getTabContent()->createLvObj(tab->getLvObj(), tab);
   }
 
   lv_obj_t *logo = setTabViewImg(tabview_header, _img);

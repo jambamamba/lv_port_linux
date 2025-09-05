@@ -22,10 +22,10 @@ LeleTextbox::LeleTextbox(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleTextbox::createLvObj(lv_obj_t *lv_parent, LeleBase *lele_parent) {
+lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent) {
 
   _lv_obj = lv_textarea_create(
-    LeleBase::createLvObj(lv_parent, lele_parent));
+    LeleBase::createLvObj(lele_parent));
   lv_textarea_set_text(_lv_obj, _text.c_str());
   // lv_obj_align(_lv_obj, LV_ALIGN_TOP_MID, x, y);
   lv_textarea_set_text_selection(_lv_obj, true);
