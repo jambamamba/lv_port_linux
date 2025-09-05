@@ -2,7 +2,8 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleBase::LeleBase(const std::string &json_str) {
+LeleBase::LeleBase(const std::string &json_str)
+: _id(__func__ ) {
 
   _tokens = LeleWidgetFactory::fromJson(json_str);
   for (const auto &[key, token]: _tokens) {
@@ -21,7 +22,8 @@ LeleBase::~LeleBase() {
 
 lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent) {
 
-  _pos->setLeleParent(lele_parent);
+  setParent(lele_parent);
+  
   lv_style_init(&_style);
   lv_style_set_radius(&_style, _pos->cornerRadius());
   lv_style_set_width(&_style, _pos->width());
@@ -34,11 +36,13 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent) {
   if(_lv_obj) {
     lv_obj_del(_lv_obj);
   }
-  _lele_parent = lele_parent;
   _lv_obj = lv_obj_create(lele_parent->getLvObj());
   lv_obj_set_pos(_lv_obj, _pos->x(), _pos->y());
   lv_obj_add_style(_lv_obj, &_style, 0);
-  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_pos->fgColor()), LV_PART_MAIN);
+  LOG(DEBUG, LVSIM, "self:%s\n", getId().c_str());
+  int fgcolor = _pos->fgColor();
+  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(fgcolor), LV_PART_MAIN);
+  LOG(DEBUG, LVSIM, "---> got fgcolor: 0x%x\n", fgcolor);
   lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_pos->bgColor()), LV_PART_MAIN);
 
   return _lv_obj;

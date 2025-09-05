@@ -10,7 +10,6 @@
         "tabs":[
             {
                 "tab":{
-                    "pos":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
                     "tab_button":{
                         "name":"Home",
                         "img":"home_icon.png"

@@ -205,7 +205,7 @@ target_link_libraries(lvglsim
     pthread 
     ${PKG_CONFIG_LIB}
     utils::utils
-    ${EXTERNAL_LIB_NAME}_imported
+    # ${EXTERNAL_LIB_NAME}_imported
 )
 # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 

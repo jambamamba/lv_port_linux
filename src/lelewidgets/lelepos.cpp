@@ -85,7 +85,7 @@ int LelePos::parseColorCode(const std::string &color_str) {
   else if(color_str.c_str()[0] == '#') {
     std::string suffix(color_str.c_str() + 1);
     if(std::all_of(suffix.begin(), suffix.end(),
-      [](unsigned char ch){ return std::isdigit(ch); })) {
+      [](unsigned char ch){return ch >= '0' && ch <= '0' + 0xff; })) {
         return std::stoi(suffix.c_str(), nullptr, 16);
     }
   }
@@ -122,12 +122,13 @@ int LelePos::bgColor() const {
   return _bgcolor;
 }
 int LelePos::fgColor() const {
-      printf("@@@@ fgColor typeid:%s\n", _lele_parent->getId().c_str());//osm todo: get color from parent class
+  
   if(_fgcolor == -1) {
     if(_lele_parent) {
-      return _lele_parent->pos()->fgColor();
+      int fgcolor = _lele_parent->pos()->fgColor();
+      LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->getId().c_str(), fgcolor);//osm todo: get color from parent class
+      return fgcolor;
     }
-    return 0;
   }
   return _fgcolor;
 }
