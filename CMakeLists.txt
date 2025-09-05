@@ -5,42 +5,23 @@ project(lvgl)
 set(CONF_PATH "${PROJECT_SOURCE_DIR}/lv_conf.h")
 
 #osm#################################
-# set(EXTERNAL_LIB_VERSION "3.13.3")
-# set(EXTERNAL_LIB_NAME "Python")
-# set(EXTERNAL_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
-# set(EXTERNAL_LIB_URL "https://www.python.org/ftp/python/${EXTERNAL_LIB_VERSION}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
-# set(EXTERNAL_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}")
+set(EXTERNAL_LIB_NAME "Python")
+set(EXTERNAL_LIB_MAJOR_MINOR "3.13")
+set(EXTERNAL_LIB_VERSION "${EXTERNAL_LIB_MAJOR_MINOR}.3")
+set(EXTERNAL_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
+set(EXTERNAL_LIB_URL "https://www.python.org/ftp/python/${EXTERNAL_LIB_VERSION}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}.tgz")
+set(EXTERNAL_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${EXTERNAL_LIB_NAME}-${EXTERNAL_LIB_VERSION}")
 
-# add_custom_target(
-#     Download_${EXTERNAL_LIB_NAME}
-#     COMMAND ${CMAKE_COMMAND} -E tar xzf ${EXTERNAL_LIB_ARCHIVE}
-#     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}c
-#     # DEPENDS ${EXTERNAL_LIB_ARCHIVE}
-#     COMMENT "Extracting ${EXTERNAL_LIB_NAME}"
-# )
-
-# add_custom_command(
-#     OUTPUT ${EXTERNAL_LIB_ARCHIVE}
-#     COMMAND ${CMAKE_COMMAND} -E download ${EXTERNAL_LIB_URL} ${EXTERNAL_LIB_ARCHIVE}
-#     MAIN_DEPENDENCY CMakeLists.txt # Depend on CMakeLists.txt to re-download if changed
-#     COMMENT "Downloading ${EXTERNAL_LIB_NAME}"
-# )
-
-# # Custom target to configure and build the library
-# add_custom_target(
-#     Build_${EXTERNAL_LIB_NAME}
-#     COMMAND CFLAGS="-Wno-error=coverage-mismatch" ./configure --enable-optimizations --enable-shared
-#     COMMAND make -j
-#     WORKING_DIRECTORY ${EXTERNAL_LIB_SOURCE_DIR}
-#     DEPENDS Download_${EXTERNAL_LIB_NAME}
-#     COMMENT "Building and installing ${EXTERNAL_LIB_NAME}"
-# )
-
-# add_library(${EXTERNAL_LIB_NAME}_imported STATIC IMPORTED)
-# set_target_properties(${EXTERNAL_LIB_NAME}_imported PROPERTIES
-#     IMPORTED_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/libpython3.13.so"
-#     #INTERFACE_INCLUDE_DIRECTORIES "${EXTERNAL_LIB_SOURCE_DIR}/include"
-# )
+add_custom_command(
+    OUTPUT ${EXTERNAL_LIB_SOURCE_DIR}/libpython${EXTERNAL_LIB_MAJOR_MINOR}.so
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} curl -L "${EXTERNAL_LIB_URL}" -o "${EXTERNAL_LIB_ARCHIVE}"
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_COMMAND} -E tar xzf ${EXTERNAL_LIB_ARCHIVE}
+    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS="-Wno-error=coverage-mismatch" ./configure --enable-optimizations --enable-shared
+    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} make -j
+    WORKING_DIRECTORY ${EXTERNAL_LIB_SOURCE_DIR}
+    COMMENT "Building python library"
+    VERBATIM
+)
 #osm#################################
 
 foreach(BACKEND_NAME "SDL" "LINUX_DRM" "LINUX_FBDEV" "X11" "WAYLAND" "OPENGLES" "EVDEV")
@@ -194,6 +175,7 @@ add_executable(lvglsim
     ${LV_LINUX_SRC} 
     ${LV_LINUX_BACKEND_SRC} 
     ${LV_IMG_DSC_SRC}
+    ${EXTERNAL_LIB_SOURCE_DIR}/libpython${EXTERNAL_LIB_MAJOR_MINOR}.so
 )
 target_link_libraries(lvglsim 
     lvgl_linux 
