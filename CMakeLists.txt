@@ -16,7 +16,7 @@ add_custom_command(
     OUTPUT ${EXTERNAL_LIB_SOURCE_DIR}/libpython${EXTERNAL_LIB_MAJOR_MINOR}.so
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} curl -L "${EXTERNAL_LIB_URL}" -o "${EXTERNAL_LIB_ARCHIVE}"
     COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_COMMAND} -E tar xzf ${EXTERNAL_LIB_ARCHIVE}
-    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS="-Wno-error=coverage-mismatch" ./configure --enable-optimizations --enable-shared
+    COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS=-Wno-error=coverage-mismatch ./configure --enable-optimizations --enable-shared
     COMMAND ${CMAKE_COMMAND} -E chdir ${EXTERNAL_LIB_SOURCE_DIR} make -j
     WORKING_DIRECTORY ${EXTERNAL_LIB_SOURCE_DIR}
     COMMENT "Building python library"
