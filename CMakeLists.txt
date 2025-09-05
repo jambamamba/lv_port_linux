@@ -20,7 +20,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS=-Wno-error=coverage-mismatch ./configure --enable-optimizations --enable-shared
     COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} make -j
     WORKING_DIRECTORY ${PYTHON_LIB_SOURCE_DIR}
-    COMMENT "Building python library"
+    COMMENT "Building ${PYTHON_LIB_NAME}"
     VERBATIM
 )
 #osm#################################
