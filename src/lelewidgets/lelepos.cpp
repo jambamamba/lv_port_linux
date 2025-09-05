@@ -1,4 +1,6 @@
 
+#include <algorithm>
+
 #include "lelepos.h"
 #include "lelewidgetfactory.h"
 #include "lelebase.h"
@@ -49,13 +51,45 @@ LelePos::LelePos(const std::string &json_str, lv_obj_t *parent)
         _pad_left = value;
       }
       else if(key == "fgcolor") {
-        _fgcolor = std::stoi(value.c_str(), nullptr, 16);
+        _fgcolor = LelePos::parseColorCode(value);
       }
       else if(key == "bgcolor") {
-        _bgcolor = std::stoi(value.c_str(), nullptr, 16);
+        _bgcolor = LelePos::parseColorCode(value);
       }
     }
   }
+}
+int LelePos::parseColorCode(const std::string &color_str) {
+  if(color_str.empty()) {
+    return 0;
+  }
+  else if(strcmp(color_str.c_str(), "red") == 0) {
+    return 0xff0000;
+  }
+  else if(strcmp(color_str.c_str(), "green") == 0) {
+    return 0x00ff00;
+  }
+  else if(strcmp(color_str.c_str(), "blue") == 0) {
+    return 0x0000ff;
+  }
+  else if(strcmp(color_str.c_str(), "white") == 0) {
+    return 0xffffff;
+  }
+  else if(strcmp(color_str.c_str(), "black") == 0) {
+    return 0x000000;
+  }
+  else if(std::all_of(color_str.begin(), color_str.end(),
+    [](unsigned char ch){ return std::isdigit(ch); })) {
+    return std::stoi(color_str.c_str(), nullptr, 10);
+  }
+  else if(color_str.c_str()[0] == '#') {
+    std::string suffix(color_str.c_str() + 1);
+    if(std::all_of(suffix.begin(), suffix.end(),
+      [](unsigned char ch){ return std::isdigit(ch); })) {
+        return std::stoi(suffix.c_str(), nullptr, 16);
+    }
+  }
+  return 0;
 }
 int LelePos::x() const {
   return toInt(_x, _parent_width);
@@ -79,5 +113,21 @@ int LelePos::padVer() const {
   return toInt(_pad_ver, _parent_height);
 }
 int LelePos::bgColor() const {
-  return toInt(_pad_ver, _parent_height);
+  if(_bgcolor == -1) {
+    if(_lele_parent) {
+      return _lele_parent->pos()->bgColor();
+    }
+    return 0;
+  }
+  return _bgcolor;
+}
+int LelePos::fgColor() const {
+      printf("@@@@ fgColor typeid:%s\n", _lele_parent->getId().c_str());//osm todo: get color from parent class
+  if(_fgcolor == -1) {
+    if(_lele_parent) {
+      return _lele_parent->pos()->fgColor();
+    }
+    return 0;
+  }
+  return _fgcolor;
 }

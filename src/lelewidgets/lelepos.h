@@ -5,11 +5,14 @@
 #include <lvgl/lvgl_private.h>
 #include <string>
 
+class LeleBase;
 class LelePos {
   public:
   // static LelePos fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LelePos(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LelePos(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+  void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
+  static int parseColorCode(const std::string &color_str);
   int x() const;
   int y() const;
   int width() const;
@@ -18,7 +21,9 @@ class LelePos {
   int padLeft() const;
   int padVer() const;
   int bgColor() const;
+  int fgColor() const;
   protected:
+  LeleBase *_lele_parent = nullptr;
   std::string _x = "0";
   std::string _y = "0";
   std::string _width = "0";
@@ -26,8 +31,8 @@ class LelePos {
   std::string _corner_radius = "5";
   std::string _pad_ver = "20";
   std::string _pad_left = "5";
-  int _fgcolor = 0;  
-  int _bgcolor = 0xffffff;  
+  int _fgcolor = -1;//0  
+  int _bgcolor = -1;//0xff0000;
   int _parent_width = 0;
   int _parent_height = 0;
 };

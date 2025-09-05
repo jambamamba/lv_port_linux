@@ -1,15 +1,16 @@
 {
     "tabview":{
-        "fgcolor":"ffffff",
-        "bgcolor":"444444",
-        "active_tab_bgcolor":"ffffff",
-        "active_tab_bottom_border_color":"cccccc",
+        "pos":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "active_tab_bgcolor":"#ffffff",
+        "active_tab_bottom_border_color":"#cccccc",
+        "tabbar_height":"75",
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
         "img":"weather-hub-logo.png",
         "tabs":[
             {
                 "tab":{
+                    "pos":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
                     "tab_button":{
                         "name":"Home",
                         "img":"home_icon.png"

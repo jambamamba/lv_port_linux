@@ -3,9 +3,10 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleTextbox::LeleTextbox(const std::string &json_str, lv_obj_t *parent)
-  : LeleBase(json_str, parent) {
+LeleTextbox::LeleTextbox(const std::string &json_str)
+  : LeleBase(json_str) {
 
+    _id = typeid(this).name();
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -22,10 +23,10 @@ LeleTextbox::LeleTextbox(const std::string &json_str, lv_obj_t *parent)
   }
 }
 
-lv_obj_t *LeleTextbox::createLvObj(lv_obj_t *parent) {
+lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent) {
 
   _lv_obj = lv_textarea_create(
-    LeleBase::createLvObj(parent));
+    LeleBase::createLvObj(lele_parent));
   lv_textarea_set_text(_lv_obj, _text.c_str());
   // lv_obj_align(_lv_obj, LV_ALIGN_TOP_MID, x, y);
   lv_textarea_set_text_selection(_lv_obj, true);
