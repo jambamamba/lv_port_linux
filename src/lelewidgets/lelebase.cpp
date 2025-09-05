@@ -39,10 +39,10 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent) {
   _lv_obj = lv_obj_create(lele_parent->getLvObj());
   lv_obj_set_pos(_lv_obj, _pos->x(), _pos->y());
   lv_obj_add_style(_lv_obj, &_style, 0);
-  LOG(DEBUG, LVSIM, "self:%s\n", getId().c_str());
+  // LOG(DEBUG, LVSIM, "self:%s\n", getId().c_str());
   int fgcolor = _pos->fgColor();
   lv_obj_set_style_text_color(_lv_obj, lv_color_hex(fgcolor), LV_PART_MAIN);
-  LOG(DEBUG, LVSIM, "---> got fgcolor: 0x%x\n", fgcolor);
+  // LOG(DEBUG, LVSIM, "---> got fgcolor: 0x%x\n", fgcolor);
   lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_pos->bgColor()), LV_PART_MAIN);
 
   return _lv_obj;
