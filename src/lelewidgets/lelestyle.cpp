@@ -1,7 +1,7 @@
 
 #include <algorithm>
 
-#include "lelepos.h"
+#include "lelestyle.h"
 #include "lelewidgetfactory.h"
 #include "lelebase.h"
 
@@ -22,7 +22,7 @@ int toInt(const std::string &x, int parent_x) {
 }
 }//namespace
 
-LelePos::LelePos(const std::string &json_str, lv_obj_t *parent) 
+LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent) 
   : _parent_width(lv_obj_get_width(parent))
   , _parent_height(lv_obj_get_height(parent)) {
 
@@ -51,15 +51,15 @@ LelePos::LelePos(const std::string &json_str, lv_obj_t *parent)
         _pad_left = value;
       }
       else if(key == "fgcolor") {
-        _fgcolor = LelePos::parseColorCode(value);
+        _fgcolor = LeleStyle::parseColorCode(value);
       }
       else if(key == "bgcolor") {
-        _bgcolor = LelePos::parseColorCode(value);
+        _bgcolor = LeleStyle::parseColorCode(value);
       }
     }
   }
 }
-int LelePos::parseColorCode(const std::string &color_str) {
+int LeleStyle::parseColorCode(const std::string &color_str) {
   if(color_str.empty()) {
     return 0;
   }
@@ -91,28 +91,28 @@ int LelePos::parseColorCode(const std::string &color_str) {
   }
   return 0;
 }
-int LelePos::x() const {
+int LeleStyle::x() const {
   return toInt(_x, _parent_width);
 }
-int LelePos::y() const {
+int LeleStyle::y() const {
   return toInt(_y, _parent_height);
 }
-int LelePos::width() const {
+int LeleStyle::width() const {
   return toInt(_width, _parent_width);
 }
-int LelePos::height() const {
+int LeleStyle::height() const {
   return toInt(_height, _parent_height);
 }
-int LelePos::cornerRadius() const {
+int LeleStyle::cornerRadius() const {
   return toInt(_corner_radius, std::max(_parent_height, _parent_width));  
 }
-int LelePos::padLeft() const {
+int LeleStyle::padLeft() const {
   return toInt(_pad_left, _parent_width);  
 }
-int LelePos::padVer() const {
+int LeleStyle::padVer() const {
   return toInt(_pad_ver, _parent_height);
 }
-int LelePos::bgColor() const {
+int LeleStyle::bgColor() const {
   if(_bgcolor == -1) {
     if(_lele_parent) {
       return _lele_parent->pos()->bgColor();
@@ -121,7 +121,7 @@ int LelePos::bgColor() const {
   }
   return _bgcolor;
 }
-int LelePos::fgColor() const {
+int LeleStyle::fgColor() const {
   
   if(_fgcolor == -1) {
     if(_lele_parent) {

@@ -6,7 +6,7 @@
 #include <lvgl/lvgl_private.h>
 #include <typeinfo>
 
-#include "lelepos.h"
+#include "lelestyle.h"
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
@@ -34,10 +34,10 @@ class LeleBase {
   }
   void setParent(LeleBase *parent) {
     _lele_parent = parent;
-    _pos->setLeleParent(parent);
+    _lele_style->setLeleParent(parent);
   }
-  const LelePos *pos() const {
-    return _pos;
+  const LeleStyle *pos() const {
+    return _lele_style;
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
   protected:
@@ -46,6 +46,6 @@ class LeleBase {
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
-  LelePos _null_pos;
-  LelePos *_pos = &_null_pos;
+  LeleStyle _null_pos;
+  LeleStyle *_lele_style = &_null_pos;
 };

@@ -6,11 +6,11 @@
 #include <string>
 
 class LeleBase;
-class LelePos {
+class LeleStyle {
   public:
-  // static LelePos fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
-  // LelePos(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
-  LelePos(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+  // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
+  // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
+  LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
   void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
   static int parseColorCode(const std::string &color_str);
   int x() const;

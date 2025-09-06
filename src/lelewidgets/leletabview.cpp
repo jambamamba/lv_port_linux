@@ -2,7 +2,7 @@
 
 #include "lelelabel.h"
 #include "leletextbox.h"
-#include "lelepos.h"
+#include "lelestyle.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -158,10 +158,10 @@ LeleTabView::LeleTabView(const std::string &json_str)
         _img = value;
       }
       else if(key == "active_tab_bgcolor") {
-        _active_tab_bgcolor = LelePos::parseColorCode(value);
+        _active_tab_bgcolor = LeleStyle::parseColorCode(value);
       }
       else if(key == "active_tab_bottom_border_color") {
-        _active_tab_bottom_border_color = LelePos::parseColorCode(value);
+        _active_tab_bottom_border_color = LeleStyle::parseColorCode(value);
       }
       else if(key == "tabbar_height") {
         _tabbar_height = std::stoi(value.c_str(), nullptr, 10);
@@ -180,13 +180,13 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent) {
 
   const lv_font_t *font_normal = &lv_font_montserrat_16;
   lv_obj_set_style_text_font(_lv_obj, font_normal, 0);
-  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_pos->fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_pos->bgColor()), LV_PART_MAIN);
+  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
   
   lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
   lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
-  lv_obj_set_style_text_color(tabview_header, lv_color_hex(_pos->fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_pos->bgColor()), LV_PART_MAIN);
+  lv_obj_set_style_text_color(tabview_header, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
 
   _tabs->createLvObj(this);
   _tabs->setLvObj(_lv_obj);

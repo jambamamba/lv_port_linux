@@ -91,7 +91,7 @@ std::vector<std::pair<std::string, Token>> fromJson(
             token = std::make_unique<LeleTextbox>(rhs);
         }
         else if(lhs == "pos") {
-            token = std::make_unique<LelePos>(rhs);
+            token = std::make_unique<LeleStyle>(rhs);
         }
         else {
             token = rhs;

@@ -13,11 +13,11 @@
 #include <variant>
 #include <vector>
 
-#include "lelepos.h"
+#include "lelestyle.h"
 class LeleBase;
 namespace LeleWidgetFactory {
 
-  using Token = std::variant<std::string, std::unique_ptr<LeleBase>, std::unique_ptr<LelePos>>;
+  using Token = std::variant<std::string, std::unique_ptr<LeleBase>, std::unique_ptr<LeleStyle>>;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
   std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str = "");
