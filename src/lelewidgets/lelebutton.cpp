@@ -40,7 +40,6 @@ lv_obj_t *LeleButton::createLvObj(LeleBase *lele_parent) {
   return _lv_obj;
 }
 
-
 void LeleButton::EventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
