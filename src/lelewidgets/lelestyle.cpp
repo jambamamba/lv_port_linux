@@ -50,11 +50,20 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       else if(key == "pad_left") {
         _pad_left = value;
       }
+      else if(key == "border_width") {
+        _border_width = value;
+      }
       else if(key == "fgcolor") {
         _fgcolor = LeleStyle::parseColorCode(value);
       }
       else if(key == "bgcolor") {
         _bgcolor = LeleStyle::parseColorCode(value);
+      }
+      else if(key == "border_color") {
+        _border_color = LeleStyle::parseColorCode(value);
+      }
+      else if(key == "checked_color") {
+        _checked_color = LeleStyle::parseColorCode(value);
       }
     }
   }
@@ -112,10 +121,13 @@ int LeleStyle::padLeft() const {
 int LeleStyle::padVer() const {
   return toInt(_pad_ver, _parent_height);
 }
+int LeleStyle::borderWidth() const {
+  return toInt(_border_width, _parent_width);
+}
 int LeleStyle::bgColor() const {
   if(_bgcolor == -1) {
     if(_lele_parent) {
-      return _lele_parent->pos()->bgColor();
+      return _lele_parent->style()->bgColor();
     }
     return 0;
   }
@@ -125,10 +137,28 @@ int LeleStyle::fgColor() const {
   
   if(_fgcolor == -1) {
     if(_lele_parent) {
-      int fgcolor = _lele_parent->pos()->fgColor();
+      int fgcolor = _lele_parent->style()->fgColor();
       // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->getId().c_str(), fgcolor);//osm todo: get color from parent class
       return fgcolor;
     }
   }
   return _fgcolor;
+}
+int LeleStyle::borderColor() const {
+  if(_border_color == -1) {
+    if(_lele_parent) {
+      return _lele_parent->style()->borderColor();
+    }
+    return 0;
+  }
+  return _border_color;
+}
+int LeleStyle::checkedColor() const {
+  if(_checked_color == -1) {
+    if(_lele_parent) {
+      return _lele_parent->style()->checkedColor();
+    }
+    return 0;
+  }
+  return _checked_color;
 }

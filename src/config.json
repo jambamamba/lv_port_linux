@@ -16,14 +16,19 @@
                     },
                     "tab_content":{
                         "label":{
-                            "text":"hello world1",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                            "text":"Static Label",
+                            "pos":{"x":"0","y":"0","width":"50%","height":"10%","corner_radius":"5"}
                         },
                         "textbox":{
-                            "text":"hello world1",
-                            "max_length":"15",
-                            "multiline":"false",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "text":"Text Box",
+                            "max_length":"1024",
+                            "multiline":"true",
+                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"50%","corner_radius":"5"}
+                        },
+                        "button":{
+                            "text":"Button",
+                            "checkable":"true",
+                            "pos":{"bgcolor":"#2196f3","checked_color":"#ff0000","x":"0","y":"65%","width":"14%","height":"8%","corner_radius":"5"}
                         }
                     }
                 }
@@ -43,7 +48,7 @@
                             "text":"hello world2",
                             "max_length":"15",
                             "multiline":"false",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }
@@ -63,7 +68,7 @@
                             "text":"hello world3",
                             "max_length":"15",
                             "multiline":"false",
-                            "pos":{"x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }

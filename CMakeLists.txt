@@ -163,6 +163,7 @@ set(LELE_WIDGETS
     src/lelewidgets/lelebase.cpp
     src/lelewidgets/lelenullwidget.cpp
     src/lelewidgets/lelelabel.cpp
+    src/lelewidgets/lelebutton.cpp
     src/lelewidgets/leletextbox.cpp
     src/lelewidgets/lelestyle.cpp
     src/lelewidgets/leletabview.cpp

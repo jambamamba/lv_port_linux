@@ -22,6 +22,9 @@ class LeleStyle {
   int padVer() const;
   int bgColor() const;
   int fgColor() const;
+  int borderColor() const;
+  int borderWidth() const;
+  int checkedColor() const;
   protected:
   LeleBase *_lele_parent = nullptr;
   std::string _x = "0";
@@ -31,8 +34,11 @@ class LeleStyle {
   std::string _corner_radius = "5";
   std::string _pad_ver = "20";
   std::string _pad_left = "5";
+  std::string _border_width = "0";
   int _fgcolor = -1;//0  
   int _bgcolor = -1;//0xff0000;
+  int _border_color = -1;
+  int _checked_color = -1;
   int _parent_width = 0;
   int _parent_height = 0;
 };

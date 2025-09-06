@@ -4,6 +4,7 @@
 #include "leletabview.h"
 #include "lelelabel.h"
 #include "leletextbox.h"
+#include "lelebutton.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -89,6 +90,9 @@ std::vector<std::pair<std::string, Token>> fromJson(
         }
         else if(lhs == "textbox") {
             token = std::make_unique<LeleTextbox>(rhs);
+        }
+        else if(lhs == "button") {
+            token = std::make_unique<LeleButton>(rhs);
         }
         else if(lhs == "pos") {
             token = std::make_unique<LeleStyle>(rhs);

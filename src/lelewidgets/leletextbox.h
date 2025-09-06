@@ -9,7 +9,7 @@ class LeleTextbox : public LeleBase  {
   LeleTextbox(const std::string &json_str);
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
   protected:
-  static void TextAreaEventCallback(lv_event_t * e);
+  static void EventCallback(lv_event_t * e);
   std::string _text;
   int _max_length = 15;
   bool _multiline = false;

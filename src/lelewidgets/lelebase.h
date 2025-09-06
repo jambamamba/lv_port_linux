@@ -36,10 +36,11 @@ class LeleBase {
     _lele_parent = parent;
     _lele_style->setLeleParent(parent);
   }
-  const LeleStyle *pos() const {
+  const LeleStyle *style() const {
     return _lele_style;
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
+  virtual void setStyle();
   protected:
   std::string _id = "N/A";
   lv_obj_t *_lv_obj = nullptr;
