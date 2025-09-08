@@ -53,6 +53,9 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       else if(key == "border_width") {
         _border_width = value;
       }
+      else if(key == "flow") {
+        _flow = value;
+      }
       else if(key == "fgcolor") {
         _fgcolor = LeleStyle::parseColorCode(value);
       }
@@ -161,4 +164,32 @@ int LeleStyle::checkedColor() const {
     return 0;
   }
   return _checked_color;
+}
+int LeleStyle::flow() const {
+  
+  if(strncmp(_flow.c_str(), "row", 6)==0) {
+    return LV_FLEX_FLOW_ROW;
+  }
+  else if(strncmp(_flow.c_str(), "row_wrap", 8)==0) {
+    return LV_FLEX_FLOW_ROW_WRAP;
+  }
+  else if(strncmp(_flow.c_str(), "row_reverse", 11)==0){
+    return LV_FLEX_FLOW_ROW_REVERSE;
+  }
+  else if(strncmp(_flow.c_str(), "row_wrap_reverse", 16)==0){
+    return LV_FLEX_FLOW_ROW_WRAP_REVERSE;
+  }
+  else if(strncmp(_flow.c_str(), "column", 6)==0) {
+    return LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
+  }
+  else if(strncmp(_flow.c_str(), "column_wrap", 11)==0){
+    return LV_FLEX_FLOW_COLUMN_WRAP;
+  }
+  else if(strncmp(_flow.c_str(), "column_reverse", 14)==0){
+    return LV_FLEX_FLOW_COLUMN_REVERSE;
+  }
+  else if(strncmp(_flow.c_str(), "column_wrap_reverse", 19)==0){
+    return LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+  }
+  return -1;
 }

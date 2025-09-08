@@ -14,7 +14,7 @@ lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent) {
   setParent(lele_parent);
   return _lv_obj;
 }
-int LeleTabView::Tabs::numTabs() const {
+int LeleTabView::Tabs::count() const {
     int idx = 0;
     for(const auto &pair: _tokens) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
@@ -190,7 +190,7 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent) {
 
   _tabs->createLvObj(this);
   _tabs->setLvObj(_lv_obj);
-  for(int idx = 0; idx < _tabs->numTabs(); ++idx) {
+  for(int idx = 0; idx < _tabs->count(); ++idx) {
     LeleTabView::Tab *tab = _tabs->getAt(idx);
     tab->createLvObj(_tabs);
     tab->getTabContent()->createLvObj(tab);

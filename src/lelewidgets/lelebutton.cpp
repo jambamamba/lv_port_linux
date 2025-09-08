@@ -2,7 +2,52 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleButton::LeleButton(const std::string &json_str)
+
+LeleButtons::LeleButtons(const std::string &json_str)
+  : LeleBase(json_str) {
+    _id = __func__ ;//
+}
+lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent) {
+  setParent(lele_parent);
+  _lv_obj = LeleBase::createLvObj(lele_parent);
+  return _lv_obj;
+}
+int LeleButtons::count() const {
+    int idx = 0;
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "button") {
+          LeleButtons::LeleButton *button = dynamic_cast<LeleButtons::LeleButton*> (value.get());
+          if(button) {
+            ++idx;  
+          }        
+        }
+      }
+    }
+    return idx;
+}
+LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
+    int idx = 0;
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "button") {
+          LeleButtons::LeleButton *button = dynamic_cast<LeleButtons::LeleButton*> (value.get());
+          if(button) {
+            if(index == idx) {
+              return button;
+            }
+            ++idx;
+          }
+        }
+        // LOG(DEBUG, LVSIM, "Tabs token %s:%s\n", pair.first.c_str(), typeid(pair.second).name());
+      }
+    }
+    return nullptr;
+}
+
+LeleButtons::LeleButton::LeleButton(const std::string &json_str)
   : LeleBase(json_str) {
 
   _id = __func__ ;//typeid(this).name();
@@ -19,9 +64,8 @@ LeleButton::LeleButton(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleButton::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent) {
 
-  _lv_obj = lv_button_create(lele_parent->getLvObj());
   _lv_obj = LeleBase::createLvObj(lele_parent);
 
   lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
@@ -40,7 +84,7 @@ lv_obj_t *LeleButton::createLvObj(LeleBase *lele_parent) {
   return _lv_obj;
 }
 
-void LeleButton::EventCallback(lv_event_t * e)
+void LeleButtons::LeleButton::EventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     lv_obj_t * lv_obj = ((LeleButton *)e->user_data)->getLvObj();

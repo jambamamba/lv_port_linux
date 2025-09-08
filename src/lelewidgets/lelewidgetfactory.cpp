@@ -91,8 +91,14 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "textbox") {
             token = std::make_unique<LeleTextbox>(rhs);
         }
+        else if(lhs == "group") {
+            token = std::make_unique<LeleGroup>(rhs);
+        }
+        else if(lhs == "buttons") {
+            token = std::make_unique<LeleButtons>(rhs);
+        }
         else if(lhs == "button") {
-            token = std::make_unique<LeleButton>(rhs);
+            token = std::make_unique<LeleButtons::LeleButton>(rhs);
         }
         else if(lhs == "pos") {
             token = std::make_unique<LeleStyle>(rhs);

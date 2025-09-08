@@ -36,7 +36,7 @@ class LeleTabView : public LeleBase {
     public:
     Tabs(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
-    int numTabs() const;
+    int count() const;
     LeleTabView::Tab* getAt(int idx) const;
     protected:
   };

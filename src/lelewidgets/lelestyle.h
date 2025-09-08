@@ -35,6 +35,7 @@ class LeleStyle {
   std::string _pad_ver = "20";
   std::string _pad_left = "5";
   std::string _border_width = "0";
+  std::string _flow = "row_wrapped";
   int _fgcolor = -1;//0  
   int _bgcolor = -1;//0xff0000;
   int _border_color = -1;

@@ -73,6 +73,10 @@ void LeleBase::setStyle() {
   lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
   lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
 
+  int flow = _lele_style->flow();
+  if(flow != -1) {
+    lv_obj_set_flex_flow(_lv_obj, flow);
+  }
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
 
