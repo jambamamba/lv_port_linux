@@ -22,8 +22,9 @@ int LeleTabView::Tabs::count() const {
         if(pair.first == "tab") {
           LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
           if(tab) {
-            ++idx;        }        
-          }
+            ++idx;        
+          }        
+        }
       }
     }
     return idx;

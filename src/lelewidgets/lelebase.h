@@ -41,6 +41,8 @@ class LeleBase {
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
   virtual void setStyle();
+  static void EventCallback(lv_event_t * e);
+  virtual void eventCallback(lv_event_t * e);
   protected:
   std::string _id = "N/A";
   lv_obj_t *_lv_obj = nullptr;

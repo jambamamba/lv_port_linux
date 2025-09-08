@@ -165,7 +165,7 @@ int LeleStyle::checkedColor() const {
   }
   return _checked_color;
 }
-int LeleStyle::flow() const {
+std::optional<lv_flex_flow_t> LeleStyle::flow() const {
   
   if(strncmp(_flow.c_str(), "row", 6)==0) {
     return LV_FLEX_FLOW_ROW;
@@ -191,5 +191,5 @@ int LeleStyle::flow() const {
   else if(strncmp(_flow.c_str(), "column_wrap_reverse", 19)==0){
     return LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
   }
-  return -1;
+  return std::nullopt;
 }

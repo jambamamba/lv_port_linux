@@ -33,18 +33,17 @@ lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent) {
   lv_textarea_set_text_selection(_lv_obj, true);
   lv_textarea_set_max_length(_lv_obj, _max_length);
   lv_textarea_set_one_line(_lv_obj, _multiline);
-  lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
 
-void LeleTextbox::EventCallback(lv_event_t * e){
+void LeleTextbox::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * lv_obj = ((LeleTextbox *)e->user_data)->getLvObj();
 
     if(code == LV_EVENT_CLICKED 
-      && lv_event_get_target(e)==lv_obj){
-        const char * text = lv_textarea_get_text(lv_obj);
+      && lv_event_get_target(e)==_lv_obj){
+        const char * text = lv_textarea_get_text(_lv_obj);
         LOG(DEBUG, LVSIM, "Textarea Clicked: %s\n", text);
     }
 }

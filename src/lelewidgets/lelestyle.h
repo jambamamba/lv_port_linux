@@ -3,6 +3,7 @@
 
 #include <json_utils/json_utils.h>
 #include <lvgl/lvgl_private.h>
+#include <optional>
 #include <string>
 
 class LeleBase;
@@ -25,6 +26,7 @@ class LeleStyle {
   int borderColor() const;
   int borderWidth() const;
   int checkedColor() const;
+  std::optional<lv_flex_flow_t> flow() const;
   protected:
   LeleBase *_lele_parent = nullptr;
   std::string _x = "0";

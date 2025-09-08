@@ -2,14 +2,40 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
+LeleGroup::LeleGroup(const std::string &json_str)
+  : LeleBase(json_str) {
+    _id = __func__ ;//
+}
+lv_obj_t *LeleGroup::createLvObj(LeleBase *lele_parent) {
+  _lv_obj = LeleBase::createLvObj(lele_parent);
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      value->createLvObj(this);
+    }
+  }
+  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
+  return _lv_obj;
+}
+void LeleGroup::eventCallback(lv_event_t * e)
+{
+    lv_event_code_t code = lv_event_get_code(e);
+    LOG(DEBUG, LVSIM, "Button Clicked\n");
+    //osm todo: uncheck all other buttons in the group, only one button should be checked at a time
+}
 LeleButtons::LeleButtons(const std::string &json_str)
   : LeleBase(json_str) {
     _id = __func__ ;//
 }
 lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent) {
   setParent(lele_parent);
-  _lv_obj = LeleBase::createLvObj(lele_parent);
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      value->createLvObj(lele_parent);
+    }
+  }
   return _lv_obj;
 }
 int LeleButtons::count() const {
@@ -81,13 +107,17 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent) {
 
   }
 
+  if(_lele_parent->getId() == "LeleGroup") { //bubble events to the parent if parent is a group
+    lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);
+  }
+  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+
   return _lv_obj;
 }
 
-void LeleButtons::LeleButton::EventCallback(lv_event_t * e)
+void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    lv_obj_t * lv_obj = ((LeleButton *)e->user_data)->getLvObj();
 
     if(code == LV_EVENT_CLICKED) {
         LOG(DEBUG, LVSIM, "Button Clicked\n");
