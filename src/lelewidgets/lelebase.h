@@ -23,8 +23,8 @@ class LeleBase {
   LeleBase(const std::string &json_str = "");
   virtual ~LeleBase();
 
-  const std::string &getId() const {
-    return _id;
+  const std::string &getClassName() const {
+    return _class_name;
   }
   lv_obj_t *getLvObj() const {
     return _lv_obj;
@@ -44,7 +44,7 @@ class LeleBase {
   static void EventCallback(lv_event_t * e);
   virtual void eventCallback(lv_event_t * e);
   protected:
-  std::string _id = "N/A";
+  std::string _class_name = "N/A";
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};

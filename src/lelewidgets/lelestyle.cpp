@@ -104,27 +104,75 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   return 0;
 }
 int LeleStyle::x() const {
+  if(_x.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->x();
+    }
+    return 0;
+  }
   return toInt(_x, _parent_width);
 }
 int LeleStyle::y() const {
+  if(_y.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->y();
+    }
+    return 0;
+  }
   return toInt(_y, _parent_height);
 }
 int LeleStyle::width() const {
+  if(_width.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->width();
+    }
+    return 0;
+  }
   return toInt(_width, _parent_width);
 }
 int LeleStyle::height() const {
+  if(_height.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->height();
+    }
+    return 0;
+  }
   return toInt(_height, _parent_height);
 }
 int LeleStyle::cornerRadius() const {
+  if(_corner_radius.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->cornerRadius();
+    }
+    return 5;
+  }
   return toInt(_corner_radius, std::max(_parent_height, _parent_width));  
 }
 int LeleStyle::padLeft() const {
+  if(_pad_left.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->padLeft();
+    }
+    return 5;
+  }
   return toInt(_pad_left, _parent_width);  
 }
 int LeleStyle::padVer() const {
+  if(_pad_ver.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->padVer();
+    }
+    return 20;
+  }
   return toInt(_pad_ver, _parent_height);
 }
 int LeleStyle::borderWidth() const {
+  if(_border_width.empty()) {
+    if(_lele_parent) {
+      return _lele_parent->style()->borderWidth();
+    }
+    return 0;
+  }
   return toInt(_border_width, _parent_width);
 }
 int LeleStyle::bgColor() const {
@@ -141,7 +189,7 @@ int LeleStyle::fgColor() const {
   if(_fgcolor == -1) {
     if(_lele_parent) {
       int fgcolor = _lele_parent->style()->fgColor();
-      // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->getId().c_str(), fgcolor);//osm todo: get color from parent class
+      // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->getClassName().c_str(), fgcolor);//osm todo: get color from parent class
       return fgcolor;
     }
   }

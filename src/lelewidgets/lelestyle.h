@@ -29,15 +29,15 @@ class LeleStyle {
   std::optional<lv_flex_flow_t> flow() const;
   protected:
   LeleBase *_lele_parent = nullptr;
-  std::string _x = "0";
-  std::string _y = "0";
-  std::string _width = "0";
-  std::string _height = "0";
-  std::string _corner_radius = "5";
-  std::string _pad_ver = "20";
-  std::string _pad_left = "5";
-  std::string _border_width = "0";
-  std::string _flow = "row_wrapped";
+  std::string _x;
+  std::string _y;
+  std::string _width;
+  std::string _height;
+  std::string _corner_radius;
+  std::string _pad_left;
+  std::string _pad_ver;
+  std::string _border_width;
+  std::string _flow;
   int _fgcolor = -1;//0  
   int _bgcolor = -1;//0xff0000;
   int _border_color = -1;

@@ -23,25 +23,28 @@
                             "text":"Text Box",
                             "max_length":"1024",
                             "multiline":"true",
-                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"50%","corner_radius":"5"}
+                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
                         },
                         "group":{
-                            "pos":{"flow":"column","bgcolor":"#2196f3","checked_color":"#ff0000"},
+                            "pos":{"flow":"column","border_width":"3","border_color":"#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
                             "buttons":[
                                 {
                                     "button":{
+                                        "pos":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }
                                 },
                                 {
                                     "button":{
+                                        "pos":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }
                                 },
                                 {
                                     "button":{
+                                        "pos":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }

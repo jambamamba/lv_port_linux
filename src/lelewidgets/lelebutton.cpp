@@ -4,7 +4,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleGroup::LeleGroup(const std::string &json_str)
   : LeleBase(json_str) {
-    _id = __func__ ;//
+    _class_name = __func__ ;//
 }
 lv_obj_t *LeleGroup::createLvObj(LeleBase *lele_parent) {
   _lv_obj = LeleBase::createLvObj(lele_parent);
@@ -26,7 +26,7 @@ void LeleGroup::eventCallback(lv_event_t * e)
 }
 LeleButtons::LeleButtons(const std::string &json_str)
   : LeleBase(json_str) {
-    _id = __func__ ;//
+    _class_name = __func__ ;//
 }
 lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent) {
   setParent(lele_parent);
@@ -76,7 +76,7 @@ LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
 LeleButtons::LeleButton::LeleButton(const std::string &json_str)
   : LeleBase(json_str) {
 
-  _id = __func__ ;//typeid(this).name();
+  _class_name = __func__ ;//typeid(this).name();
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -107,7 +107,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent) {
 
   }
 
-  if(_lele_parent->getId() == "LeleGroup") { //bubble events to the parent if parent is a group
+  if(_lele_parent->getClassName() == "LeleGroup") { //bubble events to the parent if parent is a group
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);
   }
   lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed

@@ -6,7 +6,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleTextbox::LeleTextbox(const std::string &json_str)
   : LeleBase(json_str) {
 
-    _id = __func__ ;//
+    _class_name = __func__ ;//
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);

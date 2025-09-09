@@ -3,7 +3,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleBase::LeleBase(const std::string &json_str)
-: _id(__func__ ) {
+: _class_name(__func__ ) {
 
   _tokens = LeleWidgetFactory::fromJson(json_str);
   for (const auto &[key, token]: _tokens) {
