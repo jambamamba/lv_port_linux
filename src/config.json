@@ -1,6 +1,6 @@
 {
     "tabview":{
-        "pos":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
         "active_tab_bgcolor":"#ffffff",
         "active_tab_bottom_border_color":"#cccccc",
         "tabbar_height":"75",
@@ -17,34 +17,37 @@
                     "tab_content":{
                         "label":{
                             "text":"Static Label",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"10%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"10%","corner_radius":"5"}
                         },
                         "textbox":{
                             "text":"Text Box",
                             "max_length":"1024",
                             "multiline":"true",
-                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
                         },
                         "group":{
-                            "pos":{"flow":"column","border_width":"3","border_color":"#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
+                            "style":{"flow":"column","border_width":"3","border_color":"#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
                             "buttons":[
                                 {
                                     "button":{
-                                        "pos":{"width":"45%","height":"14%"},
+                                        "type":"switch",
+                                        "style":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }
                                 },
                                 {
                                     "button":{
-                                        "pos":{"width":"45%","height":"14%"},
+                                        "type":"radio",
+                                        "style":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }
                                 },
                                 {
                                     "button":{
-                                        "pos":{"width":"45%","height":"14%"},
+                                        "type":"checkbox",
+                                        "style":{"width":"45%","height":"14%"},
                                         "text":"Button",
                                         "checkable":"true"
                                     }
@@ -63,13 +66,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world2",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world2",
                             "max_length":"15",
                             "multiline":"false",
-                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }
@@ -83,13 +86,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world3",
-                            "pos":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world3",
                             "max_length":"15",
                             "multiline":"false",
-                            "pos":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }

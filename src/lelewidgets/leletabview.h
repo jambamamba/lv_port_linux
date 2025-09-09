@@ -8,7 +8,7 @@ class LeleTabView : public LeleBase {
   class TabContent : public LeleBase {
     public:
     TabContent(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _widgets;
   };
@@ -17,7 +17,7 @@ class LeleTabView : public LeleBase {
     TabButton(const std::string &json_str);
     const std::string &name() const { return _name; }
     const std::string &img() const { return _img; }
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     protected:
     std::string _name;
     std::string _img;
@@ -25,7 +25,7 @@ class LeleTabView : public LeleBase {
   class Tab : public LeleBase {
     public:
     Tab(const std::string &json_str = "");
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     TabButton *getTabButton() const;
     TabContent *getTabContent() const;
     protected:
@@ -35,13 +35,13 @@ class LeleTabView : public LeleBase {
   class Tabs : public LeleBase {
     public:
     Tabs(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     int count() const;
     LeleTabView::Tab* getAt(int idx) const;
     protected:
   };
   LeleTabView(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 
   protected:
   static void tabViewDeleteEventCb(lv_event_t * e);

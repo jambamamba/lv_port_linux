@@ -9,8 +9,14 @@ LeleBase::LeleBase(const std::string &json_str)
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-      if(key == "pos") {
+      if(key == "style") {
         _lele_style = dynamic_cast<LeleStyle*> (value.get());
+      }
+    }
+    else if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(key == "id") {
+        _id = value;
       }
     }
   }
@@ -84,10 +90,13 @@ void LeleBase::setStyle() {
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
 }
 
-lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
-  if(!_lv_obj) {
+  if(!lv_obj) {
     _lv_obj = lv_obj_create(lele_parent->getLvObj());
+  }
+  else {
+    _lv_obj = lv_obj;
   }
   setParent(lele_parent);
   setStyle();

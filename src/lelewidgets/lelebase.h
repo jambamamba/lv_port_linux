@@ -26,6 +26,9 @@ class LeleBase {
   const std::string &getClassName() const {
     return _class_name;
   }
+  const std::string &getId() const {
+    return _id;
+  }
   lv_obj_t *getLvObj() const {
     return _lv_obj;
   }
@@ -39,12 +42,13 @@ class LeleBase {
   const LeleStyle *style() const {
     return _lele_style;
   }
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr);
+  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle();
   static void EventCallback(lv_event_t * e);
   virtual void eventCallback(lv_event_t * e);
   protected:
   std::string _class_name = "N/A";
+  std::string _id;
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};

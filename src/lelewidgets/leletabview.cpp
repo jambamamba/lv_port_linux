@@ -10,7 +10,7 @@ LeleTabView::Tabs::Tabs(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   return _lv_obj;
 }
@@ -53,7 +53,7 @@ LeleTabView::Tab::Tab(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabButton()->name().c_str());
   return _lv_obj;
@@ -102,7 +102,7 @@ LeleTabView::TabButton::TabButton(const std::string &json_str)
     }
   }
 }
-lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   if(!_img.empty()) {
     lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -124,7 +124,7 @@ LeleTabView::TabContent::TabContent(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
@@ -171,7 +171,7 @@ LeleTabView::LeleTabView(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent) {
+lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   setParent(lele_parent);
   _lv_obj = lv_tabview_create(lele_parent->getLvObj());
