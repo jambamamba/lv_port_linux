@@ -10,6 +10,8 @@
 #include <map>
 #include <openssl/sha.h>
 #include <optional>
+#include <smart_pointer/auto_free_ptr.h>
+#include <lvgl/src/lv_api_map_v8.h>
 
 #include "img_helper.h"
 
@@ -34,6 +36,49 @@ std::string sha256sum(const std::string &input_str) {
         ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(hash[i]);
     }
     return ss.str();
+}
+
+AutoFreePtr<lv_img_dsc_t> generateImgDsc(std::ofstream &c_img_filestream, const std::string &img_file_path) {
+
+    std::filesystem::path img_path(img_file_path);
+    if(!std::filesystem::is_regular_file(img_file_path)) {
+        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+    }
+
+    ImgHelper img;
+    if(!img.processImgFile(img_file_path){
+        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+    }
+    int bpp = img.stride()/img.width();
+    std::string color_format;
+    switch(bpp) {
+        case 4: color_format = "LV_COLOR_FORMAT_ARGB8888"; break;
+        case 3: color_format = "LV_COLOR_FORMAT_RGB888"; break;
+        default: printf("invalid bpp, color format could not be determined from bpp:%i\n", bpp); exit(-1);
+    }
+
+    auto img_dsc = AutoFreePtr<lv_img_dsc_t>::create(img.stride() * img.height());
+    img_dsc->header = {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = color_format,
+        .flags = 0,
+        .w = img.width(),
+        .h = img.height(),
+        .stride = img.stride()
+      };
+    img_dsc->data_size = img.stride() * img.height();
+    
+    size_t bytes_copied = 0;
+    if(!img.processImgFile(img_file_path, [&img_dsc,&bytes_copied](const uint8_t *row, size_t num_bytes){
+        memcpy(&img_dsc->data[bytes_copied], row, num_bytes);
+        bytes_copied += num_bytes;
+        return true;
+    })) {
+        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+    }
+
+    printf("width:%i, height:%i\n", img.width(), img.height());
+    return img_dsc;
 }
 
 std::optional<std::pair<std::string, std::string>> generateCImgFile(std::ofstream &c_img_filestream, const std::string &img_file_path) {

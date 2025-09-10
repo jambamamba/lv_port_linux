@@ -6,7 +6,7 @@
 #include <string>
 #include <memory>
 #include <functional>
-#include "auto_free_ptr.h"
+#include <smart_pointer/auto_free_ptr.h>
 // #include <pngstruct.h>
 // #include <pnginfo.h>
 

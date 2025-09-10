@@ -7,9 +7,11 @@ bool ImgHelper::processImgFile(const std::string &img_file_path, std::function<b
         _width = _png.width();
         _height = _png.height();
         _stride = _png.stride();
-        _png.processPngFile([scanline](const uint8_t *row, size_t num_bytes){
-            return scanline(row, num_bytes);
-        });
+        if(scanline) {
+            _png.processPngFile([scanline](const uint8_t *row, size_t num_bytes){
+                return scanline(row, num_bytes);
+            });
+        }
         return true;
     }
     // if(_heif.readHeifFile(img_file_path.c_str())) {
@@ -27,9 +29,11 @@ bool ImgHelper::processImgFile(const std::string &img_file_path, std::function<b
         _stride = _jpeg.stride();
     	// printf("@@@[%s:%i] w:%i,h:%i,s:%i,bpp:%i\n", __FILE__, __LINE__, _width, _height, _stride, _stride/_width);
         // exit(-1);
-        _jpeg.processJpegFile([scanline](const uint8_t *row, size_t num_bytes){
-            return scanline(row, num_bytes);
-            });
+        if(scanline) {
+            _jpeg.processJpegFile([scanline](const uint8_t *row, size_t num_bytes){
+                return scanline(row, num_bytes);
+                });
+        }
         return true;
     }
     
