@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <regex>
 
 #include "lelestyle.h"
 #include "lelewidgetfactory.h"
@@ -50,8 +51,8 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       else if(key == "pad_left") {
         _pad_left = value;
       }
-      else if(key == "border_width") {
-        _border_width = value;
+      else if(key == "border") {
+        std::tie(_border_type, _border_width, _border_color) = LeleStyle::parseBorder(value);
       }
       else if(key == "flow") {
         _flow = value;
@@ -61,9 +62,6 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       }
       else if(key == "bgcolor") {
         _bgcolor = LeleStyle::parseColorCode(value);
-      }
-      else if(key == "border_color") {
-        _border_color = LeleStyle::parseColorCode(value);
       }
       else if(key == "checked_color") {
         _checked_color = LeleStyle::parseColorCode(value);
@@ -102,6 +100,37 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
     }
   }
   return 0;
+}
+std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::string &border_type_width_color) {
+
+  LeleStyle::BorderTypeE border_type = LeleStyle::BorderTypeE::None;
+  int border_width = 0;
+  int border_color = 0;
+  if(border_type_width_color.empty()) {
+    return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
+  }
+  std::regex pattern("(solid|none)-(\\d*)px-(#[a-f0-9]{1,6})");
+  std::smatch matches;
+  // std::string text("none-0px-#fcfcfc");
+  // std::string text("solid-9px-#fcfcfc");
+  if (std::regex_search(border_type_width_color, matches, pattern) &&
+    matches.size() == 4) {
+    if(matches[1] == "none") {
+      border_type = None;
+    }
+    else if(matches[1] == "solid") {
+      border_type = Solid;
+    }
+    else if(matches[1] == "dashed") {
+      border_type = Dashed;
+    }
+    else if(matches[1] == "dotted") {
+      border_type = Dotted;
+    }
+    border_width = std::atoi(matches[2].str().c_str());
+    border_color = parseColorCode(matches[3]);
+  }
+  return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
 int LeleStyle::x() const {
   if(_x.empty()) {
@@ -166,14 +195,32 @@ int LeleStyle::padVer() const {
   }
   return toInt(_pad_ver, _parent_height);
 }
+LeleStyle::BorderTypeE LeleStyle::borderType() const {
+  if(_border_type == LeleStyle::BorderTypeE::None) {
+    if(_lele_parent) {
+      return _lele_parent->style()->borderType();
+    }
+    return LeleStyle::BorderTypeE::None;
+  }
+  return _border_type;
+}
 int LeleStyle::borderWidth() const {
-  if(_border_width.empty()) {
+  if(_border_width == -1) {
     if(_lele_parent) {
       return _lele_parent->style()->borderWidth();
     }
     return 0;
   }
-  return toInt(_border_width, _parent_width);
+  return _border_width;
+}
+int LeleStyle::borderColor() const {
+  if(_border_color == -1) {
+    if(_lele_parent) {
+      return _lele_parent->style()->borderColor();
+    }
+    return 0;
+  }
+  return _border_color;
 }
 int LeleStyle::bgColor() const {
   if(_bgcolor == -1) {
@@ -194,15 +241,6 @@ int LeleStyle::fgColor() const {
     }
   }
   return _fgcolor;
-}
-int LeleStyle::borderColor() const {
-  if(_border_color == -1) {
-    if(_lele_parent) {
-      return _lele_parent->style()->borderColor();
-    }
-    return 0;
-  }
-  return _border_color;
 }
 int LeleStyle::checkedColor() const {
   if(_checked_color == -1) {
