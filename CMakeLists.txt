@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(lvgl)
 
-
 set(CONF_PATH "${PROJECT_SOURCE_DIR}/lv_conf.h")
 
 #osm#################################
@@ -178,6 +177,11 @@ add_executable(lvglsim
     ${LV_LINUX_BACKEND_SRC} 
     ${LV_IMG_DSC_SRC}
     ${PYTHON_LIB_OUTPUT}
+)
+set_target_properties(lvglsim PROPERTIES
+    CMAKE_CXX_STANDARD 17
+    CMAKE_CXX_STANDARD_REQUIRED ON
+    CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
 )
 target_link_libraries(lvglsim 
     lvgl_linux 

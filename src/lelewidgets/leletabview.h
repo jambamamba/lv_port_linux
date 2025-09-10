@@ -55,7 +55,9 @@ class LeleTabView : public LeleBase {
   std::string _subtitle;
   std::string _img;
   int _active_tab_bgcolor = 0xffffff;
-  int _active_tab_bottom_border_color = 0xcccccc;
+  int _active_tab_bottom_border_color = 0;
+  int _active_tab_bottom_border_width = -1;
+  LeleStyle::BorderTypeE _active_tab_bottom_border_type = LeleStyle::BorderTypeE::None;
   int _tabbar_height = 75;
   Tabs *_tabs = nullptr;
 };

@@ -2,7 +2,7 @@
     "tabview":{
         "style":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
         "active_tab_bgcolor":"#ffffff",
-        "active_tab_bottom_border_color":"#cccccc",
+        "active_tab_bottom_border":"solid-3px-#cccccc",
         "tabbar_height":"75",
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
@@ -23,17 +23,18 @@
                             "text":"Text Box",
                             "max_length":"1024",
                             "multiline":"true",
-                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
                         },
                         "group":{
-                            "style":{"flow":"column","border_width":"3","border_color":"#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
+                            "style":{"flow":"column","border":"solid-1px-#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
                             "buttons":[
                                 {
                                     "button":{
                                         "type":"switch",
                                         "style":{"width":"45%","height":"14%"},
                                         "text":"Button",
-                                        "checkable":"true"
+                                        "checkable":"true",
+                                        "checked":"false"
                                     }
                                 },
                                 {
@@ -41,7 +42,8 @@
                                         "type":"radio",
                                         "style":{"width":"45%","height":"14%"},
                                         "text":"Button",
-                                        "checkable":"true"
+                                        "checkable":"true",
+                                        "checked":"true"
                                     }
                                 },
                                 {
@@ -72,7 +74,7 @@
                             "text":"hello world2",
                             "max_length":"15",
                             "multiline":"false",
-                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }
@@ -92,7 +94,7 @@
                             "text":"hello world3",
                             "max_length":"15",
                             "multiline":"false",
-                            "style":{"border_width":"3","border_color":"#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
                         }
                     }
                 }

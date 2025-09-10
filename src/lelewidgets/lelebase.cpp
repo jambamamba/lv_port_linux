@@ -71,8 +71,10 @@ void LeleBase::setStyle() {
   lv_style_set_y(&_style, lv_pct(_lele_style->y()));
   lv_style_set_pad_ver(&_style, _lele_style->padVer());
   lv_style_set_pad_left(&_style, _lele_style->padLeft());
-  lv_style_set_border_color(&_style, lv_color_hex(_lele_style->borderColor()));
-  lv_style_set_border_width(&_style, _lele_style->borderWidth());
+  if(_lele_style->borderType() != LeleStyle::None) {
+    lv_style_set_border_color(&_style, lv_color_hex(_lele_style->borderColor()));
+    lv_style_set_border_width(&_style, _lele_style->borderWidth());
+  }
 
   lv_obj_set_pos(_lv_obj, _lele_style->x(), _lele_style->y());
   lv_obj_add_style(_lv_obj, &_style, 0);

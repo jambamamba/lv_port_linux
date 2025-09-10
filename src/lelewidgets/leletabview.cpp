@@ -161,8 +161,13 @@ LeleTabView::LeleTabView(const std::string &json_str)
       else if(key == "active_tab_bgcolor") {
         _active_tab_bgcolor = LeleStyle::parseColorCode(value);
       }
-      else if(key == "active_tab_bottom_border_color") {
-        _active_tab_bottom_border_color = LeleStyle::parseColorCode(value);
+      else if(key == "active_tab_bottom_border") {
+        std::tie(_active_tab_bottom_border_type,_active_tab_bottom_border_width,_active_tab_bottom_border_color) = 
+          LeleStyle::parseBorder(value);
+        // printf("@@@ value:%s\n", value.c_str());
+        // printf("@@@@ _active_tab_bottom_border_type:%i\n",_active_tab_bottom_border_type);
+        // printf("@@@@ _active_tab_bottom_border_width:%i\n",_active_tab_bottom_border_width);
+        // printf("@@@@ _active_tab_bottom_border_color:0x%x\n",_active_tab_bottom_border_color);
       }
       else if(key == "tabbar_height") {
         _tabbar_height = std::stoi(value.c_str(), nullptr, 10);
@@ -201,7 +206,10 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     tab->getTabButton()->createLvObj(tab);
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
-    lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+    if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
+      lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+      lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, LV_PART_MAIN | LV_STATE_CHECKED);
+    }
   }
 
   lv_obj_t *logo = setTabViewImg(tabview_header, _img);

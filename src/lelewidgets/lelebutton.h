@@ -27,6 +27,7 @@ class LeleButtons : public LeleBase {
     protected:
     std::string _text;
     bool _checkable = false;
+    bool _checked = false;
     Type _type = Push;
   };
   LeleButtons(const std::string &json_str);

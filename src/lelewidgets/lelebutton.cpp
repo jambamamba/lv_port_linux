@@ -30,8 +30,8 @@ void LeleGroup::eventCallback(lv_event_t * e)
     if(act_cb == container) {
       return;//Do nothing if the container was clicked
     }
-    if(_active_child_idx > -1) {
-      lv_obj_t *old_cb = lv_obj_get_child(container, _active_child_idx);
+    for(int idx = 0; idx < lv_obj_get_child_count(container); ++idx) {
+      lv_obj_t *old_cb = lv_obj_get_child(container, idx);
       lv_obj_remove_state(old_cb, LV_STATE_CHECKED);
     }
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);
@@ -114,6 +114,9 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
       else if(key == "checkable") {
         _checkable = strncmp(value.c_str(), "true", 4) == 0;
       }
+      else if(key == "checked") {
+        _checked = strncmp(value.c_str(), "true", 4) == 0;
+      }
     }
   }
 }
@@ -130,7 +133,11 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
       _lv_obj = LeleBase::createLvObj(lele_parent, 
         lv_checkbox_create(lele_parent->getLvObj()));
       lv_style_set_radius(&_style, LV_RADIUS_CIRCLE);
+      // lv_style_set_width(&_style, 50);
+      // lv_style_set_height(&_style, 50);
+      // lv_obj_set_size(_lv_obj, 20, 20);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
+      // lv_style_set_height(&_style, lv_style_get_width(_lv_obj));
       lv_checkbox_set_text(_lv_obj, _text.c_str());
     break;
     case LeleButtons::LeleButton::Type::Switch:
@@ -155,6 +162,12 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   if(_checkable) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_CHECKABLE);
     lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->checkedColor()), LV_PART_MAIN | LV_STATE_CHECKED); // Green when checked
+  }
+  if(_checked) {
+    lv_obj_add_state(_lv_obj, LV_STATE_CHECKED);
+  }
+  else {
+    lv_obj_remove_state(_lv_obj, LV_STATE_CHECKED);
   }
 
   if(_lele_parent->getClassName() == "LeleGroup") { //bubble events to the parent if parent is a group
