@@ -11,7 +11,10 @@
 #include <openssl/sha.h>
 #include <optional>
 #include <smart_pointer/auto_free_ptr.h>
-#include <lvgl/src/lv_api_map_v8.h>
+
+
+#include <lvgl/src/draw/lv_image_dsc.h>
+// #include <lvgl/src/lv_api_map_v8.h>
 
 #include "img_helper.h"
 
@@ -38,16 +41,16 @@ std::string sha256sum(const std::string &input_str) {
     return ss.str();
 }
 
-AutoFreePtr<lv_img_dsc_t> generateImgDsc(std::ofstream &c_img_filestream, const std::string &img_file_path) {
+AutoFreePtr<lv_image_dsc_t> generateImgDsc(std::ofstream &c_img_filestream, const std::string &img_file_path) {
 
     std::filesystem::path img_path(img_file_path);
     if(!std::filesystem::is_regular_file(img_file_path)) {
-        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+        return AutoFreePtr<lv_image_dsc_t>::nullopt();
     }
 
     ImgHelper img;
-    if(!img.processImgFile(img_file_path){
-        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+    if(!img.processImgFile(img_file_path)){
+        return AutoFreePtr<lv_image_dsc_t>::nullopt();
     }
     int bpp = img.stride()/img.width();
     std::string color_format;
@@ -57,7 +60,7 @@ AutoFreePtr<lv_img_dsc_t> generateImgDsc(std::ofstream &c_img_filestream, const 
         default: printf("invalid bpp, color format could not be determined from bpp:%i\n", bpp); exit(-1);
     }
 
-    auto img_dsc = AutoFreePtr<lv_img_dsc_t>::create(img.stride() * img.height());
+    auto img_dsc = AutoFreePtr<lv_image_dsc_t>::create(img.stride() * img.height());
     img_dsc->header = {
         .magic = LV_IMAGE_HEADER_MAGIC,
         .cf = color_format,
@@ -74,7 +77,7 @@ AutoFreePtr<lv_img_dsc_t> generateImgDsc(std::ofstream &c_img_filestream, const 
         bytes_copied += num_bytes;
         return true;
     })) {
-        return AutoFreePtr<lv_img_dsc_t>::nullopt();
+        return AutoFreePtr<lv_image_dsc_t>::nullopt();
     }
 
     printf("width:%i, height:%i\n", img.width(), img.height());
@@ -132,7 +135,7 @@ uint8_t img_";
 //");
     c_file_end += img_path.filename();
     c_file_end += "\n\
-static const lv_img_dsc_t img_";
+static const lv_image_dsc_t img_";
     c_file_end += img_path_hash;
     c_file_end += " = {\n\
   .header = { \n\
@@ -177,11 +180,11 @@ void writeLvImgDscHeader(const std::string &out_dir, const std::map<std::string,
 #include <lvgl/lvgl.h>\n\
 \n";
 
-    c_img_filestream << "extern const std::map<std::string, const lv_img_dsc_t*> _lv_img_dsc_map;\n";
+    c_img_filestream << "extern const std::map<std::string, const lv_image_dsc_t*> _lv_img_dsc_map;\n";
 }
 void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::string, std::string> &img_file_hashes) {
 
-    c_img_filestream << "const std::map<std::string, const lv_img_dsc_t*> _lv_img_dsc_map = {\n";
+    c_img_filestream << "const std::map<std::string, const lv_image_dsc_t*> _lv_img_dsc_map = {\n";
     int idx = 0;
     for(const auto &[img_file_name, img_path_hash] : img_file_hashes) {
         if(img_file_name.empty()) {
