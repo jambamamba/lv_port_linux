@@ -1,42 +1,7 @@
 #include "lelebutton.h"
+#include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
-
-LeleGroup::LeleGroup(const std::string &json_str)
-  : LeleBase(json_str) {
-    _class_name = __func__ ;//
-}
-lv_obj_t *LeleGroup::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  _lv_obj = LeleBase::createLvObj(lele_parent);
-  for (const auto &[key, token]: _tokens) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      value->createLvObj(this);
-    }
-  }
-  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
-
-  return _lv_obj;
-}
-void LeleGroup::eventCallback(lv_event_t * e)
-{
-    lv_event_code_t code = lv_event_get_code(e);
-    LeleBase *base = static_cast<LeleBase*>(e->user_data);
-    LOG(DEBUG, LVSIM, "%s: clicked\n", base->getClassName().c_str());
-    
-    //uncheck all other buttons in the group, only one button should be checked at a time
-    lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(e);//get the object to which an event was sent. I.e. the object whose event handler is being called.
-    lv_obj_t *act_cb = lv_event_get_target_obj(e);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
-    if(act_cb == container) {
-      return;//Do nothing if the container was clicked
-    }
-    for(int idx = 0; idx < lv_obj_get_child_count(container); ++idx) {
-      lv_obj_t *old_cb = lv_obj_get_child(container, idx);
-      lv_obj_remove_state(old_cb, LV_STATE_CHECKED);
-    }
-    lv_obj_add_state(act_cb, LV_STATE_CHECKED);
-    _active_child_idx = lv_obj_get_index(act_cb);
-}
 
 LeleButtons::LeleButtons(const std::string &json_str)
   : LeleBase(json_str) {
@@ -173,8 +138,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
     lv_obj_remove_state(_lv_obj, LV_STATE_CHECKED);
   }
 
-  if(_lele_parent->getClassName() == "LeleGroup") { //bubble events to the parent if parent is a group
-    lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);
+  LeleView *view = dynamic_cast<LeleView*>(_lele_parent);
+  if(view && view->isGroup()) {
+    lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);//bubble events to the parent if parent is a group
   }
   lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
@@ -188,9 +154,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
 void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
-    // LeleGroup *group = dynamic_cast<LeleGroup>(_lele_parent);
-    // if(group) {
-    //   group->eventCallback(e);
+    // LeleView *view = dynamic_cast<LeleView>(_lele_parent);
+    // if(view) {
+    //   view->eventCallback(e);
     // }
 
     if(code == LV_EVENT_CLICKED) {

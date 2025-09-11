@@ -180,6 +180,7 @@ set(LELE_WIDGETS
     src/lelewidgets/lelestyle.cpp
     src/lelewidgets/leletabview.cpp
     src/lelewidgets/lelewidgetfactory.cpp
+    src/lelewidgets/leleview.cpp
 )
 add_executable(lvglsim 
     src/main.cpp 

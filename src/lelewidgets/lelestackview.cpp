@@ -16,32 +16,39 @@ lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj
   setParent(lele_parent);
   return _lv_obj;
 }
-
 int LeleTabView::Tabs::count() const {
-    return getChildren().size();
-}
-LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
-    auto list = getChildren();
-    if(list.size() > index) {
-        return list.at(index);
-    }
-    return nullptr;
-}
-std::vector<LeleTabView::Tab*> LeleTabView::Tabs::getChildren() const {
-    std::vector<LeleTabView::Tab*> ret;
+    int idx = 0;
     for(const auto &pair: _tokens) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "tab") {
           LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
           if(tab) {
-              ret.push_back(tab);
+            ++idx;        
+          }        
+        }
+      }
+    }
+    return idx;
+}
+LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
+    int idx = 0;
+    for(const auto &pair: _tokens) {
+      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+        if(pair.first == "tab") {
+          LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
+          if(tab) {
+            if(index == idx) {
+              return tab;
+            }
+            ++idx;
           }
         }
         // LOG(DEBUG, LVSIM, "Tabs token %s:%s\n", pair.first.c_str(), typeid(pair.second).name());
       }
     }
-    return ret;
+    return nullptr;
 }
 
 LeleTabView::Tab::Tab(const std::string &json_str)
