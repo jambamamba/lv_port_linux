@@ -12,6 +12,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 ####################################
 add_library(${libproject} SHARED
+    mainlib.h mainlib.cpp
     img_helper.cpp img_helper.h
     png_helper.cpp png_helper.h
     jpeg_helper.cpp jpeg_helper.h

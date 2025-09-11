@@ -3,6 +3,9 @@
 #include "lelebase.h"
 #include "lelewidgetfactory.h"
 
+#include <smart_pointer/auto_free_ptr.h>
+#include <optional>
+
 class LeleTabView : public LeleBase {
   public:
   class TabContent : public LeleBase {
@@ -21,6 +24,7 @@ class LeleTabView : public LeleBase {
     protected:
     std::string _name;
     std::string _img;
+    std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
   };
   class Tab : public LeleBase {
     public:
@@ -60,4 +64,5 @@ class LeleTabView : public LeleBase {
   LeleStyle::BorderTypeE _active_tab_bottom_border_type = LeleStyle::BorderTypeE::None;
   int _tabbar_height = 75;
   Tabs *_tabs = nullptr;
+  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
 };

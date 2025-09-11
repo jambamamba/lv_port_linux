@@ -24,6 +24,24 @@ add_custom_command(
 )
 #osm#################################
 
+#osm#################################
+set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/img_dsc.h")
+add_subdirectory(lv_image_converter)
+add_custom_command(
+  OUTPUT ${LV_IMG_DSC_SRC}
+  COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
+  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
+  #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
+  COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
+  COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
+  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+  DEPENDS "${CMAKE_SOURCE_DIR}/res"
+  COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
+  VERBATIM
+)
+add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
+#osm#################################
+
 foreach(BACKEND_NAME "SDL" "LINUX_DRM" "LINUX_FBDEV" "X11" "WAYLAND" "OPENGLES" "EVDEV")
 
     execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -145,11 +163,6 @@ string(APPEND LVGL_PKG_CONFIG_LIB "-llvgl_linux")
 file(GLOB LV_LINUX_SRC src/lib/*.c)
 set(LV_LINUX_INC src/lib)
 
-#osm#################begin
-set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/img_dsc.h")
-# file(GLOB GENERATED_FILES CONFIGURE_DEPENDS C_IMG_FILES ${LV_IMG_DSC_SRC} ${CMAKE_BINARY_DIR}/res/*.c)
-#osm#################end
-
 set(utils_DIR "${CMAKE_PREFIX_PATH}")
 find_package(utils REQUIRED CONFIG)
 
@@ -193,6 +206,7 @@ target_link_libraries(lvglsim
     pthread 
     ${PKG_CONFIG_LIB}
     utils::utils
+    image_converter
 )
 # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
@@ -211,20 +225,6 @@ install(TARGETS lvgl_linux
 file(COPY "src/config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin")
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
-#osm#################begin
-add_subdirectory(lv_image_converter)
-add_custom_command(OUTPUT ${LV_IMG_DSC_SRC}
-  COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
-  #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
-  COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
-  COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-  DEPENDS "${CMAKE_SOURCE_DIR}/res"
-  COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
-  VERBATIM
-)
-add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
-###
+#osm#################end
 add_dependencies(lvglsim lv_image_convert)
 #osm#################end
