@@ -132,11 +132,14 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
     case LeleButtons::LeleButton::Type::Radio:
       _lv_obj = LeleBase::createLvObj(lele_parent, 
         lv_checkbox_create(lele_parent->getLvObj()));
-      lv_style_set_radius(&_style, LV_RADIUS_CIRCLE);
+
+      // lv_obj_remove_style(_lv_obj, &_style, 0);
+      // lv_style_set_radius(&_style, LV_RADIUS_CIRCLE);
       // lv_style_set_width(&_style, 50);
-      // lv_style_set_height(&_style, 50);
-      // lv_obj_set_size(_lv_obj, 20, 20);
-      lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
+      // lv_
+      // style_set_height(&_style, 50);
+      // lv_obj_set_size(_lv_obj, 50, 50);
+      // lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       // lv_style_set_height(&_style, lv_style_get_width(_lv_obj));
       lv_checkbox_set_text(_lv_obj, _text.c_str());
     break;
@@ -177,6 +180,10 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
 
   return _lv_obj;
 }
+
+// void LeleButtons::LeleButton::setStyle() {
+  
+// }
 
 void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
 {

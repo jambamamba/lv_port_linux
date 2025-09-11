@@ -66,7 +66,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
         return std::nullopt;
     }
 
-    printf("width:%i, height:%i\n", img.width(), img.height());
+    // printf("width:%i, height:%i\n", img.width(), img.height());
     return img_dsc;
 }
 

@@ -40,7 +40,7 @@
                                 {
                                     "button":{
                                         "type":"radio",
-                                        "style":{"width":"45%","height":"14%"},
+                                        "style":{"width":"45%","height":"14%","corner_radius":"32767"},
                                         "text":"Button",
                                         "checkable":"true",
                                         "checked":"true"

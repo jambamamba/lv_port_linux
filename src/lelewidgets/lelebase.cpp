@@ -75,9 +75,9 @@ void LeleBase::setStyle() {
     lv_style_set_border_color(&_style, lv_color_hex(_lele_style->borderColor()));
     lv_style_set_border_width(&_style, _lele_style->borderWidth());
   }
-
   lv_obj_set_pos(_lv_obj, _lele_style->x(), _lele_style->y());
   lv_obj_add_style(_lv_obj, &_style, 0);
+
   lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
   lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
 
