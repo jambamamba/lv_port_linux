@@ -25,14 +25,15 @@
                             "multiline":"true",
                             "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
                         },
-                        "group":{
-                            "style":{"flow":"column","border":"solid-1px-#ffffff","checked_color":"#3eafff","x":"0","y":"35%","width":"50%","height":"60%"},
+                        "view":{
+                            "style":{"flow":"column","border":"solid-1px-#ffffff","checked_color":"#ff0000","x":"0","y":"35%","width":"40%","height":"40%"},
+                            "group":"true",
                             "buttons":[
                                 {
                                     "button":{
                                         "type":"switch",
-                                        "style":{"width":"45%","height":"14%"},
-                                        "text":"Button",
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner_radius":"0x7FFF","pad_ver":"0","pad_left":"0"},
+                                        "text":"Switch",
                                         "checkable":"true",
                                         "checked":"false"
                                     }
@@ -40,8 +41,8 @@
                                 {
                                     "button":{
                                         "type":"radio",
-                                        "style":{"width":"45%","height":"14%","corner_radius":"32767"},
-                                        "text":"Button",
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner_radius":"0x7FFF","pad_ver":"0","pad_left":"0"},
+                                        "text":"Radio Button",
                                         "checkable":"true",
                                         "checked":"true"
                                     }
@@ -49,8 +50,16 @@
                                 {
                                     "button":{
                                         "type":"checkbox",
-                                        "style":{"width":"45%","height":"14%"},
-                                        "text":"Button",
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"45%","height":"50","pad_ver":"0","pad_left":"0"},
+                                        "text":"Checkbox",
+                                        "checkable":"true"
+                                    }
+                                },
+                                {
+                                    "button":{
+                                        "type":"push",
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"15%","height":"40","pad_ver":"0","pad_left":"0"},
+                                        "text":"Push button",
                                         "checkable":"true"
                                     }
                                 }

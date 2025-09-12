@@ -29,6 +29,7 @@ class LeleBase {
   const std::string &getId() const {
     return _id;
   }
+  bool enabled() const { return _enabled; }
   lv_obj_t *getLvObj() const {
     return _lv_obj;
   }
@@ -49,6 +50,7 @@ class LeleBase {
   protected:
   std::string _class_name = "N/A";
   std::string _id;
+  bool _enabled = true;
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};

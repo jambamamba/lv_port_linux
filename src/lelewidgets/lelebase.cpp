@@ -18,6 +18,9 @@ LeleBase::LeleBase(const std::string &json_str)
       if(key == "id") {
         _id = value;
       }
+      else if(key == "enabled") {
+        _enabled = (value == "true");
+      }
     }
   }
 }

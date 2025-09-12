@@ -22,7 +22,6 @@ class LeleButtons : public LeleBase {
     };
     LeleButton(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    // virtual void setStyle() override;
     virtual void eventCallback(lv_event_t * e) override;
     bool isCheckable() const { return _checkable; }
     protected:

@@ -14,10 +14,24 @@ int absFromPercent(int percent, int parent) {
 }
 int toInt(const std::string &x, int parent_x) {
     if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
-        return absFromPercent(std::atoi(x.c_str()), parent_x);
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else {
+          i = std::stoi(x, 0, 10);
+        }
+        return absFromPercent(i, parent_x);
     }
     else if(x.size() > 0) {
-        return std::atoi(x.c_str());
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else {
+          i = std::stoi(x, 0, 10);
+        }
+        return i;
     }
     return 0;
 }
@@ -30,7 +44,10 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
-      if(key == "x") {
+      if(key == "name") {
+        _name = value;
+      }
+      else if(key == "x") {
         _x = value;
       }
       else if(key == "y") {
@@ -131,6 +148,9 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
     border_color = parseColorCode(matches[3]);
   }
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
+}
+std::string LeleStyle::name() const {
+  return _name;
 }
 int LeleStyle::x() const {
   if(_x.empty()) {

@@ -85,32 +85,27 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
     }
   }
 }
-
 lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   switch(_type) {
     case LeleButtons::LeleButton::Type::Checkbox:
       _lv_obj = LeleBase::createLvObj(lele_parent, 
         lv_checkbox_create(lele_parent->getLvObj()));
+      lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
+      lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       lv_checkbox_set_text(_lv_obj, _text.c_str());
     break;
     case LeleButtons::LeleButton::Type::Radio:
       _lv_obj = LeleBase::createLvObj(lele_parent, 
         lv_checkbox_create(lele_parent->getLvObj()));
-
-      // lv_obj_remove_style(_lv_obj, &_style, 0);
-      // lv_style_set_radius(&_style, LV_RADIUS_CIRCLE);
-      // lv_style_set_width(&_style, 50);
-      // lv_
-      // style_set_height(&_style, 50);
-      // lv_obj_set_size(_lv_obj, 50, 50);
-      // lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
-      // lv_style_set_height(&_style, lv_style_get_width(_lv_obj));
+      lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
+      lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       lv_checkbox_set_text(_lv_obj, _text.c_str());
     break;
     case LeleButtons::LeleButton::Type::Switch:
       _lv_obj = LeleBase::createLvObj(lele_parent, 
         lv_switch_create(lele_parent->getLvObj()));
+      lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
     break;
     case LeleButtons::LeleButton::Type::Push:
@@ -119,12 +114,11 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
         lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *label = lv_label_create(_lv_obj);
       lv_label_set_text(label, _text.c_str());
-      lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+      lv_obj_align(label, LV_ALIGN_CENTER, 10, 0);
     break;
   }
 
   lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
-  // lv_obj_align(_lv_obj, LV_ALIGN_CENTER, 0, -40);
   lv_obj_remove_flag(_lv_obj, LV_OBJ_FLAG_PRESS_LOCK);
 
   if(_checkable) {
@@ -147,10 +141,6 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   return _lv_obj;
 }
 
-// void LeleButtons::LeleButton::setStyle() {
-  
-// }
-
 void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
@@ -160,9 +150,9 @@ void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
     // }
 
     if(code == LV_EVENT_CLICKED) {
-        LOG(DEBUG, LVSIM, "%s: clicked\n", _class_name.c_str());
+        LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
-        LOG(DEBUG, LVSIM, "%s: value changed\n", _class_name.c_str());
+        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i\n", _class_name.c_str(), _type);
     }
 }

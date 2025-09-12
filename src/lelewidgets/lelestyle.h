@@ -18,6 +18,7 @@ class LeleStyle {
   void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
   static int parseColorCode(const std::string &color_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
+  std::string name() const;
   int x() const;
   int y() const;
   int width() const;
@@ -34,6 +35,7 @@ class LeleStyle {
   std::optional<lv_flex_flow_t> flow() const;
   protected:
   LeleBase *_lele_parent = nullptr;
+  std::string _name;
   std::string _x;
   std::string _y;
   std::string _width;
