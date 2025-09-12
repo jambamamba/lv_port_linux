@@ -8,64 +8,22 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleTabView::Tabs::Tabs(const std::string &json_str)
-  : LeleBase(json_str) {
-    _class_name = __func__ ;//
-}
-lv_obj_t *LeleTabView::Tabs::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
-  return _lv_obj;
-}
-int LeleTabView::Tabs::count() const {
-    int idx = 0;
-    for(const auto &pair: _tokens) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
-        if(pair.first == "tab") {
-          LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
-          if(tab) {
-            ++idx;        
-          }        
-        }
-      }
-    }
-    return idx;
-}
-LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
-    int idx = 0;
-    for(const auto &pair: _tokens) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
-        if(pair.first == "tab") {
-          LeleTabView::Tab *tab = dynamic_cast<LeleTabView::Tab*> (value.get());
-          if(tab) {
-            if(index == idx) {
-              return tab;
-            }
-            ++idx;
-          }
-        }
-        // LOG(DEBUG, LVSIM, "Tabs token %s:%s\n", pair.first.c_str(), typeid(pair.second).name());
-      }
-    }
-    return nullptr;
-}
 
-LeleTabView::Tab::Tab(const std::string &json_str)
+LeleStackView::Tab::Tab(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleStackView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabButton()->name().c_str());
   return _lv_obj;
 }
-LeleTabView::TabButton *LeleTabView::Tab::getTabButton() const {
+LeleStackView::TabButton *LeleStackView::Tab::getTabButton() const {
     for(const auto &pair: _tokens) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "tab_button") {
-          LeleTabView::TabButton *ptr = dynamic_cast<LeleTabView::TabButton*> (value.get());
+          LeleStackView::TabButton *ptr = dynamic_cast<LeleStackView::TabButton*> (value.get());
           if(ptr) {
             return ptr;
           }
@@ -74,12 +32,12 @@ LeleTabView::TabButton *LeleTabView::Tab::getTabButton() const {
     }
     return nullptr;
 }
-LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
+LeleStackView::TabContent *LeleStackView::Tab::getTabContent() const {
     for(const auto &pair: _tokens) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "tab_content") {
-          LeleTabView::TabContent *ptr = dynamic_cast<LeleTabView::TabContent*> (value.get());
+          LeleStackView::TabContent *ptr = dynamic_cast<LeleStackView::TabContent*> (value.get());
           if(ptr) {
             return ptr;
           }
@@ -89,7 +47,7 @@ LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
     return nullptr;
 }
 
-LeleTabView::TabButton::TabButton(const std::string &json_str)
+LeleStackView::TabButton::TabButton(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
   for (const auto &[key, token]: _tokens) {
@@ -104,7 +62,7 @@ LeleTabView::TabButton::TabButton(const std::string &json_str)
     }
   }
 }
-lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleStackView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   if(!_img.empty()) {
     lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -126,11 +84,11 @@ lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *l
   _lv_obj = lele_parent->getLvObj();
   return _lv_obj;
 }
-LeleTabView::TabContent::TabContent(const std::string &json_str)
+LeleStackView::TabContent::TabContent(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleStackView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
@@ -142,7 +100,7 @@ lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *
   return _lv_obj;
 }
 
-LeleTabView::LeleTabView(const std::string &json_str)
+LeleStackView::LeleStackView(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
   for (const auto &[key, token]: _tokens) {
@@ -150,7 +108,7 @@ LeleTabView::LeleTabView(const std::string &json_str)
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       if(key == "tabs") {
-          _tabs = dynamic_cast<Tabs*> (value.get());
+          _tabs = dynamic_cast<Views*> (value.get());
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -182,7 +140,7 @@ LeleTabView::LeleTabView(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   setParent(lele_parent);
   _lv_obj = lv_tabview_create(lele_parent->getLvObj());
@@ -203,7 +161,7 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   _tabs->createLvObj(this);
   _tabs->setLvObj(_lv_obj);
   for(int idx = 0; idx < _tabs->count(); ++idx) {
-    LeleTabView::Tab *tab = _tabs->getAt(idx);
+    LeleStackView::Tab *tab = _tabs->getAt(idx);
     tab->createLvObj(_tabs);
     tab->getTabContent()->createLvObj(tab);
 
@@ -227,7 +185,7 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 
-lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string &img) {
+lv_obj_t *LeleStackView::setTabViewImg(lv_obj_t *tabview_header, const std::string &img) {
     lv_obj_set_style_pad_left(tabview_header, LV_HOR_RES / 2, 0);
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -240,7 +198,7 @@ lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string
     return logo;
 }
 
-lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tabview_header, const std::string &title) {
+lv_obj_t *LeleStackView::setTabViewTitle(lv_obj_t *tabview_header, const std::string &title) {
     lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_title);
     const lv_font_t *font_large = &lv_font_montserrat_24;
@@ -251,7 +209,7 @@ lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tabview_header, const std::stri
     return label;
 }
 
-lv_obj_t *LeleTabView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle) {
+lv_obj_t *LeleStackView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle) {
     lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_subtitle);
     lv_style_set_text_opa(&_style_subtitle, LV_OPA_50);
@@ -261,9 +219,9 @@ lv_obj_t *LeleTabView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::s
     return label;
 }
 
-void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
+void LeleStackView::tabViewDeleteEventCb(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
-    LeleTabView *pthis = (LeleTabView*)e->user_data;
+    LeleStackView *pthis = (LeleStackView*)e->user_data;
 
     if(code == LV_EVENT_DELETE) {
         //osm lv_style_reset(&pthis->_style_subtitle);

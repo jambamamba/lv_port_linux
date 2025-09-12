@@ -6,18 +6,18 @@
 #include <smart_pointer/auto_free_ptr.h>
 #include <optional>
 
-class LeleTabView : public LeleBase {
+class LeleStackView : public LeleBase {
   public:
-  class TabContent : public LeleBase {
+  class StackViewContent : public LeleBase {
     public:
-    TabContent(const std::string &json_str);
+    StackViewContent(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _widgets;
   };
-  class TabButton : public LeleBase {
+  class StackViewButton : public LeleBase {
     public:
-    TabButton(const std::string &json_str);
+    StackViewButton(const std::string &json_str);
     const std::string &name() const { return _name; }
     const std::string &img() const { return _img; }
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
@@ -26,25 +26,7 @@ class LeleTabView : public LeleBase {
     std::string _img;
     std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
   };
-  class Tab : public LeleBase {
-    public:
-    Tab(const std::string &json_str = "");
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    TabButton *getTabButton() const;
-    TabContent *getTabContent() const;
-    protected:
-    std::vector<std::unique_ptr<LeleBase>> _tab_button;
-    std::vector<std::unique_ptr<LeleBase>> _tab_content;
-  };
-  class Tabs : public LeleBase {
-    public:
-    Tabs(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    int count() const;
-    LeleTabView::Tab* getAt(int idx) const;
-    protected:
-  };
-  LeleTabView(const std::string &json_str);
+  LeleStackView(const std::string &json_str);
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 
   protected:
@@ -63,6 +45,6 @@ class LeleTabView : public LeleBase {
   int _active_tab_bottom_border_width = -1;
   LeleStyle::BorderTypeE _active_tab_bottom_border_type = LeleStyle::BorderTypeE::None;
   int _tabbar_height = 75;
-  Tabs *_tabs = nullptr;
+  Views *_tabs = nullptr;
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
 };

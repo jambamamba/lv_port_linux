@@ -1,10 +1,11 @@
 #include "lelewidgetfactory.h"
 
-#include "lelenullwidget.h"
-#include "leletabview.h"
-#include "lelelabel.h"
-#include "leletextbox.h"
 #include "lelebutton.h"
+#include "lelelabel.h"
+#include "lelenullwidget.h"
+#include "lelestackview.h"
+#include "leletabview.h"
+#include "leletextbox.h"
 #include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -86,6 +87,17 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "tab_content") {
             token = std::make_unique<LeleTabView::TabContent>(rhs);
         }
+        //
+        else if(lhs == "stackview") {
+            token = std::make_unique<LeleStackView>(rhs);
+        }
+        else if(lhs == "views") {
+            token = std::make_unique<LeleViews>(rhs);
+        }
+        else if(lhs == "view") {
+            token = std::make_unique<LeleView>(rhs);
+        }
+//
         else if(lhs == "label") {
             token = std::make_unique<LeleLabel>(rhs);
         }
