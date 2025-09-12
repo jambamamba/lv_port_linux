@@ -6,7 +6,7 @@
 #include <iostream>
 #include <openssl/sha.h>
 
-#include "img_helper.h"
+#include <utils/img_helper.h>
 
 namespace {
 std::string sha256sum(const std::string &input_str) {

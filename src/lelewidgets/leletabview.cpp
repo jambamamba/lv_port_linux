@@ -101,11 +101,11 @@ lv_obj_t *LeleTabView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *l
   if(!_img.empty()) {
     lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    // lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-    _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
-    if(_img_dsc) {
-      lv_image_set_src(logo, _img_dsc.value().get());
-    }
+    lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+    // _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
+    // if(_img_dsc) {
+    //   lv_image_set_src(logo, _img_dsc.value().get());
+    // }
     lv_obj_center(logo);
     lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
     lv_label_set_text(label, "");

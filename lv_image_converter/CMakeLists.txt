@@ -12,21 +12,22 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 ####################################
 add_library(${libproject} SHARED
-    mainlib.h mainlib.cpp
-    img_helper.cpp img_helper.h
-    png_helper.cpp png_helper.h
-    jpeg_helper.cpp jpeg_helper.h
-    heif_helper.cpp heif_helper.h
+    mainlib.h 
+    mainlib.cpp
     )
 target_include_directories(${libproject} PRIVATE ${CMAKE_SOURCE_DIR} 
     /usr/include/
     /usr/local/src/ 
     /usr/local/src/libheif/libheif/api/
     /usr/local/src/libheif/build/
-    ${CMAKE_SOURCE_DIR}/
+    ${CMAKE_SOURCE_DIR}/smart_pointer
     )
 target_link_directories(${libproject} PRIVATE /usr/local/lib)
-target_link_libraries(${libproject} PRIVATE ssl crypto png jpeg heif)
+
+set(utils_DIR "${CMAKE_PREFIX_PATH}")
+find_package(utils REQUIRED CONFIG)
+
+target_link_libraries(${libproject} PRIVATE utils::utils ssl crypto png jpeg heif)
 
 ####################################
 add_executable(${project} main.cpp)

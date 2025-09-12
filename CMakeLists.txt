@@ -25,7 +25,11 @@ add_custom_command(
 #osm#################################
 
 #osm#################################
-set(LV_IMG_DSC_SRC "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" "${CMAKE_BINARY_DIR}/res/img_dsc.h")
+set(LV_IMG_DSC_SRC 
+    "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" 
+    "${CMAKE_BINARY_DIR}/res/img_dsc.h"
+    # "${CMAKE_BINARY_DIR}/lv_image_converter/libimage_converter.so"
+)
 add_subdirectory(lv_image_converter)
 add_custom_command(
   OUTPUT ${LV_IMG_DSC_SRC}
