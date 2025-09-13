@@ -2,6 +2,8 @@
 
 #include "lelebase.h"
 
+#include <smart_pointer/auto_free_ptr.h>
+
 class LeleView : public LeleBase {
   public:
   LeleView(const std::string &json_str);
@@ -12,7 +14,17 @@ class LeleView : public LeleBase {
   int _active_child_idx = -1;
   bool _group = false;
 };
-
+class LeleViewHeader : public LeleBase {
+  public:
+  LeleViewHeader(const std::string &json_str);
+  const std::string &name() const { return _name; }
+  const std::string &img() const { return _img; }
+  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  protected:
+  std::string _name;
+  std::string _img;
+  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
+};
 class LeleViews : public LeleBase {
   public:
   LeleViews(const std::string &json_str);

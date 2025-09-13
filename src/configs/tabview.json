@@ -10,7 +10,7 @@
         "tabs":[
             {
                 "tab":{
-                    "tab_button":{
+                    "view_header":{
                         "name":"Home",
                         "img":"home_icon.png"
                     },
@@ -70,7 +70,7 @@
             },
             {
                 "tab":{
-                    "tab_button":{
+                    "view_header":{
                         "name":"History",
                         "img":"graph-icon.png"
                     },
@@ -90,7 +90,7 @@
             },
             {
                 "tab":{
-                    "tab_button":{
+                    "view_header":{
                         "name":"Settings",
                         "img":"settings-hammer-wrench.png"
                     },

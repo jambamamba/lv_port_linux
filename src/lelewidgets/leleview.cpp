@@ -2,7 +2,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-
+////////////////////////////////////////////////////////////////////////
 LeleViews::LeleViews(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
@@ -36,6 +36,47 @@ LeleView* LeleViews::getAt(int index) const {
     }
     return nullptr;
 }
+
+////////////////////////////////////////////////////////////////////////
+LeleViewHeader::LeleViewHeader(const std::string &json_str)
+  : LeleBase(json_str) {
+    _class_name = __func__ ;//
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(key == "name") {
+        _name = value;
+      }
+      else if(key == "img") {
+        _img = value;
+      }
+    }
+  }
+}
+lv_obj_t *LeleViewHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+  if(!_img.empty()) {
+    lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
+    lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+    // _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
+    // if(_img_dsc) {
+    //   lv_image_set_src(logo, _img_dsc.value().get());
+    // }
+    lv_obj_center(logo);
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
+    lv_label_set_text(label, "");
+  }
+  else {
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
+    lv_label_set_text(label, _name.c_str());
+  }
+
+  setParent(lele_parent);
+  _lv_obj = lele_parent->getLvObj();
+  return _lv_obj;
+}
+////////////////////////////////////////////////////////////////////////
+
 
 LeleView::LeleView(const std::string &json_str)
   : LeleBase(json_str) {
@@ -78,3 +119,4 @@ void LeleView::eventCallback(lv_event_t * e)
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);
     _active_child_idx = lv_obj_get_index(act_cb);
 }
+////////////////////////////////////////////////////////////////////////

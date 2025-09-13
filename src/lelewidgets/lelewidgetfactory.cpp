@@ -81,8 +81,8 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "tab") {
             token = std::make_unique<LeleTabView::Tab>(rhs);
         }
-        else if(lhs == "tab_button") {
-            token = std::make_unique<LeleTabView::TabButton>(rhs);
+        else if(lhs == "view_header") {
+            token = std::make_unique<LeleViewHeader>(rhs);
         }
         else if(lhs == "tab_content") {
             token = std::make_unique<LeleTabView::TabContent>(rhs);
@@ -97,7 +97,7 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "view") {
             token = std::make_unique<LeleView>(rhs);
         }
-//
+        //
         else if(lhs == "label") {
             token = std::make_unique<LeleLabel>(rhs);
         }

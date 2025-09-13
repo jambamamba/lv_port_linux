@@ -185,6 +185,7 @@ set(LELE_WIDGETS
     src/lelewidgets/leletabview.cpp
     src/lelewidgets/lelewidgetfactory.cpp
     src/lelewidgets/leleview.cpp
+    src/lelewidgets/lelestackview.cpp
 )
 add_executable(lvglsim 
     src/main.cpp 
@@ -227,7 +228,7 @@ install(TARGETS lvgl_linux
     ARCHIVE DESTINATION lib
 )
 
-file(COPY "src/config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin")
+file(COPY "src/config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
 add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
 #osm#################end

@@ -6,6 +6,7 @@
 #include <smart_pointer/auto_free_ptr.h>
 #include <optional>
 
+class LeleViewHeader;
 class LeleTabView : public LeleBase {
   public:
   class TabContent : public LeleBase {
@@ -15,22 +16,11 @@ class LeleTabView : public LeleBase {
     protected:
     std::vector<std::unique_ptr<LeleBase>> _widgets;
   };
-  class TabButton : public LeleBase {
-    public:
-    TabButton(const std::string &json_str);
-    const std::string &name() const { return _name; }
-    const std::string &img() const { return _img; }
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    protected:
-    std::string _name;
-    std::string _img;
-    std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
-  };
   class Tab : public LeleBase {
     public:
     Tab(const std::string &json_str = "");
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    TabButton *getTabButton() const;
+    LeleViewHeader *getTabHeader() const;
     TabContent *getTabContent() const;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _tab_button;

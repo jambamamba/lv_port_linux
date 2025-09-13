@@ -1,104 +1,13 @@
-#include "leletabview.h"
+#include "lelestackview.h"
 
 #include "lelelabel.h"
 #include "leletextbox.h"
 #include "lelestyle.h"
+#include "leleview.h"
 
 #include <lv_image_converter/mainlib.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
-
-
-LeleStackView::Tab::Tab(const std::string &json_str)
-  : LeleBase(json_str) {
-    _class_name = __func__ ;//
-}
-lv_obj_t *LeleStackView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
-  _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabButton()->name().c_str());
-  return _lv_obj;
-}
-LeleStackView::TabButton *LeleStackView::Tab::getTabButton() const {
-    for(const auto &pair: _tokens) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
-        if(pair.first == "tab_button") {
-          LeleStackView::TabButton *ptr = dynamic_cast<LeleStackView::TabButton*> (value.get());
-          if(ptr) {
-            return ptr;
-          }
-        }
-      }
-    }
-    return nullptr;
-}
-LeleStackView::TabContent *LeleStackView::Tab::getTabContent() const {
-    for(const auto &pair: _tokens) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
-        if(pair.first == "tab_content") {
-          LeleStackView::TabContent *ptr = dynamic_cast<LeleStackView::TabContent*> (value.get());
-          if(ptr) {
-            return ptr;
-          }
-        }
-      }
-    }
-    return nullptr;
-}
-
-LeleStackView::TabButton::TabButton(const std::string &json_str)
-  : LeleBase(json_str) {
-    _class_name = __func__ ;//
-  for (const auto &[key, token]: _tokens) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "name") {
-        _name = value;
-      }
-      else if(key == "img") {
-        _img = value;
-      }
-    }
-  }
-}
-lv_obj_t *LeleStackView::TabButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  if(!_img.empty()) {
-    lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
-    lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    // lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-    _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
-    if(_img_dsc) {
-      lv_image_set_src(logo, _img_dsc.value().get());
-    }
-    lv_obj_center(logo);
-    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, "");
-  }
-  else {
-    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, _name.c_str());
-  }
-
-  setParent(lele_parent);
-  _lv_obj = lele_parent->getLvObj();
-  return _lv_obj;
-}
-LeleStackView::TabContent::TabContent(const std::string &json_str)
-  : LeleBase(json_str) {
-    _class_name = __func__ ;//
-}
-lv_obj_t *LeleStackView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
-  for (const auto &[key, token]: _tokens) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      value->createLvObj(lele_parent);
-    }
-  }
-  setParent(lele_parent);
-  return _lv_obj;
-}
 
 LeleStackView::LeleStackView(const std::string &json_str)
   : LeleBase(json_str) {
@@ -107,8 +16,8 @@ LeleStackView::LeleStackView(const std::string &json_str)
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      if(key == "tabs") {
-          _tabs = dynamic_cast<Views*> (value.get());
+      if(key == "views") {
+          _views = dynamic_cast<LeleViews*> (value.get());
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -146,7 +55,7 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = lv_tabview_create(lele_parent->getLvObj());
 
   lv_tabview_set_tab_bar_size(_lv_obj, _tabbar_height);
-  lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
+  lv_obj_add_event_cb(_lv_obj, statckViewDeleteEventCb, LV_EVENT_DELETE, this);
 
   const lv_font_t *font_normal = &lv_font_montserrat_16;
   lv_obj_set_style_text_font(_lv_obj, font_normal, 0);
@@ -158,16 +67,19 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   lv_obj_set_style_text_color(tabview_header, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
   lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
 
-  _tabs->createLvObj(this);
-  _tabs->setLvObj(_lv_obj);
-  for(int idx = 0; idx < _tabs->count(); ++idx) {
-    LeleStackView::Tab *tab = _tabs->getAt(idx);
-    tab->createLvObj(_tabs);
-    tab->getTabContent()->createLvObj(tab);
+  _views->createLvObj(this);
+  _views->setLvObj(_lv_obj);
+  for(int idx = 0; idx < _views->count(); ++idx) {
+    LeleView *view = _views->getAt(idx);
+    view->createLvObj(_views);
+    // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
 
     lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-    tab->setLvObj(button);
-    tab->getTabButton()->createLvObj(tab);
+    view->setLvObj(button);
+    LeleViewHeader *view_header = dynamic_cast<LeleViewHeader*>(getLeleObj("view_header"));
+    if(view_header) {
+      view_header->createLvObj(view);
+    }
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
     lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
     if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
@@ -176,16 +88,16 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     }
   }
 
-  lv_obj_t *logo = setTabViewImg(tabview_header, _img);
-  lv_obj_t *label = setTabViewTitle(tabview_header, _title);
+  lv_obj_t *logo = setStackViewImg(tabview_header, _img);
+  lv_obj_t *label = setStackViewTitle(tabview_header, _title);
   lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
-  label = setTabViewSubTitle(tabview_header, _subtitle);
+  label = setStackViewSubTitle(tabview_header, _subtitle);
   lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 
   return _lv_obj;
 }
 
-lv_obj_t *LeleStackView::setTabViewImg(lv_obj_t *tabview_header, const std::string &img) {
+lv_obj_t *LeleStackView::setStackViewImg(lv_obj_t *tabview_header, const std::string &img) {//osm: same as setTabViewImg
     lv_obj_set_style_pad_left(tabview_header, LV_HOR_RES / 2, 0);
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
@@ -198,7 +110,7 @@ lv_obj_t *LeleStackView::setTabViewImg(lv_obj_t *tabview_header, const std::stri
     return logo;
 }
 
-lv_obj_t *LeleStackView::setTabViewTitle(lv_obj_t *tabview_header, const std::string &title) {
+lv_obj_t *LeleStackView::setStackViewTitle(lv_obj_t *tabview_header, const std::string &title) {//osm: same as setTabViewTitle
     lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_title);
     const lv_font_t *font_large = &lv_font_montserrat_24;
@@ -209,7 +121,7 @@ lv_obj_t *LeleStackView::setTabViewTitle(lv_obj_t *tabview_header, const std::st
     return label;
 }
 
-lv_obj_t *LeleStackView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle) {
+lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle) {//osm: same as setTabViewSubTitle
     lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_subtitle);
     lv_style_set_text_opa(&_style_subtitle, LV_OPA_50);
@@ -219,7 +131,7 @@ lv_obj_t *LeleStackView::setTabViewSubTitle(lv_obj_t *tabview_header, const std:
     return label;
 }
 
-void LeleStackView::tabViewDeleteEventCb(lv_event_t * e) {
+void LeleStackView::statckViewDeleteEventCb(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleStackView *pthis = (LeleStackView*)e->user_data;
 
