@@ -141,8 +141,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   return _lv_obj;
 }
 
-void LeleButtons::LeleButton::eventCallback(lv_event_t * e)
-{
+void LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     // LeleView *view = dynamic_cast<LeleView>(_lele_parent);
     // if(view) {

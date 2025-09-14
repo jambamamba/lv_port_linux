@@ -23,7 +23,7 @@ class LeleBase {
   LeleBase(const std::string &json_str = "");
   virtual ~LeleBase();
 
-  const std::string &getClassName() const {
+  const std::string &className() const {
     return _class_name;
   }
   const std::string &getId() const {

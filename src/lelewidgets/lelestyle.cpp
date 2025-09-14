@@ -256,7 +256,7 @@ int LeleStyle::fgColor() const {
   if(_fgcolor == -1) {
     if(_lele_parent) {
       int fgcolor = _lele_parent->style()->fgColor();
-      // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->getClassName().c_str(), fgcolor);//osm todo: get color from parent class
+      // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->className().c_str(), fgcolor);//osm todo: get color from parent class
       return fgcolor;
     }
   }

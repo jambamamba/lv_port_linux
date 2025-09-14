@@ -54,25 +54,16 @@ LeleViewHeader::LeleViewHeader(const std::string &json_str)
   }
 }
 lv_obj_t *LeleViewHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  if(!_img.empty()) {
-    lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
-    lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
-    lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-    // _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
-    // if(_img_dsc) {
-    //   lv_image_set_src(logo, _img_dsc.value().get());
-    // }
-    lv_obj_center(logo);
-    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, "");
+  _lv_obj = LeleBase::createLvObj(lele_parent);
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      value->createLvObj(this);
+    }
+    else if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+    }
   }
-  else {
-    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, _name.c_str());
-  }
-
-  setParent(lele_parent);
-  _lv_obj = lele_parent->getLvObj();
   return _lv_obj;
 }
 ////////////////////////////////////////////////////////////////////////
@@ -104,7 +95,7 @@ void LeleView::eventCallback(lv_event_t * e)
 {
     lv_event_code_t code = lv_event_get_code(e);
     LeleBase *base = static_cast<LeleBase*>(e->user_data);
-    LOG(DEBUG, LVSIM, "%s: clicked\n", base->getClassName().c_str());
+    LOG(DEBUG, LVSIM, "%s: clicked\n", base->className().c_str());
     
     //uncheck all other buttons in the group, only one button should be checked at a time
     lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(e);//get the object to which an event was sent. I.e. the object whose event handler is being called.

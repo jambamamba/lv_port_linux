@@ -8,6 +8,18 @@ set -xe
 source share/pins.txt
 source share/scripts/helper-functions.sh
 
+function setConfig() {
+    local config=$1
+    if [ -z $config ]; then return; fi
+
+    pushd src/
+    if [ -f "configs/${config}.json" ]; then
+        rm config.json 
+        ln -sf configs/${config}.json config.json
+    fi
+    popd
+}
+
 function main() {
 #    sudo apt-get install -y \
 #        libevdev-dev \
@@ -15,6 +27,7 @@ function main() {
 #        libxkbcommon-dev \
 #        libwayland-bin \
 #        wayland-protocols
+    setConfig $1
 
     local deps=(zlib debug_logger json_utils curl libssh2 utils)
     installDeps $@ deps depsdir="/usr/local"

@@ -54,12 +54,53 @@ lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj)
   _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabHeader()->name().c_str());
   return _lv_obj;
 }
-LeleViewHeader *LeleTabView::Tab::getTabHeader() const {
-  return dynamic_cast<LeleViewHeader*>(getLeleObj("view_header"));
+LeleTabView::TabHeader *LeleTabView::Tab::getTabHeader() const {
+  return dynamic_cast<LeleTabView::TabHeader*>(getLeleObj("tab_header"));
 }
 LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
   return dynamic_cast<LeleTabView::TabContent*>(getLeleObj("tab_content"));
 }
+
+
+LeleTabView::TabHeader::TabHeader(const std::string &json_str)
+  : LeleBase(json_str) {
+    _class_name = __func__ ;//
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(key == "name") {
+        _name = value;
+      }
+      else if(key == "img") {
+        _img = value;
+      }
+    }
+  }
+}
+lv_obj_t *LeleTabView::TabHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+  if(!_img.empty()) {
+    lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
+    lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
+    lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
+    // _img_dsc = generateImgDsc((std::string("/repos/lv_port_linux/res/") + _img).c_str());//osm
+    // if(_img_dsc) {
+    //   lv_image_set_src(logo, _img_dsc.value().get());
+    // }
+    lv_obj_center(logo);
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
+    lv_label_set_text(label, "");
+  }
+  else {
+    lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
+    lv_label_set_text(label, _name.c_str());
+  }
+
+  setParent(lele_parent);
+  _lv_obj = lele_parent->getLvObj();
+  return _lv_obj;
+}
+
+
 LeleTabView::TabContent::TabContent(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
@@ -112,6 +153,9 @@ LeleTabView::LeleTabView(const std::string &json_str)
       else if(key == "tabbar_height") {
         _tabbar_height = std::stoi(value.c_str(), nullptr, 10);
       }
+      else if(key == "tabbar_location") {
+        _tabbar_location = (value == "bottom") ? TabBarLocationE::Bottom : TabBarLocationE::Top;
+      }
     }
   }
 }
@@ -120,6 +164,7 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   setParent(lele_parent);
   _lv_obj = lv_tabview_create(lele_parent->getLvObj());
+  lv_tabview_set_tab_bar_position(_lv_obj, _tabbar_location == TabBarLocationE::Bottom ? LV_DIR_BOTTOM : LV_DIR_TOP);
 
   lv_tabview_set_tab_bar_size(_lv_obj, _tabbar_height);
   lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);

@@ -6,6 +6,7 @@
 #include <smart_pointer/auto_free_ptr.h>
 #include <optional>
 
+class LeleViewHeader;
 class LeleViews;
 class LeleStackView : public LeleBase {
   public:
@@ -13,7 +14,7 @@ class LeleStackView : public LeleBase {
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 
   protected:
-  static void statckViewDeleteEventCb(lv_event_t * e);
+  LeleViewHeader *getButtonBar() const;
   lv_obj_t *setStackViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setStackViewTitle(lv_obj_t *tabview_header, const std::string &title);
   lv_obj_t *setStackViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);

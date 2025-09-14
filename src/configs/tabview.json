@@ -7,10 +7,11 @@
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
         "img":"weather-hub-logo.png",
+        "tabbar_location":"top",
         "tabs":[
             {
                 "tab":{
-                    "view_header":{
+                    "tab_header":{
                         "name":"Home",
                         "img":"home_icon.png"
                     },
@@ -70,7 +71,7 @@
             },
             {
                 "tab":{
-                    "view_header":{
+                    "tab_header":{
                         "name":"History",
                         "img":"graph-icon.png"
                     },
@@ -90,7 +91,7 @@
             },
             {
                 "tab":{
-                    "view_header":{
+                    "tab_header":{
                         "name":"Settings",
                         "img":"settings-hammer-wrench.png"
                     },

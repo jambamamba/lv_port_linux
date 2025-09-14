@@ -9,6 +9,17 @@
 class LeleViewHeader;
 class LeleTabView : public LeleBase {
   public:
+  class TabHeader : public LeleBase {
+    public:
+    TabHeader(const std::string &json_str);
+    const std::string &name() const { return _name; }
+    const std::string &img() const { return _img; }
+    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    protected:
+    std::string _name;
+    std::string _img;
+    std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
+  };
   class TabContent : public LeleBase {
     public:
     TabContent(const std::string &json_str);
@@ -20,7 +31,7 @@ class LeleTabView : public LeleBase {
     public:
     Tab(const std::string &json_str = "");
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    LeleViewHeader *getTabHeader() const;
+    TabHeader *getTabHeader() const;
     TabContent *getTabContent() const;
     protected:
     std::vector<std::unique_ptr<LeleBase>> _tab_button;
@@ -54,6 +65,11 @@ class LeleTabView : public LeleBase {
   int _active_tab_bottom_border_width = -1;
   LeleStyle::BorderTypeE _active_tab_bottom_border_type = LeleStyle::BorderTypeE::None;
   int _tabbar_height = 75;
+  enum TabBarLocationE {
+    Top,
+    Bottom
+  };
+  TabBarLocationE _tabbar_location = TabBarLocationE::Top;
   Tabs *_tabs = nullptr;
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
 };

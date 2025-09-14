@@ -49,23 +49,36 @@ LeleStackView::LeleStackView(const std::string &json_str)
   }
 }
 
+static void event_cb1(lv_event_t * e) {
+  printf("@@@@@@@ %s:%s\n", __FUNCTION__, (char*)e->user_data);
+}
+
+LeleViewHeader *LeleStackView::getButtonBar() const {
+  return dynamic_cast<LeleViewHeader*>(getLeleObj("view_header"));
+}
+
 lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
-  setParent(lele_parent);
-  _lv_obj = lv_tabview_create(lele_parent->getLvObj());
+  _lv_obj = LeleBase::createLvObj(lele_parent);
+  for (const auto &[key, token]: _tokens) {
+    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+      static auto foo = value->createLvObj(this);
+    }
+    else if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+    }
+  }
+  lv_obj_set_size(_lv_obj, lv_pct(100), lv_pct(100));
 
-  lv_tabview_set_tab_bar_size(_lv_obj, _tabbar_height);
-  lv_obj_add_event_cb(_lv_obj, statckViewDeleteEventCb, LV_EVENT_DELETE, this);
+  LeleViewHeader *button_bar = getButtonBar();
+  lv_obj_add_event_cb(_lv_obj, event_cb1, LV_EVENT_CLICKED, (void*)className().c_str());
+  lv_obj_add_event_cb(button_bar->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->className().c_str());
+  lv_obj_add_event_cb(button_bar->getLeleObj("button")->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->getLeleObj("button")->className().c_str());
 
-  const lv_font_t *font_normal = &lv_font_montserrat_16;
-  lv_obj_set_style_text_font(_lv_obj, font_normal, 0);
-  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
-  
-  lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
-  lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
-  lv_obj_set_style_text_color(tabview_header, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
+  // lv_obj_t *cont = lv_obj_create(_lv_obj);
+  // static char cont_name[] = "container";
+  // lv_obj_add_event_cb(cont, event_cb1, LV_EVENT_CLICKED, cont_name);
 
   _views->createLvObj(this);
   _views->setLvObj(_lv_obj);
@@ -73,26 +86,13 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     LeleView *view = _views->getAt(idx);
     view->createLvObj(_views);
     // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
-
-    lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-    view->setLvObj(button);
-    LeleViewHeader *view_header = dynamic_cast<LeleViewHeader*>(getLeleObj("view_header"));
-    if(view_header) {
-      view_header->createLvObj(view);
-    }
-    lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
-    lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
-    if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
-      lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-      lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, LV_PART_MAIN | LV_STATE_CHECKED);
-    }
   }
 
-  lv_obj_t *logo = setStackViewImg(tabview_header, _img);
-  lv_obj_t *label = setStackViewTitle(tabview_header, _title);
-  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
-  label = setStackViewSubTitle(tabview_header, _subtitle);
-  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+  // lv_obj_t *logo = setStackViewImg(tab_bar, _img);
+  // lv_obj_t *label = setStackViewTitle(tab_bar, _title);
+  // lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+  // label = setStackViewSubTitle(tab_bar, _subtitle);
+  // lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
 
   return _lv_obj;
 }
@@ -129,14 +129,4 @@ lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const st
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_label_set_text(label, subtitle.c_str());
     return label;
-}
-
-void LeleStackView::statckViewDeleteEventCb(lv_event_t * e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    LeleStackView *pthis = (LeleStackView*)e->user_data;
-
-    if(code == LV_EVENT_DELETE) {
-        //osm lv_style_reset(&pthis->_style_subtitle);
-        //osm lv_style_reset(&pthis->_style_title);
-    }
 }
