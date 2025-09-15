@@ -20,20 +20,20 @@ class LeleStyle {
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
   std::string className() const;
-  int x(std::string class_name = "") const;
-  int y(std::string class_name = "") const;
-  int width(std::string class_name = "") const;
-  int height(std::string class_name = "") const;
-  int cornerRadius(std::string class_name = "") const;
-  std::tuple<int,int,int,int> padding(std::string class_name = "") const;
-  std::tuple<int,int,int,int> margin(std::string class_name = "") const;
-  int bgColor(std::string class_name = "") const;
-  int fgColor(std::string class_name = "") const;
-  int checkedColor(std::string class_name = "") const;
-  BorderTypeE borderType(std::string class_name = "") const;
-  int borderColor(std::string class_name = "") const;
-  int borderWidth(std::string class_name = "") const;
-  std::optional<lv_flex_flow_t> flow() const;
+  std::optional<int> x(std::string class_name = "") const;
+  std::optional<int> y(std::string class_name = "") const;
+  std::optional<int> width(std::string class_name = "") const;
+  std::optional<int> height(std::string class_name = "") const;
+  std::optional<int> cornerRadius(std::string class_name = "") const;
+  std::optional<std::tuple<int,int,int,int>> padding(std::string class_name = "") const;
+  std::optional<std::tuple<int,int,int,int>> margin(std::string class_name = "") const;
+  std::optional<int> bgColor(std::string class_name = "") const;
+  std::optional<int> fgColor(std::string class_name = "") const;
+  std::optional<int> checkedColor(std::string class_name = "") const;
+  std::optional<BorderTypeE> borderType(std::string class_name = "") const;
+  std::optional<int> borderColor(std::string class_name = "") const;
+  std::optional<int> borderWidth(std::string class_name = "") const;
+  std::optional<lv_flex_flow_t> flow(std::string class_name = "") const;
   protected:
   LeleBase *_lele_parent = nullptr;
   std::string _class_name;
@@ -54,4 +54,26 @@ class LeleStyle {
   int _checked_color = -1;
   int _parent_width = 0;
   int _parent_height = 0;
+};
+class LeleStyles {
+  public:
+  void setLeleParent(LeleBase *lele_parent);
+  void addStyle(LeleStyle* lele_style);
+  int x(std::string class_name = "") const;
+  int y(std::string class_name = "") const;
+  int width(std::string class_name = "") const;
+  int height(std::string class_name = "") const;
+  int cornerRadius(std::string class_name = "") const;
+  std::tuple<int,int,int,int> padding(std::string class_name = "") const;
+  std::tuple<int,int,int,int> margin(std::string class_name = "") const;
+  int bgColor(std::string class_name = "") const;
+  int fgColor(std::string class_name = "") const;
+  int checkedColor(std::string class_name = "") const;
+  LeleStyle::BorderTypeE borderType(std::string class_name = "") const;
+  int borderColor(std::string class_name = "") const;
+  int borderWidth(std::string class_name = "") const;
+  std::optional<lv_flex_flow_t> flow(std::string class_name = "") const;
+  protected:
+  LeleStyle _null_pos;
+  std::vector<LeleStyle *>_lele_styles;
 };

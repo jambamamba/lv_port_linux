@@ -175,7 +175,7 @@ std::string LeleStyle::className() const {
   return _class_name;
 }
 
-int LeleStyle::x(std::string class_name) const {
+std::optional<int> LeleStyle::x(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -183,11 +183,11 @@ int LeleStyle::x(std::string class_name) const {
     return toInt(_x, _parent_width);
   }
   if(_lele_parent) {
-    return _lele_parent->style()->x(class_name);
+    return _lele_parent->styles()->x(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::y(std::string class_name) const {
+std::optional<int> LeleStyle::y(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -195,11 +195,11 @@ int LeleStyle::y(std::string class_name) const {
     return toInt(_y, _parent_height);
   }
   if(_lele_parent) {
-    return _lele_parent->style()->y(class_name);
+    return _lele_parent->styles()->y(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::width(std::string class_name) const {
+std::optional<int> LeleStyle::width(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -207,11 +207,11 @@ int LeleStyle::width(std::string class_name) const {
     return toInt(_width, _parent_width);
   }
   if(_lele_parent) {
-    return _lele_parent->style()->width(class_name);
+    return _lele_parent->styles()->width(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::height(std::string class_name) const {
+std::optional<int> LeleStyle::height(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -219,11 +219,11 @@ int LeleStyle::height(std::string class_name) const {
     return toInt(_height, _parent_height);
   }    
   if(_lele_parent) {
-    return _lele_parent->style()->height(class_name);
+    return _lele_parent->styles()->height(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::cornerRadius(std::string class_name) const {
+std::optional<int> LeleStyle::cornerRadius(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -231,11 +231,11 @@ int LeleStyle::cornerRadius(std::string class_name) const {
     return toInt(_corner_radius, std::max(_parent_height, _parent_width));  
   }
   if(_lele_parent) {
-    return _lele_parent->style()->cornerRadius(class_name);
+    return _lele_parent->styles()->cornerRadius(class_name);
   }
-  return 5;
+  return std::nullopt;
 }
-std::tuple<int,int,int,int> LeleStyle::padding(std::string class_name) const {
+std::optional<std::tuple<int,int,int,int>> LeleStyle::padding(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -243,11 +243,11 @@ std::tuple<int,int,int,int> LeleStyle::padding(std::string class_name) const {
     return parsePaddingOrMargin(_padding);
   }
   if(_lele_parent) {
-    return _lele_parent->style()->padding(class_name);
+    return _lele_parent->styles()->padding(class_name);
   }
-  return std::tuple<int,int,int,int>{0,0,0,0};
+  return std::nullopt;
 }
-std::tuple<int,int,int,int> LeleStyle::margin(std::string class_name) const {
+std::optional<std::tuple<int,int,int,int>> LeleStyle::margin(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -255,11 +255,11 @@ std::tuple<int,int,int,int> LeleStyle::margin(std::string class_name) const {
     return parsePaddingOrMargin(_margin);
   }
   if(_lele_parent) {
-    return _lele_parent->style()->margin(class_name);
+    return _lele_parent->styles()->margin(class_name);
   }
-  return std::tuple<int,int,int,int>{0,0,0,0};
+  return std::nullopt;
 }
-LeleStyle::BorderTypeE LeleStyle::borderType(std::string class_name) const {
+std::optional<LeleStyle::BorderTypeE> LeleStyle::borderType(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -267,11 +267,11 @@ LeleStyle::BorderTypeE LeleStyle::borderType(std::string class_name) const {
     return _border_type;
   }
   if(_lele_parent) {
-    return _lele_parent->style()->borderType(class_name);
+    return _lele_parent->styles()->borderType(class_name);
   }
-  return LeleStyle::BorderTypeE::None;
+  return std::nullopt;
 }
-int LeleStyle::borderWidth(std::string class_name) const {
+std::optional<int> LeleStyle::borderWidth(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -279,11 +279,11 @@ int LeleStyle::borderWidth(std::string class_name) const {
     return _border_width;
   }
   if(_lele_parent) {
-    return _lele_parent->style()->borderWidth(class_name);
+    return _lele_parent->styles()->borderWidth(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::borderColor(std::string class_name) const {
+std::optional<int> LeleStyle::borderColor(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -291,11 +291,11 @@ int LeleStyle::borderColor(std::string class_name) const {
     return _border_color;
   }
   if(_lele_parent) {
-    return _lele_parent->style()->borderColor(class_name);
+    return _lele_parent->styles()->borderColor(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::bgColor(std::string class_name) const {
+std::optional<int> LeleStyle::bgColor(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -303,11 +303,11 @@ int LeleStyle::bgColor(std::string class_name) const {
     return _bgcolor;
   }
   if(_lele_parent) {
-    return _lele_parent->style()->bgColor(class_name);
+    return _lele_parent->styles()->bgColor(class_name);
   }
-  return 0;
+  return std::nullopt;
 }
-int LeleStyle::fgColor(std::string class_name) const {
+std::optional<int> LeleStyle::fgColor(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -315,13 +315,13 @@ int LeleStyle::fgColor(std::string class_name) const {
     return _fgcolor;
   }
   if(_lele_parent) {
-    int fgcolor = _lele_parent->style()->fgColor(class_name);
+    int fgcolor = _lele_parent->styles()->fgColor(class_name);
     // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->className().c_str(), fgcolor);//osm todo: get color from parent class
     return fgcolor;
   }
-  return 0xffffff;
+  return std::nullopt;
 }
-int LeleStyle::checkedColor(std::string class_name) const {
+std::optional<int> LeleStyle::checkedColor(std::string class_name) const {
   if(class_name.empty()) {
     class_name = _class_name;
   }
@@ -329,35 +329,203 @@ int LeleStyle::checkedColor(std::string class_name) const {
     return _checked_color;
   }
   if(_lele_parent) {
-    return _lele_parent->style()->checkedColor(class_name);
-  }
-  return 0;
-}
-std::optional<lv_flex_flow_t> LeleStyle::flow() const {
-  
-  if(strncmp(_flow.c_str(), "row", 6)==0) {
-    return LV_FLEX_FLOW_ROW;
-  }
-  else if(strncmp(_flow.c_str(), "row_wrap", 8)==0) {
-    return LV_FLEX_FLOW_ROW_WRAP;
-  }
-  else if(strncmp(_flow.c_str(), "row_reverse", 11)==0){
-    return LV_FLEX_FLOW_ROW_REVERSE;
-  }
-  else if(strncmp(_flow.c_str(), "row_wrap_reverse", 16)==0){
-    return LV_FLEX_FLOW_ROW_WRAP_REVERSE;
-  }
-  else if(strncmp(_flow.c_str(), "column", 6)==0) {
-    return LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
-  }
-  else if(strncmp(_flow.c_str(), "column_wrap", 11)==0){
-    return LV_FLEX_FLOW_COLUMN_WRAP;
-  }
-  else if(strncmp(_flow.c_str(), "column_reverse", 14)==0){
-    return LV_FLEX_FLOW_COLUMN_REVERSE;
-  }
-  else if(strncmp(_flow.c_str(), "column_wrap_reverse", 19)==0){
-    return LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+    return _lele_parent->styles()->checkedColor(class_name);
   }
   return std::nullopt;
+}
+std::optional<lv_flex_flow_t> LeleStyle::flow(std::string class_name) const {
+  if(class_name.empty()) {
+    class_name = _class_name;
+  }  
+  if(!_flow.empty() && class_name == _class_name) {
+    if(strncmp(_flow.c_str(), "row", 6)==0) {
+      return LV_FLEX_FLOW_ROW;
+    }
+    else if(strncmp(_flow.c_str(), "row_wrap", 8)==0) {
+      return LV_FLEX_FLOW_ROW_WRAP;
+    }
+    else if(strncmp(_flow.c_str(), "row_reverse", 11)==0){
+      return LV_FLEX_FLOW_ROW_REVERSE;
+    }
+    else if(strncmp(_flow.c_str(), "row_wrap_reverse", 16)==0){
+      return LV_FLEX_FLOW_ROW_WRAP_REVERSE;
+    }
+    else if(strncmp(_flow.c_str(), "column", 6)==0) {
+      return LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
+    }
+    else if(strncmp(_flow.c_str(), "column_wrap", 11)==0){
+      return LV_FLEX_FLOW_COLUMN_WRAP;
+    }
+    else if(strncmp(_flow.c_str(), "column_reverse", 14)==0){
+      return LV_FLEX_FLOW_COLUMN_REVERSE;
+    }
+    else if(strncmp(_flow.c_str(), "column_wrap_reverse", 19)==0){
+      return LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+    }
+  }
+  if(_lele_parent) {
+    return _lele_parent->styles()->flow(class_name);
+  }
+  return std::nullopt;
+}
+
+///////////////////////////////////
+
+void LeleStyles::setLeleParent(LeleBase *lele_parent) {
+    for(auto *lele_style : _lele_styles) {
+      lele_style->setLeleParent(lele_parent);
+    }
+}
+void LeleStyles::addStyle(LeleStyle* lele_style) {
+  _lele_styles.push_back(lele_style);
+}
+int LeleStyles::x(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->x(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::y(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->y(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::width(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->width(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::height(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->height(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::cornerRadius(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->cornerRadius(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+std::tuple<int,int,int,int> LeleStyles::padding(std::string class_name) const {
+  std::optional<std::tuple<int,int,int,int>> ret;
+  std::tuple<int,int,int,int> value = {0,0,0,0};
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->padding(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+std::tuple<int,int,int,int> LeleStyles::margin(std::string class_name) const {
+  std::optional<std::tuple<int,int,int,int>> ret;
+  std::tuple<int,int,int,int> value = {0,0,0,0};
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->margin(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::bgColor(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->bgColor(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::fgColor(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0xffffff;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->fgColor(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::checkedColor(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->checkedColor(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+LeleStyle::BorderTypeE LeleStyles::borderType(std::string class_name) const {
+  std::optional<LeleStyle::BorderTypeE> ret;
+  LeleStyle::BorderTypeE value = LeleStyle::BorderTypeE::None;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->borderType(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::borderColor(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->borderColor(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+int LeleStyles::borderWidth(std::string class_name) const {
+  std::optional<int> ret;
+  int value = 0;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->borderWidth(class_name);
+      if(ret) {
+        value = ret.value();
+      }
+    }
+  return value;
+}
+std::optional<lv_flex_flow_t> LeleStyles::flow(std::string class_name) const {
+  std::optional<lv_flex_flow_t> ret;
+   for(auto *lele_style : _lele_styles) {
+      ret = lele_style->flow(class_name);
+    }
+  return ret;
 }

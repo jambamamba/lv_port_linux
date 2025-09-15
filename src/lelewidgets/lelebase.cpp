@@ -10,7 +10,7 @@ LeleBase::LeleBase(const std::string &json_str)
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
       if(key == "style") {
-        _lele_style = dynamic_cast<LeleStyle*> (value.get());
+        _lele_styles.addStyle(dynamic_cast<LeleStyle*> (value.get()));
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -67,36 +67,36 @@ static void new_theme_init_and_set(void)
 
 void LeleBase::setStyle() {
   lv_style_init(&_style);
-  lv_style_set_radius(&_style, _lele_style->cornerRadius());
-  lv_style_set_width(&_style, _lele_style->width());
-  lv_style_set_height(&_style, _lele_style->height());
-  lv_style_set_x(&_style, lv_pct(_lele_style->x()));
-  lv_style_set_y(&_style, lv_pct(_lele_style->y()));
-  auto [top_padding, right_padding, bottom_padding, left_padding] = _lele_style->padding();
+  lv_style_set_radius(&_style, _lele_styles.cornerRadius());
+  lv_style_set_width(&_style, _lele_styles.width());
+  lv_style_set_height(&_style, _lele_styles.height());
+  lv_style_set_x(&_style, lv_pct(_lele_styles.x()));
+  lv_style_set_y(&_style, lv_pct(_lele_styles.y()));
+  auto [top_padding, right_padding, bottom_padding, left_padding] = _lele_styles.padding();
   lv_style_set_pad_top(&_style, top_padding);
   lv_style_set_pad_right(&_style, top_padding);
   lv_style_set_pad_bottom(&_style, top_padding);
   lv_style_set_pad_left(&_style, top_padding);
-  auto [top_margin, right_margin, bottom_margin, left_margin] = _lele_style->margin();
+  auto [top_margin, right_margin, bottom_margin, left_margin] = _lele_styles.margin();
   lv_style_set_margin_top(&_style, top_margin);
   lv_style_set_margin_right(&_style, top_margin);
   lv_style_set_margin_bottom(&_style, top_margin);
   lv_style_set_margin_left(&_style, top_margin);
 
-  if(_lele_style->borderType() == LeleStyle::None) {
+  if(_lele_styles.borderType() == LeleStyle::None) {
     lv_style_set_border_width(&_style, 0);
   }
   else {
-    lv_style_set_border_color(&_style, lv_color_hex(_lele_style->borderColor()));
-    lv_style_set_border_width(&_style, _lele_style->borderWidth());
+    lv_style_set_border_color(&_style, lv_color_hex(_lele_styles.borderColor()));
+    lv_style_set_border_width(&_style, _lele_styles.borderWidth());
   }
-  lv_obj_set_pos(_lv_obj, _lele_style->x(), _lele_style->y());
+  lv_obj_set_pos(_lv_obj, _lele_styles.x(), _lele_styles.y());
   lv_obj_add_style(_lv_obj, &_style, 0);
 
-  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_style->fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->bgColor()), LV_PART_MAIN);
+  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_styles.fgColor()), LV_PART_MAIN);
+  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_styles.bgColor()), LV_PART_MAIN);
 
-  auto flow = _lele_style->flow();
+  auto flow = _lele_styles.flow();
   if(flow) {
     lv_obj_set_flex_flow(_lv_obj, flow.value());
   }

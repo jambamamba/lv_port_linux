@@ -39,10 +39,10 @@ class LeleBase {
   }
   void setParent(LeleBase *parent) {
     _lele_parent = parent;
-    _lele_style->setLeleParent(parent);
+    _lele_styles.setLeleParent(parent);
   }
-  const LeleStyle *style() const {
-    return _lele_style;
+  const LeleStyles *styles() const {
+    return &_lele_styles;
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle();
@@ -56,6 +56,5 @@ class LeleBase {
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
-  LeleStyle _null_pos;
-  LeleStyle *_lele_style = &_null_pos;
+  LeleStyles _lele_styles;
 };

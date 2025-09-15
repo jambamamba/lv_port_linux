@@ -123,7 +123,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
 
   if(_checkable) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_CHECKABLE);
-    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_style->checkedColor()), LV_PART_MAIN | LV_STATE_CHECKED); // Green when checked
+    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_styles.checkedColor()), LV_PART_MAIN | LV_STATE_CHECKED); // Green when checked
   }
   if(_checked) {
     lv_obj_add_state(_lv_obj, LV_STATE_CHECKED);
