@@ -33,7 +33,7 @@
                                 {
                                     "button":{
                                         "type":"switch",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner_radius":"0x7FFF","pad_ver":"0","pad_left":"0"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner_radius":"0x7FFF"},
                                         "text":"Switch",
                                         "checkable":"true",
                                         "checked":"false"
@@ -42,7 +42,7 @@
                                 {
                                     "button":{
                                         "type":"radio",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner_radius":"0x7FFF","pad_ver":"0","pad_left":"0"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner_radius":"0x7FFF"},
                                         "text":"Radio Button",
                                         "checkable":"true",
                                         "checked":"true"
@@ -51,7 +51,7 @@
                                 {
                                     "button":{
                                         "type":"checkbox",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"45%","height":"50","pad_ver":"0","pad_left":"0"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"45%","height":"50"},
                                         "text":"Checkbox",
                                         "checkable":"true"
                                     }
@@ -59,7 +59,7 @@
                                 {
                                     "button":{
                                         "type":"push",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"15%","height":"40","pad_ver":"0","pad_left":"0"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"15%","height":"40"},
                                         "text":"Push button",
                                         "checkable":"true"
                                     }

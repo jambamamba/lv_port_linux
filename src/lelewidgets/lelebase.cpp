@@ -72,16 +72,16 @@ void LeleBase::setStyle() {
   lv_style_set_height(&_style, _lele_style->height());
   lv_style_set_x(&_style, lv_pct(_lele_style->x()));
   lv_style_set_y(&_style, lv_pct(_lele_style->y()));
-  // lv_style_set_pad_ver(&_style, _lele_style->padVer());
-  // lv_style_set_pad_left(&_style, _lele_style->padLeft());
-  lv_style_set_pad_left(&_style, 0);
-  lv_style_set_pad_right(&_style, 0);
-  lv_style_set_pad_top(&_style, 0);
-  lv_style_set_pad_bottom(&_style, 0);
-  lv_style_set_margin_left(&_style, 0);
-  lv_style_set_margin_right(&_style, 0);
-  lv_style_set_margin_top(&_style, 0);
-  lv_style_set_margin_bottom(&_style, 0);
+  auto [top_padding, right_padding, bottom_padding, left_padding] = _lele_style->padding();
+  lv_style_set_pad_top(&_style, top_padding);
+  lv_style_set_pad_right(&_style, top_padding);
+  lv_style_set_pad_bottom(&_style, top_padding);
+  lv_style_set_pad_left(&_style, top_padding);
+  auto [top_margin, right_margin, bottom_margin, left_margin] = _lele_style->margin();
+  lv_style_set_margin_top(&_style, top_margin);
+  lv_style_set_margin_right(&_style, top_margin);
+  lv_style_set_margin_bottom(&_style, top_margin);
+  lv_style_set_margin_left(&_style, top_margin);
 
   if(_lele_style->borderType() == LeleStyle::None) {
     lv_style_set_border_width(&_style, 0);
