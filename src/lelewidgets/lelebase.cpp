@@ -17,7 +17,7 @@ LeleBase::LeleBase(const std::string &json_str)
       if(key == "styles") {
         auto &value = std::get<std::unique_ptr<LeleStyles>>(token);
         LeleStyles* styles = dynamic_cast<LeleStyles*> (value.get());
-        styles = nullptr;
+        styles = nullptr;//osm todo
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
