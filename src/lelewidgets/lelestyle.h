@@ -37,6 +37,7 @@ class LeleStyle {
   protected:
   LeleBase *_lele_parent = nullptr;
   std::string _class_name;
+  std::string _id;
   std::string _x;
   std::string _y;
   std::string _width;
@@ -57,6 +58,7 @@ class LeleStyle {
 };
 class LeleStyles {
   public:
+  LeleStyles(const std::string &json_str = "");
   void setLeleParent(LeleBase *lele_parent);
   void addStyle(LeleStyle* lele_style);
   int x(std::string class_name = "") const;
@@ -74,6 +76,8 @@ class LeleStyles {
   int borderWidth(std::string class_name = "") const;
   std::optional<lv_flex_flow_t> flow(std::string class_name = "") const;
   protected:
+  std::string _id;
   LeleStyle _null_pos;
   std::vector<LeleStyle *>_lele_styles;
+  LeleBase *_lele_parent = nullptr;
 };

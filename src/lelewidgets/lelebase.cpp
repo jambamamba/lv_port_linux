@@ -8,9 +8,16 @@ LeleBase::LeleBase(const std::string &json_str)
   _tokens = LeleWidgetFactory::fromJson(json_str);
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
       if(key == "style") {
+        auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
         _lele_styles.addStyle(dynamic_cast<LeleStyle*> (value.get()));
+      }
+    }
+    else if (std::holds_alternative<std::unique_ptr<LeleStyles>>(token)) {
+      if(key == "styles") {
+        auto &value = std::get<std::unique_ptr<LeleStyles>>(token);
+        LeleStyles* styles = dynamic_cast<LeleStyles*> (value.get());
+        styles = nullptr;
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
