@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "lelebase.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -10,14 +12,19 @@ LeleBase::LeleBase(const std::string &json_str)
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       if(key == "style") {
         auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-        _lele_styles.addStyle(dynamic_cast<LeleStyle*> (value.get()));
+        LeleStyle *lele_style = dynamic_cast<LeleStyle*> (value.get());
+        _lele_styles += *lele_style;
+        printf("@@@@loading style\n");//osm
+        std::cout << _lele_styles << "\n";
       }
     }
     else if (std::holds_alternative<std::unique_ptr<LeleStyles>>(token)) {
       if(key == "styles") {
         auto &value = std::get<std::unique_ptr<LeleStyles>>(token);
-        LeleStyles* styles = dynamic_cast<LeleStyles*> (value.get());
-        styles = nullptr;//osm todo
+        LeleStyles* lele_styles = dynamic_cast<LeleStyles*> (value.get());
+        _lele_styles += *lele_styles;
+        printf("@@@@loading styles\n");//osm
+        std::cout << _lele_styles << "\n";
       }
     }
     else if (std::holds_alternative<std::string>(token)) {

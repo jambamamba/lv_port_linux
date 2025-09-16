@@ -15,7 +15,9 @@ class LeleStyle {
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+  friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
+  LeleBase *getLeleParent() const { return _lele_parent; }
   static int parseColorCode(const std::string &color_str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
@@ -59,8 +61,12 @@ class LeleStyle {
 class LeleStyles {
   public:
   LeleStyles(const std::string &json_str = "");
+  friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
   void setLeleParent(LeleBase *lele_parent);
   void addStyle(LeleStyle* lele_style);
+  size_t size() const { return _lele_styles.size(); }
+  LeleStyles &operator+=(LeleStyles &);
+  LeleStyles &operator+=(LeleStyle &);
   int x(std::string class_name = "") const;
   int y(std::string class_name = "") const;
   int width(std::string class_name = "") const;
@@ -81,3 +87,4 @@ class LeleStyles {
   std::vector<LeleStyle *>_lele_styles;
   LeleBase *_lele_parent = nullptr;
 };
+

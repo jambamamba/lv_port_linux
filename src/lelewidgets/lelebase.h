@@ -26,7 +26,7 @@ class LeleBase {
   const std::string &className() const {
     return _class_name;
   }
-  const std::string &getId() const {
+  const std::string &id() const {
     return _id;
   }
   LeleBase *getLeleObj(const std::string &obj_name) const;

@@ -22,16 +22,21 @@
             "button":{
                 "type":"push",
                 "style":{"id":"button0","border":"none","width":"15%","height":"40"},
-                "text":"> Push button1"
+                "text":"> Push button0"
             },
             "button":{
                 "type":"push",
                 "style":{"id":"button1","border":"none","width":"15%","height":"40"},
-                "text":"> Push button2"
+                "text":"> Push button1"
             },
             "button":{
                 "type":"push",
                 "style":{"id":"button2","border":"none","width":"15%","height":"40"},
+                "text":"> Push button2"
+            },
+            "button":{
+                "type":"push",
+                "style":{"id":"button3","border":"none","width":"15%","height":"40"},
                 "text":"> Push button3"
             }
         },

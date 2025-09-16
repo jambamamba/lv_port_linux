@@ -319,7 +319,6 @@ std::optional<int> LeleStyle::fgColor(std::string class_name) const {
   }
   if(_lele_parent) {
     int fgcolor = _lele_parent->styles()->fgColor(class_name);
-    // LOG(DEBUG, LVSIM, "parent:%s, fgcolor: 0x%x\n", _lele_parent->className().c_str(), fgcolor);//osm todo: get color from parent class
     return fgcolor;
   }
   return std::nullopt;
@@ -395,12 +394,22 @@ LeleStyles::LeleStyles(const std::string &json_str) {
 // }
 void LeleStyles::setLeleParent(LeleBase *lele_parent) {
     for(auto *lele_style : _lele_styles) {
-      lele_style->setLeleParent(lele_parent);
+      if(!lele_style->getLeleParent()) {
+        lele_style->setLeleParent(lele_parent);
+      }
     }
     _lele_parent = lele_parent;
 }
-void LeleStyles::addStyle(LeleStyle* lele_style) {
-  _lele_styles.push_back(lele_style);
+// void LeleStyles::addStyle(LeleStyle* lele_style) {
+//   _lele_styles.push_back(lele_style);
+// }
+LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
+  _lele_styles.insert(_lele_styles.end(), lele_styles._lele_styles.begin(), lele_styles._lele_styles.end());
+  return *this;
+}
+LeleStyles &LeleStyles::operator+=(LeleStyle &lele_style) {
+  _lele_styles.push_back(&lele_style);
+  return *this;
 }
 int LeleStyles::x(std::string class_name) const {
   std::optional<int> value;
@@ -625,4 +634,39 @@ std::optional<lv_flex_flow_t> LeleStyles::flow(std::string class_name) const {
       return _lele_parent->styles()->flow(class_name);
     }
   return std::nullopt;//default value
+}
+////////////////////////////////////////////////////
+
+std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
+    os << "LeleStyle id: " << p._id << ", {";
+    os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
+    os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+    os << "x:" << std::dec << (p.x().has_value() ? p.x().value() : -1) << ",";
+    os << "y:" << std::dec << (p.y().has_value() ? p.y().value() : -1) << ",";
+    os << "width:" << std::dec << (p.width().has_value() ? p.width().value() : -1) << ",";
+    os << "height:" << std::dec << (p.height().has_value() ? p.height().value() : -1) << ",";
+    os << "cornerRadius:" << std::dec << (p.cornerRadius().has_value() ? p.cornerRadius().value() : -1) << ",";
+    auto [padding_top, padding_right, padding_bottom, padding_left] = p.padding().has_value() ? p.padding().value() : std::tuple<int,int,int,int>(-1,-1,-1,-1);
+    os << "padding:[" << padding_top << "px " << padding_right << "px " << padding_bottom << "px " << padding_left << "px],";
+    auto [margin_top, margin_right, margin_bottom, margin_left] = p.margin().has_value() ? p.margin().value() : std::tuple<int,int,int,int>(-1,-1,-1,-1);
+    os << "margin:[" << margin_top << "px " << margin_right << "px " << margin_bottom << "px " << margin_left << "px],";
+    os << "bgColor:" << std::hex << (p.bgColor().has_value() ? p.bgColor().value() : -1) << ",";
+    os << "fgColor:" << std::hex << (p.fgColor().has_value() ? p.fgColor().value() : -1) << ",";
+    os << "checkedColor:" << std::hex << (p.checkedColor().has_value() ? p.checkedColor().value() : -1) << ",";
+    os << "borderType:" << std::dec << (p.borderType().has_value() ? p.borderType().value() : -1)  << ",";
+    os << "borderColor:" << std::hex << (p.borderColor().has_value() ? p.borderColor().value() : -1) << ",";
+    os << "borderWidth:" << std::dec << (p.borderWidth().has_value() ? p.borderWidth().value() : -1) << ",";
+    os << "}\n";
+    return os;
+}
+std::ostream& operator<<(std::ostream& os, const LeleStyles& p) {
+    os << "LeleStyles id: " << p._id << ", ";
+    os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
+    os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+    os << "\nStyles {\n";
+    for(const LeleStyle *lele_style : p._lele_styles) {
+      os << "\t" << *lele_style << ",\n";
+    }
+    os << "}\n";
+    return os;
 }

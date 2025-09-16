@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "lelestackview.h"
 
 #include "lelelabel.h"
@@ -47,6 +49,7 @@ LeleStackView::LeleStackView(const std::string &json_str)
       }
     }
   }
+  std::cout << "StackView: styles: " << _lele_styles << "\n";
 }
 
 static void event_cb1(lv_event_t * e) {
@@ -63,7 +66,7 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      static auto foo = value->createLvObj(this);
+      static auto foo = value->createLvObj(this);//osm
     }
     else if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
