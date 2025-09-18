@@ -1,16 +1,8 @@
 {
     "stackview":{
-        "styles":[
-            {
-                "style":{"id":"statckview/styles/style0","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"}
-            },
-            {
-                "style":{"id":"statckview/styles/style1"}
-            },
-            {
-                "style":{"id":"statckview/styles/style2"}
-            }
-        ],
+        "style":{"id":"statckview/styles/style0","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"id":"statckview/styles/style1"},
+        "style":{"id":"statckview/styles/style2"},
         "active_tab_bgcolor":"#ffffff",
         "active_tab_bottom_border":"solid-3px-#cccccc",
         "tabbar_height":"75",
