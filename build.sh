@@ -14,7 +14,7 @@ function setConfig() {
 
     pushd src/
     if [ -f "configs/${config}.json" ]; then
-        rm config.json 
+        rm -f config.json 
         ln -sf configs/${config}.json config.json
     fi
     popd
@@ -47,7 +47,7 @@ function main() {
 
     pushd x86-build/bin
     echo "set confirm off" |sudo tee ~/.gdbinit
-    gdb ./lvglsim
+    gdb -ex "run" --args ./lvglsim
     popd
 }
 

@@ -171,13 +171,23 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   const lv_font_t *font_normal = &lv_font_montserrat_16;
   lv_obj_set_style_text_font(_lv_obj, font_normal, 0);
-  lv_obj_set_style_text_color(_lv_obj, lv_color_hex(_lele_styles.fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(_lele_styles.bgColor()), LV_PART_MAIN);
+  auto fgcolor =_lele_styles.getValue("fgcolor");
+  if(fgcolor) {
+    lv_obj_set_style_text_color(_lv_obj, lv_color_hex(std::get<int>(fgcolor.value())), LV_PART_MAIN);
+  }
+  auto bgcolor =_lele_styles.getValue("bgcolor");
+  if(bgcolor) {
+    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(bgcolor.value())), LV_PART_MAIN);
+  }
   
   lv_obj_t *tabview_content = lv_tabview_get_content(_lv_obj);
   lv_obj_t *tabview_header = lv_tabview_get_tab_bar(_lv_obj);
-  lv_obj_set_style_text_color(tabview_header, lv_color_hex(_lele_styles.fgColor()), LV_PART_MAIN);
-  lv_obj_set_style_bg_color(tabview_header, lv_color_hex(_lele_styles.bgColor()), LV_PART_MAIN);
+  if(fgcolor) {
+    lv_obj_set_style_text_color(tabview_header, lv_color_hex(std::get<int>(fgcolor.value())), LV_PART_MAIN);
+  }
+  if(bgcolor) {
+    lv_obj_set_style_bg_color(tabview_header, lv_color_hex(std::get<int>(bgcolor.value())), LV_PART_MAIN);
+  }
 
   _tabs->createLvObj(this);
   _tabs->setLvObj(_lv_obj);

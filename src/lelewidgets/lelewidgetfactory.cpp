@@ -116,9 +116,6 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "button") {
             token = std::make_unique<LeleButtons::LeleButton>(rhs);
         }
-        // else if(lhs == "styles") {
-        //     token = std::make_unique<LeleStyles>(rhs);
-        // }
         else if(lhs == "style") {
             token = std::make_unique<LeleStyle>(rhs);
         }

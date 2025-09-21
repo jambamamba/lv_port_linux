@@ -76,19 +76,24 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   LeleViewHeader *button_bar = getButtonBar();
   lv_obj_add_event_cb(_lv_obj, event_cb1, LV_EVENT_CLICKED, (void*)className().c_str());
-  lv_obj_add_event_cb(button_bar->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->className().c_str());
-  lv_obj_add_event_cb(button_bar->getLeleObj("button")->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->getLeleObj("button")->className().c_str());
-
+  if(button_bar) {
+    lv_obj_add_event_cb(button_bar->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->className().c_str());
+    if(button_bar->getLeleObj("button")){
+      lv_obj_add_event_cb(button_bar->getLeleObj("button")->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->getLeleObj("button")->className().c_str());
+    }
+  }
   // lv_obj_t *cont = lv_obj_create(_lv_obj);
   // static char cont_name[] = "container";
   // lv_obj_add_event_cb(cont, event_cb1, LV_EVENT_CLICKED, cont_name);
 
-  _views->createLvObj(this);
-  _views->setLvObj(_lv_obj);
-  for(int idx = 0; idx < _views->count(); ++idx) {
-    LeleView *view = _views->getAt(idx);
-    view->createLvObj(_views);
-    // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
+  if(_views) {
+    _views->createLvObj(this);
+    _views->setLvObj(_lv_obj);
+    for(int idx = 0; idx < _views->count(); ++idx) {
+      LeleView *view = _views->getAt(idx);
+      view->createLvObj(_views);
+      // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
+    }
   }
 
   // lv_obj_t *logo = setStackViewImg(tab_bar, _img);
