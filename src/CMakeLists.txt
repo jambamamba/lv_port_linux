@@ -116,3 +116,7 @@ endfunction()
 buildPythonLib(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim()
+
+add_subdirectory(googletest)
+include_directories(googletest/include googletest)
+add_subdirectory(lelewidgets/tests)
