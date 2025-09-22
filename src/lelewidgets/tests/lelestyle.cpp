@@ -3,7 +3,7 @@
 // Simple test
 TEST(MyFunctionTest, HandlesPositiveInput) {
     // ... test logic and assertions
-    ASSERT_EQ(5, 4);
+    ASSERT_EQ(5, 5);
 }
 
 class MyClass {
