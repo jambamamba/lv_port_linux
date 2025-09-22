@@ -13,3 +13,6 @@
 [submodule "share"]
 	path = share
 	url = git@github.com:jambamamba/share.git
+[submodule "src/googletest"]
+	path = src/googletest
+	url = https://github.com/google/googletest.git
