@@ -209,16 +209,15 @@ std::string LeleStyle::className() const {
 }
 
 std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, std::string class_name) const {
-  auto it = _style.find(key);
-  if(it != _style.end() && it->second) {
-    return it->second;
+  std::string cls = class_name.empty() ? _class_name : class_name;
+  if(cls == _class_name) {
+    auto it = _style.find(key);
+    if(it != _style.end() && it->second) {
+      return it->second;
+    }
   }
-  else if(_lele_parent) {
-    return _lele_parent->styles()->getValue(
-        key, 
-        class_name.empty() ? 
-          _class_name : class_name
-    );
+  if(_lele_parent) {
+    return _lele_parent->styles()->getValue(key, cls);
   }
   return std::nullopt;
 }
