@@ -113,10 +113,22 @@ function(buildLvglSim)
     add_dependencies(lvglsim lv_image_convert)
 endfunction()
 
+function(buildTests)
+    add_subdirectory(googletest)
+    include_directories(googletest/include googletest)
+    add_subdirectory(lelewidgets/tests)
+endfunction()
+
+function(runTests)
+  add_custom_target(run_tests ALL
+        COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lelewidgets/tests"
+        DEPENDS style_tests # Ensure test executable is built before running tests
+    )
+endfunction()
+
 buildPythonLib(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim()
-
-add_subdirectory(googletest)
-include_directories(googletest/include googletest)
-add_subdirectory(lelewidgets/tests)
+buildTests()
+runTests()

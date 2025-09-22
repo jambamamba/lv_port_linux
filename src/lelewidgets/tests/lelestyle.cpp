@@ -26,3 +26,8 @@ protected:
 TEST_F(MyClassTest, InitialStateIsEmpty) {
     EXPECT_TRUE(obj.isEmpty());
 }
+
+int main(int argc, char **argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
