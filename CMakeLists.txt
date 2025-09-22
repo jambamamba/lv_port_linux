@@ -3,49 +3,6 @@ project(lvgl)
 
 set(CONF_PATH "${PROJECT_SOURCE_DIR}/lv_conf.h")
 
-#osm#################################
-set(PYTHON_LIB_NAME "Python")
-set(PYTHON_LIB_MAJOR_MINOR "3.13")
-set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.3")
-set(PYTHON_LIB_OUTPUT "${PYTHON_LIB_SOURCE_DIR}/libpython${PYTHON_LIB_MAJOR_MINOR}.so")
-set(PYTHON_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
-set(PYTHON_LIB_URL "https://www.python.org/ftp/python/${PYTHON_LIB_VERSION}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
-set(PYTHON_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}")
-
-add_custom_command(
-    OUTPUT ${PYTHON_LIB_OUTPUT}
-    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} curl -L "${PYTHON_LIB_URL}" -o "${PYTHON_LIB_ARCHIVE}"
-    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_COMMAND} -E tar xzf ${PYTHON_LIB_ARCHIVE}
-    COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} ${CMAKE_COMMAND} -E env CFLAGS=-Wno-error=coverage-mismatch ./configure --enable-optimizations --enable-shared
-    COMMAND ${CMAKE_COMMAND} -E chdir ${PYTHON_LIB_SOURCE_DIR} make -j
-    WORKING_DIRECTORY ${PYTHON_LIB_SOURCE_DIR}
-    COMMENT "Building ${PYTHON_LIB_NAME}"
-    VERBATIM
-)
-#osm#################################
-
-#osm#################################
-set(LV_IMG_DSC_SRC 
-    "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" 
-    "${CMAKE_BINARY_DIR}/res/img_dsc.h"
-    # "${CMAKE_BINARY_DIR}/lv_image_converter/libimage_converter.so"
-)
-add_subdirectory(lv_image_converter)
-add_custom_command(
-  OUTPUT ${LV_IMG_DSC_SRC}
-  COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
-  COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
-  #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
-  COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
-  COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
-  WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-  DEPENDS "${CMAKE_SOURCE_DIR}/res"
-  COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
-  VERBATIM
-)
-add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
-#osm#################################
-
 foreach(BACKEND_NAME "SDL" "LINUX_DRM" "LINUX_FBDEV" "X11" "WAYLAND" "OPENGLES" "EVDEV")
 
     execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
@@ -167,54 +124,10 @@ string(APPEND LVGL_PKG_CONFIG_LIB "-llvgl_linux")
 file(GLOB LV_LINUX_SRC src/lib/*.c)
 set(LV_LINUX_INC src/lib)
 
-set(utils_DIR "${CMAKE_PREFIX_PATH}")
-find_package(utils REQUIRED CONFIG)
-
 add_subdirectory(lvgl)
 target_include_directories(lvgl PUBLIC ${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/src/lib ${PKG_CONFIG_INC} ${CMAKE_BINARY_DIR})
 add_library(lvgl_linux STATIC ${LV_LINUX_SRC} ${LV_LINUX_BACKEND_SRC})
 target_include_directories(lvgl_linux PRIVATE ${LV_LINUX_INC} ${PROJECT_SOURCE_DIR})
-
-set(LELE_WIDGETS
-    src/lelewidgets/lelebase.cpp
-    src/lelewidgets/lelenullwidget.cpp
-    src/lelewidgets/lelelabel.cpp
-    src/lelewidgets/lelebutton.cpp
-    src/lelewidgets/leletextbox.cpp
-    src/lelewidgets/lelestyle.cpp
-    src/lelewidgets/leletabview.cpp
-    src/lelewidgets/lelewidgetfactory.cpp
-    src/lelewidgets/leleview.cpp
-    src/lelewidgets/lelestackview.cpp
-)
-add_executable(lvglsim 
-    src/main.cpp 
-    # src/mainwindow.cpp 
-    # src/chart.cpp 
-    ${LELE_WIDGETS}
-    ${LV_LINUX_SRC} 
-    ${LV_LINUX_BACKEND_SRC} 
-    ${LV_IMG_DSC_SRC}
-    ${PYTHON_LIB_OUTPUT}
-)
-set_target_properties(lvglsim PROPERTIES
-    CMAKE_CXX_STANDARD 17
-    CMAKE_CXX_STANDARD_REQUIRED ON
-    CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
-)
-target_link_libraries(lvglsim 
-    lvgl_linux 
-    lvgl 
-    lvgl::examples 
-    lvgl::demos 
-    lvgl::thorvg 
-    m 
-    pthread 
-    ${PKG_CONFIG_LIB}
-    utils::utils
-    image_converter
-)
-# target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
 
 # Install the lvgl_linux library and its headers
@@ -228,9 +141,4 @@ install(TARGETS lvgl_linux
     ARCHIVE DESTINATION lib
 )
 
-file(COPY "src/config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
-add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
-
-#osm#################end
-add_dependencies(lvglsim lv_image_convert)
-#osm#################end
+add_subdirectory(src)
