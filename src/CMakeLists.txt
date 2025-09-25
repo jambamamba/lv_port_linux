@@ -35,26 +35,26 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
     )
     add_subdirectory(lv_image_converter)
     add_custom_command(
-    OUTPUT ${LV_IMG_DSC_SRC}
-    COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
-    #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
-    COMMAND ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
-    COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    DEPENDS "${CMAKE_SOURCE_DIR}/res"
-    COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
-    VERBATIM
+        OUTPUT ${LV_IMG_DSC_SRC}
+        COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
+        COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib' ${CMAKE_BINARY_DIR}/src/lv_image_converter/libimage_converter.so
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/lv_image_converter/libimage_converter.so /usr/local/lib/
+        COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib:${CMAKE_BINARY_DIR}/src/lv_image_converter' ${CMAKE_BINARY_DIR}/bin/lv_image_converter
+        #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
+        COMMAND LD_LIBRARY_PATH=/usr/local/lib ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
+        COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
+        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+        # WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lv_image_converter/"
+        # -E env LD_LIBRARY_PATH=/usr/local/lib 
+        DEPENDS "${CMAKE_SOURCE_DIR}/res"
+        COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
+        VERBATIM
     )
     add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
 
     set(${OUT_VAR_LV_IMG_DSC_SRC} "${LV_IMG_DSC_SRC}" PARENT_SCOPE)
 endfunction()
-
-if(NOT TARGET utils::utils)
-    set(utils_DIR "${CMAKE_PREFIX_PATH}")
-    find_package(utils REQUIRED CONFIG)
-endif()
 
 function(buildLvglSim)
     message(STATUS "buildLvglSim()")
@@ -126,6 +126,11 @@ function(runTests)
         DEPENDS style_tests # Ensure test executable is built before running tests
     )
 endfunction()
+
+if(NOT TARGET utils::utils)
+    set(utils_DIR "${CMAKE_PREFIX_PATH}")
+    find_package(utils REQUIRED CONFIG)
+endif()
 
 buildPythonLib(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)

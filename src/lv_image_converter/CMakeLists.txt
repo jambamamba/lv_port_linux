@@ -25,8 +25,8 @@ target_include_directories(${libproject} PRIVATE ${CMAKE_SOURCE_DIR}
 target_link_directories(${libproject} PRIVATE /usr/local/lib)
 
 if(NOT TARGET utils::utils)
-set(utils_DIR "${CMAKE_PREFIX_PATH}")
-find_package(utils REQUIRED CONFIG)
+    set(utils_DIR "${CMAKE_PREFIX_PATH}")
+    find_package(utils REQUIRED CONFIG)
 endif()
 
 target_link_libraries(${libproject} PRIVATE utils::utils ssl crypto png jpeg heif)
