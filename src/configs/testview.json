@@ -1,7 +1,88 @@
 {
-"view":{
-        "id":"view",
-        "style":{"id":"view0","fgcolor":"#ffffff","bgcolor":"#000000","corner_radius":"5","border":"solid-1px-#ffffff","x":"0","y":"0","width":"100%","height":"100%"},
-        "style":{"id":"view1","fgcolor":"#ffffff","bgcolor":"#444444"}
+    "stackview":{
+        "style":{"id":"statckview/styles/style0","padding":"none","margin":"none","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"id":"statckview/styles/style1","class_name":"statckview/view","border":"solid-1px-#0000ff","x":"0","y":"0","width":"100%","height":"95%"},
+        "style":{"id":"statckview/styles/style2","class_name":"statckview/view/header","border":"none","width":"0%","height":"0%"},
+        "active_tab_bgcolor":"#ffffff",
+        "active_tab_bottom_border":"solid-3px-#cccccc",
+        "tabbar_height":"75",
+        "title":"ACME Weather Hub",
+        "subtitle":"Local Weather Station",
+        "img":"weather-hub-logo.png",
+        "view_header":{
+            "style":{"id":"view_header","border":"solid-1px-#ff0000","flow":"row","width":"100%","height":"5%"},
+            "button":{
+                "type":"push",
+                "style":{"id":"button0","border":"none","width":"15%","height":"40"},
+                "text":"> Push button0"
+            },
+            "button":{
+                "type":"push",
+                "style":{"id":"button1","border":"none","width":"15%","height":"40"},
+                "text":"> Push button1"
+            },
+            "button":{
+                "type":"push",
+                "style":{"id":"button2","border":"none","width":"15%","height":"40"},
+                "text":"> Push button2"
+            },
+            "button":{
+                "type":"push",
+                "style":{"id":"button3","border":"none","width":"15%","height":"40"},
+                "text":"> Push button3"
+            }
+        },
+        "views":[
+            {
+                "id":"views:0",
+                "view":{
+                    "id":"views:0/view",
+                    "style":{"id":"views:0/view","class_name":"statckview/view"},
+                    "view_header":{
+                        "id":"views:0/view/view_header",
+                        "style":{"id":"views:0/view/header","class_name":"statckview/view/header"},
+                        "name":"History",
+                        "img":"graph-icon.png"
+                    },
+                    "label":{
+                        "id":"views:0/view/label",
+                        "text":"hello world2",
+                        "style":{"id":"views/view0/label","x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                    },  
+                    "textbox":{
+                        "id":"views:0/view/textbox",
+                        "text":"hello world2",
+                        "max_length":"15",
+                        "multiline":"false",
+                        "style":{"id":"views:0/view/textbox","border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                    }
+                }
+            },
+            {
+                "id":"views:1",
+                "view":{
+                    "id":"views:1/view",
+                    "style":{"id":"views:0/view","class_name":"statckview/view"},
+                    "view_header":{
+                        "id":"views:1/view/view_header",
+                        "style":{"id":"views:1/view/header","class_name":"statckview/view/header"},
+                        "name":"Settings",
+                        "img":"settings-hammer-wrench.png"
+                    },
+                    "label":{
+                        "id":"views:1/view/label",
+                        "text":"hello world3",
+                        "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                    },  
+                    "textbox":{
+                        "id":"views:1/view/textbox",
+                        "text":"hello world3",
+                        "max_length":"15",
+                        "multiline":"false",
+                        "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                    }
+                }
+            }
+        ]
     }
 }

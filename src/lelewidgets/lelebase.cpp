@@ -207,3 +207,11 @@ void LeleBase::EventCallback(lv_event_t * e) {
 
 void LeleBase::eventCallback(lv_event_t * e) {
 }
+std::ostream& operator<<(std::ostream& os, const LeleBase& p) {
+    // os << "LeleStyles id: " << p._id << ", ";
+    os << "_id:" << p._id << ",";
+    os << "_class_name:" << p._class_name << ",";
+    os << "\nStyles {\n";
+    os << p._lele_styles;
+    return os;
+}

@@ -22,6 +22,7 @@ class LeleBase {
   public:
   LeleBase(const std::string &json_str = "");
   virtual ~LeleBase();
+  friend std::ostream& operator<<(std::ostream& os, const LeleBase& p);
 
   const std::string &className() const {
     return _class_name;

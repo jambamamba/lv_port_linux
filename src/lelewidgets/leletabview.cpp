@@ -189,29 +189,33 @@ lv_obj_t *LeleTabView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(std::get<int>(bgcolor.value())), LV_PART_MAIN);
   }
 
-  _tabs->createLvObj(this);
-  _tabs->setLvObj(_lv_obj);
-  for(int idx = 0; idx < _tabs->count(); ++idx) {
-    LeleTabView::Tab *tab = _tabs->getAt(idx);
-    tab->createLvObj(_tabs);
-    tab->getTabContent()->createLvObj(tab);
+  if(_tabs){
+    _tabs->createLvObj(this);
+    _tabs->setLvObj(_lv_obj);
+    for(int idx = 0; idx < _tabs->count(); ++idx) {
+      LeleTabView::Tab *tab = _tabs->getAt(idx);
+      tab->createLvObj(_tabs);
+      tab->getTabContent()->createLvObj(tab);
 
-    lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-    tab->setLvObj(button);
-    tab->getTabHeader()->createLvObj(tab);
-    lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
-    lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
-    if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
-      lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-      lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, LV_PART_MAIN | LV_STATE_CHECKED);
+      lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
+      tab->setLvObj(button);
+      tab->getTabHeader()->createLvObj(tab);
+      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
+      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+      if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
+        lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, LV_PART_MAIN | LV_STATE_CHECKED);
+      }
     }
   }
 
-  lv_obj_t *logo = setTabViewImg(tabview_header, _img);
-  lv_obj_t *label = setTabViewTitle(tabview_header, _title);
-  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
-  label = setTabViewSubTitle(tabview_header, _subtitle);
-  lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+  if(tabview_header){
+    lv_obj_t *logo = setTabViewImg(tabview_header, _img);
+    lv_obj_t *label = setTabViewTitle(tabview_header, _title);
+    lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_TOP, 10, 0);
+    label = setTabViewSubTitle(tabview_header, _subtitle);
+    lv_obj_align_to(label, logo, LV_ALIGN_OUT_RIGHT_BOTTOM, 10, 0);
+  }
 
   return _lv_obj;
 }

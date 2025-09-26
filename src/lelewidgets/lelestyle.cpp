@@ -188,7 +188,7 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
   int right = 0;
   int bottom = 0;
   int left = 0;
-  if(padding_str.empty() || padding_str == "none") {
+  if(padding_str.empty() || padding_str == "none" || padding_str == "0px") {
     return std::tuple<int,int,int,int>{top,right,bottom,left};
   }
   std::regex pattern("(\\d*)px\\s+(\\d*)px\\s+(\\d*)px\\s+(\\d*)px\\s*");
