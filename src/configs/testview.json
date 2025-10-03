@@ -1,8 +1,9 @@
 {
     "stackview":{
-        "style":{"id":"statckview/styles/style0","padding":"none","margin":"none","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
-        "style":{"id":"statckview/styles/style1","class_name":"statckview/view","border":"solid-1px-#0000ff","x":"0","y":"0","width":"100%","height":"95%"},
-        "style":{"id":"statckview/styles/style2","class_name":"statckview/view/header","border":"none","width":"0%","height":"0%"},
+        "style":{"id":"stackview/styles/style0","padding":"none","margin":"none","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"id":"stackview/styles/style1","class_name":"stackview/view","border":"solid-1px-#0000ff","x":"0","y":"0","width":"100%","height":"95%"},
+        "style":{"id":"stackview/styles/style2","class_name":"stackview/view/header","border":"none","width":"0%","height":"0%"},
+        "style":{"id":"stackview/styles/style3","class_name":"stackview/view/button","border":"none","width":"15%","height":"40","fgcolor":"#ffffff","bgcolor":"#ff0000"},
         "active_tab_bgcolor":"#ffffff",
         "active_tab_bottom_border":"solid-3px-#cccccc",
         "tabbar_height":"75",
@@ -10,6 +11,7 @@
         "subtitle":"Local Weather Station",
         "img":"weather-hub-logo.png",
         "view_header":{
+            "id":"view_header",
             "style":{"id":"view_header","border":"solid-1px-#ff0000","flow":"row","width":"100%","height":"5%"},
             "button":{
                 "type":"push",
@@ -37,10 +39,10 @@
                 "id":"views:0",
                 "view":{
                     "id":"views:0/view",
-                    "style":{"id":"views:0/view","class_name":"statckview/view"},
+                    "style":{"id":"views:0/view","class_name":"stackview/view"},
                     "view_header":{
                         "id":"views:0/view/view_header",
-                        "style":{"id":"views:0/view/header","class_name":"statckview/view/header"},
+                        "style":{"id":"views:0/view/header","class_name":"stackview/view/header"},
                         "name":"History",
                         "img":"graph-icon.png"
                     },
@@ -55,6 +57,11 @@
                         "max_length":"15",
                         "multiline":"false",
                         "style":{"id":"views:0/view/textbox","border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                    },
+                    "button":{
+                        "type":"push",
+                        "style":{"id":"button0","border":"none","width":"15%","height":"40"},
+                        "text":"> Push button0"
                     }
                 }
             },
@@ -62,24 +69,59 @@
                 "id":"views:1",
                 "view":{
                     "id":"views:1/view",
-                    "style":{"id":"views:0/view","class_name":"statckview/view"},
+                    "style":{"id":"views:1/view","class_name":"stackview/view"},
                     "view_header":{
                         "id":"views:1/view/view_header",
-                        "style":{"id":"views:1/view/header","class_name":"statckview/view/header"},
+                        "style":{"id":"views:1/view/header","class_name":"stackview/view/header"},
                         "name":"Settings",
                         "img":"settings-hammer-wrench.png"
                     },
                     "label":{
                         "id":"views:1/view/label",
-                        "text":"hello world3",
+                        "text":"hello world2",
                         "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
                     },  
                     "textbox":{
                         "id":"views:1/view/textbox",
+                        "text":"hello world2",
+                        "max_length":"15",
+                        "multiline":"false",
+                        "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                    },
+                    "button":{
+                        "type":"push",
+                        "style":{"id":"button0","border":"none","width":"15%","height":"40"},
+                        "text":"> Push button0"
+                    }
+                }
+            },
+            {
+                "id":"views:2",
+                "view":{
+                    "id":"views:2/view",
+                    "style":{"id":"views:2/view","class_name":"stackview/view"},
+                    "view_header":{
+                        "id":"views:2/view/view_header",
+                        "style":{"id":"views:2/view/header","class_name":"stackview/view/header"},
+                        "name":"Settings",
+                        "img":"settings-hammer-wrench.png"
+                    },
+                    "label":{
+                        "id":"views:2/view/label",
+                        "text":"hello world3",
+                        "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                    },  
+                    "textbox":{
+                        "id":"views:2/view/textbox",
                         "text":"hello world3",
                         "max_length":"15",
                         "multiline":"false",
                         "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                    },
+                    "button":{
+                        "type":"push",
+                        "style":{"id":"button0","border":"none","width":"15%","height":"40"},
+                        "text":"> Push button0"
                     }
                 }
             }

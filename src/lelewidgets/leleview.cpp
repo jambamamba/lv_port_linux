@@ -6,6 +6,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleViews::LeleViews(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
+    LOG(DEBUG, LVSIM, "LeleViews json_str:%s\n", json_str.c_str());
 }
 lv_obj_t *LeleViews::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);

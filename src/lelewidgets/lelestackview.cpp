@@ -39,10 +39,10 @@ LeleStackView::LeleStackView(const std::string &json_str)
       else if(key == "active_tab_bottom_border") {
         std::tie(_active_tab_bottom_border_type,_active_tab_bottom_border_width,_active_tab_bottom_border_color) = 
           LeleStyle::parseBorder(value);
-        // printf("@@@ value:%s\n", value.c_str());
-        // printf("@@@@ _active_tab_bottom_border_type:%i\n",_active_tab_bottom_border_type);
-        // printf("@@@@ _active_tab_bottom_border_width:%i\n",_active_tab_bottom_border_width);
-        // printf("@@@@ _active_tab_bottom_border_color:0x%x\n",_active_tab_bottom_border_color);
+        // LOG(DEBUG, LVSIM, "@@@ value:%s\n", value.c_str());
+        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_type:%i\n",_active_tab_bottom_border_type);
+        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_width:%i\n",_active_tab_bottom_border_width);
+        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_color:0x%x\n",_active_tab_bottom_border_color);
       }
       else if(key == "tabbar_height") {
         _tabbar_height = std::stoi(value.c_str(), nullptr, 10);
@@ -53,7 +53,7 @@ LeleStackView::LeleStackView(const std::string &json_str)
 }
 
 static void event_cb1(lv_event_t * e) {
-  printf("@@@@@@@ %s:%s\n", __FUNCTION__, (char*)e->user_data);
+  LOG(DEBUG, LVSIM, "@@@@@@@ %s:%s\n", __FUNCTION__, (char*)e->user_data);
 }
 
 LeleViewHeader *LeleStackView::getButtonBar() const {
@@ -66,10 +66,12 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   for (const auto &[key, token]: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
-      static auto foo = value->createLvObj(this);//osm
+      value->createLvObj(this);//osm
+      // LOG(DEBUG, LVSIM, "stackview obj: %s:%s\n", key.c_str(), value->id().c_str());
     }
     else if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
+      // LOG(DEBUG, LVSIM, "stackview obj: %s:%s\n", key.c_str(), value.c_str());
     }
   }
   lv_obj_set_size(_lv_obj, lv_pct(100), lv_pct(100));
@@ -82,9 +84,6 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
       lv_obj_add_event_cb(button_bar->getLeleObj("button")->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->getLeleObj("button")->className().c_str());
     }
   }
-  // lv_obj_t *cont = lv_obj_create(_lv_obj);
-  // static char cont_name[] = "container";
-  // lv_obj_add_event_cb(cont, event_cb1, LV_EVENT_CLICKED, cont_name);
 
   if(_views) {
     _views->createLvObj(this);
@@ -92,6 +91,15 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     for(int idx = 0; idx < _views->count(); ++idx) {
       LeleView *view = _views->getAt(idx);
       view->createLvObj(_views);
+      int32_t width=-1, height=-1;
+      if(idx > 0) {
+        width = lv_obj_get_width(view->getLvObj());
+        height = lv_obj_get_height(view->getLvObj());
+        lv_obj_set_size(view->getLvObj(), 0, 0);
+      }
+      width = lv_obj_get_width(view->getLvObj());
+      height = lv_obj_get_height(view->getLvObj());
+      LOG(DEBUG, LVSIM, "stackview view: %i:%s, width:%i, height:%i\n", idx, view->id().c_str(), width, height);
       // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
     }
   }

@@ -122,6 +122,7 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else {
             token = rhs;
         }
+        // LOG(DEBUG, LVSIM, "lhs:%s\n", lhs.c_str());
         res.emplace_back(
             std::make_pair<std::string, Token>(
                 std::string(lhs), std::move(token)));
