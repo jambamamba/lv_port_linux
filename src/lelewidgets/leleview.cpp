@@ -92,8 +92,13 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   return _lv_obj;
 }
-void LeleView::eventCallback(lv_event_t * e)
-{
+void LeleView::hide() {
+  int width = lv_obj_get_width(getLvObj());
+  int height = lv_obj_get_height(getLvObj());
+  lv_obj_set_size(getLvObj(), 0, 0);
+}
+
+void LeleView::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleBase *base = static_cast<LeleBase*>(e->user_data);
     LOG(DEBUG, LVSIM, "%s: clicked\n", base->className().c_str());

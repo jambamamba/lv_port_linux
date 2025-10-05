@@ -209,14 +209,21 @@ std::string LeleStyle::className() const {
 }
 
 std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, std::string class_name) const {
-  std::string cls = class_name.empty() ? _class_name : class_name;
-  if(cls == _class_name) {
+  if(class_name == _class_name) {
     auto it = _style.find(key);
     if(it != _style.end() && it->second) {
+      // if(it->second.has_value()){
+      //   if (std::holds_alternative<int>(it->second.value())) {
+      //     int value = std::get<int>(it->second.value());
+      //     int x = 0;
+      //     x = 1;
+      //   }
+      // }
       return it->second;
     }
   }
   if(_lele_parent) {
+    std::string cls = class_name.empty() ? _class_name : class_name;
     return _lele_parent->styles()->getValue(key, cls);
   }
   return std::nullopt;
@@ -225,13 +232,14 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
 //////////////////////////////////////////////////////////////////////
 LeleStyles::LeleStyles(const std::string &json_str) {
   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-    if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-      if(key == "style") {
-        _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
-      }
-    }
-    else if (std::holds_alternative<std::string>(token)) {
+    // if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
+    //   auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
+    //   if(key == "style") {
+    //     _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
+    //   }
+    // }
+    // else 
+    if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "id") {
         _id = value;

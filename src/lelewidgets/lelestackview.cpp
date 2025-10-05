@@ -91,15 +91,9 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     for(int idx = 0; idx < _views->count(); ++idx) {
       LeleView *view = _views->getAt(idx);
       view->createLvObj(_views);
-      int32_t width=-1, height=-1;
       if(idx > 0) {
-        width = lv_obj_get_width(view->getLvObj());
-        height = lv_obj_get_height(view->getLvObj());
-        lv_obj_set_size(view->getLvObj(), 0, 0);
+        view->hide();
       }
-      width = lv_obj_get_width(view->getLvObj());
-      height = lv_obj_get_height(view->getLvObj());
-      LOG(DEBUG, LVSIM, "stackview view: %i:%s, width:%i, height:%i\n", idx, view->id().c_str(), width, height);
       // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
     }
   }
