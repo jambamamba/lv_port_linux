@@ -10,7 +10,6 @@ class LeleView : public LeleBase {
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   bool isGroup() const { return _group; }
-  void hide();
   protected:
   int _active_child_idx = -1;
   bool _group = false;

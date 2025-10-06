@@ -206,6 +206,16 @@ void LeleBase::EventCallback(lv_event_t *e) {
       base->eventCallback(LeleEvent(e));
     }
 }
+void LeleBase::hide() {
+  // int width = lv_obj_get_width(getLvObj());
+  // int height = lv_obj_get_height(getLvObj());
+  // lv_obj_set_size(getLvObj(), 0, 0);
+  lv_obj_add_flag(getLvObj(), LV_OBJ_FLAG_HIDDEN);
+}
+
+void LeleBase::show() {
+  lv_obj_remove_flag(getLvObj(), LV_OBJ_FLAG_HIDDEN);
+}
 
 bool LeleBase::eventCallback(LeleEvent &&e) {
   // LOG(DEBUG, LVSIM, "LeleBase::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
