@@ -144,6 +144,13 @@ lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const st
 bool LeleStackView::eventCallback(LeleEvent &&e) {
   if(e.type() == "clicked") {
     LOG(DEBUG, LVSIM, "LeleStackView::eventCallback, type:%s, action:%s\n", e.type().c_str(), e.action().c_str());
+    for(auto &[name,value]: e.args()) {
+      LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, value:%s\n", name.c_str(), value.c_str());
+      if(name == "id") {
+        //osm todo: find view with name 'value.c_str()' and show it and hide other views, and update breadcrumbs
+        //osm todo: why are we getting this callback twice?
+      }
+    }
   }
   return LeleBase::eventCallback(std::move(e));
 }
