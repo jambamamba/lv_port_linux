@@ -13,15 +13,16 @@
 #include <variant>
 #include <vector>
 
-#include "lelestyle.h"
+class LeleEvent;
+class LeleStyle;
 class LeleBase;
 namespace LeleWidgetFactory {
 
   using Token = std::variant<
-    std::string, 
-    std::unique_ptr<LeleBase>, 
-    std::unique_ptr<LeleStyle>, 
-    std::unique_ptr<LeleStyles>
+    std::string
+    ,std::unique_ptr<LeleBase> 
+    ,std::unique_ptr<LeleEvent>
+    ,std::unique_ptr<LeleStyle>
   >;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");

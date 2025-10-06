@@ -98,7 +98,7 @@ void LeleView::hide() {
   lv_obj_set_size(getLvObj(), 0, 0);
 }
 
-void LeleView::eventCallback(lv_event_t * e) {
+bool LeleView::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleBase *base = static_cast<LeleBase*>(e->user_data);
     LOG(DEBUG, LVSIM, "%s: clicked\n", base->className().c_str());
@@ -107,7 +107,7 @@ void LeleView::eventCallback(lv_event_t * e) {
     lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(e);//get the object to which an event was sent. I.e. the object whose event handler is being called.
     lv_obj_t *act_cb = lv_event_get_target_obj(e);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
     if(act_cb == container) {
-      return;//Do nothing if the container was clicked
+      return false;//Do nothing if the container was clicked
     }
     for(int idx = 0; idx < lv_obj_get_child_count(container); ++idx) {
       lv_obj_t *old_cb = lv_obj_get_child(container, idx);
@@ -115,5 +115,6 @@ void LeleView::eventCallback(lv_event_t * e) {
     }
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);
     _active_child_idx = lv_obj_get_index(act_cb);
+    return true;
 }
 ////////////////////////////////////////////////////////////////////////

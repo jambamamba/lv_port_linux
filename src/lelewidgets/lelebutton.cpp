@@ -1,4 +1,6 @@
 #include "lelebutton.h"
+
+#include "leleevent.h"
 #include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -83,6 +85,10 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
         _checked = strncmp(value.c_str(), "true", 4) == 0;
       }
     }
+    else if(std::holds_alternative<std::unique_ptr<LeleEvent>>(token)) {
+      LeleEvent *event = std::get<std::unique_ptr<LeleEvent>>(token).get();
+      _events.push_back(event);
+    }
   }
 }
 lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
@@ -144,7 +150,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   return _lv_obj;
 }
 
-void LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
+bool LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
     // LeleView *view = dynamic_cast<LeleView>(_lele_parent);
     // if(view) {
@@ -153,8 +159,17 @@ void LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
 
     if(code == LV_EVENT_CLICKED) {
         LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
+        for(LeleEvent *event: _events) {
+          if(event->type() == "clicked"){
+            if(event->action() == "stackview.push") {
+              e->user_data = event;
+              _lele_parent->eventCallback(e);
+            }
+          }
+        }
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
         LOG(DEBUG, LVSIM, "%s: value changed. button type:%i\n", _class_name.c_str(), _type);
     }
+    return true;
 }

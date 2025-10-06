@@ -61,7 +61,8 @@
                     "button":{
                         "type":"push",
                         "style":{"id":"button0","class_name":"stackview/view/button","border":"none","width":"15%","height":"40"},
-                        "text":"> Push button0"
+                        "text":"> Push button0",
+                        "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:2/view"}}
                     }
                 }
             },
@@ -91,8 +92,7 @@
                     "button":{
                         "type":"push",
                         "style":{"id":"button0","border":"none","width":"15%","height":"40"},
-                        "text":"> Push button0",
-                        "event":{"type":"push","action":"stackview.push","args":{"id":"views:2/view"}}
+                        "text":"> Push button0"
                     }
                 }
             },

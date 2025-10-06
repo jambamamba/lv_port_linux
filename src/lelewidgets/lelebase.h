@@ -6,6 +6,8 @@
 #include <lvgl/lvgl_private.h>
 #include <typeinfo>
 
+//need to include all the types in   using Token = std::variant<
+#include "leleevent.h"
 #include "lelestyle.h"
 
 #if LV_USE_STDLIB_MALLOC == LV_STDLIB_BUILTIN && LV_MEM_SIZE < (38ul * 1024ul)
@@ -48,7 +50,7 @@ class LeleBase {
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle();
   static void EventCallback(lv_event_t * e);
-  virtual void eventCallback(lv_event_t * e);
+  virtual bool eventCallback(lv_event_t * e);
   protected:
   std::string _class_name = "N/A";
   std::string _id;

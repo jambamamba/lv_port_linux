@@ -38,7 +38,7 @@ lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 
-void LeleTextbox::eventCallback(lv_event_t * e) {
+bool LeleTextbox::eventCallback(lv_event_t * e) {
     lv_event_code_t code = lv_event_get_code(e);
 
     if(code == LV_EVENT_CLICKED 
@@ -46,4 +46,5 @@ void LeleTextbox::eventCallback(lv_event_t * e) {
         const char * text = lv_textarea_get_text(_lv_obj);
         LOG(DEBUG, LVSIM, "Textarea Clicked: %s\n", text);
     }
+    return true;
 }
