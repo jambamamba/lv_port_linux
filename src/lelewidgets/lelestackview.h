@@ -2,12 +2,14 @@
 
 #include "lelebase.h"
 #include "lelewidgetfactory.h"
+#include <stack>
 
 #include <smart_pointer/auto_free_ptr.h>
 #include <optional>
 
 class LeleViewHeader;
 class LeleViews;
+class LeleView;
 class LeleStackView : public LeleBase {
   public:
   LeleStackView(const std::string &json_str);
@@ -32,4 +34,5 @@ class LeleStackView : public LeleBase {
   int _tabbar_height = 75;
   LeleViews *_views = nullptr;
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
+  std::stack<LeleView*> _stack;
 };

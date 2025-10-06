@@ -152,6 +152,7 @@ bool LeleStackView::eventCallback(LeleEvent &&e) {
         for(LeleView *view : _views->getChildren()) {
           if(view->id() == id) {
             view->show();
+            _stack.push(view);
           }
           else {
             view->hide();
