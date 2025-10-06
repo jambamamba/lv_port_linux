@@ -61,15 +61,16 @@ function(buildLvglSim)
 
     set(LELE_WIDGETS
         lelewidgets/lelebase.cpp
-        lelewidgets/lelenullwidget.cpp
-        lelewidgets/lelelabel.cpp
         lelewidgets/lelebutton.cpp
-        lelewidgets/leletextbox.cpp
+        lelewidgets/leleevent.cpp
+        lelewidgets/lelelabel.cpp
+        lelewidgets/lelenullwidget.cpp
+        lelewidgets/lelestackview.cpp
         lelewidgets/lelestyle.cpp
         lelewidgets/leletabview.cpp
-        lelewidgets/lelewidgetfactory.cpp
+        lelewidgets/leletextbox.cpp
         lelewidgets/leleview.cpp
-        lelewidgets/lelestackview.cpp
+        lelewidgets/lelewidgetfactory.cpp
     )
 
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
