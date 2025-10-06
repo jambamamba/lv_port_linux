@@ -98,14 +98,15 @@ void LeleView::hide() {
   lv_obj_set_size(getLvObj(), 0, 0);
 }
 
-bool LeleView::eventCallback(lv_event_t * e) {
-    lv_event_code_t code = lv_event_get_code(e);
-    LeleBase *base = static_cast<LeleBase*>(e->user_data);
+bool LeleView::eventCallback(LeleEvent &&e) {
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_code_t code = lv_event_get_code(lv_event);
+    LeleBase *base = static_cast<LeleBase*>(lv_event->user_data);
     LOG(DEBUG, LVSIM, "%s: clicked\n", base->className().c_str());
     
     //uncheck all other buttons in the group, only one button should be checked at a time
-    lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(e);//get the object to which an event was sent. I.e. the object whose event handler is being called.
-    lv_obj_t *act_cb = lv_event_get_target_obj(e);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
+    lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(lv_event);//get the object to which an event was sent. I.e. the object whose event handler is being called.
+    lv_obj_t *act_cb = lv_event_get_target_obj(lv_event);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
     if(act_cb == container) {
       return false;//Do nothing if the container was clicked
     }

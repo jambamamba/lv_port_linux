@@ -38,11 +38,12 @@ lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 
-bool LeleTextbox::eventCallback(lv_event_t * e) {
-    lv_event_code_t code = lv_event_get_code(e);
+bool LeleTextbox::eventCallback(LeleEvent &&e) {
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_code_t code = lv_event_get_code(lv_event);
 
     if(code == LV_EVENT_CLICKED 
-      && lv_event_get_target(e)==_lv_obj){
+      && lv_event_get_target(lv_event)==_lv_obj){
         const char * text = lv_textarea_get_text(_lv_obj);
         LOG(DEBUG, LVSIM, "Textarea Clicked: %s\n", text);
     }

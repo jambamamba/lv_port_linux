@@ -150,8 +150,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   return _lv_obj;
 }
 
-bool LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
-    lv_event_code_t code = lv_event_get_code(e);
+bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_code_t code = lv_event_get_code(lv_event);
     // LeleView *view = dynamic_cast<LeleView>(_lele_parent);
     // if(view) {
     //   view->eventCallback(e);
@@ -161,10 +162,9 @@ bool LeleButtons::LeleButton::eventCallback(lv_event_t * e) {
         LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
         for(LeleEvent *event: _events) {
           if(event->type() == "clicked"){
-            if(event->action() == "stackview.push") {
-              e->user_data = event;
-              _lele_parent->eventCallback(e);
-            }
+            // e->copy(event.id(), event->type(), event->action(), event->args);
+            printf("@@@@ LeleButtons::LeleButton::eventCallback\n");
+            return LeleBase::eventCallback(LeleEvent(*event, lv_event));
           }
         }
     }

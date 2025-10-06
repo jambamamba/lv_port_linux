@@ -140,3 +140,8 @@ lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const st
     lv_label_set_text(label, subtitle.c_str());
     return label;
 }
+
+bool LeleStackView::eventCallback(LeleEvent &&e) {
+  printf("@@@@ LeleStackView::eventCallback\n");
+  return true;
+}

@@ -6,7 +6,7 @@ class LeleGroup : public LeleBase {
   public:
   LeleGroup(const std::string &json_str);
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-  virtual bool eventCallback(lv_event_t * e) override;
+  virtual bool eventCallback(LeleEvent &&e) override;
   protected:
   int _active_child_idx = -1;
 };
@@ -22,7 +22,7 @@ class LeleButtons : public LeleBase {
     };
     LeleButton(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    virtual bool eventCallback(lv_event_t * e) override;
+    virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
     protected:
     std::string _text;

@@ -8,7 +8,7 @@ class LeleView : public LeleBase {
   public:
   LeleView(const std::string &json_str);
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-  virtual bool eventCallback(lv_event_t * e) override;
+  virtual bool eventCallback(LeleEvent &&e) override;
   bool isGroup() const { return _group; }
   void hide();
   protected:

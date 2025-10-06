@@ -1,6 +1,8 @@
 #include <iostream>
+#include <lvgl/lvgl_private.h>
 
 #include "lelebase.h"
+
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -197,15 +199,18 @@ LeleBase *LeleBase::getLeleObj(const std::string &obj_name) const {
   return nullptr;
 }
 
-void LeleBase::EventCallback(lv_event_t * e) {
+void LeleBase::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleBase *base = static_cast<LeleBase*>(e->user_data);
     if(base) {
-      base->eventCallback(e);
+      base->eventCallback(LeleEvent(e));
     }
 }
 
-bool LeleBase::eventCallback(lv_event_t * e) {
+bool LeleBase::eventCallback(LeleEvent &&e) {
+  if(_lele_parent) {
+    return _lele_parent->eventCallback(std::move(e));
+  }
   return true;
 }
 std::ostream& operator<<(std::ostream& os, const LeleBase& p) {
