@@ -141,24 +141,44 @@ lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const st
     return label;
 }
 
+void LeleStackView::pushView(const std::map<std::string, std::string> &args) {
+  for(auto &[name,id]: args) {
+    LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, id:%s\n", name.c_str(), id.c_str());
+    if(name == "id") {
+      //osm todo:  update breadcrumbs
+      //osm todo: why are we getting this callback twice?
+      for(LeleView *view : _views->getChildren()) {
+        if(view->id() == id) {
+          view->show();
+          _stack.push(view);
+        }
+        else {
+          view->hide();
+        }
+      }
+    }
+  }
+}
+
+void LeleStackView::popView() {
+  if(!_stack.empty()) {
+    _views->hide();
+    _stack.pop();
+    LeleView *view = _stack.top();
+    if(view) {
+      view->show();
+    }
+  }
+}
+
 bool LeleStackView::eventCallback(LeleEvent &&e) {
   if(e.type() == "clicked") {
     LOG(DEBUG, LVSIM, "LeleStackView::eventCallback, type:%s, action:%s\n", e.type().c_str(), e.action().c_str());
-    for(auto &[name,id]: e.args()) {
-      LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, id:%s\n", name.c_str(), id.c_str());
-      if(name == "id") {
-        //osm todo: find view with name 'value.c_str()' and show it and hide other views, and update breadcrumbs
-        //osm todo: why are we getting this callback twice?
-        for(LeleView *view : _views->getChildren()) {
-          if(view->id() == id) {
-            view->show();
-            _stack.push(view);
-          }
-          else {
-            view->hide();
-          }
-        }
-      }
+    if(e.action() == "stackview.push"){
+      pushView(e.args());
+    }
+    else if(e.action() == "stackview.pop"){
+      popView();
     }
   }
   return LeleBase::eventCallback(std::move(e));

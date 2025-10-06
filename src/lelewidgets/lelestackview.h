@@ -21,7 +21,9 @@ class LeleStackView : public LeleBase {
   lv_obj_t *setStackViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setStackViewTitle(lv_obj_t *tabview_header, const std::string &title);
   lv_obj_t *setStackViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);
-  
+  void pushView(const std::map<std::string, std::string> &args);
+  void popView();
+
   lv_style_t _style_title;
   lv_style_t _style_subtitle;
   std::string _title;

@@ -32,5 +32,7 @@ class LeleViews : public LeleBase {
   int count() const;
   LeleView* getAt(int idx) const;
   std::vector<LeleView*> getChildren() const;
+  virtual void show() override;
+  virtual void hide() override;
   protected:
 };

@@ -30,8 +30,9 @@
             },
             "button":{
                 "type":"push",
-                "style":{"id":"button3","border":"none","width":"15%","height":"40"},
-                "text":"> Push button3"
+                "style":{"id":"close","border":"none","width":"15%","height":"40"},
+                "text":"X",
+                "event":{"type":"clicked","action":"stackview.pop","args":{}}
             }
         },
         "views":[

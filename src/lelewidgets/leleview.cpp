@@ -38,6 +38,20 @@ LeleView* LeleViews::getAt(int index) const {
     return nullptr;
 }
 
+void LeleViews::show(){
+  for(LeleView *view : getChildren()) {
+    if(view) {
+      view->show();
+    }
+  }
+}
+void LeleViews::hide(){
+  for(LeleView *view : getChildren()) {
+    if(view) {
+      view->hide();
+    }
+  }
+}
 ////////////////////////////////////////////////////////////////////////
 LeleViewHeader::LeleViewHeader(const std::string &json_str)
   : LeleBase(json_str) {
@@ -92,7 +106,6 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   return _lv_obj;
 }
-
 bool LeleView::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
     lv_event_code_t code = lv_event_get_code(lv_event);
