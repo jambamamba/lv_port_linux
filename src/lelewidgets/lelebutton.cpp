@@ -159,11 +159,11 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
     // }
 
     if(code == LV_EVENT_CLICKED) {
-        LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
+        // LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
         for(LeleEvent *event: _events) {
           if(event->type() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);
-            printf("@@@@ LeleButtons::LeleButton::eventCallback\n");
+            // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
             return LeleBase::eventCallback(LeleEvent(*event, lv_event));
           }
         }
@@ -171,5 +171,5 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
     else if(code == LV_EVENT_VALUE_CHANGED) {
         LOG(DEBUG, LVSIM, "%s: value changed. button type:%i\n", _class_name.c_str(), _type);
     }
-    return true;
+    return LeleBase::eventCallback(std::move(e));
 }

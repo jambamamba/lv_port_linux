@@ -208,6 +208,9 @@ void LeleBase::EventCallback(lv_event_t *e) {
 }
 
 bool LeleBase::eventCallback(LeleEvent &&e) {
+  // LOG(DEBUG, LVSIM, "LeleBase::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
+    // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
+
   if(_lele_parent) {
     return _lele_parent->eventCallback(std::move(e));
   }

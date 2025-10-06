@@ -102,13 +102,14 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
     lv_event_code_t code = lv_event_get_code(lv_event);
     LeleBase *base = static_cast<LeleBase*>(lv_event->user_data);
-    LOG(DEBUG, LVSIM, "%s: clicked\n", base->className().c_str());
+    // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->className().c_str());
     
     //uncheck all other buttons in the group, only one button should be checked at a time
     lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(lv_event);//get the object to which an event was sent. I.e. the object whose event handler is being called.
     lv_obj_t *act_cb = lv_event_get_target_obj(lv_event);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
     if(act_cb == container) {
-      return false;//Do nothing if the container was clicked
+      // LOG(DEBUG, LVSIM, "Do nothing, the container was clicked, not the button\n");
+      return LeleBase::eventCallback(std::move(e));//Do nothing if the container was clicked
     }
     for(int idx = 0; idx < lv_obj_get_child_count(container); ++idx) {
       lv_obj_t *old_cb = lv_obj_get_child(container, idx);
@@ -116,6 +117,8 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     }
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);
     _active_child_idx = lv_obj_get_index(act_cb);
-    return true;
+
+    // LOG(DEBUG, LVSIM, "_lele_parent %s\n", _lele_parent->className().c_str());
+    return LeleBase::eventCallback(std::move(e));
 }
 ////////////////////////////////////////////////////////////////////////

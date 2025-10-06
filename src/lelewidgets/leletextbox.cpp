@@ -47,5 +47,5 @@ bool LeleTextbox::eventCallback(LeleEvent &&e) {
         const char * text = lv_textarea_get_text(_lv_obj);
         LOG(DEBUG, LVSIM, "Textarea Clicked: %s\n", text);
     }
-    return true;
+    return LeleBase::eventCallback(std::move(e));
 }

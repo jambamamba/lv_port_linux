@@ -39,10 +39,10 @@ LeleStackView::LeleStackView(const std::string &json_str)
       else if(key == "active_tab_bottom_border") {
         std::tie(_active_tab_bottom_border_type,_active_tab_bottom_border_width,_active_tab_bottom_border_color) = 
           LeleStyle::parseBorder(value);
-        // LOG(DEBUG, LVSIM, "@@@ value:%s\n", value.c_str());
-        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_type:%i\n",_active_tab_bottom_border_type);
-        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_width:%i\n",_active_tab_bottom_border_width);
-        // LOG(DEBUG, LVSIM, "@@@@ _active_tab_bottom_border_color:0x%x\n",_active_tab_bottom_border_color);
+        // LOG(DEBUG, LVSIM, "value:%s\n", value.c_str());
+        // LOG(DEBUG, LVSIM, "_active_tab_bottom_border_type:%i\n",_active_tab_bottom_border_type);
+        // LOG(DEBUG, LVSIM, "_active_tab_bottom_border_width:%i\n",_active_tab_bottom_border_width);
+        // LOG(DEBUG, LVSIM, "_active_tab_bottom_border_color:0x%x\n",_active_tab_bottom_border_color);
       }
       else if(key == "tabbar_height") {
         _tabbar_height = std::stoi(value.c_str(), nullptr, 10);
@@ -142,6 +142,8 @@ lv_obj_t *LeleStackView::setStackViewSubTitle(lv_obj_t *tabview_header, const st
 }
 
 bool LeleStackView::eventCallback(LeleEvent &&e) {
-  printf("@@@@ LeleStackView::eventCallback\n");
-  return true;
+  if(e.type() == "clicked") {
+    LOG(DEBUG, LVSIM, "LeleStackView::eventCallback, type:%s, action:%s\n", e.type().c_str(), e.action().c_str());
+  }
+  return LeleBase::eventCallback(std::move(e));
 }
