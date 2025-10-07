@@ -21,6 +21,7 @@ class LeleStackView : public LeleBase {
   LeleViewHeader *getViewHeader(const LeleView *view) const;
   LeleViewHeader *getBreadcrumbBar() const;
   std::vector<LeleBase*> getBreadcrumbLabels() const;
+  void updateBreadcrumbLabels();
   lv_obj_t *setStackViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setStackViewTitle(lv_obj_t *tabview_header, const std::string &title);
   lv_obj_t *setStackViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);
@@ -39,5 +40,5 @@ class LeleStackView : public LeleBase {
   int _tabbar_height = 75;
   LeleViews *_views = nullptr;
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
-  std::stack<LeleView*> _stack;
+  std::vector<LeleView*> _stack;
 };
