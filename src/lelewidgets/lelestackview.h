@@ -8,6 +8,7 @@
 #include <optional>
 
 class LeleViewHeader;
+class LeleLabel;
 class LeleViews;
 class LeleView;
 class LeleStackView : public LeleBase {
@@ -17,7 +18,9 @@ class LeleStackView : public LeleBase {
   virtual bool eventCallback(LeleEvent &&e) override;
 
   protected:
-  LeleViewHeader *getButtonBar() const;
+  LeleViewHeader *getViewHeader(const LeleView *view) const;
+  LeleViewHeader *getBreadcrumbBar() const;
+  std::vector<LeleBase*> getBreadcrumbLabels() const;
   lv_obj_t *setStackViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setStackViewTitle(lv_obj_t *tabview_header, const std::string &title);
   lv_obj_t *setStackViewSubTitle(lv_obj_t *tabview_header, const std::string &subtitle);

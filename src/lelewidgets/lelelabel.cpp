@@ -24,3 +24,12 @@ lv_obj_t *LeleLabel::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   lv_label_set_text(_lv_obj, _text.c_str());
   return _lv_obj;
 }
+
+void LeleLabel::setText(const std::string &text) {
+  _text = text;
+  lv_label_set_text(_lv_obj, _text.c_str());
+}
+
+std::string LeleLabel::getText() const { 
+  return _text; 
+}

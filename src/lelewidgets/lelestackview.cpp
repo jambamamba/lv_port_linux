@@ -56,8 +56,26 @@ static void event_cb1(lv_event_t * e) {
   LOG(DEBUG, LVSIM, "@@@@@@@ %s:%s\n", __FUNCTION__, (char*)e->user_data);
 }
 
-LeleViewHeader *LeleStackView::getButtonBar() const {
-  return dynamic_cast<LeleViewHeader*>(getLeleObj("view_header"));
+LeleViewHeader *LeleStackView::getViewHeader(const LeleView *view) const {
+  std::vector<LeleBase *> objs = view->getLeleObj("view_header");
+  if(objs.size() > 0) {
+    return dynamic_cast<LeleViewHeader*>(objs.front());
+  }
+  return nullptr;
+}
+
+LeleViewHeader *LeleStackView::getBreadcrumbBar() const {
+  std::vector<LeleBase *> objs = getLeleObj("view_header");
+  if(objs.size() > 0) {
+    return dynamic_cast<LeleViewHeader*>(objs.front());
+  }
+  return nullptr;
+}
+
+std::vector<LeleBase*> LeleStackView::getBreadcrumbLabels() const {
+  LeleViewHeader *breadcrumb_bar = LeleStackView::getBreadcrumbBar();
+  std::vector<LeleBase *> objs = breadcrumb_bar->getLeleObj("label");
+  return objs;
 }
 
 lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
@@ -76,25 +94,18 @@ lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   }
   lv_obj_set_size(_lv_obj, lv_pct(100), lv_pct(100));
 
-  LeleViewHeader *button_bar = getButtonBar();
-  lv_obj_add_event_cb(_lv_obj, event_cb1, LV_EVENT_CLICKED, (void*)className().c_str());
-  if(button_bar) {
-    lv_obj_add_event_cb(button_bar->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->className().c_str());
-    if(button_bar->getLeleObj("button")){
-      lv_obj_add_event_cb(button_bar->getLeleObj("button")->getLvObj(), event_cb1, LV_EVENT_CLICKED, (void*)button_bar->getLeleObj("button")->className().c_str());
-    }
-  }
-
   if(_views) {
     _views->createLvObj(this);
     _views->setLvObj(_lv_obj);
     for(int idx = 0; idx < _views->count(); ++idx) {
       LeleView *view = _views->getAt(idx);
       view->createLvObj(_views);
-      if(idx > 0) {
+      if(idx == 0) {
+        _stack.push(view);
+      }
+      else {
         view->hide();
       }
-      // view->getTabContent()->createLvObj(view);//osm: create child view which will be the content
     }
   }
 
@@ -145,12 +156,17 @@ void LeleStackView::pushView(const std::map<std::string, std::string> &args) {
   for(auto &[name,id]: args) {
     LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, id:%s\n", name.c_str(), id.c_str());
     if(name == "id") {
-      //osm todo:  update breadcrumbs
-      //osm todo: why are we getting this callback twice?
+      //osm todo:  update breadcrumbs, X button should be right aligned
       for(LeleView *view : _views->getChildren()) {
         if(view->id() == id) {
           view->show();
           _stack.push(view);
+
+          //osm todo: fill up rest of crumbs, do not use std::stack so we can interate
+          std::vector<LeleBase*> labels = getBreadcrumbLabels();
+          LeleLabel *label = dynamic_cast<LeleLabel *>(labels.back());
+          LeleViewHeader *view_header = getViewHeader(view);
+          label->setText(view_header->name());
         }
         else {
           view->hide();
@@ -161,14 +177,12 @@ void LeleStackView::pushView(const std::map<std::string, std::string> &args) {
 }
 
 void LeleStackView::popView() {
-  if(!_stack.empty()) {
-    _views->hide();
-    _stack.pop();
-    LeleView *view = _stack.top();
-    if(view) {
-      view->show();
-    }
+  if(_stack.size() < 2) {
+    return;
   }
+  _views->hide();
+  _stack.pop();
+  _stack.top()->show();
 }
 
 bool LeleStackView::eventCallback(LeleEvent &&e) {

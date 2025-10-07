@@ -187,16 +187,17 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 
-LeleBase *LeleBase::getLeleObj(const std::string &obj_name) const {
+std::vector<LeleBase *> LeleBase::getLeleObj(const std::string &obj_name) const {
+  std::vector<LeleBase *> res;
   for(const auto &pair: _tokens) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
       if(pair.first == obj_name) {
-        return value.get();
+        res.push_back(value.get());
       }
     }
   }
-  return nullptr;
+  return res;
 }
 
 void LeleBase::EventCallback(lv_event_t *e) {

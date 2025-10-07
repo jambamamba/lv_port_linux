@@ -32,7 +32,7 @@ class LeleBase {
   const std::string &id() const {
     return _id;
   }
-  LeleBase *getLeleObj(const std::string &obj_name) const;
+  std::vector<LeleBase *> getLeleObj(const std::string &obj_name) const;
   bool enabled() const { return _enabled; }
   lv_obj_t *getLvObj() const {
     return _lv_obj;

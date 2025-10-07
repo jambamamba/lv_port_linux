@@ -55,10 +55,18 @@ lv_obj_t *LeleTabView::Tab::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj)
   return _lv_obj;
 }
 LeleTabView::TabHeader *LeleTabView::Tab::getTabHeader() const {
-  return dynamic_cast<LeleTabView::TabHeader*>(getLeleObj("tab_header"));
+  std::vector<LeleBase *> objs = getLeleObj("tab_header");
+  if(objs.size() > 0) {
+    return dynamic_cast<LeleTabView::TabHeader*>(objs.front());
+  }
+  return nullptr;
 }
 LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
-  return dynamic_cast<LeleTabView::TabContent*>(getLeleObj("tab_content"));
+  std::vector<LeleBase *> objs = getLeleObj("tab_content");
+  if(objs.size() > 0) {
+    return dynamic_cast<LeleTabView::TabContent*>(objs.front());
+  }
+  return nullptr;
 }
 
 
