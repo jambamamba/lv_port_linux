@@ -30,7 +30,7 @@
             },
             "label":{
                 "id":"view_header/spacer",
-                "style":{"id":"view_header/spacer","border":"none","autofit":{"top":"parent","right":"parent","bottom":"parent","left":"parent"}}
+                "style":{"id":"view_header/spacer","border":"none","grow":"1"}
             },
             "button":{
                 "type":"push",

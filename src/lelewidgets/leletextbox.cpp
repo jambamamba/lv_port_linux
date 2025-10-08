@@ -14,10 +14,11 @@ LeleTextbox::LeleTextbox(const std::string &json_str)
         _text = value;
       }
       else if(key == "max_length") {
-        _max_length = value.empty() ? 15 : std::atoi(value.c_str());
+        constexpr int TEXTBOX_DEFAULT_MAX_LEN = 32;
+        _max_length = value.empty() ? TEXTBOX_DEFAULT_MAX_LEN : std::stoi(value);
       }
       else if(key == "multiline") {
-        _multiline = value.empty() ? true : (std::atoi(value.c_str()) != 0);
+        _multiline = (value.empty() || value == "true");
       }
     }
   }

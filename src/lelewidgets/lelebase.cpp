@@ -81,10 +81,14 @@ void LeleBase::setStyle() {
   value = _lele_styles.getValue("width");
   if(value) {
     lv_style_set_width(&_style, std::get<int>(value.value()));
+    // lv_obj_set_width(obj, lv_pct(100));//to set an object's size as a percentage of its parent's size
+    // LV_SIZE_CONTENT //to make an object automatically size itself to fit its children
   }
   value = _lele_styles.getValue("height");
   if(value) {
     lv_style_set_height(&_style, std::get<int>(value.value()));
+    // lv_obj_set_height(obj, lv_pct(100));//to set an object's size as a percentage of its parent's size
+    // LV_SIZE_CONTENT //to make an object automatically size itself to fit its children
   }
   value = _lele_styles.getValue("x");
   if(value) {
@@ -129,20 +133,6 @@ void LeleBase::setStyle() {
     lv_style_set_margin_left(&_style, std::get<int>(value.value()));
   }
 
-  value = _lele_styles.getValue("autofit/top");
-  if(value) {
-  }
-  value = _lele_styles.getValue("autofit/right");
-  if(value) {
-    lv_cont_set_fit4(_lv_obj, LV_FIT_TIGHT);
-  }
-  value = _lele_styles.getValue("autofit/bottom");
-  if(value) {
-  }
-  value = _lele_styles.getValue("autofit/left");
-  if(value) {
-  }
-
   value = _lele_styles.getValue("border_type");
   if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::None) {
     lv_style_set_border_width(&_style, 0);
@@ -180,7 +170,12 @@ void LeleBase::setStyle() {
 
   value = _lele_styles.getValue("flow");
   if(value) {
+    lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(_lv_obj, std::get<lv_flex_flow_t>(value.value()));
+  }
+  value = _lele_styles.getValue("grow");
+  if(value) {
+    lv_obj_set_flex_grow(_lv_obj, std::get<int>(value.value()));
   }
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
