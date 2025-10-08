@@ -66,10 +66,13 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         _style[key] = toInt(value, std::max(_parent_height, _parent_width));
       }
       else if(key == "padding") {
-        std::tie(_style["padding_top"], _style["padding_right"], _style["padding_bottom"], _style["padding_left"]) = parsePaddingOrMargin(value);
+        std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
       }
       else if(key == "margin") {
-        std::tie(_style["margin_top"], _style["margin_right"], _style["margin_bottom"], _style["margin_left"]) = parsePaddingOrMargin(value);
+        std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
+      }
+      else if(key == "autofit") {
+        std::tie(_style["autofit/top"], _style["autofit/right"], _style["autofit/bottom"], _style["autofit/left"]) = parseTopRightBottomLeft(value);
       }
       else if(key == "border") {
         // auto [border_type, border_width, border_color] = LeleStyle::parseBorder(value);
@@ -182,6 +185,42 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
   }
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
+
+std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopRightBottomLeft(const std::string &value) {
+  std::string top("none");
+  std::string right("none");
+  std::string bottom("none");
+  std::string left("none");
+  for (const auto &[key, val]: LeleWidgetFactory::fromJson(value)) {
+    if (std::holds_alternative<std::string>(val)) {
+      const std::string &value = std::get<std::string>(val);
+      if(value.empty() || value == "none" || value == "tight" || value == "parent" || value == "max") {
+        if(key == "top") {
+          // _style[key+"/top"] = val;
+          // top = std::atoi(value.c_str());
+          top = value;
+        }
+        else if(key == "right") {
+          // _style[key+"/right"] = val;
+          // right = std::atoi(value.c_str());
+          right = value;
+        }
+        else if(key == "bottom") {
+          // _style[key+"/bottom"] = val;
+          // bottom = std::atoi(value.c_str());
+          bottom = value;
+        }
+        else if(key == "left") {
+          // _style[key+"/left"] = val;
+          // left = std::atoi(value.c_str());
+          left = value;
+        }
+      }
+    }
+  }
+  return std::tuple<std::string,std::string,std::string,std::string>{top,right,bottom,left};
+}
+
 std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &padding_str) {
 
   int top = 0;

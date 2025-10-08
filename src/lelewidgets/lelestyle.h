@@ -30,6 +30,7 @@ class LeleStyle {
   static int parseColorCode(const std::string &color_str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
+  static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
   std::string className() const;
   std::optional<StyleValue> getValue(const std::string &key, std::string class_name = "") const;
   protected:
@@ -42,14 +43,18 @@ class LeleStyle {
     {"width", std::nullopt},
     {"height", std::nullopt},
     {"corner_radius", std::nullopt},
-    {"padding_top", std::nullopt},
-    {"padding_right", std::nullopt},
-    {"padding_bottom", std::nullopt},
-    {"padding_left", std::nullopt},
-    {"margin_top", std::nullopt},
-    {"margin_right", std::nullopt},
-    {"margin_bottom", std::nullopt},
-    {"margin_left", std::nullopt},
+    {"padding/top", std::nullopt},
+    {"padding/right", std::nullopt},
+    {"padding/bottom", std::nullopt},
+    {"padding/left", std::nullopt},
+    {"margin/top", std::nullopt},
+    {"margin/right", std::nullopt},
+    {"margin/bottom", std::nullopt},
+    {"margin/left", std::nullopt},
+    {"autofit/top", std::nullopt},
+    {"autofit/right", std::nullopt},
+    {"autofit/bottom", std::nullopt},
+    {"autofit/left", std::nullopt},
     {"border_type", std::nullopt},
     {"border_width", std::nullopt},
     {"border_color", std::nullopt},

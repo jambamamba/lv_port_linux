@@ -28,6 +28,10 @@
                 "text":"",
                 "style":{"id":"view_header/label2","border":"none","width":"15%","height":"40"}
             },
+            "label":{
+                "id":"view_header/spacer",
+                "style":{"id":"view_header/spacer","border":"none","autofit":{"top":"parent","right":"parent","bottom":"parent","left":"parent"}}
+            },
             "button":{
                 "type":"push",
                 "style":{"id":"close","border":"none","width":"15%","height":"10%"},

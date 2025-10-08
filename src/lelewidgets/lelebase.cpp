@@ -1,5 +1,6 @@
 #include <iostream>
 #include <lvgl/lvgl_private.h>
+#include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
 #include "lelebase.h"
 
@@ -94,38 +95,52 @@ void LeleBase::setStyle() {
     lv_style_set_y(&_style, lv_pct(std::get<int>(value.value())));
   }
 
-  value = _lele_styles.getValue("padding_top");
+  value = _lele_styles.getValue("padding/top");
   if(value) {
     lv_style_set_pad_top(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("padding_right");
+  value = _lele_styles.getValue("padding/right");
   if(value) {
     lv_style_set_pad_right(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("padding_bottom");
+  value = _lele_styles.getValue("padding/bottom");
   if(value) {
     lv_style_set_pad_bottom(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("padding_left");
+  value = _lele_styles.getValue("padding/left");
   if(value) {
     lv_style_set_pad_left(&_style, std::get<int>(value.value()));
   }
 
-  value = _lele_styles.getValue("margin_top");
+  value = _lele_styles.getValue("margin/top");
   if(value) {
     lv_style_set_margin_top(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("margin_right");
+  value = _lele_styles.getValue("margin/right");
   if(value) {
     lv_style_set_margin_right(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("margin_bottom");
+  value = _lele_styles.getValue("margin/bottom");
   if(value) {
     lv_style_set_margin_bottom(&_style, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("margin_left");
+  value = _lele_styles.getValue("margin/left");
   if(value) {
     lv_style_set_margin_left(&_style, std::get<int>(value.value()));
+  }
+
+  value = _lele_styles.getValue("autofit/top");
+  if(value) {
+  }
+  value = _lele_styles.getValue("autofit/right");
+  if(value) {
+    lv_cont_set_fit4(_lv_obj, LV_FIT_TIGHT);
+  }
+  value = _lele_styles.getValue("autofit/bottom");
+  if(value) {
+  }
+  value = _lele_styles.getValue("autofit/left");
+  if(value) {
   }
 
   value = _lele_styles.getValue("border_type");
