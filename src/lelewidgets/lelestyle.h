@@ -58,7 +58,9 @@ class LeleStyle {
     {"grow", std::nullopt},
     {"fgcolor", std::nullopt},
     {"bgcolor", std::nullopt},
-    {"checked_color", std::nullopt}
+    {"checked_color", std::nullopt},
+    {"align", std::nullopt},
+    {"text_align", std::nullopt}
   };
   int _parent_width = 0;
   int _parent_height = 0;

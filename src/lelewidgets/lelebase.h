@@ -49,6 +49,8 @@ class LeleBase {
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle();
+  virtual void setAlignStyle(lv_obj_t *lv_obj);
+  virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();
   virtual void hide();
   static void EventCallback(lv_event_t *e);

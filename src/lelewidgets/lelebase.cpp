@@ -177,11 +177,43 @@ void LeleBase::setStyle() {
   if(value) {
     lv_obj_set_flex_grow(_lv_obj, std::get<int>(value.value()));
   }
+
+  value = _lele_styles.getValue("align");
+  if(value) {
+    lv_obj_align(_lv_obj, 
+      static_cast<lv_align_t>(std::get<int>(value.value())), 0, 0);
+  }
+  value = _lele_styles.getValue("text_align");
+  if(value) {
+    lv_obj_set_style_text_align(_lv_obj, 
+      static_cast<lv_text_align_t>(std::get<int>(value.value())), 0);
+  }
+
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
 
   // lv_style_t * btn_style = lv_theme_get_style(my_theme, LV_PART_MAIN); // Get the button style from your custom theme
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
+}
+
+void LeleBase::setAlignStyle(lv_obj_t *lv_obj) {
+  auto value = _lele_styles.getValue("align");
+  if(value) {
+    lv_obj_align(lv_obj, 
+      static_cast<lv_align_t>(
+        std::get<int>(value.value())),
+      0, 0);
+  }
+}
+
+void LeleBase::setTextAlignStyle(lv_obj_t *lv_obj) {
+  auto value = _lele_styles.getValue("text_align");
+  if(value) {
+    lv_obj_set_style_text_align(lv_obj, 
+      static_cast<lv_text_align_t>(
+        std::get<int>(value.value())),
+      0);
+  }
 }
 
 lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {

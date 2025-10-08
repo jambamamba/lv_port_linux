@@ -13,4 +13,5 @@ class LeleTextbox : public LeleBase  {
   std::string _text;
   int _max_length = 15;
   bool _multiline = false;
+  lv_text_align_t _text_align = LV_TEXT_ALIGN_AUTO;
 };

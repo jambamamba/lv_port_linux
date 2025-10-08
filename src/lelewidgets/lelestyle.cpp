@@ -119,6 +119,52 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       else if(key == "checked_color") {
         _style[key] = LeleStyle::parseColorCode(value);
       }
+      else if(key == "align") {
+        if(strncmp(value.c_str(), "center", strlen("center"))==0){
+          _style[key] = LV_ALIGN_CENTER;
+        }
+        else if(strncmp(value.c_str(), "top_left", strlen("top_left"))==0){
+          _style[key] = LV_ALIGN_TOP_LEFT;
+        }
+        else if(strncmp(value.c_str(), "top_mid", strlen("top_mid"))==0){
+          _style[key] = LV_ALIGN_TOP_MID;
+        }
+        else if(strncmp(value.c_str(), "top_right", strlen("top_right"))==0){
+          _style[key] = LV_ALIGN_TOP_RIGHT;
+        }
+        else if(strncmp(value.c_str(), "bottom_left", strlen("bottom_left"))==0){
+          _style[key] = LV_ALIGN_BOTTOM_LEFT;
+        }
+        else if(strncmp(value.c_str(), "bottom_mid", strlen("bottom_mid"))==0){
+          _style[key] = LV_ALIGN_BOTTOM_MID;
+        }
+        else if(strncmp(value.c_str(), "bottom_right", strlen("bottom_right"))==0){
+          _style[key] = LV_ALIGN_BOTTOM_RIGHT;
+        }
+        else if(strncmp(value.c_str(), "left_mid", strlen("left_mid"))==0){
+          _style[key] = LV_ALIGN_LEFT_MID;
+        }
+        else if(strncmp(value.c_str(), "right_mid", strlen("right_mid"))==0){
+          _style[key] = LV_ALIGN_RIGHT_MID;
+        }
+        else {
+          _style[key] = LV_ALIGN_DEFAULT;
+        }
+      }
+      else if(key == "text_align") {
+        if(strncmp(value.c_str(), "center", 6)==0){
+          _style[key] = LV_TEXT_ALIGN_CENTER;
+        }
+        else if(strncmp(value.c_str(), "right", 5)==0){
+          _style[key] = LV_TEXT_ALIGN_RIGHT;
+        }
+        else if(strncmp(value.c_str(), "left", 4)==0){
+          _style[key] = LV_TEXT_ALIGN_LEFT;
+        }
+        else {
+          _style[key] = LV_TEXT_ALIGN_AUTO;
+        }
+      }
     }
   }
 }
