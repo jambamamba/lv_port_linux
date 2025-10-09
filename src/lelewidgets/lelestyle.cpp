@@ -78,6 +78,17 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         // _style["border_color"] = border_color;
         std::tie(_style["border_type"], _style["border_width"], _style["border_color"]) = LeleStyle::parseBorder(value); 
       }
+      else if(key == "layout") {
+        if(strncmp(value.c_str(), "flex", 4)==0) {
+          _style[key] = LV_LAYOUT_FLEX;
+        }
+        else if(strncmp(value.c_str(), "grid", 4)==0) {
+          _style[key] = LV_LAYOUT_GRID;
+        }
+        else {//if(strncmp(value.c_str(), "none", 4)==0) {
+          _style[key] = LV_LAYOUT_NONE;
+        }
+      }
       else if(key == "flow") {
         if(strncmp(value.c_str(), "row", 6)==0) {
           _style[key] = LV_FLEX_FLOW_ROW;

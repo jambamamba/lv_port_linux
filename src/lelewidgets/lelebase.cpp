@@ -157,8 +157,6 @@ void LeleBase::setStyle() {
     lv_obj_set_y(_lv_obj, std::get<int>(value.value()));
   }
 
-  lv_obj_add_style(_lv_obj, &_style, LV_PART_MAIN);
-
   value =_lele_styles.getValue("fgcolor");
   if(value) {
     lv_obj_set_style_text_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
@@ -168,17 +166,19 @@ void LeleBase::setStyle() {
     lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
 
-  value = _lele_styles.getValue("flow");//osm todo add LV_LAYOUT_GRID option also
-  if(!value) {
-    lv_obj_set_layout(_lv_obj, LV_LAYOUT_NONE);
+  value = _lele_styles.getValue("layout");
+  if(value) {
+    lv_obj_set_style_layout(_lv_obj, 
+      std::get<lv_layout_t>(value.value()), LV_STYLE_STATE_CMP_SAME); //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
   }
-  else {
-    lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);
-    lv_obj_set_flex_flow(_lv_obj, std::get<lv_flex_flow_t>(value.value()));
+  value = _lele_styles.getValue("flow");
+  if(value) {
+    lv_obj_set_style_flex_flow(_lv_obj, 
+      std::get<lv_flex_flow_t>(value.value()), LV_STYLE_STATE_CMP_SAME);
 
     value = _lele_styles.getValue("grow");
     if(value) {
-      lv_obj_set_flex_grow(_lv_obj, std::get<int>(value.value()));
+      lv_obj_set_style_flex_grow(_lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
     }
   }
 
@@ -198,6 +198,7 @@ void LeleBase::setStyle() {
 
   // lv_style_t * btn_style = lv_theme_get_style(my_theme, LV_PART_MAIN); // Get the button style from your custom theme
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
+  lv_obj_add_style(_lv_obj, &_style, LV_PART_MAIN);
 }
 
 void LeleBase::setObjAlignStyle(lv_obj_t *lv_obj) {

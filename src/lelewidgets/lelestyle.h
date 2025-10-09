@@ -18,6 +18,7 @@ class LeleStyle {
   using StyleValue = std::variant<
     int,
     std::string,
+    lv_layout_t,
     lv_flex_flow_t,
     BorderTypeE
   >;
@@ -54,6 +55,7 @@ class LeleStyle {
     {"border_type", std::nullopt},
     {"border_width", std::nullopt},
     {"border_color", std::nullopt},
+    {"layout", std::nullopt},
     {"flow", std::nullopt},
     {"grow", std::nullopt},
     {"fgcolor", std::nullopt},
