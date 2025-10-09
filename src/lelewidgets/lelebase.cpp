@@ -45,7 +45,7 @@ static void new_theme_apply_cb(lv_theme_t * th, lv_obj_t * obj)
     LV_UNUSED(th);
 
     if(lv_obj_check_type(obj, &lv_button_class)) {
-        lv_obj_add_style(obj, &style_btn, 0);
+        lv_obj_add_style(obj, &style_btn, LV_PART_MAIN);
     }
 }
 
@@ -157,7 +157,7 @@ void LeleBase::setStyle() {
     lv_obj_set_y(_lv_obj, std::get<int>(value.value()));
   }
 
-  lv_obj_add_style(_lv_obj, &_style, 0);
+  lv_obj_add_style(_lv_obj, &_style, LV_PART_MAIN);
 
   value =_lele_styles.getValue("fgcolor");
   if(value) {
@@ -168,14 +168,18 @@ void LeleBase::setStyle() {
     lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
 
-  value = _lele_styles.getValue("flow");
-  if(value) {
+  value = _lele_styles.getValue("flow");//osm todo add LV_LAYOUT_GRID option also
+  if(!value) {
+    lv_obj_set_layout(_lv_obj, LV_LAYOUT_NONE);
+  }
+  else {
     lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);
     lv_obj_set_flex_flow(_lv_obj, std::get<lv_flex_flow_t>(value.value()));
-  }
-  value = _lele_styles.getValue("grow");
-  if(value) {
-    lv_obj_set_flex_grow(_lv_obj, std::get<int>(value.value()));
+
+    value = _lele_styles.getValue("grow");
+    if(value) {
+      lv_obj_set_flex_grow(_lv_obj, std::get<int>(value.value()));
+    }
   }
 
   value = _lele_styles.getValue("align");
@@ -196,23 +200,25 @@ void LeleBase::setStyle() {
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
 }
 
-void LeleBase::setAlignStyle(lv_obj_t *lv_obj) {
+void LeleBase::setObjAlignStyle(lv_obj_t *lv_obj) {
   auto value = _lele_styles.getValue("align");
   if(value) {
     lv_obj_align(lv_obj, 
       static_cast<lv_align_t>(
         std::get<int>(value.value())),
       0, 0);
+    //make sure to do lv_obj_set_layout(parent, LV_LAYOUT_NONE); otherwise this function might not work
   }
 }
 
 void LeleBase::setTextAlignStyle(lv_obj_t *lv_obj) {
+
   auto value = _lele_styles.getValue("text_align");
   if(value) {
     lv_obj_set_style_text_align(lv_obj, 
       static_cast<lv_text_align_t>(
         std::get<int>(value.value())),
-      0);
+      LV_PART_MAIN);
   }
 }
 

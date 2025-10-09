@@ -246,7 +246,7 @@ lv_obj_t *LeleTabView::setTabViewTitle(lv_obj_t *tabview_header, const std::stri
     lv_style_init(&_style_title);
     const lv_font_t *font_large = &lv_font_montserrat_24;
     lv_style_set_text_font(&_style_title, font_large);
-    lv_obj_add_style(label, &_style_title, 0);
+    lv_obj_add_style(label, &_style_title, LV_PART_MAIN);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_label_set_text_fmt(label, "%s", title.c_str());//"LVGL v%d.%d.%d", lv_version_major(), lv_version_minor(), lv_version_patch());
     return label;
@@ -256,7 +256,7 @@ lv_obj_t *LeleTabView::setTabViewSubTitle(lv_obj_t *tabview_header, const std::s
     lv_obj_t *label = lv_label_create(tabview_header);
     lv_style_init(&_style_subtitle);
     lv_style_set_text_opa(&_style_subtitle, LV_OPA_50);
-    lv_obj_add_style(label, &_style_subtitle, 0);
+    lv_obj_add_style(label, &_style_subtitle, LV_PART_MAIN);
     lv_obj_add_flag(label, LV_OBJ_FLAG_IGNORE_LAYOUT);
     lv_label_set_text(label, subtitle.c_str());
     return label;

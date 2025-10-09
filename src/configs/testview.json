@@ -34,7 +34,7 @@
             },
             "button":{
                 "type":"push",
-                "style":{"id":"close","border":"none","width":"15%","height":"10%","align":"top_right"},
+                "style":{"id":"close","flow":"row","border":"solid-1px-#ff0000","padding":"none","margin":"none","width":"15%","height":"10%","align":"top_right","text_align":"right"},
                 "text":"X",
                 "event":{"type":"clicked","action":"stackview.pop","args":{}}
             }

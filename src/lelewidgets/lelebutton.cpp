@@ -120,9 +120,8 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
         lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *label = lv_label_create(_lv_obj);
       lv_label_set_text(label, _text.c_str());
-      //osm todo: right align text is not working
-      // setTextAlignStyle(label);
-      // setAlignStyle(label);
+      setObjAlignStyle(label);
+      lv_obj_set_layout(_lv_obj, LV_LAYOUT_NONE);
     break;
   }
 
