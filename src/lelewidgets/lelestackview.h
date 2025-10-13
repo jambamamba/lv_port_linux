@@ -39,6 +39,6 @@ class LeleStackView : public LeleBase {
   LeleStyle::BorderTypeE _active_tab_bottom_border_type = LeleStyle::BorderTypeE::None;
   int _tabbar_height = 75;
   LeleViews *_views = nullptr;
-  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
+  std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
   std::vector<LeleView*> _stack;
 };

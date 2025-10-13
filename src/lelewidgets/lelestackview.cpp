@@ -170,9 +170,9 @@ lv_obj_t *LeleStackView::setStackViewImg(lv_obj_t *tabview_header, const std::st
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // lv_image_set_src(logo, _lv_img_dsc_map.at(img));
-    _logo = generateImgDsc((std::string("/repos/lv_port_linux/res/") + img).c_str());//osm
-    if(_logo) {
-      lv_image_set_src(logo, _logo.value().get());
+    _images[img] = generateImgDsc((applicationPath().parent_path().string() + "/res/" + img).c_str());//osm
+    if(_images[img]) {
+      lv_image_set_src(logo, _images[img].value().get());
     }
     lv_obj_align(logo, LV_ALIGN_LEFT_MID, -LV_HOR_RES / 2 + 25, 0);
     return logo;

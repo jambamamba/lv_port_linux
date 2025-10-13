@@ -141,6 +141,11 @@ static void configureSimulator(int argc, char **argv)
  * @param argc the count of arguments in argv
  * @param argv The arguments
  */
+static std::string _app_path;
+std::filesystem::path applicationPath() {
+    return std::filesystem::path(_app_path);
+}
+
 int main(int argc, char **argv)
 {
     LOG_INIT("/tmp");
@@ -173,8 +178,12 @@ int main(int argc, char **argv)
     // addLoaderArc();
     // addProgressBar();
     // addChart();
-    LOG(DEBUG, LVSIM, "create tab view\n");
-    auto tokens = LeleWidgetFactory::fromConfig();
+    // LOG(DEBUG, LVSIM, "create tab view\n");
+    _app_path = argv[0];
+    std::string config_json = (argc > 1 && *argv[1] && std::filesystem::exists(argv[1])) ? 
+            argv[1] : std::filesystem::current_path().string() + "/config.json";
+    // LOG(DEBUG, LVSIM, "main %s\n", argv[0]);
+    auto tokens = LeleWidgetFactory::fromConfig(config_json);
     
     /* Enter the run loop of the selected backend */
     driver_backends_run_loop();

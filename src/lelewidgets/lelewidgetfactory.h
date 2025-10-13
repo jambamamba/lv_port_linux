@@ -13,6 +13,8 @@
 #include <variant>
 #include <vector>
 
+extern std::filesystem::path applicationPath();
+
 class LeleEvent;
 class LeleStyle;
 class LeleBase;

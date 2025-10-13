@@ -109,6 +109,7 @@ function(buildLvglSim)
     # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
     file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
+    file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
     add_dependencies(lvglsim lv_image_convert)

@@ -18,7 +18,7 @@ class LeleTabView : public LeleBase {
     protected:
     std::string _name;
     std::string _img;
-    std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
+    std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
   };
   class TabContent : public LeleBase {
     public:
@@ -71,5 +71,5 @@ class LeleTabView : public LeleBase {
   };
   TabBarLocationE _tabbar_location = TabBarLocationE::Top;
   Tabs *_tabs = nullptr;
-  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _logo;
+  std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
 };
