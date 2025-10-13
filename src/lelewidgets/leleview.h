@@ -13,6 +13,7 @@ class LeleView : public LeleBase {
   protected:
   int _active_child_idx = -1;
   bool _group = false;
+  std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
 };
 class LeleViewHeader : public LeleBase {
   public:

@@ -100,6 +100,28 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
       if(key == "group") {
         _group = (value == "true");
       }
+      else if(key == "img") {
+        // osm todo: value should be these, see (/repos/lv_port_linux/lvgl/src/widgets/image/lv_image.h)
+        // {
+        //   "src":"/path/to/image/file", 
+        //   "name":"image_name",
+        //   "x":"0",
+        //   "y":"0",
+        //   "rotation/angle":"0",
+        //   "rotation/pivot/x":"0",
+        //   "rotation/pivot/y":"0",
+        //   "scale/percent":"100",
+        //   "scale/percent/x":"100",
+        //   "scale/percent/y":"100",
+        //   "blendmode":"?",
+        //   "anti-aliasing":"true",
+        //   "align":"",//LV_IMAGE_ALIGN_STRETCH | LV_IMAGE_ALIGN_FIT
+        // }
+        _images[value] = generateImgDsc((applicationPath().parent_path().string() + "/res/" + value).c_str());
+        if(_images[value]) {
+          lv_image_set_src(_lv_obj, _images[value].value().get());
+        }
+      }
     }
   }
   lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
