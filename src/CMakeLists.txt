@@ -63,6 +63,7 @@ function(buildLvglSim)
         lelewidgets/lelebase.cpp
         lelewidgets/lelebutton.cpp
         lelewidgets/leleevent.cpp
+        lelewidgets/leleimage.cpp
         lelewidgets/lelelabel.cpp
         lelewidgets/lelenullwidget.cpp
         lelewidgets/lelestackview.cpp
