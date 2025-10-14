@@ -69,7 +69,8 @@
                         "style":{"id":"button0","class_name":"stackview/view/button","border":"none","width":"15%","height":"40"},
                         "text":"> Push button0",
                         "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
-                    }
+                    },
+                    "img":"logo.jpg"
                 }
             },
             {

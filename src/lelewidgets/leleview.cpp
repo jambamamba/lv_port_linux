@@ -1,5 +1,7 @@
 #include "leleview.h"
 
+#include <lv_image_converter/mainlib.h>
+
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 ////////////////////////////////////////////////////////////////////////
@@ -117,9 +119,12 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
         //   "anti-aliasing":"true",
         //   "align":"",//LV_IMAGE_ALIGN_STRETCH | LV_IMAGE_ALIGN_FIT
         // }
-        _images[value] = generateImgDsc((applicationPath().parent_path().string() + "/res/" + value).c_str());
+        std::string img_path(applicationPath().parent_path().string() + "/res/" + value);
+        // LOG(DEBUG, LVSIM, "@@@ img_path %s\n", img_path.c_str());
+        _images[value] = generateImgDsc(img_path.c_str());
         if(_images[value]) {
-          lv_image_set_src(_lv_obj, _images[value].value().get());
+          lv_obj_t *logo = lv_image_create(_lv_obj);
+          lv_image_set_src(logo, _images[value].value().get());
         }
       }
     }
