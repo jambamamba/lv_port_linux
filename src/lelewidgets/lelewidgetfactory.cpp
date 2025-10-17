@@ -138,6 +138,22 @@ std::vector<std::pair<std::string, Token>> fromJson(
     return res;
 }
 
+void fromJson(const std::string &json_str, std::function<void (const std::string &key, int value)> callback) {
+  const cJSON *item = cJSON_Parse(json_str.c_str());
+  if(cJSON_IsNumber(item)) {
+    callback("", cJSON_GetNumberValue(item));
+    return;
+  }
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+    if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(callback) {
+        callback(key, std::stoi(value));
+      }
+    }
+  }
+}
+
 std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_json) {
     static LeleBase _root_widget;
     _root_widget.setLvObj(lv_screen_active());

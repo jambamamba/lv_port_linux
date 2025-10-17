@@ -2,6 +2,7 @@
 
 #include <debug_logger/debug_logger.h>
 #include <filesystem>
+#include <functional>
 #include <json_utils/json_utils.h>
 #include <lvgl/lvgl_private.h>
 #include <memory>
@@ -28,6 +29,7 @@ namespace LeleWidgetFactory {
   >;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
+  void fromJson(const std::string &json_str, std::function<void (const std::string &key, int value)> callback);
   std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str = "");
 
 }//LeleWidgetFactory
