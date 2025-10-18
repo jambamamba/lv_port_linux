@@ -29,7 +29,7 @@ namespace LeleWidgetFactory {
   >;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
-  void fromJson(const std::string &json_str, std::function<void (const std::string &key, int value)> callback);
+  void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback);
   std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str = "");
 
 }//LeleWidgetFactory

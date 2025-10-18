@@ -156,6 +156,14 @@ void LeleBase::setStyle() {
   if(value) {
     lv_obj_set_y(_lv_obj, std::get<int>(value.value()));
   }
+  value = _lele_styles.getValue("width");
+  if(value) {
+    lv_obj_set_width(_lv_obj, std::get<int>(value.value()));
+  }
+  value = _lele_styles.getValue("height");
+  if(value) {
+    lv_obj_set_height(_lv_obj, std::get<int>(value.value()));
+  }
 
   value =_lele_styles.getValue("fgcolor");
   if(value) {

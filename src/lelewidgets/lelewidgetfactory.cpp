@@ -18,7 +18,7 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
     if(json_str.empty()) {
         return res;
     }
-    const cJSON *json = cJSON_Parse(json_str.c_str());
+    cJSON *json = cJSON_Parse(json_str.c_str());
     cJSON *item = nullptr;
     int idx = 0;
     cJSON_ArrayForEach(item, json) {
@@ -60,6 +60,9 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
     // for(const auto &pair: res) {
     //     LOG(DEBUG, LVSIM, "Processed token %s:%s\n", pair.first.c_str(), pair.second.c_str());
     // }
+    if(json) {
+        cJSON_Delete(json);
+    }
     return res;
 }
 }//namespace
@@ -125,7 +128,15 @@ std::vector<std::pair<std::string, Token>> fromJson(
             token = std::make_unique<LeleEvent>(rhs);
         }
         else if(lhs == "img") {
-            token = std::make_unique<LeleImage>(rhs);
+            //osm todo: should be cJSON_IsString, not cJSON_IsObject when rhs is a string
+            const cJSON *item = cJSON_Parse(rhs.c_str());
+            if(cJSON_IsString(item)) {
+                int x = 0;
+                x = 1;
+            }
+            if(cJSON_IsObject(item)) {
+                token = std::make_unique<LeleImage>(rhs);
+            }
         }
         else {
             token = rhs;
@@ -138,19 +149,26 @@ std::vector<std::pair<std::string, Token>> fromJson(
     return res;
 }
 
-void fromJson(const std::string &json_str, std::function<void (const std::string &key, int value)> callback) {
-  const cJSON *item = cJSON_Parse(json_str.c_str());
-  if(cJSON_IsNumber(item)) {
-    callback("", cJSON_GetNumberValue(item));
-    return;
-  }
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(callback) {
-        callback(key, std::stoi(value));
-      }
+void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback) {
+  cJSON *item = cJSON_Parse(json_str.c_str());
+  if(cJSON_IsObject(item)) {
+    for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+        if (std::holds_alternative<std::string>(token)) {
+            const std::string &value = std::get<std::string>(token);
+            if(callback) {
+                callback(key, value);
+            }
+        }
     }
+  }
+  else if(cJSON_IsString(item)) {
+    callback("", cJSON_GetStringValue(item));
+  }
+  else if(cJSON_IsNumber(item)) {
+    callback("", std::to_string(cJSON_GetNumberValue(item)));
+  }
+  if(item) {
+    cJSON_Delete(item);
   }
 }
 
