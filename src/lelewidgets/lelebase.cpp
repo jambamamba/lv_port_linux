@@ -133,16 +133,16 @@ void LeleBase::setStyle() {
     lv_style_set_margin_left(&_style, std::get<int>(value.value()));
   }
 
-  value = _lele_styles.getValue("border_type");
+  value = _lele_styles.getValue("border/type");
   if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::None) {
     lv_style_set_border_width(&_style, 0);
   }
   else {
-    value = _lele_styles.getValue("border_color");
+    value = _lele_styles.getValue("border/color");
     if(value) {
       lv_style_set_border_color(&_style, lv_color_hex(std::get<int>(value.value())));
     }
-    value = _lele_styles.getValue("border_width");
+    value = _lele_styles.getValue("border/width");
     if(value) {
       lv_style_set_border_width(&_style, std::get<int>(value.value()));
     }
@@ -201,6 +201,45 @@ void LeleBase::setStyle() {
       static_cast<lv_text_align_t>(std::get<int>(value.value())), 0);
   }
 
+  value = _lele_styles.getValue("background/color");
+  if(value) {
+    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+  }
+  value = _lele_styles.getValue("background/image");
+  if(value) {
+    lv_obj_t *lv_img = lv_image_create(_lv_obj);
+    std::string src = std::get<std::string>(value.value());
+    if(src.at(0) == '/') {
+      _bg_img = generateImgDsc(src.c_str());
+    }
+    else {
+      std::string img_path(applicationPath().parent_path().string() + "/res/" + src);
+      _bg_img = generateImgDsc(img_path.c_str());
+    }
+    if(_bg_img) {
+      value = _lele_styles.getValue("background/position");
+      if(value) {
+      }
+      value = _lele_styles.getValue("background/size");
+      if(value) {
+        int x = 0;
+        int y = 0;
+        parseXY(std::get<std::string>(value.value()), {"x", "y"}, {&x, &y}, {_bg_img.value()->header.w, _bg_img.value()->header.h});
+        if(size.size() > 1 && size.at(size.size() - 1) == '%') {
+          i = std::stoi(size);
+        }
+        else if(size.size() > 0) {
+          if(size == "contain") {}
+          else if(size == "cover") {}
+        }
+      }
+      value = _lele_styles.getValue("background/repeat");
+      if(value) {
+      }
+      lv_image_set_src(lv_img, _bg_img.value().get());
+    }
+  }
+  
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
 

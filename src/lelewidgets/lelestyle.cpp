@@ -72,11 +72,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
       }
       else if(key == "border") {
-        // auto [border_type, border_width, border_color] = LeleStyle::parseBorder(value);
-        // _style["border_type"] = border_type;
-        // _style["border_width"] = border_width;
-        // _style["border_color"] = border_color;
-        std::tie(_style["border_type"], _style["border_width"], _style["border_color"]) = LeleStyle::parseBorder(value); 
+        std::tie(_style["border/type"], _style["border/width"], _style["border/color"]) = LeleStyle::parseBorder(value); 
       }
       else if(key == "layout") {
         if(strncmp(value.c_str(), "flex", 4)==0) {
@@ -176,6 +172,25 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
           _style[key] = LV_TEXT_ALIGN_AUTO;
         }
       }
+      else if(key == "background") {
+        LeleWidgetFactory::fromJson(value, [this, &key](const std::string &subkey, const std::string &value){
+          if(subkey == "color") {
+            _style[key + "/" + subkey] = parseColorCode(value);
+          }
+          else if(subkey == "image") {
+            _style[key + "/" + subkey] = value;
+          }
+          else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
+            _style[key + "/" + subkey] = value;
+          }
+          else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
+            _style[key + "/" + subkey] = value;
+          }
+          else if(subkey == "repeat") {
+            _style[key + "/" + subkey] = value;
+          }
+        });
+      }
     }
   }
 }
@@ -206,7 +221,17 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
     std::string suffix(color_str.c_str() + 1);
     if(std::all_of(suffix.begin(), suffix.end(),
       [](unsigned char ch){return ch >= '0' && ch <= '0' + 0xff; })) {
-        return std::stoi(suffix.c_str(), nullptr, 16);
+          if(suffix.size() == 3) { // #fff => #ffffff
+              std::string value;
+              for(int i=0; i<3; ++i) {
+                  value+=suffix.at(i);
+                  value+=suffix.at(i);
+              }
+              return std::stoi(value.c_str(), nullptr, 16);
+          }
+          else {
+            return std::stoi(suffix.c_str(), nullptr, 16);
+          }
     }
   }
   return 0;
@@ -350,7 +375,7 @@ LeleStyles::LeleStyles(const std::string &json_str) {
     //     _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
     //   }
     // }
-    // else 
+    // else
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "id") {

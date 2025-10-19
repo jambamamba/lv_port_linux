@@ -20,7 +20,6 @@ class LeleEvent;
 class LeleStyle;
 class LeleBase;
 namespace LeleWidgetFactory {
-
   using Token = std::variant<
     std::string
     ,std::unique_ptr<LeleBase> 
@@ -31,5 +30,5 @@ namespace LeleWidgetFactory {
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
   void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback);
   std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str = "");
-
+  bool parseXY(const std::string &value, const std:vector<int> &names, std::vector<int*> &values, const std::vector<int> &max_val = {});
 }//LeleWidgetFactory

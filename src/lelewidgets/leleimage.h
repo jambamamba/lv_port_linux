@@ -27,7 +27,6 @@ class LeleImage : public LeleBase  {
     int _percent_y = 0;
   };
   protected:
-  void parseXY(const std::string &key, const std::string &value, int &x, int &y);
   std::optional<LeleImage::Rotation> parseRotation(const std::string &json_str);
   
   std::string _src;

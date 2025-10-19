@@ -52,9 +52,9 @@ class LeleStyle {
     {"margin/right", std::nullopt},
     {"margin/bottom", std::nullopt},
     {"margin/left", std::nullopt},
-    {"border_type", std::nullopt},
-    {"border_width", std::nullopt},
-    {"border_color", std::nullopt},
+    {"border/type", std::nullopt},
+    {"border/width", std::nullopt},
+    {"border/color", std::nullopt},
     {"layout", std::nullopt},
     {"flow", std::nullopt},
     {"grow", std::nullopt},
@@ -62,7 +62,11 @@ class LeleStyle {
     {"bgcolor", std::nullopt},
     {"checked_color", std::nullopt},
     {"align", std::nullopt},
-    {"text_align", std::nullopt}
+    {"background/image", std::nullopt},
+    {"background/position", std::nullopt},
+    {"background/size", std::nullopt},
+    {"background/repeat", std::nullopt},
+    {"background/color", std::nullopt}
   };
   int _parent_width = 0;
   int _parent_height = 0;

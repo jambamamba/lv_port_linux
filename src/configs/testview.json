@@ -70,7 +70,12 @@
                         "text":"> Push button0",
                         "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
                     },
-                    "img":{
+                    "view":{
+                        "style":{"id":"img","border":"solid-1px-#ff0000","x":"0","y":"0","width":"50%","height":"50%",
+                            "background":{"image":"firefox-logo.png","position":"","size":{"x":"10%","y":"10%"},"repeat":"","color":"#0f0"}
+                        }
+                    },
+                    "ximg":{
                         "style":{"id":"img","border":"solid-1px-#ff0000","x":"0","y":"0","width":"50%","height":"50%"},
                         "src":"logo.png",
                         "xsrc":"firefox-logo.png",

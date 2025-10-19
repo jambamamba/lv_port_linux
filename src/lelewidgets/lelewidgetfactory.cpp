@@ -13,15 +13,31 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
+struct cJSONRAII {
+    cJSONRAII(const std::string &json_str)
+    : _json(cJSON_Parse(json_str.c_str())) {
+    }
+    ~cJSONRAII(){
+        if(_json) {
+            cJSON_Delete(_json);
+        }
+    }
+    cJSON *operator()(){
+        return _json;
+    }
+    protected:
+    cJSON *_json;
+};
+
 static std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
     std::vector<std::pair<std::string, std::string>> res;
     if(json_str.empty()) {
         return res;
     }
-    cJSON *json = cJSON_Parse(json_str.c_str());
+    cJSONRAII json(json_str);
     cJSON *item = nullptr;
     int idx = 0;
-    cJSON_ArrayForEach(item, json) {
+    cJSON_ArrayForEach(item, json()) {
         std::string item_num = std::string("@") + std::to_string(idx);
         // LOG(DEBUG, LVSIM, "Process item: %s:%s\n", item_num.c_str(), item->string);
         std::string key = !item->string ? 
@@ -60,9 +76,6 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
     // for(const auto &pair: res) {
     //     LOG(DEBUG, LVSIM, "Processed token %s:%s\n", pair.first.c_str(), pair.second.c_str());
     // }
-    if(json) {
-        cJSON_Delete(json);
-    }
     return res;
 }
 }//namespace
@@ -127,16 +140,8 @@ std::vector<std::pair<std::string, Token>> fromJson(
         else if(lhs == "event") {
             token = std::make_unique<LeleEvent>(rhs);
         }
-        else if(lhs == "img") {
-            //osm todo: should be cJSON_IsString, not cJSON_IsObject when rhs is a string
-            const cJSON *item = cJSON_Parse(rhs.c_str());
-            if(cJSON_IsString(item)) {
-                int x = 0;
-                x = 1;
-            }
-            if(cJSON_IsObject(item)) {
-                token = std::make_unique<LeleImage>(rhs);
-            }
+        else if(lhs == "img" && tokenize(rhs).size() > 0) {
+            token = std::make_unique<LeleImage>(rhs);
         }
         else {
             token = rhs;
@@ -150,8 +155,8 @@ std::vector<std::pair<std::string, Token>> fromJson(
 }
 
 void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback) {
-  cJSON *item = cJSON_Parse(json_str.c_str());
-  if(cJSON_IsObject(item)) {
+  cJSONRAII json(json_str);
+  if(cJSON_IsObject(json())) {
     for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
         if (std::holds_alternative<std::string>(token)) {
             const std::string &value = std::get<std::string>(token);
@@ -161,14 +166,11 @@ void fromJson(const std::string &json_str, std::function<void (const std::string
         }
     }
   }
-  else if(cJSON_IsString(item)) {
-    callback("", cJSON_GetStringValue(item));
+  else if(cJSON_IsString(json())) {
+    callback("", cJSON_GetStringValue(json()));
   }
-  else if(cJSON_IsNumber(item)) {
-    callback("", std::to_string(cJSON_GetNumberValue(item)));
-  }
-  if(item) {
-    cJSON_Delete(item);
+  else if(cJSON_IsNumber(json())) {
+    callback("", std::to_string(cJSON_GetNumberValue(json())));
   }
 }
 
@@ -190,4 +192,41 @@ std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_
     }
     return tokens;
 }
+
+bool parseXY(const std::string &value, const std:vector<int> &names, std::vector<int*> &values, const std::vector<int> &max_val) {
+//osm todo fix this
+    bool res = false;
+  LeleWidgetFactory::fromJson(value, [&res, &val, &max_val](const std::string &key, const std::string &value){
+    if(key.empty()) {
+      if(value.size() > 1 && value.at(value.size() - 1) == '%') {
+        int idx = 0;
+        for(auto &x: values) {
+            if(max_val.size() > idx && max_val[idx] > -1) {
+                x = std::stoi(value) * 100 / max_val[idx];
+            }
+            ++idx;
+        }
+        res = true;
+      }
+      else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
+        for(auto &x: values) {
+            x = std::stoi(value);
+        }
+        res = true;
+      }
+    }
+    else if(key == "x") {
+      if(value.size() > 1 && value.at(value.size() - 1) == '%' && max_x > 0) {
+        x = std::stoi(value) * 100 / max_x;
+        res = true;
+      }
+      else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
+        x = std::stoi(value);
+        res = true;
+      }
+    }
+  });
+  return res;
+}
+
 }//LeleWidgetFactory

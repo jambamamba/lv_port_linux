@@ -3,7 +3,9 @@
 #include "lelewidgetfactory.h"
 
 #include <json_utils/json_utils.h>
+#include <lv_image_converter/mainlib.h>
 #include <lvgl/lvgl_private.h>
+#include <optional>
 #include <typeinfo>
 
 //need to include all the types in   using Token = std::variant<
@@ -62,6 +64,7 @@ class LeleBase {
   lv_obj_t *_lv_obj = nullptr;
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};
+  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;
   std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
   LeleStyles _lele_styles;
 };
