@@ -4,7 +4,7 @@
 
 #include <map>
 #include <optional>
-#include <lv_image_converter/mainlib.h>
+#include <lv_image_converter/lv_image_converter.h>
 
 class LeleImage : public LeleBase  {
   public:

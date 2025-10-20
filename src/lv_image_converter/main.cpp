@@ -1,4 +1,4 @@
-#include "mainlib.h"
+#include "lv_image_converter.h"
 
 namespace {
 bool iterateDirectory(const std::string &base_path, 
@@ -36,14 +36,16 @@ int main(int argc, char **argv) {
 
     std::map<std::string, std::string> img_file_hashes;
     if(std::filesystem::is_regular_file(path)) {
-        auto res = generateCImgFile(c_img_filestream, argv[1]);
+        auto res = LeleImageConverter
+::generateCImgFile(c_img_filestream, argv[1]);
         if(res) {
             img_file_hashes.insert(res.value());
         }
     }
     else if(std::filesystem::is_directory(path)) {
         iterateDirectory(argv[1], [&c_img_filestream, &img_file_hashes](const std::string &filename){
-            auto res = generateCImgFile(c_img_filestream, filename);
+            auto res = LeleImageConverter
+::generateCImgFile(c_img_filestream, filename);
             if(res) {
                 img_file_hashes.insert(res.value());
             }
@@ -60,8 +62,10 @@ int main(int argc, char **argv) {
     //     printf("@@@ %s\n", filename.c_str());
     // }
 
-    writeLvImgDscHeader(argv[2], img_file_hashes);
-    writeLvImgDscCpp(c_img_filestream, img_file_hashes);
+    LeleImageConverter
+::writeLvImgDscHeader(argv[2], img_file_hashes);
+    LeleImageConverter
+::writeLvImgDscCpp(c_img_filestream, img_file_hashes);
 
     return 0;
 }

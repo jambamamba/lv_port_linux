@@ -7,7 +7,7 @@
 #include "lelestyle.h"
 #include "leleview.h"
 
-#include <lv_image_converter/mainlib.h>
+#include <lv_image_converter/lv_image_converter.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -170,7 +170,7 @@ lv_obj_t *LeleStackView::setStackViewImg(lv_obj_t *tabview_header, const std::st
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // lv_image_set_src(logo, _lv_img_dsc_map.at(img));
-    _images[img] = generateImgDsc((applicationPath().parent_path().string() + "/res/" + img).c_str());//osm
+    _images[img] = LeleImageConverter::generateImgDsc((applicationPath().parent_path().string() + "/res/" + img).c_str());//osm
     if(_images[img]) {
       lv_image_set_src(logo, _images[img].value().get());
     }

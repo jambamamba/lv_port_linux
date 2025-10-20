@@ -20,11 +20,11 @@ LeleImage::LeleImage(const std::string &json_str)
       }
       else if(key == "offset") {
         _offset = std::optional<LeleImage::Offset>();
-        LeleWidgetFactory::parseXY(value, {"x", "y"}, {&_offset->_offset_x, &_offset->_offset_y});
+        LeleWidgetFactory::parseXY(value, {{"x", &_offset->_offset_x}, {"y", &_offset->_offset_y}});
       }
-      else if(key == "scale_percent") {
+      else if(key == "scale") {
         _scale = std::optional<LeleImage::Scale>();
-        LeleWidgetFactory::parseXY(value, {"x", "y"}, {&_scale->_percent_x, &_scale->_percent_y});
+        LeleWidgetFactory::parseXY(value, {{"x", &_scale->_percent_x}, {"y", &_scale->_percent_y}});
       }
       else if(key == "blendmode") {
         if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }
@@ -65,11 +65,11 @@ lv_obj_t *LeleImage::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> img;
   if(!_src.empty()) {
     if(_src.at(0) == '/') {
-      img = generateImgDsc(_src.c_str());
+      img = LeleImageConverter::generateImgDsc(_src.c_str());
     }
     else {
       std::string img_path(applicationPath().parent_path().string() + "/res/" + _src);
-      img = generateImgDsc(img_path.c_str());
+      img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
   }
   if(!img) {
@@ -131,7 +131,7 @@ std::optional<LeleImage::Rotation> LeleImage::parseRotation(const std::string &j
         processed = true;
       }
       else if(key == "pivot") {
-        LeleWidgetFactory::parseXY(value, {"x","y"}, {&rotation._pivot_x, &rotation._pivot_y});
+        LeleWidgetFactory::parseXY(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
         processed = true;
       }
     }

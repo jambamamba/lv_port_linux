@@ -1,4 +1,4 @@
-#include "mainlib.h"
+#include "lv_image_converter.h"
 
 #include <cstring>
 #include <fstream>
@@ -21,6 +21,8 @@ std::string sha256sum(const std::string &input_str) {
 }
 }//namespace
 
+namespace LeleImageConverter
+ {
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::string &img_file_path) {
 
     std::filesystem::path img_path(img_file_path);
@@ -187,3 +189,4 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
     }
     c_img_filestream << "};\n";
 }
+}//namespace LeleImageConverter

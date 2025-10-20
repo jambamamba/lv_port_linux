@@ -210,33 +210,46 @@ void LeleBase::setStyle() {
     lv_obj_t *lv_img = lv_image_create(_lv_obj);
     std::string src = std::get<std::string>(value.value());
     if(src.at(0) == '/') {
-      _bg_img = generateImgDsc(src.c_str());
+      _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
     }
     else {
       std::string img_path(applicationPath().parent_path().string() + "/res/" + src);
-      _bg_img = generateImgDsc(img_path.c_str());
+      _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
     if(_bg_img) {
+      lv_image_set_src(lv_img, _bg_img.value().get());
       value = _lele_styles.getValue("background/position");
-      if(value) {
+      if(value) {//osm todo
       }
       value = _lele_styles.getValue("background/size");
       if(value) {
-        int x = 0;
-        int y = 0;
-        parseXY(std::get<std::string>(value.value()), {"x", "y"}, {&x, &y}, {_bg_img.value()->header.w, _bg_img.value()->header.h});
-        if(size.size() > 1 && size.at(size.size() - 1) == '%') {
-          i = std::stoi(size);
-        }
-        else if(size.size() > 0) {
-          if(size == "contain") {}
-          else if(size == "cover") {}
+        std::string val = std::get<std::string>(value.value());
+        if(val == "contain") {}//osm todo
+        else if(val == "cover") {}//osm todo
+        else {
+          int scale_x = -1;
+          int scale_y = -1;
+          int max_x = lv_obj_get_width(_lele_parent->getLvObj());//_bg_img.value()->header.w;
+          int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
+          if(LeleWidgetFactory::parseXY(val, {{"x", &scale_x}, {"y", &scale_y}}, {{"x", max_x}, {"y", max_y}})) {
+            if(scale_x == scale_y) {
+              lv_image_set_scale(lv_img, LV_SCALE_NONE * scale_x / 100);
+            }
+            else {
+              lv_image_set_scale_x(lv_img, LV_SCALE_NONE * scale_x / 100);
+              lv_image_set_scale_y(lv_img, LV_SCALE_NONE * scale_y / 100);
+            }
+            // lv_image_set_offset_x(lv_img, 0);
+            // lv_image_set_offset_y(lv_img, 0);
+            // lv_obj_set_x(lv_img, 0);
+            // lv_obj_set_y(lv_img, 0);
+          }
         }
       }
       value = _lele_styles.getValue("background/repeat");
-      if(value) {
+      if(value) {//osm todo
+        // lv_image_set_inner_align(lv_img, LV_IMAGE_ALIGN_TILE);
       }
-      lv_image_set_src(lv_img, _bg_img.value().get());
     }
   }
   

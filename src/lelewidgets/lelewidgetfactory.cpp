@@ -193,40 +193,43 @@ std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_
     return tokens;
 }
 
-bool parseXY(const std::string &value, const std:vector<int> &names, std::vector<int*> &values, const std::vector<int> &max_val) {
-//osm todo fix this
-    bool res = false;
-  LeleWidgetFactory::fromJson(value, [&res, &val, &max_val](const std::string &key, const std::string &value){
-    if(key.empty()) {
+bool parseXY(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
+  bool ret = false;
+  LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
+    if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]
       if(value.size() > 1 && value.at(value.size() - 1) == '%') {
-        int idx = 0;
-        for(auto &x: values) {
-            if(max_val.size() > idx && max_val[idx] > -1) {
-                x = std::stoi(value) * 100 / max_val[idx];
+        int iret = 0;
+        for(auto &[key, val]: values) {
+            const auto &it = max_values.find(key);
+            if(it != max_values.end()) {
+                *val = std::stoi(value) * it->second / 100;
+                ++iret;
             }
-            ++idx;
         }
-        res = true;
+        ret = (iret == values.size());
       }
       else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
-        for(auto &x: values) {
-            x = std::stoi(value);
+        for(auto &[key, val]: values) {
+            *val = std::stoi(value);
         }
-        res = true;
+        ret = true;
       }
     }
-    else if(key == "x") {
-      if(value.size() > 1 && value.at(value.size() - 1) == '%' && max_x > 0) {
-        x = std::stoi(value) * 100 / max_x;
-        res = true;
+    else {// e.g. json_str: "x:10%, y:10%", so values[x] in the values map should get 10% of value for the given max_value[]
+      if(value.size() > 1 && value.at(value.size() - 1) == '%') {
+        const auto &it = max_values.find(key);
+        if(it != max_values.end()) {
+            *values[key] = std::stoi(value) * it->second / 100;
+            ret = true;
+        }
       }
       else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
-        x = std::stoi(value);
-        res = true;
+        *values[key] = std::stoi(value);
+        ret = true;
       }
     }
   });
-  return res;
+  return ret;
 }
 
 }//LeleWidgetFactory

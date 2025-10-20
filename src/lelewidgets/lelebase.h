@@ -3,7 +3,7 @@
 #include "lelewidgetfactory.h"
 
 #include <json_utils/json_utils.h>
-#include <lv_image_converter/mainlib.h>
+#include <lv_image_converter/lv_image_converter.h>
 #include <lvgl/lvgl_private.h>
 #include <optional>
 #include <typeinfo>

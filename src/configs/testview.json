@@ -72,7 +72,7 @@
                     },
                     "view":{
                         "style":{"id":"img","border":"solid-1px-#ff0000","x":"0","y":"0","width":"50%","height":"50%",
-                            "background":{"image":"firefox-logo.png","position":"","size":{"x":"10%","y":"10%"},"repeat":"","color":"#0f0"}
+                            "background":{"image":"firefox-logo.png","position":"","size":"20%","repeat":"repeat","color":"#0f0"}
                         }
                     },
                     "ximg":{
@@ -81,9 +81,9 @@
                         "xsrc":"firefox-logo.png",
                         "antialias":"true",
                         "xrotation":{"angle":"90","pivot":{"x":"0","y":"0"}},
-                        "xoffset":{"x":"0","y":"0"},
-                        "scale_percent":"20",
-                        "align":"tile"
+                        "xoffset":{"x":"20","y":"30"},
+                        "scale":"20%",
+                        "xalign":"tile"
                     }
                 }
             },

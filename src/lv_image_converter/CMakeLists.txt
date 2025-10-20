@@ -12,8 +12,8 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/bin)
 
 ####################################
 add_library(${libproject} SHARED
-    mainlib.h 
-    mainlib.cpp
+    lv_image_converter.h 
+    lv_image_converter.cpp
     )
 target_include_directories(${libproject} PRIVATE ${CMAKE_SOURCE_DIR} 
     /usr/include/
