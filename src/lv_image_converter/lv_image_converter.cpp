@@ -21,8 +21,28 @@ std::string sha256sum(const std::string &input_str) {
 }
 }//namespace
 
-namespace LeleImageConverter
- {
+namespace LeleImageConverter {
+
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
+    int bpp = src_img->header.stride/src_img->header.w;
+    auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
+    if(!resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        new_width, new_height, dst_img->data)) {
+        return std::nullopt;
+    }
+    return dst_img;
+}
+
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
+    int bpp = src_img->header.stride/src_img->header.w;
+    auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
+    if(!tileImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        new_width, new_height, dst_img->data)) {
+        return std::nullopt;
+    }
+    return dst_img;
+}
+
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::string &img_file_path) {
 
     std::filesystem::path img_path(img_file_path);
