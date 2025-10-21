@@ -217,7 +217,6 @@ void LeleBase::setStyle() {
       _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
     if(_bg_img) {
-      lv_image_set_src(lv_img, _bg_img.value().get());
       value = _lele_styles.getValue("background/position");
       if(value) {//osm todo
       }
@@ -232,13 +231,15 @@ void LeleBase::setStyle() {
           int max_x = lv_obj_get_width(_lele_parent->getLvObj());//_bg_img.value()->header.w;
           int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
           if(LeleWidgetFactory::parseXY(val, {{"x", &scale_x}, {"y", &scale_y}}, {{"x", max_x}, {"y", max_y}})) {
-            if(scale_x == scale_y) {
-              lv_image_set_scale(lv_img, LV_SCALE_NONE * scale_x / 100);
-            }
-            else {
-              lv_image_set_scale_x(lv_img, LV_SCALE_NONE * scale_x / 100);
-              lv_image_set_scale_y(lv_img, LV_SCALE_NONE * scale_y / 100);
-            }
+            _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), scale_x, scale_y);
+
+            // if(scale_x == scale_y) {
+            //   lv_image_set_scale(lv_img, LV_SCALE_NONE * scale_x / 100);
+            // }
+            // else {
+            //   lv_image_set_scale_x(lv_img, LV_SCALE_NONE * scale_x / 100);
+            //   lv_image_set_scale_y(lv_img, LV_SCALE_NONE * scale_y / 100);
+            // }
             // lv_image_set_offset_x(lv_img, 0);
             // lv_image_set_offset_y(lv_img, 0);
             // lv_obj_set_x(lv_img, 0);
@@ -250,6 +251,7 @@ void LeleBase::setStyle() {
       if(value) {//osm todo
         // lv_image_set_inner_align(lv_img, LV_IMAGE_ALIGN_TILE);
       }
+      lv_image_set_src(lv_img, _bg_img.value().get());
     }
   }
   
