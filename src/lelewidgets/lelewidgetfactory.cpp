@@ -15,7 +15,8 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 namespace {
 struct cJSONRAII {
     cJSONRAII(const std::string &json_str)
-    : _json(cJSON_Parse(json_str.c_str())) {
+    : _json(cJSON_Parse(json_str.c_str()))
+    , _json_str(json_str) {
     }
     ~cJSONRAII(){
         if(_json) {
@@ -25,8 +26,12 @@ struct cJSONRAII {
     cJSON *operator()(){
         return _json;
     }
+    const std::string &str() const {
+        return _json_str;
+    }
     protected:
     cJSON *_json;
+    const std::string &_json_str;
 };
 
 static std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {

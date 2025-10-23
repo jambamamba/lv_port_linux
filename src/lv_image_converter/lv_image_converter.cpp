@@ -31,6 +31,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(lv_image_dsc_t *src_i
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
+    dst_img->data_size = new_width * bpp * new_height;
     return dst_img;
 }
 
@@ -42,6 +43,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(lv_image_dsc_t *src_img
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
+    dst_img->data_size = new_width * bpp * new_height;
     return dst_img;
 }
 
