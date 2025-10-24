@@ -19,6 +19,26 @@ std::string sha256sum(const std::string &input_str) {
     }
     return ss.str();
 }
+
+void initImageDsc(lv_image_dsc_t *dst_img, int width, int height, int bpp) {
+    uint32_t color_format;
+    switch(bpp) {
+        case 4: color_format = LV_COLOR_FORMAT_ARGB8888; break;
+        case 3: color_format = LV_COLOR_FORMAT_RGB888; break;
+        default: printf("invalid bpp, color format could not be determined from bpp:%i\n", bpp); exit(-1);
+    }
+    dst_img->header = lv_image_header_t {
+        .magic = LV_IMAGE_HEADER_MAGIC,
+        .cf = color_format,
+        .flags = 0,
+        .w = static_cast<uint32_t>(width),
+        .h = static_cast<uint32_t>(height),
+        .stride = static_cast<uint32_t>(width * bpp)
+      };
+    dst_img->data_size = width * bpp * height;
+    dst_img->data = reinterpret_cast<uint8_t*>(&dst_img[1]);
+}
+
 }//namespace
 
 namespace LeleImageConverter {
@@ -26,24 +46,26 @@ namespace LeleImageConverter {
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
+    initImageDsc(dst_img.get(), new_width, new_height, bpp);
+
     ImgHelper img;
     if(!img.resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
-    dst_img->data_size = new_width * bpp * new_height;
     return dst_img;
 }
 
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
+    initImageDsc(dst_img.get(), new_width, new_height, bpp);
+
     ImgHelper img;
     if(!img.tileImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
-    dst_img->data_size = new_width * bpp * new_height;
     return dst_img;
 }
 
@@ -61,23 +83,8 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
         return std::nullopt;
     }
     int bpp = img.stride()/img.width();
-    uint32_t color_format;
-    switch(bpp) {
-        case 4: color_format = LV_COLOR_FORMAT_ARGB8888; break;
-        case 3: color_format = LV_COLOR_FORMAT_RGB888; break;
-        default: printf("invalid bpp, color format could not be determined from bpp:%i\n", bpp); exit(-1);
-    }
-
     auto img_dsc = AutoFreeSharedPtr<lv_image_dsc_t>::create(img.stride() * img.height());
-    img_dsc->header = lv_image_header_t {
-        .magic = LV_IMAGE_HEADER_MAGIC,
-        .cf = color_format,
-        .flags = 0,
-        .w = static_cast<uint32_t>(img.width()),
-        .h = static_cast<uint32_t>(img.height()),
-        .stride = static_cast<uint32_t>(img.stride())
-      };
-    img_dsc->data_size = img.stride() * img.height();
+    initImageDsc(img_dsc.get(), img.width(), img.height(), bpp);
     
     size_t bytes_copied = 0;
     lv_image_dsc_t *p = img_dsc.get();

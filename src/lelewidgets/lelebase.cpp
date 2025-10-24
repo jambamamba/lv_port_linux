@@ -232,12 +232,8 @@ void LeleBase::setStyle() {
           int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
           std::string root = std::string("\"") + val + "\"";
           if(LeleWidgetFactory::parseXY(root, {{"x", &scale_x}, {"y", &scale_y}}, {{"x", max_x}, {"y", max_y}})) {
-    printf("@@@%i scale_x:%i, scale_x:%i, max_x:%i, max_y:%i\n", __LINE__, scale_x, scale_y, max_x, max_y);
-    printf("@@@%i w:%i, h:%i, stride:%i, datasize:%i\n",
-        __LINE__, _bg_img->get()->header.w, _bg_img->get()->header.h, _bg_img->get()->header.stride, _bg_img->get()->data_size);
             _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), scale_x, scale_y);
-    printf("@@@%i w:%i, h:%i, stride:%i, datasize:%i\n",
-        __LINE__, _bg_img->get()->header.w, _bg_img->get()->header.h, _bg_img->get()->header.stride, _bg_img->get()->data_size);
+            _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), max_x, max_y);
 
             // if(scale_x == scale_y) {
             //   lv_image_set_scale(lv_img, LV_SCALE_NONE * scale_x / 100);
