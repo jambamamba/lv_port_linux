@@ -8,35 +8,6 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-namespace {
-int absFromPercent(int percent, int parent) {
-    return percent * parent / 100;
-}
-int toInt(const std::string &x, int parent_x) {
-    if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
-        int i = 0;
-        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
-          i = std::stoi(x, 0, 16);
-        }
-        else {
-          i = std::stoi(x, 0, 10);
-        }
-        return absFromPercent(i, parent_x);
-    }
-    else if(x.size() > 0) {
-        int i = 0;
-        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
-          i = std::stoi(x, 0, 16);
-        }
-        else {
-          i = std::stoi(x, 0, 10);
-        }
-        return i;
-    }
-    return 0;
-}
-}//namespace
-
 LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent) 
   : _parent_width(lv_obj_get_width(parent))
   , _parent_height(lv_obj_get_height(parent)) {
@@ -181,7 +152,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
             _style[key + "/" + subkey] = value;
           }
           else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-            _style[key + "/" + subkey] = value;
+            // _style[key + "/" + subkey] = value;
           }
           else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
             _style[key + "/" + subkey] = value;
@@ -194,6 +165,41 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
     }
   }
 }
+
+std::string LeleStyle::trim(const std::string& str) {
+    size_t first = str.find_first_not_of(" \t\n\r\f\v");
+    if (std::string::npos == first) {
+        return str; // String is all whitespace or empty
+    }
+    size_t last = str.find_last_not_of(" \t\n\r\f\v");
+    return str.substr(first, (last - first + 1));
+}
+
+int LeleStyle::toInt(const std::string &x, int parent_x) {
+    if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else {
+          i = std::stoi(x, 0, 10);
+        }
+        // return absFromPercent(i, parent_x);
+        return i * parent_x / 100;
+    }
+    else if(x.size() > 0) {
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else {
+          i = std::stoi(x, 0, 10);
+        }
+        return i;
+    }
+    return 0;
+}
+
 int LeleStyle::parseColorCode(const std::string &color_str) {
   if(color_str.empty()) {
     return 0;

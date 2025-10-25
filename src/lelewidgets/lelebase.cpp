@@ -225,28 +225,21 @@ void LeleBase::setStyle() {
         std::string val = std::get<std::string>(value.value());
         if(val == "contain") {}//osm todo
         else if(val == "cover") {}//osm todo
-        else {
-          int scale_x = -1;
-          int scale_y = -1;
+        else if(!val.empty()) {
+          val = LeleStyle::trim(val);
           int max_x = lv_obj_get_width(_lele_parent->getLvObj());//_bg_img.value()->header.w;
           int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
-          std::string root = std::string("\"") + val + "\"";
-          if(LeleWidgetFactory::parseXY(root, {{"x", &scale_x}, {"y", &scale_y}}, {{"x", max_x}, {"y", max_y}})) {
-            _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), scale_x, scale_y);
-            _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), max_x, max_y);
-
-            // if(scale_x == scale_y) {
-            //   lv_image_set_scale(lv_img, LV_SCALE_NONE * scale_x / 100);
-            // }
-            // else {
-            //   lv_image_set_scale_x(lv_img, LV_SCALE_NONE * scale_x / 100);
-            //   lv_image_set_scale_y(lv_img, LV_SCALE_NONE * scale_y / 100);
-            // }
-            // lv_image_set_offset_x(lv_img, 0);
-            // lv_image_set_offset_y(lv_img, 0);
-            // lv_obj_set_x(lv_img, 0);
-            // lv_obj_set_y(lv_img, 0);
+          int x = -1;
+          int y = -1;
+          if(val.at(0) == '{' && LeleWidgetFactory::parseXY(val, {{"x", &x}, {"y", &y}}, {{"x", max_x}, {"y", max_y}})) {
+            _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), x, y);
           }
+          else {
+            x = LeleStyle::toInt(val, max_x);
+            y = LeleStyle::toInt(val, max_y);
+            _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), x, y);
+          }
+          // _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), max_x, max_y);
         }
       }
       value = _lele_styles.getValue("background/repeat");
