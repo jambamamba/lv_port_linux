@@ -22,19 +22,19 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         _id = value;
       }
       else if(key == "x") {
-        _style[key] = toInt(value, _parent_width);
+        _style[key] = parseIntOrPercent(value, _parent_width);
       }
       else if(key == "y") {
-        _style[key] = toInt(value, _parent_height);
+        _style[key] = parseIntOrPercent(value, _parent_height);
       }
       else if(key == "width") {
-        _style[key] = toInt(value, _parent_width);
+        _style[key] = parseIntOrPercent(value, _parent_width);
       }
       else if(key == "height") {
-        _style[key] = toInt(value, _parent_height);
+        _style[key] = parseIntOrPercent(value, _parent_height);
       }
       else if(key == "corner_radius") {
-        _style[key] = toInt(value, std::max(_parent_height, _parent_width));
+        _style[key] = parseIntOrPercent(value, std::max(_parent_height, _parent_width));
       }
       else if(key == "padding") {
         std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
@@ -166,16 +166,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
   }
 }
 
-std::string LeleStyle::trim(const std::string& str) {
-    size_t first = str.find_first_not_of(" \t\n\r\f\v");
-    if (std::string::npos == first) {
-        return str; // String is all whitespace or empty
-    }
-    size_t last = str.find_last_not_of(" \t\n\r\f\v");
-    return str.substr(first, (last - first + 1));
-}
-
-int LeleStyle::toInt(const std::string &x, int parent_x) {
+int LeleStyle::parseIntOrPercent(const std::string &x, int parent_x) {
     if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
         int i = 0;
         if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {

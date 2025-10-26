@@ -159,7 +159,23 @@ std::vector<std::pair<std::string, Token>> fromJson(
     return res;
 }
 
+std::string trim(const std::string& str) {
+    size_t first = str.find_first_not_of(" \t\n\r\f\v");
+    if (std::string::npos == first) {
+        return str; // String is all whitespace or empty
+    }
+    size_t last = str.find_last_not_of(" \t\n\r\f\v");
+    return str.substr(first, (last - first + 1));
+}
+
 void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback) {
+  if(json_str.empty()) {
+    return;
+  }
+  
+  if(json_str.at(0) != '{' || json_str.at(json_str.size() - 1) != '}') {
+    return;
+  }
   cJSONRAII json(json_str);
   if(cJSON_IsObject(json())) {
     for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
@@ -198,7 +214,7 @@ std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_
     return tokens;
 }
 
-bool parseXY(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
+bool parseNameValue(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
   bool ret = false;
   LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]

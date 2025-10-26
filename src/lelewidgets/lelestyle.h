@@ -29,7 +29,7 @@ class LeleStyle {
   void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
   LeleBase *getLeleParent() const { return _lele_parent; }
   static int parseColorCode(const std::string &color_str);
-  static int toInt(const std::string &x, int parent_x);
+  static int parseIntOrPercent(const std::string &x, int parent_x);
   static std::string trim(const std::string& str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);

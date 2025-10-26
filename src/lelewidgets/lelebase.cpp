@@ -223,20 +223,20 @@ void LeleBase::setStyle() {
       value = _lele_styles.getValue("background/size");
       if(value) {
         std::string val = std::get<std::string>(value.value());
-        if(val == "contain") {}//osm todo
-        else if(val == "cover") {}//osm todo
+        if(val == "cover") {}//Fills the container, potentially cropping the content. 
+        else if(val == "contain") {}//Shows the entire content, potentially leaving empty space in the container.
         else if(!val.empty()) {
-          val = LeleStyle::trim(val);
-          int max_x = lv_obj_get_width(_lele_parent->getLvObj());//_bg_img.value()->header.w;
-          int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
           int x = -1;
           int y = -1;
-          if(val.at(0) == '{' && LeleWidgetFactory::parseXY(val, {{"x", &x}, {"y", &y}}, {{"x", max_x}, {"y", max_y}})) {
+          int max_x = lv_obj_get_width(_lele_parent->getLvObj());//_bg_img.value()->header.w;
+          int max_y = lv_obj_get_height(_lele_parent->getLvObj());//_bg_img.value()->header.h;
+          val = LeleWidgetFactory::trim(val);
+          if(LeleWidgetFactory::parseNameValue(val, {{"x", &x}, {"y", &y}}, {{"x", max_x}, {"y", max_y}})) {
             _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), x, y);
           }
           else {
-            x = LeleStyle::toInt(val, max_x);
-            y = LeleStyle::toInt(val, max_y);
+            x = LeleStyle::parseIntOrPercent(val, max_x);
+            y = LeleStyle::parseIntOrPercent(val, max_y);
             _bg_img = LeleImageConverter::resizeImg(_bg_img.value().get(), x, y);
           }
           // _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), max_x, max_y);
