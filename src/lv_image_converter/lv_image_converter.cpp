@@ -48,12 +48,26 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
 
-    ImgHelper img;
-    if(!img.resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+    if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
     return dst_img;
+}
+
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(
+    const lv_image_dsc_t *src_img, int x, int y, int cropped_width, int cropped_height) {
+
+    int bpp = src_img->header.stride/src_img->header.w;
+    auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(cropped_width * bpp * cropped_height);
+    initImageDsc(dst_img.get(), cropped_width, cropped_height, bpp);
+
+    if(!ImgHelper::cropImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        0, 0, cropped_width, cropped_height, const_cast<uint8_t*>(dst_img->data))) {
+        return std::nullopt;
+    }
+
+    return dst_img;        
 }
 
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
@@ -71,8 +85,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
         case TileRepeat::RepeatXY: default: tile_repeat = ImgHelper::RepeatXY; break;
     }
 
-    ImgHelper img;
-    if(!img.tileImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+    if(!ImgHelper::tileImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
         new_width, new_height, const_cast<uint8_t*>(dst_img->data),
         tile_repeat, dx, dy)) {
         return std::nullopt;

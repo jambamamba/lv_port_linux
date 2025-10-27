@@ -24,4 +24,5 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t *src_img, int new_width, int new_height);
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(const lv_image_dsc_t *src_img, int new_width, int new_height,
     TileRepeat repeat = TileRepeat::RepeatXY, int dx = 0, int dy = 0);
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(const lv_image_dsc_t *src_img, int x, int y, int cropped_width, int cropped_height);
 }//namespace LeleImageConverter

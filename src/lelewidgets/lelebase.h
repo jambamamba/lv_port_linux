@@ -58,6 +58,10 @@ class LeleBase {
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
   protected:
+  void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
+  std::tuple<int,int> parseBackgroundPosition(
+    const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const;
+
   std::string _class_name = "N/A";
   std::string _id;
   bool _enabled = true;

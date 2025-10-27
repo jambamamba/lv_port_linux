@@ -268,47 +268,7 @@ void LeleBase::setStyle() {
   }
   value = _lele_styles.getValue("background/image");
   if(value) {
-    lv_obj_t *lv_img = lv_image_create(_lv_obj);
-    std::string src = std::get<std::string>(value.value());
-    if(src.at(0) == '/') {
-      _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
-    }
-    else {
-      std::string img_path(applicationPath().parent_path().string() + "/res/" + src);
-      _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
-    }
-    if(_bg_img) {
-      value = _lele_styles.getValue("background/size");
-      if(value) {
-        std::string val = std::get<std::string>(value.value());
-        if(val == "cover") {
-          _bg_img = resizeContentToFillContainerPotentiallyCroppingContent(_bg_img.value().get(), obj_width, obj_height);
-        }
-        else if(val == "contain") {
-          _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
-        }
-        else if(!val.empty()) {
-          _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
-        }
-      }
-      value = _lele_styles.getValue("background/position");
-      if(value) {
-      }
-      value = _lele_styles.getValue("background/repeat");
-      if(value) {
-        std::string val = std::get<std::string>(value.value());
-        if(val == "repeat-x"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX);
-        }
-        else if(val == "repeat-y"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY);
-        }
-        else if(val == "repeat"){
-        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY);
-        }
-      }
-      lv_image_set_src(lv_img, _bg_img.value().get());
-    }
+    drawBackgroundImage(value, obj_width, obj_height);
   }
   
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
@@ -319,6 +279,89 @@ void LeleBase::setStyle() {
   lv_obj_add_style(_lv_obj, &_style, LV_PART_MAIN);
 }
 
+void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
+    lv_obj_t *lv_img = lv_image_create(_lv_obj);
+    if(!lv_img) {
+        LOG(FATAL, LVSIM, "Failed in lv_image_create");
+        return;
+    }
+    std::string src = std::get<std::string>(value.value());
+    if(src.at(0) == '/') {
+      _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
+    }
+    else {
+      std::string img_path(applicationPath().parent_path().string() + "/res/" + src);
+      _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
+    }
+    if(!_bg_img) {
+        LOG(FATAL, LVSIM, "Failed in generating image description");
+        return;
+    }
+    value = _lele_styles.getValue("background/size");
+    if(value) {
+      std::string val = std::get<std::string>(value.value());
+      if(val == "cover") {
+        _bg_img = resizeContentToFillContainerPotentiallyCroppingContent(_bg_img.value().get(), obj_width, obj_height);
+      }
+      else if(val == "contain") {
+        _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
+      }
+      else if(!val.empty()) {
+        _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
+      }
+    }
+    if(!_bg_img) {
+      LOG(FATAL, LVSIM, "Failed in processing background/size");
+      return;
+    }
+    int offset_x = 0;
+    int offset_y = 0;
+    value = _lele_styles.getValue("background/position");
+    if(value) {
+      std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
+    }
+    value = _lele_styles.getValue("background/repeat");
+    if(value) {
+      std::string val = std::get<std::string>(value.value());
+      if(val == "repeat-x"){
+        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset_x, offset_y);
+      }
+      else if(val == "repeat-y"){
+        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset_x, offset_y);
+      }
+      else if(val == "repeat"){
+      _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
+      }
+    }
+    if(!_bg_img) {
+      LOG(FATAL, LVSIM, "Failed in background/repeat");
+      return;
+    }
+    if(_bg_img.value().get()->header.w > obj_width || 
+        _bg_img.value().get()->header.h > obj_height) {
+        _bg_img = LeleImageConverter::cropImg(_bg_img.value().get(), 0, 0, obj_width, obj_height);
+    }
+    if(!_bg_img) {
+      LOG(FATAL, LVSIM, "Failed in cropping image");
+      return;
+    }
+    lv_image_set_src(lv_img, _bg_img.value().get());
+}
+
+std::tuple<int,int> LeleBase::parseBackgroundPosition(
+  const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const {
+  int x = 0;
+  int y = 0;
+  std::string val = std::get<std::string>(value.value());
+  if(!val.empty()) {
+    val = LeleWidgetFactory::trim(val);
+    if(!LeleWidgetFactory::parsePercentValues(val, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
+      x = LeleStyle::parsePercentValue(val, container_width);
+      y = LeleStyle::parsePercentValue(val, container_height);
+    }
+  }
+  return std::tuple<int,int>(x, y);
+}
 void LeleBase::setObjAlignStyle(lv_obj_t *lv_obj) {
   auto value = _lele_styles.getValue("align");
   if(value) {

@@ -152,7 +152,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
             _style[key + "/" + subkey] = value;
           }
           else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-            // _style[key + "/" + subkey] = value;
+            _style[key + "/" + subkey] = value;
           }
           else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
             _style[key + "/" + subkey] = value;

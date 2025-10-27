@@ -72,7 +72,7 @@
                     },
                     "view":{
                         "style":{"id":"img","border":"solid-1px-#00ff00","x":"0","y":"0","width":"80%","height":"50%",
-                            "background":{"image":"firefox-logo.png","position":"","xsize":"contain","xsize":"cover","xsize":"20%","size":{"x":"20%","y":"20%"},"repeat":"repeat","color":"#0f0"}
+                            "background":{"image":"firefox-logo.png","xposition":"19%","position":{"x":"21","y":"22"},"xsize":"contain","xsize":"cover","xsize":"20%","size":{"x":"20%","y":"20%"},"repeat":"repeat-y","color":"#0f0"}
                         }
                     },
                     "ximg":{
