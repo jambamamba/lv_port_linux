@@ -214,7 +214,7 @@ std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_
     return tokens;
 }
 
-bool parseNameValue(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
+bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
   bool ret = false;
   LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]

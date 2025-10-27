@@ -20,11 +20,11 @@ LeleImage::LeleImage(const std::string &json_str)
       }
       else if(key == "offset") {
         _offset = std::optional<LeleImage::Offset>();
-        LeleWidgetFactory::parseNameValue(value, {{"x", &_offset->_offset_x}, {"y", &_offset->_offset_y}});
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_offset_x}, {"y", &_offset->_offset_y}});
       }
       else if(key == "scale") {
         _scale = std::optional<LeleImage::Scale>();
-        LeleWidgetFactory::parseNameValue(value, {{"x", &_scale->_percent_x}, {"y", &_scale->_percent_y}});
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_percent_x}, {"y", &_scale->_percent_y}});
       }
       else if(key == "blendmode") {
         if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }
@@ -131,7 +131,7 @@ std::optional<LeleImage::Rotation> LeleImage::parseRotation(const std::string &j
         processed = true;
       }
       else if(key == "pivot") {
-        LeleWidgetFactory::parseNameValue(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
         processed = true;
       }
     }

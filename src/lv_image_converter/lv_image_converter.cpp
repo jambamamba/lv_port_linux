@@ -43,7 +43,7 @@ void initImageDsc(lv_image_dsc_t *dst_img, int width, int height, int bpp) {
 
 namespace LeleImageConverter {
 
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t *src_img, int new_width, int new_height) {
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
@@ -56,14 +56,25 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(lv_image_dsc_t *src_i
     return dst_img;
 }
 
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(lv_image_dsc_t *src_img, int new_width, int new_height) {
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
+    const lv_image_dsc_t *src_img, int new_width, int new_height,
+    TileRepeat repeat, int dx, int dy) {
+
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
 
+    ImgHelper::TileRepeat tile_repeat;
+    switch(repeat) {
+        case TileRepeat::RepeatX: tile_repeat = ImgHelper::RepeatX; break;
+        case TileRepeat::RepeatY: tile_repeat = ImgHelper::RepeatY; break;
+        case TileRepeat::RepeatXY: default: tile_repeat = ImgHelper::RepeatXY; break;
+    }
+
     ImgHelper img;
     if(!img.tileImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
+        new_width, new_height, const_cast<uint8_t*>(dst_img->data),
+        tile_repeat, dx, dy)) {
         return std::nullopt;
     }
     return dst_img;

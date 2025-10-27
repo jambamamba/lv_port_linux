@@ -71,8 +71,8 @@
                         "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
                     },
                     "view":{
-                        "style":{"id":"img","border":"solid-1px-#ff0000","x":"0","y":"0","width":"50%","height":"50%",
-                            "background":{"image":"firefox-logo.png","position":"","size":"20%","xsize":{"x":"20%","y":"20%"},"repeat":"repeat","color":"#0f0"}
+                        "style":{"id":"img","border":"solid-1px-#00ff00","x":"0","y":"0","width":"80%","height":"50%",
+                            "background":{"image":"firefox-logo.png","position":"","xsize":"contain","xsize":"cover","xsize":"20%","size":{"x":"20%","y":"20%"},"repeat":"repeat","color":"#0f0"}
                         }
                     },
                     "ximg":{

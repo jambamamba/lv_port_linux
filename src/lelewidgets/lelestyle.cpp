@@ -22,19 +22,19 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         _id = value;
       }
       else if(key == "x") {
-        _style[key] = parseIntOrPercent(value, _parent_width);
+        _style[key] = parsePercentValue(value, _parent_width);
       }
       else if(key == "y") {
-        _style[key] = parseIntOrPercent(value, _parent_height);
+        _style[key] = parsePercentValue(value, _parent_height);
       }
       else if(key == "width") {
-        _style[key] = parseIntOrPercent(value, _parent_width);
+        _style[key] = parsePercentValue(value, _parent_width);
       }
       else if(key == "height") {
-        _style[key] = parseIntOrPercent(value, _parent_height);
+        _style[key] = parsePercentValue(value, _parent_height);
       }
       else if(key == "corner_radius") {
-        _style[key] = parseIntOrPercent(value, std::max(_parent_height, _parent_width));
+        _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
       }
       else if(key == "padding") {
         std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
@@ -166,7 +166,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
   }
 }
 
-int LeleStyle::parseIntOrPercent(const std::string &x, int parent_x) {
+int LeleStyle::parsePercentValue(const std::string &x, int parent_x) {
     if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
         int i = 0;
         if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
