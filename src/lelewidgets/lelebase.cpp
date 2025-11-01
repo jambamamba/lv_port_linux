@@ -238,12 +238,14 @@ void LeleBase::setStyle() {
   value = _lele_styles.getValue("layout");
   if(value) {
     lv_obj_set_style_layout(_lv_obj, 
-      std::get<lv_layout_t>(value.value()), LV_STYLE_STATE_CMP_SAME); //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
+      std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
+      LV_STYLE_STATE_CMP_SAME);
   }
   value = _lele_styles.getValue("flow");
   if(value) {
     lv_obj_set_style_flex_flow(_lv_obj, 
-      std::get<lv_flex_flow_t>(value.value()), LV_STYLE_STATE_CMP_SAME);
+      std::get<lv_flex_flow_t>(value.value()), //LV_FLEX_FLOW_ROW or LV_FLEX_FLOW_COLUMN or ...
+      LV_STYLE_STATE_CMP_SAME);
 
     value = _lele_styles.getValue("grow");
     if(value) {

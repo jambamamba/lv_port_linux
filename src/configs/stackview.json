@@ -1,6 +1,6 @@
 {
     "stackview":{
-        "style":{"id":"stackview/styles/style0","padding":"none","margin":"none","layout":"flex","flow":"column","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"id":"stackview/styles/style0","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
         "style":{"id":"stackview/styles/style1","class_name":"stackview/view","border":"solid-1px-#0000ff","x":"0","y":"0","width":"100%","height":"95%"},
         "style":{"id":"stackview/styles/style2","class_name":"stackview/view/header","border":"none","width":"0%","height":"0%"},
         "style":{"id":"stackview/styles/style3","class_name":"stackview/view/button","border":"none","width":"15%","height":"40","fgcolor":"#ffffff","bgcolor":"#ff0000"},
