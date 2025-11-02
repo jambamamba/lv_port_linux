@@ -20,6 +20,7 @@ class LeleStyle {
     std::string,
     lv_layout_t,
     lv_flex_flow_t,
+    lv_scrollbar_mode_t,
     BorderTypeE
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
@@ -68,7 +69,8 @@ class LeleStyle {
     {"background/position", std::nullopt},
     {"background/size", std::nullopt},
     {"background/repeat", std::nullopt},
-    {"background/color", std::nullopt}
+    {"background/color", std::nullopt},
+    {"scrollbar", std::nullopt}
   };
   int _parent_width = 0;
   int _parent_height = 0;

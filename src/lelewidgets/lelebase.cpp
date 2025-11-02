@@ -272,6 +272,10 @@ void LeleBase::setStyle() {
   if(value) {
     drawBackgroundImage(value, obj_width, obj_height);
   }
+  value = _lele_styles.getValue("scrollbar");
+  if(value) {
+    lv_obj_set_scrollbar_mode(_lv_obj, std::get<lv_scrollbar_mode_t>(value.value()));
+  }
   
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active

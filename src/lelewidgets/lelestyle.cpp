@@ -57,7 +57,7 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
         }
       }
       else if(key == "flow") {
-        if(strncmp(value.c_str(), "row", 6)==0) {
+        if(strncmp(value.c_str(), "row", 3)==0) {
           _style[key] = LV_FLEX_FLOW_ROW;
         }
         else if(strncmp(value.c_str(), "row_wrap", 8)==0) {
@@ -87,6 +87,20 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
       }
       else if(key == "grow") {
         _style[key] = std::stoi(value);
+      }
+      else if(key == "scrollbar") {
+        if(strncmp(value.c_str(), "off", 3)==0 || strncmp(value.c_str(), "none", 4)==0 || strncmp(value.c_str(), "false", 4)==0) {
+          _style[key] = LV_SCROLLBAR_MODE_OFF;
+        }
+        else if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "always", 6)==0 || strncmp(value.c_str(), "true", 4)==0) {
+          _style[key] = LV_SCROLLBAR_MODE_ON;
+        }
+        else if(strncmp(value.c_str(), "active", 6)==0) {
+          _style[key] = LV_SCROLLBAR_MODE_ACTIVE;
+        }
+        else {// "auto"
+          _style[key] = LV_SCROLLBAR_MODE_AUTO;
+        }
       }
       else if(key == "fgcolor") {
         _style[key] = LeleStyle::parseColorCode(value);
