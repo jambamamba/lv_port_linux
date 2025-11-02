@@ -74,7 +74,7 @@
                         "style":{"id":"img","border":"solid-1px-#00ff00","x":"0","y":"0","width":"80%","height":"50%",
                             "background":{
                                 "image":"firefox-logo.png",
-                                "this-is-causing-artifacts-around-image->position":"20",
+                                "position":"20",
                                 "xposition":{"x":"20","y":"20"},
                                 "xsize":"contain",
                                 "xsize":"cover",

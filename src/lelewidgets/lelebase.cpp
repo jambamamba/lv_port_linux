@@ -332,7 +332,7 @@ void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, i
         _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset_x, offset_y);
       }
       else if(val == "repeat"){
-      _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
+        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
       }
     }
     if(!_bg_img) {
@@ -347,6 +347,7 @@ void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, i
       LOG(FATAL, LVSIM, "Failed in cropping image");
       return;
     }
+    // LOG(DEBUG, LVSIM, "obj_width:%i, obj_height:%i\n", obj_width, obj_height);
     lv_image_set_src(lv_img, _bg_img.value().get());
 }
 

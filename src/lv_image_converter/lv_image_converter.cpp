@@ -77,6 +77,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
+    memset((void*)dst_img->data, 0, new_width * bpp * new_height);//this prevents artifacts from appearing if you you have dx/dy, because tiling with dx/dy will skip pixels, and we want to make sure those skipped pixels are zero.
 
     ImgHelper::TileRepeat tile_repeat;
     switch(repeat) {
