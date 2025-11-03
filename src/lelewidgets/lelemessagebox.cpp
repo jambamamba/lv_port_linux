@@ -38,13 +38,14 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       lv_obj_t *btn = value->createLvObj(nullptr, lv_msgbox_add_close_button(_lv_obj));
-      value->setStyle(btn);//osm todo: the style is not set if class_name is set in the json
+      // value->setStyle(btn);//osm todo: the style is not set if class_name is set in the json
 
       // lv_msgbox_add_close_button(mbox1);
       // btn = lv_msgbox_add_footer_button(mbox1, "Apply");
       // lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);
       // btn = lv_msgbox_add_footer_button(mbox1, "Cancel");
-      // lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);    }
+      // lv_obj_add_event_cb(btn, event_cb, LV_EVENT_CLICKED, NULL);    
+      }
   }
   return _lv_obj;
 }
