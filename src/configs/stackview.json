@@ -16,27 +16,27 @@
             "label":{
                 "id":"view_header/label0",
                 "text":"",
-                "style":{"id":"view_header/label0","border":"none","width":"15%","height":"40"}
+                "style":{"id":"view_header/label0","border":"none","width":"15%"}
             },
             "label":{
                 "id":"view_header/label1",
                 "text":"",
-                "style":{"id":"view_header/label1","border":"none","width":"15%","height":"40"}
+                "style":{"id":"view_header/label1","border":"none","width":"15%"}
             },
             "label":{
                 "id":"view_header/label2",
                 "text":"",
-                "style":{"id":"view_header/label2","border":"none","width":"15%","height":"40"}
+                "style":{"id":"view_header/label2","border":"none","width":"15%"}
             },
             "label":{
                 "id":"view_header/spacer",
                 "style":{"id":"view_header/spacer","border":"none","grow":"1"}
             },
             "button":{
-                "type":"push",
+                "type":"close",
                 "id":"close",
-                "style":{"id":"close","layout":"none","width":"15%","height":"10%","align":"top_right","text_align":"right"},
-                 "text":"X",
+                "style":{"id":"close","xborder":"solid-1px-#fff","layout":"none","width":"5%","align":"xtop_right","xtext_align":"right"},
+                "xtext":"X",
                 "event":{"type":"clicked","action":"stackview.pop","args":{}}
             }
         },

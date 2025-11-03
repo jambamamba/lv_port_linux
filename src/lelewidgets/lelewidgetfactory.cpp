@@ -4,6 +4,7 @@
 #include "leleevent.h"
 #include "leleimage.h"
 #include "lelelabel.h"
+#include "lelemessagebox.h"
 #include "lelenullwidget.h"
 #include "lelestackview.h"
 #include "leletabview.h"
@@ -138,6 +139,9 @@ std::vector<std::pair<std::string, Token>> fromJson(
         }
         else if(lhs == "button") {
             token = std::make_unique<LeleButtons::LeleButton>(rhs);
+        }
+        else if(lhs == "messagebox") {
+            token = std::make_unique<LeleMessageBox>(rhs);
         }
         else if(lhs == "style") {
             token = std::make_unique<LeleStyle>(rhs);

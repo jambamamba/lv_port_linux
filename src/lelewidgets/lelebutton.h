@@ -18,7 +18,8 @@ class LeleButtons : public LeleBase {
       Push,
       Checkbox,
       Radio,
-      Switch
+      Switch,
+      Close
     };
     LeleButton(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;

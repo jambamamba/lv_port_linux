@@ -71,6 +71,7 @@ function(buildLvglSim)
         lelewidgets/leletabview.cpp
         lelewidgets/leletextbox.cpp
         lelewidgets/leleview.cpp
+        lelewidgets/lelemessagebox.cpp
         lelewidgets/lelewidgetfactory.cpp
     )
 

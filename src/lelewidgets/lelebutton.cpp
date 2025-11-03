@@ -74,6 +74,9 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
         else if(value == "switch") {
           _type = LeleButtons::LeleButton::Type::Switch;
         }
+        else if(value == "close") {
+          _type = LeleButtons::LeleButton::Type::Close;
+        }
         else {
           _type = LeleButtons::LeleButton::Type::Push;
         }
@@ -94,34 +97,46 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
 lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   switch(_type) {
-    case LeleButtons::LeleButton::Type::Checkbox:
+    case LeleButtons::LeleButton::Type::Checkbox:{
       _lv_obj = LeleBase::createLvObj(lele_parent, 
-        lv_checkbox_create(lele_parent->getLvObj()));
+        lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       lv_checkbox_set_text(_lv_obj, _text.c_str());
-    break;
-    case LeleButtons::LeleButton::Type::Radio:
+      break;
+    }
+    case LeleButtons::LeleButton::Type::Radio:{
       _lv_obj = LeleBase::createLvObj(lele_parent, 
-        lv_checkbox_create(lele_parent->getLvObj()));
+        lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       lv_checkbox_set_text(_lv_obj, _text.c_str());
-    break;
-    case LeleButtons::LeleButton::Type::Switch:
+      break;
+    }
+    case LeleButtons::LeleButton::Type::Switch:{
       _lv_obj = LeleBase::createLvObj(lele_parent, 
-        lv_switch_create(lele_parent->getLvObj()));
+        lv_obj ? lv_obj : lv_switch_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
-    break;
+      break;
+    }
+    case LeleButtons::LeleButton::Type::Close: {
+      _lv_obj = LeleBase::createLvObj(lele_parent, 
+        lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
+      lv_obj_t *img = lv_image_create(_lv_obj);
+      lv_image_set_src(img, LV_SYMBOL_CLOSE);
+      lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
+      break;
+    }
     case LeleButtons::LeleButton::Type::Push:
-    default:
+    default: {
       _lv_obj = LeleBase::createLvObj(lele_parent, 
-        lv_button_create(lele_parent->getLvObj()));
+        lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *label = lv_label_create(_lv_obj);
       lv_label_set_text(label, _text.c_str());
       setObjAlignStyle(label);
-    break;
+      break;
+    }
   }
 
   lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);

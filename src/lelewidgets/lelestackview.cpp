@@ -203,7 +203,6 @@ void LeleStackView::pushView(const std::map<std::string, std::string> &args) {
   for(auto &[name,id]: args) {
     LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, id:%s\n", name.c_str(), id.c_str());
     if(name == "id") {
-      //osm todo:  update breadcrumbs, X button should be right aligned
       for(LeleView *view : _views->getChildren()) {
         if(view->id() == id) {
           view->show();

@@ -50,7 +50,7 @@ class LeleBase {
     return &_lele_styles;
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
-  virtual void setStyle();
+  virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();

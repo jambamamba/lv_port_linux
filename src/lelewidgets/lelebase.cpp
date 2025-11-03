@@ -127,7 +127,7 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
-void LeleBase::setStyle() {
+void LeleBase::setStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
   auto value = _lele_styles.getValue("corner_radius");
   if(value) {
@@ -209,64 +209,64 @@ void LeleBase::setStyle() {
 
   value = _lele_styles.getValue("x");
   if(value) {
-    lv_obj_set_x(_lv_obj, std::get<int>(value.value()));
+    lv_obj_set_x(lv_obj, std::get<int>(value.value()));
   }
   value = _lele_styles.getValue("y");
   if(value) {
-    lv_obj_set_y(_lv_obj, std::get<int>(value.value()));
+    lv_obj_set_y(lv_obj, std::get<int>(value.value()));
   }
   value = _lele_styles.getValue("width");
   if(value) {
     obj_width = std::get<int>(value.value());
-    lv_obj_set_width(_lv_obj, obj_width);
+    lv_obj_set_width(lv_obj, obj_width);
   }
   value = _lele_styles.getValue("height");
   if(value) {
     obj_height = std::get<int>(value.value());
-    lv_obj_set_height(_lv_obj, obj_height);
+    lv_obj_set_height(lv_obj, obj_height);
   }
 
   value =_lele_styles.getValue("fgcolor");
   if(value) {
-    lv_obj_set_style_text_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+    lv_obj_set_style_text_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
   value =_lele_styles.getValue("bgcolor");
   if(value) {
-    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
 
   value = _lele_styles.getValue("layout");
   if(value) {
-    lv_obj_set_style_layout(_lv_obj, 
+    lv_obj_set_style_layout(lv_obj, 
       std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
       LV_STYLE_STATE_CMP_SAME);
   }
   value = _lele_styles.getValue("flow");
   if(value) {
-    lv_obj_set_style_flex_flow(_lv_obj, 
+    lv_obj_set_style_flex_flow(lv_obj, 
       std::get<lv_flex_flow_t>(value.value()), //LV_FLEX_FLOW_ROW or LV_FLEX_FLOW_COLUMN or ...
       LV_STYLE_STATE_CMP_SAME);
 
     value = _lele_styles.getValue("grow");
     if(value) {
-      lv_obj_set_style_flex_grow(_lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
+      lv_obj_set_style_flex_grow(lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
     }
   }
 
   value = _lele_styles.getValue("align");
   if(value) {
-    lv_obj_align(_lv_obj, 
+    lv_obj_align(lv_obj, 
       static_cast<lv_align_t>(std::get<int>(value.value())), 0, 0);
   }
   value = _lele_styles.getValue("text_align");
   if(value) {
-    lv_obj_set_style_text_align(_lv_obj, 
+    lv_obj_set_style_text_align(lv_obj, 
       static_cast<lv_text_align_t>(std::get<int>(value.value())), 0);
   }
 
   value = _lele_styles.getValue("background/color");
   if(value) {
-    lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+    lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
   value = _lele_styles.getValue("background/image");
   if(value) {
@@ -274,7 +274,7 @@ void LeleBase::setStyle() {
   }
   value = _lele_styles.getValue("scrollbar");
   if(value) {
-    lv_obj_set_scrollbar_mode(_lv_obj, std::get<lv_scrollbar_mode_t>(value.value()));
+    lv_obj_set_scrollbar_mode(lv_obj, std::get<lv_scrollbar_mode_t>(value.value()));
   }
   
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
@@ -282,7 +282,7 @@ void LeleBase::setStyle() {
 
   // lv_style_t * btn_style = lv_theme_get_style(my_theme, LV_PART_MAIN); // Get the button style from your custom theme
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
-  lv_obj_add_style(_lv_obj, &_style, LV_PART_MAIN);
+  lv_obj_add_style(lv_obj, &_style, LV_PART_MAIN);
 }
 
 void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
@@ -400,7 +400,7 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
     _lv_obj = lv_obj;
   }
   setParent(lele_parent);
-  setStyle();
+  setStyle(_lv_obj);
   return _lv_obj;
 }
 
