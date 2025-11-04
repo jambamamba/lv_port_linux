@@ -1,0 +1,27 @@
+{
+    "messagebox":{
+        "style":{"id":"messagebox","width":"50%","height":"50%"},
+        "title":"Title",
+        "text":"Messagebox text....",
+        "button":{
+            "type":"close",
+            "id":"close",
+            "style":{"id":"close","xclass_name":"none","fgcolor":"#fff","bgcolor":"#444"},
+            "event":{"id":"close","type":"clicked","action":"","args":{}}
+        },
+        "button":{
+            "type":"push",
+            "id":"push",
+            "text":"hwwai!",
+            "style":{"id":"push","xclass_name":"none","fgcolor":"#fff","bgcolor":"#444"},
+            "event":{"id":"push","type":"clicked","action":"","args":{}}
+        },
+        "button":{
+            "type":"push",
+            "id":"push",
+            "text":"weeger!",
+            "style":{"id":"push","xclass_name":"none","fgcolor":"#fff","bgcolor":"#444"},
+            "event":{"id":"push","type":"clicked","action":"","args":{}}
+        }
+    }
+}

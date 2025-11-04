@@ -37,18 +37,7 @@
             "type":"push",
             "style":{"id":"button0","class_name":"view/button"},
             "text":"> Push button0",
-            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
-        },
-        "messagebox":{
-            "style":{"id":"messagebox","width":"50%","height":"50%"},
-            "title":"Title",
-            "text":"Messagebox text....",
-            "button":{
-                "type":"close",
-                "id":"close",
-                "style":{"id":"close","xclass_name":"none","fgcolor":"#fff","bgcolor":"#444"},
-                "xevent":{"type":"clicked","action":"stackview.pop","args":{}}
-            }
+            "event":{"type":"clicked","action":"","args":{}}
         }
     }
 }

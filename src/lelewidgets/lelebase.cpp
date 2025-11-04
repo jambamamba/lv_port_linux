@@ -424,6 +424,7 @@ void LeleBase::EventCallback(lv_event_t *e) {
       base->eventCallback(LeleEvent(e));
     }
 }
+
 void LeleBase::hide() {
   // int width = lv_obj_get_width(getLvObj());
   // int height = lv_obj_get_height(getLvObj());

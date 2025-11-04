@@ -25,11 +25,14 @@ class LeleButtons : public LeleBase {
     virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
+    bool isChecked() const { return _checked; }
+    Type type() const { return _type; }
+    const std::string &text() const { return _text; }
     protected:
-    std::string _text;
     bool _checkable = false;
     bool _checked = false;
     Type _type = Push;
+    std::string _text;
     std::vector<LeleEvent*> _events;
   };
   LeleButtons(const std::string &json_str);
