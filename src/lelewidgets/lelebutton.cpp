@@ -64,7 +64,10 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
       if(key == "text") {
         _text = value;
       }
-      if(key == "type") {
+      else if(key == "value") {
+        _value = std::stoi(value);
+      }
+      else if(key == "type") {
         if(value == "checkbox") {
           _type = LeleButtons::LeleButton::Type::Checkbox;
         }
@@ -73,6 +76,9 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
         }
         else if(value == "switch") {
           _type = LeleButtons::LeleButton::Type::Switch;
+        }
+        else if(value == "slider") {
+          _type = LeleButtons::LeleButton::Type::Slider;
         }
         else if(value == "close") {
           _type = LeleButtons::LeleButton::Type::Close;
@@ -118,6 +124,12 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
         lv_obj ? lv_obj : lv_switch_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
+      break;
+    }
+    case LeleButtons::LeleButton::Type::Slider:{
+      _lv_obj = LeleBase::createLvObj(lele_parent, 
+        lv_obj ? lv_obj : lv_slider_create(lele_parent->getLvObj()));
+        lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
       break;
     }
     case LeleButtons::LeleButton::Type::Close: {
@@ -184,7 +196,9 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
         }
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
-        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i\n", _class_name.c_str(), _type);
+        lv_obj_t *slider = lv_event_get_target_obj(lv_event);
+        int value = slider ? lv_slider_get_value(slider) : 0;
+        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, value);
     }
     return LeleBase::eventCallback(std::move(e));
 }

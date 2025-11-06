@@ -38,6 +38,12 @@
             "style":{"id":"button0","class_name":"view/button"},
             "text":"> Push button0",
             "event":{"type":"clicked","action":"","args":{}}
+        },  
+        "button":{
+            "type":"slider",
+            "style":{"id":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+            "value":"10",
+            "event":{"type":"clicked","action":"","args":{}}
         }
     }
 }
