@@ -286,6 +286,7 @@ void LeleBase::setStyle(lv_obj_t *lv_obj) {
 }
 
 void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
+  //osm todo: apply these in the same order they are defined in the json
     lv_obj_t *lv_img = lv_image_create(_lv_obj);
     if(!lv_img) {
         LOG(FATAL, LVSIM, "Failed in lv_image_create");

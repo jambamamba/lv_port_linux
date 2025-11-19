@@ -264,7 +264,7 @@ std::optional<LeleStyle::Rotation> LeleStyle::parseRotation(const std::string &j
         processed = true;
       }
       else if(key == "pivot") {
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
         processed = true;
       }
     }
