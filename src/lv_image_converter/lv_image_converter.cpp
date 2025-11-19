@@ -70,6 +70,33 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(
     return dst_img;        
 }
 
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> rotateImg(
+    const lv_image_dsc_t *src_img, int pivot_x, int pivot_y, float angle) {
+    
+    int rotated_width = 0;
+    int rotated_height = 0; 
+
+    if(!ImgHelper::rotateImageData(
+        src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        pivot_x, pivot_y, angle, 
+        rotated_width, rotated_height)) {
+        return std::nullopt;
+    }
+    int bpp = src_img->header.stride/src_img->header.w;
+    auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(rotated_width * bpp * rotated_height);
+    initImageDsc(dst_img.get(), rotated_width, rotated_height, bpp);
+
+    if(!ImgHelper::rotateImageData(
+        src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        pivot_x, pivot_y, angle, 
+        rotated_width, rotated_height, 
+        const_cast<uint8_t*>(dst_img->data))) {
+        return std::nullopt;
+    }
+
+    return dst_img;        
+}
+
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
     const lv_image_dsc_t *src_img, int new_width, int new_height,
     TileRepeat repeat, int dx, int dy) {

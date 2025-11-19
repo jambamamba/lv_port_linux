@@ -16,7 +16,7 @@ LeleImage::LeleImage(const std::string &json_str)
         _name = value;
       }
       else if(key == "rotation") {
-        _rotation = parseRotation(value);
+        _rotation = LeleStyle::parseRotation(value);
       }
       else if(key == "offset") {
         _offset = std::optional<LeleImage::Offset>();
@@ -118,25 +118,6 @@ lv_obj_t *LeleImage::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   }
 
   return _lv_obj;
-}
-
-std::optional<LeleImage::Rotation> LeleImage::parseRotation(const std::string &json_str) {
-  bool processed = false;
-  LeleImage::Rotation rotation;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "angle") {
-        rotation._angle = std::stof(value);
-        processed = true;
-      }
-      else if(key == "pivot") {
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
-        processed = true;
-      }
-    }
-  }
-  return processed ? std::optional<LeleImage::Rotation>(rotation) : std::nullopt;
 }
 
 std::string LeleImage::getSrc() const { 

@@ -9,6 +9,7 @@
                     "image":"firefox-logo.png",
                     "position":"20",
                     "xposition":{"x":"20","y":"20"},
+                    "rotation":{"angle":"90","pivot":{"x":"10","y":"0"}},
                     "xsize":"contain",
                     "xsize":"cover",
                     "xsize":"20%",

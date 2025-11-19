@@ -15,13 +15,19 @@ class LeleStyle {
   enum BorderTypeE {
     None=-1,Solid,Dashed,Dotted
   };
+  struct Rotation {
+    float _angle = 0.;
+    int _pivot_x = 0;
+    int _pivot_y = 0;
+  };
   using StyleValue = std::variant<
     int,
     std::string,
     lv_layout_t,
     lv_flex_flow_t,
     lv_scrollbar_mode_t,
-    BorderTypeE
+    BorderTypeE,
+    LeleStyle::Rotation
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
@@ -31,6 +37,7 @@ class LeleStyle {
   LeleBase *getLeleParent() const { return _lele_parent; }
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
+  static std::optional<LeleStyle::Rotation> parseRotation(const std::string &json_str);
   static std::string trim(const std::string& str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
@@ -70,6 +77,7 @@ class LeleStyle {
     {"background/size", std::nullopt},
     {"background/repeat", std::nullopt},
     {"background/color", std::nullopt},
+    {"background/rotate", std::nullopt},
     {"scrollbar", std::nullopt}
   };
   int _parent_width = 0;

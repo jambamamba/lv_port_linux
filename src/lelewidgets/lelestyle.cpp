@@ -162,6 +162,12 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
           if(subkey == "color") {
             _style[key + "/" + subkey] = parseColorCode(value);
           }
+          else if(subkey == "rotation") {
+            auto rotation = parseRotation(value);
+            if(rotation) {
+              _style[key + "/" + subkey] = rotation.value();
+            }
+          }
           else if(subkey == "image") {
             _style[key + "/" + subkey] = value;
           }
@@ -247,6 +253,25 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   }
   return 0;
 }
+std::optional<LeleStyle::Rotation> LeleStyle::parseRotation(const std::string &json_str) {
+  bool processed = false;
+  LeleStyle::Rotation rotation;
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+    if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(key == "angle") {
+        rotation._angle = std::stof(value);
+        processed = true;
+      }
+      else if(key == "pivot") {
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});
+        processed = true;
+      }
+    }
+  }
+  return processed ? std::optional<LeleStyle::Rotation>(rotation) : std::nullopt;
+}
+
 std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::string &border_type_width_color) {
 
   LeleStyle::BorderTypeE border_type = LeleStyle::BorderTypeE::None;

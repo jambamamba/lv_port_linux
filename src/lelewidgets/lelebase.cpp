@@ -326,6 +326,11 @@ void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, i
     if(value) {
       std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
     }
+    value = _lele_styles.getValue("background/rotation");
+    if(value) {
+      LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
+      _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
+    }
     value = _lele_styles.getValue("background/repeat");
     if(value) {
       std::string val = std::get<std::string>(value.value());
