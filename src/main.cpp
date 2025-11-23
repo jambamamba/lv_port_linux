@@ -199,10 +199,11 @@ int main(int argc, char **argv) {
                 tokens = LeleWidgetFactory::fromConfig(json_config);
                 return true;
             },
-            [](){
+            [](std::function<bool()> keepRunning){
+                LOG(DEBUG, LVSIM, "@@@@@ keepRunning: %i\n", keepRunning());
                 driver_backends_run_loop([](){
                     // LOG(DEBUG, LVSIM, "runloop\n");
-                    //osm todo: call py callback
+                    //osm todo: use keepRunning here, but c function only takes captureless lambdas
                     return true;
                 });
                 return true;

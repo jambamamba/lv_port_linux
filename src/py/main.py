@@ -16,7 +16,9 @@ def main():
     res = lele.loadConfig("imageview.json")
     print(f"loadConfig result:{res}")
 
-    res = lele.runMainLoop() #osm todo: pass callback, that should return true to continue main loop, or false to exit
+    res = lele.runMainLoop(
+        lambda: keepRunning()
+    )
     print(f"loadConfig result:{res}")
 
     return 0
@@ -24,3 +26,6 @@ def main():
 
 def callback(str):
 	print(str)
+
+def keepRunning():
+    return True

@@ -92,11 +92,21 @@ namespace {
         return PyLong_FromLong(0);
     }
     static PyObject* _mymodule_runMainLoop(PyObject *self, PyObject *args) {
+        PyObject *callback = nullptr;
+        if(!PyArg_ParseTuple(args, "O", //obj
+            &callback)) {
+            return PyLong_FromLong(-1);
+        }
         if(!_py->_runMainLoop) {
             std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No runMainLoop was set in load function" << "\n";
             return PyLong_FromLong(-1);
         }
-        if(!_py->_runMainLoop()) {
+        if(!_py->_runMainLoop([callback](){
+            PyObject *res = PyObject_CallObject(callback, nullptr);
+            if(res) { Py_DECREF(res); }
+            Py_DECREF(callback);
+            return PyObject_IsTrue(res);
+        })) {
             return PyLong_FromLong(-1);
         }
         return PyLong_FromLong(0);
@@ -255,7 +265,7 @@ void PythonWrapper::unload() {
 bool PythonWrapper::load(
     const std::string &py_script,
     std::function<bool(const std::string &config_json)> loadConfig,
-    std::function<bool()> runMainLoop
+    std::function<bool(std::function<bool()>)> runMainLoop
     ) {
 
     static PythonWrapper py;

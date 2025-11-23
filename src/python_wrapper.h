@@ -11,12 +11,12 @@ public:
     static bool load(
         const std::string &py_script,
         std::function<bool(const std::string &config_json)> loadConfig = nullptr,
-        std::function<bool()> runMainLoop = nullptr
+        std::function<bool(std::function<bool()>)> runMainLoop = nullptr
     );
     static void unload();
 
     std::function<bool(const std::string &config_json)> _loadConfig = nullptr;
-    std::function<bool()> _runMainLoop = nullptr;
+    std::function<bool(std::function<bool()>)> _runMainLoop = nullptr;
 protected:
     PythonWrapper() = default;
     PyObject *loadModule(const std::string &py_script) const;
