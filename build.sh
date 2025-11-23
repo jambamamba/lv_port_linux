@@ -8,26 +8,21 @@ set -xe
 source share/pins.txt
 source share/scripts/helper-functions.sh
 
-function setConfig() {
-    local config=$1
-    if [ -z $config ]; then return; fi
-
-    pushd src/
-    if [ -f "configs/${config}.json" ]; then
-        rm -f config.json 
-        ln -sf configs/${config}.json config.json
-    fi
-    popd
-}
-
 function main() {
-#    sudo apt-get install -y \
-#        libevdev-dev \
-#        libwayland-dev \
-#        libxkbcommon-dev \
-#        libwayland-bin \
-#        wayland-protocols
-    setConfig $1
+    local py_script="$(pwd)/src/py/main.py"
+    local config_json="$(pwd)/src/configs/testview.json"
+    parseArgs $@
+    local input_file
+    if [ -f ${py_script} ]; then
+        input_file=${py_script}
+    elif [ -f ${config_json} ]; then
+        input_file=${config_json}
+    else
+        echo "syntax:"
+        echo " ./build.sh py_script=/path/to/py/script"
+        echo " ./build.sh config_json=/path/to/config/json"
+        exit -1
+    fi
 
     local deps=(zlib debug_logger json_utils curl libssh2 utils)
     installDeps $@ deps depsdir="/usr/local"
@@ -47,7 +42,7 @@ function main() {
 
     pushd x86-build/bin
     echo "set confirm off" |sudo tee ~/.gdbinit
-    gdb -ex "run" --args ./lvglsim
+    gdb -ex "run" --args ./lvglsim ${input_file}
     popd
 }
 

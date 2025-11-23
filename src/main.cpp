@@ -34,11 +34,11 @@
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
 
+#include "python_wrapper.h"
 #include "src/lib/driver_backends.h"
 #include "src/lib/simulator_util.h"
 #include "src/lib/simulator_settings.h"
-
-#include "src/lelewidgets/leletabview.h"
+#include "src/lelewidgets/lelebase.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -146,10 +146,6 @@ std::filesystem::path applicationPath() {
     return std::filesystem::path(_app_path);
 }
 
-bool runloop() {
-    return true;
-}
-
 int main(int argc, char **argv) {
     LOG_INIT("/tmp");
 
@@ -182,16 +178,41 @@ int main(int argc, char **argv) {
     // addProgressBar();
     // addChart();
     // LOG(DEBUG, LVSIM, "create tab view\n");
-    _app_path = argv[0];
-    std::string config_json = (argc > 1 && *argv[1] && std::filesystem::exists(argv[1])) ? 
-            argv[1] : std::filesystem::current_path().string() + "/config.json";
-    // LOG(DEBUG, LVSIM, "main %s\n", argv[0]);
-    auto tokens = LeleWidgetFactory::fromConfig(config_json);
-    
-    /* Enter the run loop of the selected backend */
-    driver_backends_run_loop(&runloop);
 
+    // LOG(DEBUG, LVSIM, "main %s\n", argv[0]);
+    _app_path = argv[0];
+
+    std::vector<std::pair<std::string, LeleWidgetFactory::Token>> tokens;
+    std::string input_file = (argc > 1 && *argv[1] && std::filesystem::exists(argv[1])) ? 
+            argv[1] : std::filesystem::current_path().string() + "/main.py";
+    if(std::filesystem::path(input_file).extension() == ".json") {
+        tokens = LeleWidgetFactory::fromConfig(input_file);
+        driver_backends_run_loop([](){
+            // LOG(DEBUG, LVSIM, "runloop\n");
+            return true;
+        });
+    }
+    else if(std::filesystem::path(input_file).extension() == ".py") {
+        if(!PythonWrapper::load(
+            input_file, 
+            [&tokens](const std::string &json_config){
+                tokens = LeleWidgetFactory::fromConfig(json_config);
+                return true;
+            },
+            [](){
+                driver_backends_run_loop([](){
+                    // LOG(DEBUG, LVSIM, "runloop\n");
+                    //osm todo: call py callback
+                    return true;
+                });
+                return true;
+            })) {
+            return -1;
+        }
+    }
+    else {
+        LOG(FATAL, LVSIM, "Missing python script or config json\n");
+        return -1;
+    }
     return 0;
 }
-
-

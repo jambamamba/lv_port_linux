@@ -56,8 +56,8 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
     set(${OUT_VAR_LV_IMG_DSC_SRC} "${LV_IMG_DSC_SRC}" PARENT_SCOPE)
 endfunction()
 
-function(buildLvglSim)
-    message(STATUS "buildLvglSim()")
+function(buildLvglSim PYTHON_LIB)
+    message(STATUS "buildLvglSim() PYTHON_LIB:${PYTHON_LIB}")
 
     set(LELE_WIDGETS
         lelewidgets/lelebase.cpp
@@ -117,7 +117,15 @@ function(buildLvglSim)
     )
     # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
-    file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
+    # file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
+    get_filename_component(PYTHON_DIR "${PYTHON_LIB}" DIRECTORY)
+    message(STATUS "PYTHON_DIR: ${PYTHON_DIR}")
+    add_custom_target(create_my_symlink ALL
+        COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${PYTHON_DIR}
+        ${CMAKE_BINARY_DIR}/bin/Python
+        COMMENT "Creating symbolic link: ${CMAKE_BINARY_DIR}/bin/Python -> ${PYTHON_DIR}"
+    )
     file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
@@ -145,6 +153,6 @@ endif()
 
 buildPythonLib(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
-buildLvglSim()
+buildLvglSim(${PYTHON_LIB_OUTPUT})
 buildTests()
 runTests()

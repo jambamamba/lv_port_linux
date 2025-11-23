@@ -1,15 +1,14 @@
 #include <filesystem>
 #include <iostream>
-#include <string>
-#include <vector>
-#include <Python.h>
-
 #include <debug_logger/debug_logger.h>
+
+#include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
     bool _cancel = false;
+    static PythonWrapper *_py;
 
     //Functions that py script can call
     static PyObject* _mymodule_version(PyObject *self, PyObject *args) {
@@ -65,29 +64,58 @@ namespace {
 
         return PyLong_FromLong(0);
     }
+    static PyObject* _mymodule_loadConfig(PyObject *self, PyObject *args) {
+        char *str = nullptr;
+        if(!PyArg_ParseTuple(args, "s", //str
+            &str)) {
+            return PyLong_FromLong(-1);
+        }
+        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
+
+        if(!str) {
+            return PyLong_FromLong(-1);
+        }
+
+        std::string input_file(str);
+        if(str[0] != '/') {
+            input_file = std::filesystem::current_path().string() + "/" + input_file;
+        }
+        if((std::filesystem::exists(input_file))) {
+            if(!_py->_loadConfig) {
+                std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No loadConfig was set in load function" << "\n";
+                return PyLong_FromLong(-1);
+            }
+            if(!_py->_loadConfig(input_file)) {
+                return PyLong_FromLong(-1);
+            }
+        }
+        return PyLong_FromLong(0);
+    }
+    static PyObject* _mymodule_runMainLoop(PyObject *self, PyObject *args) {
+        if(!_py->_runMainLoop) {
+            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No runMainLoop was set in load function" << "\n";
+            return PyLong_FromLong(-1);
+        }
+        if(!_py->_runMainLoop()) {
+            return PyLong_FromLong(-1);
+        }
+        return PyLong_FromLong(0);
+    }
     static PyMethodDef _mymodule_methods[] = {
-        {"version", _mymodule_version, METH_VARARGS, "mymodule.version()"},
-        {"foo", _mymodule_foo, METH_VARARGS, "mymodule.foo(num, str, list, dic, callback)"},
+        {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
+        {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
+        {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
+        {"runMainLoop", _mymodule_runMainLoop, METH_VARARGS, "lele.runMainLoop()"},
         {NULL, NULL, 0, NULL}
     };
     static PyModuleDef _mymodule = {
-        PyModuleDef_HEAD_INIT, "mymodule", NULL, -1, _mymodule_methods,
+        PyModuleDef_HEAD_INIT, "lele", NULL, -1, _mymodule_methods,
         NULL, NULL, NULL, NULL
     };
     static PyObject* PyInitMyModule(void) {
         return PyModule_Create(&_mymodule);
     }    
 }//namespace
-
-class PythonWrapper {
-    public:
-    void printError() const;
-    PyObject *loadModule(const std::string &py_script) const;
-    void runScript(const std::string &py_script) const;
-    bool callPythonFunction(PyObject *py_module, const char* func, const std::vector<std::string> &args);
-
-};//class PythonWrapper
-
 
 void PythonWrapper::printError() const
 {
@@ -174,7 +202,7 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
 PyObject *PythonWrapper::loadModule(const std::string &py_script) const
 {
     setlocale(LC_ALL, "en_US.UTF-8");
-    PyImport_AppendInittab("mymodule", &PyInitMyModule);
+    PyImport_AppendInittab("lele", &PyInitMyModule);
 
     std::filesystem::path path(py_script);
     std::string py_script_dir = path.parent_path().string();
@@ -189,6 +217,7 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const
 #endif
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
     std::string _py_home_dir(std::filesystem::current_path().string() + "/Python");
+    std::cout << "Using _py_home_dir: " << _py_home_dir << "\n";
     std::wstring home_ws(converter.from_bytes(_py_home_dir.c_str()));
     PyWideStringList_Append(&config.module_search_paths, home_ws.c_str());
     std::string _py_lib_dir(_py_home_dir + "/Lib");
@@ -198,6 +227,7 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const
     PyWideStringList_Append(&config.module_search_paths, py_script_dir_ws.c_str());
     Py_InitializeFromConfig(&config);
  
+    //osm todo: use LOG(DEBUG instead of cout
     std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Loading py script: " << py_script << "\n";
  
    PyObject *obj = PyUnicode_FromString(path.stem().c_str());
@@ -211,21 +241,35 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const
    }
     return py_module;
 }
-// int main(int argc, char** argv) {
-    
-//     if(argc != 2) {
-//         std::cout << "Please provide absolute path to the python file you want to run\n";
-//         return -1;
-//     }
+PythonWrapper::~PythonWrapper() {
+    unload();
+}
+void PythonWrapper::unload() {
+    if(!_py->_py_module) {
+        return;
+    }
+    Py_DECREF(_py->_py_module);
+    Py_FinalizeEx();
+    _py->_py_module = nullptr;
+}
+bool PythonWrapper::load(
+    const std::string &py_script,
+    std::function<bool(const std::string &config_json)> loadConfig,
+    std::function<bool()> runMainLoop
+    ) {
 
-//     PythonWrapper wrapper;
-//     PyObject *py_module = wrapper.loadModule(argv[1]);
-//     if(!py_module) {
-//         return -1;
-//     }
-//     wrapper.callPythonFunction(py_module, "main", std::vector<std::string>());
-//     Py_DECREF(py_module);
-//     Py_FinalizeEx();
-
-//     return 0;
-// }
+    static PythonWrapper py;
+    _py = &py;
+    if(_py->_py_module) {
+        std::cout << "Already loaded, refusing to load another script\n";
+        return false;
+    }
+    _py->_py_module = _py->loadModule(py_script);
+    if(!_py->_py_module) {
+        std::cout << "Failed to load another script: '" << py_script.c_str() << "'\n";
+        return false;
+    }
+    _py->_loadConfig = loadConfig;
+    _py->_runMainLoop = runMainLoop;
+    return _py->callPythonFunction(_py->_py_module, "main", std::vector<std::string>());
+}
