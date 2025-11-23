@@ -146,8 +146,11 @@ std::filesystem::path applicationPath() {
     return std::filesystem::path(_app_path);
 }
 
-int main(int argc, char **argv)
-{
+bool runloop() {
+    return true;
+}
+
+int main(int argc, char **argv) {
     LOG_INIT("/tmp");
 
     LOG(DEBUG, LVSIM, "configure simulator\n");
@@ -186,7 +189,7 @@ int main(int argc, char **argv)
     auto tokens = LeleWidgetFactory::fromConfig(config_json);
     
     /* Enter the run loop of the selected backend */
-    driver_backends_run_loop();
+    driver_backends_run_loop(&runloop);
 
     return 0;
 }

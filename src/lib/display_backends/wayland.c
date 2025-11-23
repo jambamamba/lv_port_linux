@@ -37,7 +37,7 @@
  *  STATIC PROTOTYPES
  **********************/
 static lv_display_t *init_wayland(void);
-static void run_loop_wayland(void);
+static void run_loop_wayland(bool (*runloop)());
 
 /**********************
  *  STATIC VARIABLES
@@ -119,7 +119,7 @@ static lv_display_t *init_wayland(void)
  * @note Currently, the wayland driver calls lv_timer_handler internaly
  * The wayland driver needs to be re-written to match the other backends
  */
-static void run_loop_wayland(void)
+static void run_loop_wayland(bool (*runloop)())
 {
 
     bool completed;
@@ -132,6 +132,9 @@ static void run_loop_wayland(void)
         if (completed) {
             /* wait only if the cycle was completed */
             usleep(LV_DEF_REFR_PERIOD * 1000);
+            if(runloop && !(*runloop)()){
+                break;
+            }
         }
 
         /* Run until the last window closes */
