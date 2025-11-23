@@ -78,6 +78,7 @@ function(buildLvglSim)
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
     add_executable(lvglsim 
         main.cpp 
+        python_wrapper.cpp
         # mainwindow.cpp 
         # chart.cpp 
         ${LELE_WIDGETS}
@@ -92,6 +93,9 @@ function(buildLvglSim)
         CMAKE_CXX_STANDARD_REQUIRED ON
         CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
     )
+    target_link_directories(lvglsim PRIVATE 
+        ${CMAKE_BINARY_DIR}/src/Python-3.13.3
+    )
     target_link_libraries(lvglsim 
         lvgl_linux 
         lvgl 
@@ -103,10 +107,13 @@ function(buildLvglSim)
         ${PKG_CONFIG_LIB}
         utils::utils
         image_converter
+        python3.13 crypt pthread dl util m
     )
     target_include_directories(lvglsim
         PRIVATE
         ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_BINARY_DIR}/src/Python-3.13.3 #pyconfig.h
+        ${CMAKE_BINARY_DIR}/src/Python-3.13.3/Include
     )
     # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
 
