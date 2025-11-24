@@ -18,6 +18,7 @@ def main():
 
     while lele.handleEvents():
         pass
+    return 0
 
 
 def callback(str):
