@@ -91,31 +91,21 @@ namespace {
         }
         return PyLong_FromLong(0);
     }
-    static PyObject* _mymodule_runMainLoop(PyObject *self, PyObject *args) {
-        PyObject *callback = nullptr;
-        if(!PyArg_ParseTuple(args, "O", //obj
-            &callback)) {
-            return PyLong_FromLong(-1);
+    static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
+        if(!_py->_handleEvents) {
+            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No handleEvents was set in load function" << "\n";
+            return PyLong_FromLong(0);
         }
-        if(!_py->_runMainLoop) {
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No runMainLoop was set in load function" << "\n";
-            return PyLong_FromLong(-1);
+        if(!_py->_handleEvents()) {
+            return PyLong_FromLong(0);
         }
-        if(!_py->_runMainLoop([callback](){
-            PyObject *res = PyObject_CallObject(callback, nullptr);
-            if(res) { Py_DECREF(res); }
-            Py_DECREF(callback);
-            return PyObject_IsTrue(res);
-        })) {
-            return PyLong_FromLong(-1);
-        }
-        return PyLong_FromLong(0);
+        return PyLong_FromLong(1);
     }
     static PyMethodDef _mymodule_methods[] = {
         {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
         {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
-        {"runMainLoop", _mymodule_runMainLoop, METH_VARARGS, "lele.runMainLoop()"},
+        {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
         {NULL, NULL, 0, NULL}
     };
     static PyModuleDef _mymodule = {
@@ -265,7 +255,7 @@ void PythonWrapper::unload() {
 bool PythonWrapper::load(
     const std::string &py_script,
     std::function<bool(const std::string &config_json)> loadConfig,
-    std::function<bool(std::function<bool()>)> runMainLoop
+    std::function<bool()> handleEvents
     ) {
 
     static PythonWrapper py;
@@ -280,6 +270,6 @@ bool PythonWrapper::load(
         return false;
     }
     _py->_loadConfig = loadConfig;
-    _py->_runMainLoop = runMainLoop;
+    _py->_handleEvents = handleEvents;
     return _py->callPythonFunction(_py->_py_module, "main", std::vector<std::string>());
 }

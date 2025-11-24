@@ -30,7 +30,7 @@ extern "C" {
 typedef lv_display_t *(*display_init_t)(void);
 
 /* Prototype of the run loop */
-typedef void (*run_loop_t)(bool (*runloop)());
+typedef void (*run_loop_t)();
 
 /* Represents a display driver handle */
 typedef struct {

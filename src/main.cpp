@@ -133,6 +133,20 @@ static void configureSimulator(int argc, char **argv)
         }
     }
 }
+
+void eventLoop() {
+    while(true) {
+        if (lv_wayland_timer_handler()) {
+            /* wait only if the cycle was completed */
+            usleep(LV_DEF_REFR_PERIOD * 1000);
+        }
+        /* Run until the last window closes */
+        if (!lv_wayland_window_is_open(NULL)) {
+            break;
+        }
+    }
+}
+
 }//namespace
 
 /**
@@ -187,28 +201,29 @@ int main(int argc, char **argv) {
             argv[1] : std::filesystem::current_path().string() + "/main.py";
     if(std::filesystem::path(input_file).extension() == ".json") {
         tokens = LeleWidgetFactory::fromConfig(input_file);
-        driver_backends_run_loop([](){
-            // LOG(DEBUG, LVSIM, "runloop\n");
-            return true;
-        });
+        eventLoop();
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
         if(!PythonWrapper::load(
             input_file, 
-            [&tokens](const std::string &json_config){
+            [&tokens](const std::string &json_config){//loadConfig
                 tokens = LeleWidgetFactory::fromConfig(json_config);
                 return true;
             },
-            [](std::function<bool()> keepRunning){
-                LOG(DEBUG, LVSIM, "@@@@@ keepRunning: %i\n", keepRunning());
-                driver_backends_run_loop([](){
-                    // LOG(DEBUG, LVSIM, "runloop\n");
-                    //osm todo: use keepRunning here, but c function only takes captureless lambdas
-                    return true;
-                });
+            [](){//handleEvents
+                // LOG(DEBUG, LVSIM, "@@@@@ handleEvents\n");
+                if (lv_wayland_timer_handler()) {
+                    // Wait only if the cycle was completed
+                    usleep(LV_DEF_REFR_PERIOD * 1000);
+                }
+                // Run until the last window closes
+                if (!lv_wayland_window_is_open(NULL)) {
+                    LOG(DEBUG, LVSIM, "Exiting event loop because all windows are closed\n");
+                    return false;
+                }
                 return true;
-            })) {
-            return -1;
+            })){
+            LOG(FATAL, LVSIM, "Failed to load Python module\n");
         }
     }
     else {

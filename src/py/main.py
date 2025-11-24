@@ -16,16 +16,10 @@ def main():
     res = lele.loadConfig("imageview.json")
     print(f"loadConfig result:{res}")
 
-    res = lele.runMainLoop(
-        lambda: keepRunning()
-    )
-    print(f"loadConfig result:{res}")
-
-    return 0
+    while lele.handleEvents():
+        pass
 
 
 def callback(str):
 	print(str)
 
-def keepRunning():
-    return True
