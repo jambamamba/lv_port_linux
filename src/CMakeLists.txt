@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) #-fPIC
+
 function(buildPythonLib OUT_VAR_PYTHON_LIB_OUTPUT)
     message(STATUS "buildPython()")
 
@@ -74,11 +76,10 @@ function(buildLvglSim PYTHON_LIB)
         lelewidgets/lelemessagebox.cpp
         lelewidgets/lelewidgetfactory.cpp
     )
-
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
-    add_executable(lvglsim 
-        main.cpp 
-        python_wrapper.cpp
+    set(sources
+        python_binding.cpp
+        graphics_backend.cpp
         # mainwindow.cpp 
         # chart.cpp 
         ${LELE_WIDGETS}
@@ -87,16 +88,10 @@ function(buildLvglSim PYTHON_LIB)
         ${LV_IMG_DSC_SRC}
         ${PYTHON_LIB_OUTPUT}
     )
-
-    set_target_properties(lvglsim PROPERTIES
-        CMAKE_CXX_STANDARD 17
-        CMAKE_CXX_STANDARD_REQUIRED ON
-        CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
-    )
-    target_link_directories(lvglsim PRIVATE 
+    set(link_dirs
         ${CMAKE_BINARY_DIR}/src/Python-3.13.3
     )
-    target_link_libraries(lvglsim 
+    set(link_libs
         lvgl_linux 
         lvgl 
         lvgl::examples 
@@ -109,13 +104,28 @@ function(buildLvglSim PYTHON_LIB)
         image_converter
         python3.13 crypt pthread dl util m
     )
-    target_include_directories(lvglsim
-        PRIVATE
+    set(inc_dirs
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_BINARY_DIR}/src/Python-3.13.3 #pyconfig.h
         ${CMAKE_BINARY_DIR}/src/Python-3.13.3/Include
     )
-    # target_compile_options(lvglsim PRIVATE "-fdiagnostics-all-candidates")
+    set(props
+        CMAKE_CXX_STANDARD 17
+        CMAKE_CXX_STANDARD_REQUIRED ON
+        CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
+    )
+
+    add_library(lele SHARED ${sources})
+    set_target_properties(lele PROPERTIES ${props})
+    target_link_directories(lele PRIVATE ${link_dirs})
+    target_link_libraries(lele PRIVATE ${link_libs})
+    target_include_directories(lele PRIVATE ${inc_dirs})
+
+    add_executable(lvglsim main.cpp python_wrapper.cpp)
+    set_target_properties(lvglsim PROPERTIES ${props})
+    target_link_directories(lvglsim PRIVATE ${link_dirs})
+    target_link_libraries(lvglsim PRIVATE ${link_libs} lele)
+    target_include_directories(lvglsim PRIVATE ${inc_dirs})
 
     # file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
     get_filename_component(PYTHON_DIR "${PYTHON_LIB}" DIRECTORY)

@@ -44,6 +44,11 @@ function main() {
     echo "set confirm off" |sudo tee ~/.gdbinit
     gdb -ex "run" --args ./lvglsim ${input_file}
     popd
+
+    #ways of running:
+    # cd x86-build/bin
+    # ./lvglsim ../../src/configs/imageview.json
+    # ./lvglsim ../../src/py/main.py #must be in x86-build/bin folder to run like this
 }
 
 # function buildImageConverter() {

@@ -34,195 +34,27 @@
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
 
-#include "python_wrapper.h"
-#include "src/lib/driver_backends.h"
-#include "src/lib/simulator_util.h"
-#include "src/lib/simulator_settings.h"
+#include "src/python_wrapper.h"
+#include "src/graphics_backend.h"
 #include "src/lelewidgets/lelebase.h"
 
+
 LOG_CATEGORY(LVSIM, "LVSIM");
-
-/* Global simulator settings, defined in lv_linux_backend.c */
-extern simulator_settings_t settings;
-
-namespace {
-
-/* Internal functions */
-static void print_lvgl_version(void);
-static void print_usage(void);
-
-/* contains the name of the selected backend if user
- * has specified one on the command line */
-static char *selected_backend;
-
-/**
- * @brief Print LVGL version
- */
-static void print_lvgl_version(void)
-{
-    fprintf(stdout, "%d.%d.%d-%s\n",
-            LVGL_VERSION_MAJOR,
-            LVGL_VERSION_MINOR,
-            LVGL_VERSION_PATCH,
-            LVGL_VERSION_INFO);
-}
-
-/**
- * @brief Print usage information
- */
-static void print_usage(void)
-{
-    fprintf(stdout, "\nlvglsim [-V] [-B] [-b backend_name] [-W window_width] [-H window_height]\n\n");
-    fprintf(stdout, "-V print LVGL version\n");
-    fprintf(stdout, "-B list supported backends\n");
-}
-
-/**
- * @brief Configure simulator
- * @description process arguments recieved by the program to select
- * appropriate options
- * @param argc the count of arguments in argv
- * @param argv The arguments
- */
-static void configureSimulator(int argc, char **argv)
-{
-    int opt = 0;
-    char *backend_name;
-
-    selected_backend = NULL;
-    driver_backends_register();//connect to wayland server
-
-    /* Default values */
-    settings.window_width = atoi(getenv("LV_SIM_WINDOW_WIDTH") ? : "800");
-    settings.window_height = atoi(getenv("LV_SIM_WINDOW_HEIGHT") ? : "480");
-
-    /* Parse the command-line options. */
-    while ((opt = getopt (argc, argv, "b:fmW:H:BVh")) != -1) {
-        switch (opt) {
-        case 'h':
-            print_usage();
-            exit(EXIT_SUCCESS);
-            break;
-        case 'V':
-            print_lvgl_version();
-            exit(EXIT_SUCCESS);
-            break;
-        case 'B':
-            driver_backends_print_supported();
-            exit(EXIT_SUCCESS);
-            break;
-        case 'b':
-            if (driver_backends_is_supported(optarg) == 0) {
-                die("error no such backend: %s\n", optarg);
-            }
-            selected_backend = strdup(optarg);
-            break;
-        case 'W':
-            settings.window_width = atoi(optarg);
-            break;
-        case 'H':
-            settings.window_height = atoi(optarg);
-            break;
-        case ':':
-            print_usage();
-            die("Option -%c requires an argument.\n", optopt);
-            break;
-        case '?':
-            print_usage();
-            die("Unknown option -%c.\n", optopt);
-        }
-    }
-}
-
-void eventLoop() {
-    while(true) {
-        if (lv_wayland_timer_handler()) {
-            /* wait only if the cycle was completed */
-            usleep(LV_DEF_REFR_PERIOD * 1000);
-        }
-        /* Run until the last window closes */
-        if (!lv_wayland_window_is_open(NULL)) {
-            break;
-        }
-    }
-}
-
-}//namespace
-
-/**
- * @brief entry point
- * @description start a demo
- * @param argc the count of arguments in argv
- * @param argv The arguments
- */
-static std::string _app_path;
-std::filesystem::path applicationPath() {
-    return std::filesystem::path(_app_path);
-}
 
 int main(int argc, char **argv) {
     LOG_INIT("/tmp");
 
-    LOG(DEBUG, LVSIM, "configure simulator\n");
-    configureSimulator(argc, argv);
-
-    /* Initialize LVGL. */
-    lv_init();
-
-    /* Initialize the configured backend */
-    if (driver_backends_init_backend(selected_backend) == -1) {
-        die("Failed to initialize display backend");
-    }
-
-    /* Enable for EVDEV support */
-#if LV_USE_EVDEV
-    char evdev[] = "EVDEV";
-    if (driver_backends_init_backend(evdev) == -1) {
-        die("Failed to initialize evdev");
-    }
-#endif
-
-    /*Create a Demo*/
-    // lv_demo_widgets();
-    // lv_demo_widgets_start_slideshow();
-
-    // addTextArea();
-    // addStatusMessage();
-    // addLoaderArc();
-    // addProgressBar();
-    // addChart();
-    // LOG(DEBUG, LVSIM, "create tab view\n");
-
     // LOG(DEBUG, LVSIM, "main %s\n", argv[0]);
-    _app_path = argv[0];
-
-    std::vector<std::pair<std::string, LeleWidgetFactory::Token>> tokens;
     std::string input_file = (argc > 1 && *argv[1] && std::filesystem::exists(argv[1])) ? 
             argv[1] : std::filesystem::current_path().string() + "/main.py";
     if(std::filesystem::path(input_file).extension() == ".json") {
-        tokens = LeleWidgetFactory::fromConfig(input_file);
-        eventLoop();
+        GraphicsBackend backend;
+        backend.load();
+        auto tokens = LeleWidgetFactory::fromConfig(input_file);
+        while(backend.handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
-        if(!PythonWrapper::load(
-            input_file, 
-            [&tokens](const std::string &json_config){//loadConfig
-                tokens = LeleWidgetFactory::fromConfig(json_config);
-                return true;
-            },
-            [](){//handleEvents
-                // LOG(DEBUG, LVSIM, "@@@@@ handleEvents\n");
-                if (lv_wayland_timer_handler()) {
-                    // Wait only if the cycle was completed
-                    usleep(LV_DEF_REFR_PERIOD * 1000);
-                }
-                // Run until the last window closes
-                if (!lv_wayland_window_is_open(NULL)) {
-                    LOG(DEBUG, LVSIM, "Exiting event loop because all windows are closed\n");
-                    return false;
-                }
-                return true;
-            })){
+        if(!PythonWrapper::load(input_file)){
             LOG(FATAL, LVSIM, "Failed to load Python module\n");
         }
     }

@@ -4,118 +4,11 @@
 
 #include "python_wrapper.h"
 
-LOG_CATEGORY(LVSIM, "LVSIM");
-
 namespace {
-    bool _cancel = false;
     static PythonWrapper *_py;
-
-    //Functions that py script can call
-    static PyObject* _mymodule_version(PyObject *self, PyObject *args) {
-        int major_version = 1;//(int)(This->GetVersion().toFloat());
-        int minor_version = 0;//(int)((This->GetVersion().toFloat() - major_version) * 100.);
-        PyObject *dict = PyDict_New();
-        PyDict_SetItem(dict, PyUnicode_FromString("Major"), PyLong_FromDouble(major_version));
-        PyDict_SetItem(dict, PyUnicode_FromString("Minor"), PyLong_FromDouble(minor_version));
-        return dict;
-    }
-    static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
-        int num = 0;
-        char *str = nullptr;
-        PyObject *list = nullptr;
-        PyObject *dic = nullptr;
-        PyObject *callback = nullptr;
-        if(!PyArg_ParseTuple(args, "isOOO", //int,str,obj,obj,obj
-            &num,
-            &str,
-            &list,
-            &dic,
-            &callback)) {
-            return PyLong_FromLong(-1);
-        }
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "num: " << num << "\n";
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
-
-        int len = PyList_Size(list);
-        while (len--) {
-            std::string str(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "List item: " << str << "\n";
-        }
-        Py_DECREF(list);
-
-        PyObject* keys = PyDict_Keys(dic); 
-        Py_ssize_t size = PyList_Size(keys);
-        for (Py_ssize_t i = 0; i < size; i++) {
-            PyObject* key = PyList_GetItem(keys, i);
-            PyObject* key_str = PyObject_Str(key);
-            const char* key_c_str = PyUnicode_AsUTF8(key_str);
-            PyObject *value_str = PyDict_GetItemString(dic, key_c_str);
-            const char* value_c_str = PyUnicode_AsUTF8(value_str);
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
-            Py_DECREF(key_str);
-            Py_DECREF(value_str);
-        }
-        Py_DECREF(dic);     
-
-        PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
-        PyObject *res = PyObject_CallObject(callback, arglist);
-        if(res) { Py_DECREF(res); }
-        Py_DECREF(callback);
-
-        return PyLong_FromLong(0);
-    }
-    static PyObject* _mymodule_loadConfig(PyObject *self, PyObject *args) {
-        char *str = nullptr;
-        if(!PyArg_ParseTuple(args, "s", //str
-            &str)) {
-            return PyLong_FromLong(-1);
-        }
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
-
-        if(!str) {
-            return PyLong_FromLong(-1);
-        }
-
-        std::string input_file(str);
-        if(str[0] != '/') {
-            input_file = std::filesystem::current_path().string() + "/" + input_file;
-        }
-        if((std::filesystem::exists(input_file))) {
-            if(!_py->_loadConfig) {
-                std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No loadConfig was set in load function" << "\n";
-                return PyLong_FromLong(-1);
-            }
-            if(!_py->_loadConfig(input_file)) {
-                return PyLong_FromLong(-1);
-            }
-        }
-        return PyLong_FromLong(0);
-    }
-    static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
-        if(!_py->_handleEvents) {
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "No handleEvents was set in load function" << "\n";
-            return PyLong_FromLong(0);
-        }
-        if(!_py->_handleEvents()) {
-            return PyLong_FromLong(0);
-        }
-        return PyLong_FromLong(1);
-    }
-    static PyMethodDef _mymodule_methods[] = {
-        {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
-        {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
-        {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
-        {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
-        {NULL, NULL, 0, NULL}
-    };
-    static PyModuleDef _mymodule = {
-        PyModuleDef_HEAD_INIT, "lele", NULL, -1, _mymodule_methods,
-        NULL, NULL, NULL, NULL
-    };
-    static PyObject* PyInitMyModule(void) {
-        return PyModule_Create(&_mymodule);
-    }    
 }//namespace
+
+PyMODINIT_FUNC PyInit_mymodule(void);
 
 void PythonWrapper::printError() const
 {
@@ -202,7 +95,7 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
 PyObject *PythonWrapper::loadModule(const std::string &py_script) const
 {
     setlocale(LC_ALL, "en_US.UTF-8");
-    PyImport_AppendInittab("lele", &PyInitMyModule);
+    PyImport_AppendInittab("lele", &PyInit_mymodule);
 
     std::filesystem::path path(py_script);
     std::string py_script_dir = path.parent_path().string();
@@ -254,22 +147,22 @@ void PythonWrapper::unload() {
 }
 bool PythonWrapper::load(
     const std::string &py_script,
-    std::function<bool(const std::string &config_json)> loadConfig,
-    std::function<bool()> handleEvents
+    std::function<bool(const std::string &config_json)> loadConfig
     ) {
 
     static PythonWrapper py;
-    _py = &py;
-    if(_py->_py_module) {
+    if(py._py_module) {
         std::cout << "Already loaded, refusing to load another script\n";
         return false;
     }
-    _py->_py_module = _py->loadModule(py_script);
-    if(!_py->_py_module) {
+    py._py_module = py.loadModule(py_script);
+    if(!py._py_module) {
         std::cout << "Failed to load another script: '" << py_script.c_str() << "'\n";
         return false;
     }
-    _py->_loadConfig = loadConfig;
-    _py->_handleEvents = handleEvents;
-    return _py->callPythonFunction(_py->_py_module, "main", std::vector<std::string>());
+    _py = &py;
+    // if(!py.callPythonFunction(py._py_module, "main", std::vector<std::string>())) {
+    //     return false;
+    // }
+    return true;    
 }

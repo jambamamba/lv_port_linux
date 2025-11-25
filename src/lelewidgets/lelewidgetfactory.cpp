@@ -1,5 +1,8 @@
 #include "lelewidgetfactory.h"
 
+#include <filesystem>
+#include <unistd.h>
+
 #include "lelebutton.h"
 #include "leleevent.h"
 #include "leleimage.h"
@@ -12,6 +15,16 @@
 #include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
+
+std::filesystem::path applicationPath() {
+
+    char path[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", path, PATH_MAX);
+    if (count != -1) {
+        return std::string(path, count);
+    }
+    return std::filesystem::path("");
+}
 
 namespace {
 struct cJSONRAII {
