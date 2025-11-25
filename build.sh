@@ -35,15 +35,15 @@ function main() {
     mkdir -p x86-build
     pushd x86-build
     cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
-    ninja
+    ninja install
     popd
 
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
-    pushd x86-build/bin
-    echo "set confirm off" |sudo tee ~/.gdbinit
-    gdb -ex "run" --args ./lvglsim ${input_file}
-    popd
+    # pushd x86-build/bin
+    # echo "set confirm off" |sudo tee ~/.gdbinit
+    # gdb -ex "run" --args ./lvglsim ${input_file}
+    # popd
 
     #ways of running:
     # cd x86-build/bin
@@ -66,4 +66,4 @@ function main() {
 # }
 # buildImageConverter
 
-main $@
+main $@ |tee x86-build/build.log

@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.10)
-
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) #-fPIC
 
 function(buildPythonLib OUT_VAR_PYTHON_LIB_OUTPUT)
@@ -166,3 +165,9 @@ buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim(${PYTHON_LIB_OUTPUT})
 buildTests()
 runTests()
+install(TARGETS lele LIBRARY DESTINATION /usr/local/lib)
+
+# libutils.so => not found
+# libdebug_logger.so => not found
+# libjson_utils.so => not found
+# libimage_converter.so
