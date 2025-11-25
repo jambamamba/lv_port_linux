@@ -66,4 +66,8 @@ function main() {
 # }
 # buildImageConverter
 
+function buildPyModule() {
+    pip3 install setuptools cmake-build-extension
+    python3 setup.py sdist
+}
 main $@ |tee x86-build/build.log
