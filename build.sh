@@ -10,18 +10,12 @@ source share/scripts/helper-functions.sh
 
 function buildPyModule() {
     pip3 install setuptools
-    rm -fr build
-    # CFLAGS='-std=c99'\
-    # CPPFLAGS='-std=c++17 -stdlib=libc++' \
     CC=clang \
     CXX=clang++ \
     LD_LIBRARY_PATH=/usr/local/lib \
     python3 setup.py build_ext --verbose\
     --build-lib='py-build' \
-    --include-dirs='.:x86-build:src:src/Python-3.13.3:src/Python-3.13.3/Include' \
-    --define='LV_CONF_INCLUDE_SIMPLE' \
-    --libraries='lvgl_linux lvgl m pthread evdev wayland-client wayland-cursor xkbcommon utils image_converter python3.13 crypt pthread dl util m' \
-    --library-dirs='src:x86-build/src/Python-3.13.3' \
+    --build-temp='/tmp/py-build' \
     --parallel=$(nproc)
     pushd src/py
     LD_LIBRARY_PATH=/usr/local/lib python main.py
