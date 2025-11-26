@@ -31,7 +31,7 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
 
     set(LV_IMG_DSC_SRC 
         "${CMAKE_BINARY_DIR}/res/img_dsc.cpp" 
-        "${CMAKE_BINARY_DIR}/res/img_dsc.h"
+        # "${CMAKE_BINARY_DIR}/res/img_dsc.h"
         # "${CMAKE_BINARY_DIR}/lv_image_converter/libimage_converter.so"
     )
     add_subdirectory(lv_image_converter)
@@ -85,7 +85,7 @@ function(buildLvglSim PYTHON_LIB)
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 
         ${LV_IMG_DSC_SRC}
-        ${PYTHON_LIB_OUTPUT}
+        # ${PYTHON_LIB_OUTPUT}
     )
     set(link_dirs
         ${CMAKE_BINARY_DIR}/src/Python-3.13.3
@@ -114,16 +114,30 @@ function(buildLvglSim PYTHON_LIB)
         CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
     )
 
-    add_library(lele SHARED ${sources})
-    set_target_properties(lele PROPERTIES ${props})
-    target_link_directories(lele PRIVATE ${link_dirs})
-    target_link_libraries(lele PRIVATE ${link_libs})
-    target_include_directories(lele PRIVATE ${inc_dirs})
+    # message(FATAL_ERROR "@@@ {sources} ${sources}")
+    message(STATUS "==================================")
+    message(STATUS "@@@ {sources} ${sources}")
+    message(STATUS "==================================")
+    message(STATUS "@@@ {props} ${props}")
+    message(STATUS "==================================")
+    message(STATUS "@@@ {link_dirs} ${link_dirs}")
+    message(STATUS "==================================")
+    message(STATUS "@@@ {link_libs} ${link_libs}")
+    message(STATUS "==================================")
+    message(STATUS "@@@ {inc_dirs} ${inc_dirs}")
+    message(STATUS "==================================")
+    # message(FATAL_ERROR "==================================")
+
+    add_library(lele_ui SHARED ${sources})
+    set_target_properties(lele_ui PROPERTIES ${props})
+    target_link_directories(lele_ui PRIVATE ${link_dirs})
+    target_link_libraries(lele_ui PRIVATE ${link_libs})
+    target_include_directories(lele_ui PRIVATE ${inc_dirs})
 
     add_executable(lvglsim main.cpp python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
     target_link_directories(lvglsim PRIVATE ${link_dirs})
-    target_link_libraries(lvglsim PRIVATE ${link_libs} lele)
+    target_link_libraries(lvglsim PRIVATE ${link_libs} lele_ui)
     target_include_directories(lvglsim PRIVATE ${inc_dirs})
 
     # file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
@@ -165,7 +179,7 @@ buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim(${PYTHON_LIB_OUTPUT})
 buildTests()
 runTests()
-install(TARGETS lele LIBRARY DESTINATION /usr/local/lib)
+install(TARGETS lele_ui LIBRARY DESTINATION /usr/local/lib)
 
 # libutils.so => not found
 # libdebug_logger.so => not found

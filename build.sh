@@ -8,6 +8,25 @@ set -xe
 source share/pins.txt
 source share/scripts/helper-functions.sh
 
+function buildPyModule() {
+    pip3 install setuptools
+    rm -fr build
+    # CFLAGS='-std=c99'\
+    # CPPFLAGS='-std=c++17 -stdlib=libc++' \
+    CC=clang \
+    CXX=clang++ \
+    LD_LIBRARY_PATH=/usr/local/lib \
+    python3 setup.py build_ext --verbose --inplace \
+    --include-dirs='.:x86-build:src:src/Python-3.13.3:src/Python-3.13.3/Include' \
+    --define='LV_CONF_INCLUDE_SIMPLE' \
+    --libraries='lvgl_linux lvgl m pthread evdev wayland-client wayland-cursor xkbcommon utils image_converter python3.13 crypt pthread dl util m' \
+    --library-dirs='src:x86-build/src/Python-3.13.3' \
+    --parallel=8
+    LD_LIBRARY_PATH=/usr/local/lib \
+    # python setup.py bdist_wheel
+    python3 src/py/main.py
+}
+
 function main() {
     local py_script="$(pwd)/src/py/main.py"
     local config_json="$(pwd)/src/configs/testview.json"
@@ -38,7 +57,9 @@ function main() {
     ninja install
     popd
 
-    echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    buildPyModule
+
+    # echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
 
     # pushd x86-build/bin
     # echo "set confirm off" |sudo tee ~/.gdbinit
@@ -66,8 +87,5 @@ function main() {
 # }
 # buildImageConverter
 
-function buildPyModule() {
-    pip3 install setuptools cmake-build-extension
-    python3 setup.py sdist
-}
-main $@ |tee x86-build/build.log
+buildPyModule
+# main $@ |tee x86-build/build.log
