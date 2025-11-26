@@ -68,7 +68,7 @@ lv_obj_t *LeleImage::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
       img = LeleImageConverter::generateImgDsc(_src.c_str());
     }
     else {
-      std::string img_path(applicationPath().parent_path().string() + "/res/" + _src);
+      std::string img_path(std::filesystem::current_path().parent_path().string() + "/res/" + _src);
       img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
   }

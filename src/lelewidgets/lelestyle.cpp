@@ -12,9 +12,10 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
   : _parent_width(lv_obj_get_width(parent))
   , _parent_height(lv_obj_get_height(parent)) {
 
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+  for (const auto &[ref_key, token]: LeleWidgetFactory::fromJson(json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
+      std::string key = ref_key;// to print error: reference to local binding 'key' declared in enclosing function 'LeleStyle::LeleStyle' : _style[key + "/" + subkey] = value;
       if(key == "class_name") {
         _class_name = value;
       }

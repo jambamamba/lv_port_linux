@@ -21,7 +21,7 @@ class custom_build_ext(build_ext):
             # print(f"@@@ filename:{filename}, extension:{extension}")
             
             # Apply specific flags if found in the mapping
-            if extension == '.c':
+            if extension == '.cpp':
                 ext.extra_compile_args = c_compile_args
                 # print(f"Applying flags {c_compile_args} to {filename}")
             else:
@@ -39,20 +39,31 @@ class custom_build_ext(build_ext):
         # Restore original flags and sources (though not strictly necessary here, good practice)
         ext.extra_compile_args = original_extra_compile_args
 
-
+#osm todo: use CMakeLists.txt with these outputs below to generate this setup.py file:
+# -- ==================================
+# -- @@@ {props} CMAKE_CXX_STANDARD;17;CMAKE_CXX_STANDARD_REQUIRED;ON;CMAKE_CXX_EXTENSIONS;OFF
+# -- ==================================
+# -- @@@ {link_dirs} /repos/lv_port_linux/x86-build/src/Python-3.13.3
+# -- ==================================
+# -- @@@ {link_libs} lvgl_linux;lvgl;lvgl::examples;lvgl::demos;lvgl::thorvg;m;pthread;evdev;wayland-client;wayland-cursor;xkbcommon;utils::utils;image_converter;python3.13;crypt;pthread;dl;util;m
+# -- ==================================
+# -- @@@ {inc_dirs} /repos/lv_port_linux/src;/repos/lv_port_linux/x86-build/src/Python-3.13.3;/repos/lv_port_linux/x86-build/src/Python-3.13.3/Include
 setup(name='lele',
       version='1.0',
       description='This is a demo package',
       ext_modules=[
         Extension('lele',
-            sources=[
-                'src/python_binding.cpp','src/graphics_backend.cpp','src/lelewidgets/lelebase.cpp','src/lelewidgets/lelebutton.cpp','src/lelewidgets/leleevent.cpp','src/lelewidgets/leleimage.cpp','src/lelewidgets/lelelabel.cpp','src/lelewidgets/lelenullwidget.cpp','src/lelewidgets/lelestackview.cpp','src/lelewidgets/lelestyle.cpp','src/lelewidgets/leletabview.cpp','src/lelewidgets/leletextbox.cpp','src/lelewidgets/leleview.cpp','src/lelewidgets/lelemessagebox.cpp','src/lelewidgets/lelewidgetfactory.cpp','src/lib/driver_backends.c','src/lib/mouse_cursor_icon.c','src/lib/simulator_util.c','src/lib/indev_backends/evdev.c','src/lib/display_backends/wayland.c','/repos/lv_port_linux/wl_protocols/wayland_xdg_shell.c','/repos/lv_port_linux/x86-build/res/img_dsc.cpp'
+            sources=[ #all source files must be cpp, because the extra_compile_args get applied to all, and if applied to c files, it gives a compiler error
+                'src/python_binding.cpp','src/graphics_backend.cpp','src/lelewidgets/lelebase.cpp','src/lelewidgets/lelebutton.cpp','src/lelewidgets/leleevent.cpp','src/lelewidgets/leleimage.cpp','src/lelewidgets/lelelabel.cpp','src/lelewidgets/lelenullwidget.cpp','src/lelewidgets/lelestackview.cpp','src/lelewidgets/lelestyle.cpp','src/lelewidgets/leletabview.cpp','src/lelewidgets/leletextbox.cpp','src/lelewidgets/leleview.cpp','src/lelewidgets/lelemessagebox.cpp','src/lelewidgets/lelewidgetfactory.cpp','src/lib/driver_backends.cpp','src/lib/mouse_cursor_icon.cpp','src/lib/simulator_util.cpp','src/lib/indev_backends/evdev.cpp','src/lib/display_backends/wayland.cpp','/repos/lv_port_linux/wl_protocols/wayland_xdg_shell.cpp','/repos/lv_port_linux/x86-build/res/img_dsc.cpp'
             ],
             include_dirs=['.','x86-build','src', 'src/Python-3.13.3', 'src/Python-3.13.3/Include'],  # Directories to search for headers
             library_dirs=['src','x86-build/src/Python-3.13.3'],  # Directories to search for libraries
-            libraries=['lvgl_linux','lvgl','m','pthread','evdev','wayland-client','wayland-cursor','xkbcommon','utils','image_converter','python3.13','crypt','pthread','dl','util','m'],  # Names of libraries to link (e.g., 'libsomething.a' becomes 'something')
-            define_macros=[('LV_CONF_INCLUDE_SIMPLE', '1')], # List of compile definitions
-            extra_compile_args=cpp_compile_args, # Additional compiler flags (optional)
+            libraries=['lele_ui','lvgl_linux','lvgl','m','pthread','evdev','wayland-client','wayland-cursor','xkbcommon','utils','image_converter','python3.13','crypt','pthread','dl','util','m'],  # Names of libraries to link (e.g., 'libsomething.a' becomes 'something')
+            define_macros=[('LV_CONF_INCLUDE_SIMPLE', '1'),('LV_USE_WAYLAND', '1')], # List of compile definitions
+            undef_macros=['LV_USE_EVDEV'],
+            extra_compile_args=['-std=c++20'], # Additional compiler flags (optional)
+            extra_link_args=[],
+            parallel=True,
             language='c++' # Specify the language as C++
         )
       ]

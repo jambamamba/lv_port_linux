@@ -297,7 +297,7 @@ void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, i
       _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
     }
     else {
-      std::string img_path(applicationPath().parent_path().string() + "/res/" + src);
+      std::string img_path(std::filesystem::current_path().parent_path().string() + "/res/" + src);
       _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
     if(!_bg_img) {

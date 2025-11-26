@@ -44,3 +44,4 @@ target_include_directories(${project} PRIVATE ${CMAKE_SOURCE_DIR}
 target_link_directories(${project} PRIVATE /usr/local/lib)
 target_link_libraries(${project} PRIVATE ${libproject} ssl crypto png jpeg heif)
 install(TARGETS ${libproject} LIBRARY DESTINATION /usr/local/lib)
+install(TARGETS ${project} RUNTIME DESTINATION /usr/local/bin)

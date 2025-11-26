@@ -8,7 +8,7 @@ namespace {
     static PythonWrapper *_py;
 }//namespace
 
-PyMODINIT_FUNC PyInit_mymodule(void);
+PyMODINIT_FUNC PyInit_lele(void);
 
 void PythonWrapper::printError() const
 {
@@ -95,7 +95,7 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
 PyObject *PythonWrapper::loadModule(const std::string &py_script) const
 {
     setlocale(LC_ALL, "en_US.UTF-8");
-    PyImport_AppendInittab("lele", &PyInit_mymodule);
+    PyImport_AppendInittab("lele", &PyInit_lele);
 
     std::filesystem::path path(py_script);
     std::string py_script_dir = path.parent_path().string();

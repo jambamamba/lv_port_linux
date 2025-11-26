@@ -103,7 +103,7 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
         _group = (value == "true");
       }
       // else if(key == "img") {
-      //   std::string img_path(applicationPath().parent_path().string() + "/res/" + value);
+      //   std::string img_path(std::filesystem::current_path().parent_path().string() + "/res/" + value);
       //   // LOG(DEBUG, LVSIM, "@@@ img_path %s\n", img_path.c_str());
       //   _images[value] = LeleImageConverter::generateImgDsc(img_path.c_str());
       //   if(_images[value]) {

@@ -16,15 +16,17 @@ function buildPyModule() {
     CC=clang \
     CXX=clang++ \
     LD_LIBRARY_PATH=/usr/local/lib \
-    python3 setup.py build_ext --verbose --inplace \
+    python3 setup.py build_ext --verbose\
+    --build-lib='py-build' \
     --include-dirs='.:x86-build:src:src/Python-3.13.3:src/Python-3.13.3/Include' \
     --define='LV_CONF_INCLUDE_SIMPLE' \
     --libraries='lvgl_linux lvgl m pthread evdev wayland-client wayland-cursor xkbcommon utils image_converter python3.13 crypt pthread dl util m' \
     --library-dirs='src:x86-build/src/Python-3.13.3' \
-    --parallel=8
-    LD_LIBRARY_PATH=/usr/local/lib \
+    --parallel=$(nproc)
+    pushd src/py
+    LD_LIBRARY_PATH=/usr/local/lib python main.py
+    popd
     # python setup.py bdist_wheel
-    python3 src/py/main.py
 }
 
 function main() {

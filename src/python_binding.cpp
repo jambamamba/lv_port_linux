@@ -109,7 +109,7 @@ namespace {
     };
 }//namespace
 
-PyMODINIT_FUNC PyInit_mymodule(void) {
+PyMODINIT_FUNC PyInit_lele(void) {
     if(!_graphics_backend.load()) {
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n")
         return nullptr;

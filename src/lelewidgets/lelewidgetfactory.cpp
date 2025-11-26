@@ -16,16 +16,6 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-std::filesystem::path applicationPath() {
-
-    char path[PATH_MAX];
-    ssize_t count = readlink("/proc/self/exe", path, PATH_MAX);
-    if (count != -1) {
-        return std::string(path, count);
-    }
-    return std::filesystem::path("");
-}
-
 namespace {
 struct cJSONRAII {
     cJSONRAII(const std::string &json_str)
@@ -88,7 +78,7 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
             }
         }
         else {
-            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key);
+            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key.c_str());
         }
         ++idx;
     }

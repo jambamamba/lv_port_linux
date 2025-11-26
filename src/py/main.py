@@ -1,7 +1,6 @@
 import sys
 print(sys.path)
 import lele
-import sys
 
 print("hello from python")
 print(f"lele version: {lele.version()}")

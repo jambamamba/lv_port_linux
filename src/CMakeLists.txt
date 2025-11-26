@@ -22,7 +22,7 @@ function(buildPythonLib OUT_VAR_PYTHON_LIB_OUTPUT)
         COMMENT "Building ${PYTHON_LIB_NAME}"
         VERBATIM
     )
-
+    add_custom_target(python DEPENDS ${PYTHON_LIB_OUTPUT})
     set(${OUT_VAR_PYTHON_LIB_OUTPUT} "${PYTHON_LIB_OUTPUT}" PARENT_SCOPE)
 endfunction()
 
@@ -39,22 +39,22 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
         OUTPUT ${LV_IMG_DSC_SRC}
         COMMAND ${CMAKE_COMMAND} -E rm -rf "${CMAKE_BINARY_DIR}/res"
         COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/res"
-        COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib' ${CMAKE_BINARY_DIR}/src/lv_image_converter/libimage_converter.so
+        # COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib' ${CMAKE_BINARY_DIR}/src/lv_image_converter/libimage_converter.so
         COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/lv_image_converter/libimage_converter.so /usr/local/lib/
-        COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib:${CMAKE_BINARY_DIR}/src/lv_image_converter' ${CMAKE_BINARY_DIR}/bin/lv_image_converter
-        #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/res/ /repos/lv_port_linux/x86-build/res/
+        # COMMAND patchelf --set-rpath '$ORIGIN/../lib:/usr/local/lib:${CMAKE_BINARY_DIR}/src/lv_image_converter' ${CMAKE_BINARY_DIR}/bin/lv_image_converter
+        #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/src/res/ /repos/lv_port_linux/x86-build/res/
         COMMAND LD_LIBRARY_PATH=/usr/local/lib ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/res" "${CMAKE_BINARY_DIR}/res" 
         COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         # WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lv_image_converter/"
         # -E env LD_LIBRARY_PATH=/usr/local/lib 
-        DEPENDS "${CMAKE_SOURCE_DIR}/res"
-        COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/res ${CMAKE_BINARY_DIR}/res"
+        DEPENDS "${CMAKE_SOURCE_DIR}/src/res" lv_image_converter
+        COMMENT "Converting image files to lv format... ${CMAKE_BINARY_DIR}/bin/lv_image_converter ${CMAKE_SOURCE_DIR}/src/res ${CMAKE_BINARY_DIR}/res"
         VERBATIM
     )
-    add_custom_target(lv_image_convert DEPENDS lv_image_converter ${LV_IMG_DSC_SRC})
-
+    add_custom_target(lv_image_convert DEPENDS ${LV_IMG_DSC_SRC})
     set(${OUT_VAR_LV_IMG_DSC_SRC} "${LV_IMG_DSC_SRC}" PARENT_SCOPE)
+    # message(FATAL_ERROR "@@@ BUILT {LV_IMG_DSC_SRC} ${LV_IMG_DSC_SRC}")
 endfunction()
 
 function(buildLvglSim PYTHON_LIB)
@@ -101,7 +101,7 @@ function(buildLvglSim PYTHON_LIB)
         ${PKG_CONFIG_LIB}
         utils::utils
         image_converter
-        python3.13 crypt pthread dl util m
+        ${PYTHON_LIB_OUTPUT} crypt pthread dl util m
     )
     set(inc_dirs
         ${CMAKE_SOURCE_DIR}/src
@@ -133,12 +133,14 @@ function(buildLvglSim PYTHON_LIB)
     target_link_directories(lele_ui PRIVATE ${link_dirs})
     target_link_libraries(lele_ui PRIVATE ${link_libs})
     target_include_directories(lele_ui PRIVATE ${inc_dirs})
+    add_dependencies(lele_ui lv_image_convert python)
 
     add_executable(lvglsim main.cpp python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
     target_link_directories(lvglsim PRIVATE ${link_dirs})
     target_link_libraries(lvglsim PRIVATE ${link_libs} lele_ui)
     target_include_directories(lvglsim PRIVATE ${inc_dirs})
+    add_dependencies(lvglsim lele_ui)
 
     # file(COPY "config.json" DESTINATION "${CMAKE_BINARY_DIR}/bin" FOLLOW_SYMLINK_CHAIN)
     get_filename_component(PYTHON_DIR "${PYTHON_LIB}" DIRECTORY)
@@ -149,10 +151,9 @@ function(buildLvglSim PYTHON_LIB)
         ${CMAKE_BINARY_DIR}/bin/Python
         COMMENT "Creating symbolic link: ${CMAKE_BINARY_DIR}/bin/Python -> ${PYTHON_DIR}"
     )
-    file(COPY ${CMAKE_SOURCE_DIR}/res DESTINATION ${CMAKE_BINARY_DIR}/bin/)
+    file(COPY ${CMAKE_SOURCE_DIR}/src/res DESTINATION ${CMAKE_BINARY_DIR}/bin/)
     add_custom_target (run COMMAND ${EXECUTABLE_OUTPUT_PATH}/lvglsim DEPENDS lvglsim)
 
-    add_dependencies(lvglsim lv_image_convert)
 endfunction()
 
 function(buildTests)

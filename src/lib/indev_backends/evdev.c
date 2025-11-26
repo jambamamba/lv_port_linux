@@ -67,7 +67,7 @@ static char *backend_name = "EVDEV";
 int backend_init_evdev(backend_t *backend)
 {
     LV_ASSERT_NULL(backend);
-    backend->handle->indev = malloc(sizeof(indev_backend_t));
+    backend->handle->indev = (indev_backend_t*)malloc(sizeof(indev_backend_t));
     LV_ASSERT_NULL(backend->handle->indev);
 
     backend->handle->indev->init_indev = init_pointer_evdev;
@@ -91,7 +91,7 @@ int backend_init_evdev(backend_t *backend)
 static void indev_deleted_cb(lv_event_t *e)
 {
     if(LV_GLOBAL_DEFAULT()->deinit_in_progress) return;
-    lv_obj_t *cursor_obj = lv_event_get_user_data(e);
+    lv_obj_t *cursor_obj = (lv_obj_t *)lv_event_get_user_data(e);
     lv_obj_delete(cursor_obj);
 }
 
@@ -112,7 +112,7 @@ static void discovery_cb(lv_indev_t *indev, lv_evdev_type_t type, void *user_dat
                                               type == LV_EVDEV_TYPE_KEY ? "KEY" :
                                               "unknown");
 
-    lv_display_t *disp = user_data;
+    lv_display_t *disp = (lv_display_t *)user_data;
     lv_indev_set_display(indev, disp);
 
     if(type == LV_EVDEV_TYPE_REL) {

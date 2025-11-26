@@ -89,6 +89,7 @@ backend_init_t available_backends[] = {
 #endif
 
 #if LV_USE_EVDEV
+#error "LV_USE_EVDEV"
     backend_init_evdev,
 #endif
     NULL    /* Sentinel */
@@ -129,10 +130,10 @@ void driver_backends_register(void)
 
     while ((init_backend = available_backends[i]) != NULL) {
 
-        b = malloc(sizeof(backend_t));
+        b = (backend_t*)malloc(sizeof(backend_t));
         LV_ASSERT_NULL(b);
 
-        b->handle = malloc(sizeof(backend_handle_t));
+        b->handle = (backend_handle_t*)malloc(sizeof(backend_handle_t));
 
         init_backend = available_backends[i];
         LV_ASSERT_NULL(init_backend);
@@ -276,7 +277,7 @@ void driver_backends_run_loop()
     if (sel_display_backend != NULL && sel_display_backend->handle->display != NULL) {
 
         dispb = sel_display_backend->handle->display;
-        dispb->run_loop();
+        dispb->run_loop(0);
 
     } else {
         LV_LOG_ERROR("No backend has been selected - initialize the backend first");
