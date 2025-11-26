@@ -83,5 +83,5 @@ function main() {
 # }
 # buildImageConverter
 
-buildPyModule
-# main $@ |tee x86-build/build.log
+# buildPyModule
+main $@ |tee x86-build/build.log
