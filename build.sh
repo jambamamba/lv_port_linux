@@ -8,7 +8,7 @@ set -xe
 source share/pins.txt
 source share/scripts/helper-functions.sh
 
-function buildPyModule() {
+function buildpy() {
     pip3 install setuptools
     CC=clang \
     CXX=clang++ \
@@ -17,13 +17,10 @@ function buildPyModule() {
     --build-lib='py-build' \
     --build-temp='/tmp/py-build' \
     --parallel=$(nproc)
-    pushd src/py
-    LD_LIBRARY_PATH=/usr/local/lib python main.py
-    popd
     # python setup.py bdist_wheel
 }
 
-function main() {
+function buildelf() {
     local py_script="$(pwd)/src/py/main.py"
     local config_json="$(pwd)/src/configs/testview.json"
     parseArgs $@
@@ -52,36 +49,31 @@ function main() {
     cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
     ninja install
     popd
+}
 
-    buildPyModule
+function run() {
+    echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
+    echo "set confirm off" |sudo tee ~/.gdbinit
 
-    # echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
-
+    #ways of running:
     # pushd x86-build/bin
-    # echo "set confirm off" |sudo tee ~/.gdbinit
     # gdb -ex "run" --args ./lvglsim ${input_file}
     # popd
 
-    #ways of running:
-    # cd x86-build/bin
+    # pushd x86-build/bin
     # ./lvglsim ../../src/configs/imageview.json
     # ./lvglsim ../../src/py/main.py #must be in x86-build/bin folder to run like this
+    # popd
+
+    pushd src/py
+    LD_LIBRARY_PATH=/usr/local/lib python main.py
+    popd
 }
 
-# function buildImageConverter() {
-#     pushd lv_image_converter
-#     # if [ ! -d libpng ]; then
-#     #     git clone https://github.com/pnggroup/libpng.git -b v1.6.48 --depth 1
-#     # fi
-#     mkdir -p build
-#     cd build
-#     cmake ..
-#     make -j
-#     popd
+function main() {
+    buildelf 
+    buildpy
+    run
+}
 
-#     #./lv_image_converter/build/bin/lv_image_converter /home/oosman/Documents/NuGen/ .res
-# }
-# buildImageConverter
-
-# buildPyModule
 main $@ |tee x86-build/build.log
