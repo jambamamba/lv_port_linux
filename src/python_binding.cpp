@@ -43,7 +43,7 @@ namespace {
             std::string str(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
             std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "List item: " << str << "\n";
         }
-        Py_DECREF(list);
+        // Py_DECREF(list);
 
         PyObject* keys = PyDict_Keys(dic); 
         Py_ssize_t size = PyList_Size(keys);
@@ -57,12 +57,12 @@ namespace {
             Py_DECREF(key_str);
             Py_DECREF(value_str);
         }
-        Py_DECREF(dic);     
+        // Py_DECREF(dic);     
 
         PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
         PyObject *res = PyObject_CallObject(callback, arglist);
         if(res) { Py_DECREF(res); }
-        Py_DECREF(callback);
+        // Py_DECREF(callback);
 
         return PyLong_FromLong(0);
     }
@@ -91,10 +91,18 @@ namespace {
         return PyLong_FromLong(0);
     }
     static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
+        PyObject* dict = PyDict_New();
         if(!_graphics_backend.handleEvents()) {
-            return PyLong_FromLong(0);
+            return dict;//PyLong_FromLong(0);
         }
-        return PyLong_FromLong(1);
+        PyObject* val1 = PyUnicode_FromString("data_01");
+        if (!val1) {
+            Py_XDECREF(dict);
+            Py_XDECREF(val1);
+        }
+        PyDict_SetItemString(dict, "key1", val1); 
+        Py_DECREF(val1);
+        return dict;//PyLong_FromLong(1);
     }
     static PyMethodDef _mymodule_methods[] = {
         {"version", _mymodule_version, METH_VARARGS, "lele.version()"},

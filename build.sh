@@ -21,21 +21,6 @@ function buildpy() {
 }
 
 function buildelf() {
-    local py_script="$(pwd)/src/py/main.py"
-    local config_json="$(pwd)/src/configs/testview.json"
-    parseArgs $@
-    local input_file
-    if [ -f ${py_script} ]; then
-        input_file=${py_script}
-    elif [ -f ${config_json} ]; then
-        input_file=${config_json}
-    else
-        echo "syntax:"
-        echo " ./build.sh py_script=/path/to/py/script"
-        echo " ./build.sh config_json=/path/to/config/json"
-        exit -1
-    fi
-
     local deps=(zlib debug_logger json_utils curl libssh2 utils)
     installDeps $@ deps depsdir="/usr/local"
 
@@ -52,27 +37,40 @@ function buildelf() {
 }
 
 function run() {
+    local py_script="$(pwd)/src/py/main.py"
+    local config_json="$(pwd)/src/configs/testview.json"
+
+    parseArgs $@
+    local input_file
+    if [ -f ${py_script} ]; then
+        input_file=${py_script}
+    elif [ -f ${config_json} ]; then
+        input_file=${config_json}
+    else
+        echo "missing input file"
+        exit -1
+    fi
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     echo "set confirm off" |sudo tee ~/.gdbinit
 
-    #ways of running:
-    # pushd x86-build/bin
-    # gdb -ex "run" --args ./lvglsim ${input_file}
-    # popd
+    # ways of running:
+    pushd x86-build/bin
+    gdb -ex "run" --args ./lvglsim ${input_file}
+    popd
 
     # pushd x86-build/bin
     # ./lvglsim ../../src/configs/imageview.json
     # ./lvglsim ../../src/py/main.py #must be in x86-build/bin folder to run like this
     # popd
 
-    pushd src/py
-    LD_LIBRARY_PATH=/usr/local/lib python main.py
-    popd
+    # pushd src/py
+    # LD_LIBRARY_PATH=/usr/local/lib gdb --args python main.py
+    # popd
 }
 
 function main() {
-    buildelf 
-    buildpy
+    buildelf
+    # buildpy
     run
 }
 

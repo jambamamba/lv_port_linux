@@ -6,7 +6,7 @@ print("hello from python")
 print(f"lele version: {lele.version()}")
 
 def callback(str):
-	print(str)
+   print(str)
 
 res = lele.foo(
         10,
@@ -19,7 +19,9 @@ print(f"foo result:{res}")
 res = lele.loadConfig("/repos/lv_port_linux/src/configs/imageview.json")
 print(f"loadConfig result:{res}")
 
-while lele.handleEvents():
+while True:
+    event = lele.handleEvents()
+    print(f"got event: {event}")
     pass
 
 

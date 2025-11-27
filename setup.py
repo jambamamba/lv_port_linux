@@ -61,8 +61,8 @@ setup(name='lele',
             libraries=['lele_ui','lvgl_linux','lvgl','m','pthread','evdev','wayland-client','wayland-cursor','xkbcommon','utils','image_converter','python3.13','crypt','pthread','dl','util','m'],  # Names of libraries to link (e.g., 'libsomething.a' becomes 'something')
             define_macros=[('LV_CONF_INCLUDE_SIMPLE', '1'),('LV_USE_WAYLAND', '1')], # List of compile definitions
             undef_macros=['LV_USE_EVDEV'],
-            extra_compile_args=['-std=c++20'], # Additional compiler flags (optional)
-            extra_link_args=[],
+            extra_compile_args=['-O0', '-g', '-UNDEBUG', '-std=c++20'], # Additional compiler flags (optional)
+            extra_link_args=['-g'],
             parallel=True,
             language='c++' # Specify the language as C++
         )
