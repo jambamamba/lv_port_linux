@@ -1,6 +1,6 @@
 {
     "view":{
-        "id":"views:0/view",
+        "id":"/views:0/view",
         "style":{"padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"5"},
         "style":{"id":"view/button","class_name":"view/button","border":"solid-1px-#0f0","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
         "xstyle":{"id":"slider_style0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
@@ -42,6 +42,7 @@
             "event":{"type":"clicked","action":"","args":{}}
         },  
         "button":{
+            "id":"slider",
             "type":"slider",
             "style":{"id":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
             "xstyle":{"id":"slider_style1","class_name":"slider0","border":"solid-1px-#f00","osm todo":"this border should override border from top slider_style0, line:6"},

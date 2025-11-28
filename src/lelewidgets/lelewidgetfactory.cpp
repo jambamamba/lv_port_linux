@@ -202,12 +202,35 @@ void fromJson(const std::string &json_str, std::function<void (const std::string
   }
 }
 
+void iterateNodes(std::vector<std::pair<std::string, LeleWidgetFactory::Token>> &nodes, int depth) {
+    for (const auto &[key,token]: nodes) {
+        LOG(DEBUG, LVSIM, "ITER key:%s\n", key.c_str());
+        if (std::holds_alternative<std::unique_ptr<LeleEvent>>(token)) {
+            auto &lele_event = std::get<std::unique_ptr<LeleEvent>>(token);
+            LOG(DEBUG, LVSIM, "         lele_event:%s\n", " ");
+        }
+        else if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
+            auto &lele_style = std::get<std::unique_ptr<LeleStyle>>(token);
+            LOG(DEBUG, LVSIM, "         lele_style:%s\n", " ");
+        }
+        else if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
+            auto &lele_base = std::get<std::unique_ptr<LeleBase>>(token);
+            LOG(DEBUG, LVSIM, "         (%i) lele_base:%s\n", depth, lele_base->id().c_str());
+            LeleWidgetFactory::iterateNodes(lele_base->children(), depth+1);
+        }
+    }
+}
+
 std::vector<std::pair<std::string, Token>> fromConfig(const std::string &config_json) {
     static LeleBase _root_widget;
     _root_widget.setLvObj(lv_screen_active());
+    if(!std::filesystem::exists(config_json)) {
+        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", config_json.c_str());
+        return std::vector<std::pair<std::string, LeleWidgetFactory::Token>>();
+    }
     const cJSON* root = readJson(config_json.c_str());
     if(!root) {
-        LOG(FATAL, LVSIM, "Failed to failed to load file: '%s'\n", config_json.c_str());
+        LOG(FATAL, LVSIM, "Failed to load file: '%s'\n", config_json.c_str());
         return std::vector<std::pair<std::string, LeleWidgetFactory::Token>>();
     }
     auto tokens = LeleWidgetFactory::fromJson(cJSON_Print(root));

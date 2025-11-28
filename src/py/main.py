@@ -4,9 +4,14 @@ import lele
 
 print("hello from python")
 print(f"lele version: {lele.version()}")
+print(f"lele.event: {lele.event}")
 
 def callback(str):
    print(str)
+
+def sliderMoved(percent):
+   print(f"slider moved to: {percent}")
+   pass
 
 res = lele.foo(
         10,
@@ -19,9 +24,9 @@ print(f"foo result:{res}")
 res = lele.loadConfig("/repos/lv_port_linux/src/configs/imageview.json")
 print(f"loadConfig result:{res}")
 
-while True:
-    event = lele.handleEvents()
-    print(f"got event: {event}")
+lele.addEventHandler("slider", lambda percent: sliderMoved(percent))
+
+while lele.handleEvents():
     pass
 
 

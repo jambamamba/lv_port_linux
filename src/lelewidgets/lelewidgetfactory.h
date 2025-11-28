@@ -26,6 +26,7 @@ namespace LeleWidgetFactory {
   >;
   std::vector<std::pair<std::string, Token>> fromConfig(
     const std::string &config_json = std::filesystem::current_path().string() + "/config.json");
+  void iterateNodes(std::vector<std::pair<std::string, Token>> &nodes, int depth = 0);
   void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback);
   std::vector<std::pair<std::string, Token>> fromJson(const std::string &json_str = "");
   bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values = {});

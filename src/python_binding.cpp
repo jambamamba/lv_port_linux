@@ -21,6 +21,21 @@ namespace {
         PyDict_SetItem(dict, PyUnicode_FromString("Minor"), PyLong_FromDouble(minor_version));
         return dict;
     }
+    static PyObject* _mymodule_addEventHandler(PyObject *self, PyObject *args) {
+        char *str = nullptr;
+        PyObject *callback = nullptr;
+        if(!PyArg_ParseTuple(args, "sO", //str, obj
+            &str,
+            &callback)) {
+            return PyLong_FromLong(0);
+        }
+        LOG(DEBUG, LVSIM, "_mymodule_addEventHandler id:'%s'\n", str);
+        // PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
+        // PyObject *res = PyObject_CallObject(callback, arglist);
+        // if(res) { Py_DECREF(res); }
+
+        return PyLong_FromLong(1);
+    }
     static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
         int num = 0;
         char *str = nullptr;
@@ -33,7 +48,7 @@ namespace {
             &list,
             &dic,
             &callback)) {
-            return PyLong_FromLong(-1);
+            return PyLong_FromLong(0);
         }
         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "num: " << num << "\n";
         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
@@ -64,18 +79,18 @@ namespace {
         if(res) { Py_DECREF(res); }
         // Py_DECREF(callback);
 
-        return PyLong_FromLong(0);
+        return PyLong_FromLong(1);
     }
     static PyObject* _mymodule_loadConfig(PyObject *self, PyObject *args) {
         char *str = nullptr;
         if(!PyArg_ParseTuple(args, "s", //str
             &str)) {
-            return PyLong_FromLong(-1);
+            return PyLong_FromLong(0);
         }
         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
 
         if(!str) {
-            return PyLong_FromLong(-1);
+            return PyLong_FromLong(0);
         }
 
         std::string input_file(str);
@@ -85,30 +100,24 @@ namespace {
         if((std::filesystem::exists(input_file))) {
             _tokens = LeleWidgetFactory::fromConfig(input_file);
             if(_tokens.size() == 0) {
-                return PyLong_FromLong(-1);
+                return PyLong_FromLong(0);
             }
+            LeleWidgetFactory::iterateNodes(_tokens);
         }
-        return PyLong_FromLong(0);
+        return PyLong_FromLong(1);
     }
     static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
-        PyObject* dict = PyDict_New();
         if(!_graphics_backend.handleEvents()) {
-            return dict;//PyLong_FromLong(0);
+            return PyLong_FromLong(0);
         }
-        PyObject* val1 = PyUnicode_FromString("data_01");
-        if (!val1) {
-            Py_XDECREF(dict);
-            Py_XDECREF(val1);
-        }
-        PyDict_SetItemString(dict, "key1", val1); 
-        Py_DECREF(val1);
-        return dict;//PyLong_FromLong(1);
+        return PyLong_FromLong(1);
     }
     static PyMethodDef _mymodule_methods[] = {
         {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
         {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
         {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
+        {"addEventHandler", _mymodule_addEventHandler, METH_VARARGS, "lele.addEventHandler(callback)"},
         {NULL, NULL, 0, NULL}
     };
     static PyModuleDef _mymodule = {
@@ -119,8 +128,10 @@ namespace {
 
 PyMODINIT_FUNC PyInit_lele(void) {
     if(!_graphics_backend.load()) {
-        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n")
+        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return nullptr;
     }
-    return PyModule_Create(&_mymodule);
+    PyObject *mod = PyModule_Create(&_mymodule);
+    PyModule_AddObject(mod, "event", PyUnicode_FromString("bar"));
+    return mod;
 }    

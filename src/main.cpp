@@ -44,9 +44,12 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 int main(int argc, char **argv) {
     LOG_INIT("/tmp");
 
-    // LOG(DEBUG, LVSIM, "main %s\n", argv[0]);
-    std::string input_file = (argc > 1 && *argv[1] && std::filesystem::exists(argv[1])) ? 
-            argv[1] : std::filesystem::current_path().string() + "/main.py";
+    LOG(DEBUG, LVSIM, "main %s\n", argv[1]);
+    if(argc < 2 || !*argv[1]) {
+        LOG(FATAL, LVSIM, "Missing argument, either path to config json, or path to a python file\n");
+        return -1;
+    }
+    std::string input_file = argv[1];
     if(std::filesystem::path(input_file).extension() == ".json") {
         GraphicsBackend backend;
         backend.load();

@@ -45,7 +45,8 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
         #/repos/lv_port_linux/x86-build/bin/lv_image_converter /repos/lv_port_linux/src/res/ /repos/lv_port_linux/x86-build/res/
         COMMAND LD_LIBRARY_PATH=/usr/local/lib ${CMAKE_BINARY_DIR}/bin/lv_image_converter "${CMAKE_SOURCE_DIR}/src/res" "${CMAKE_BINARY_DIR}/res" 
         COMMAND ${CMAKE_COMMAND} -E touch "${CMAKE_BINARY_DIR}/res/.success"
-        #osm todo copy ${CMAKE_SOURCE_DIR}/src/res/* to ${CMAKE_BINARY_DIR}/res/
+        # osm todo copy ${CMAKE_SOURCE_DIR}/src/res/* to ${CMAKE_BINARY_DIR}/res/
+        COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/src/res ${CMAKE_BINARY_DIR}/res
         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
         # WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/src/lv_image_converter/"
         # -E env LD_LIBRARY_PATH=/usr/local/lib 

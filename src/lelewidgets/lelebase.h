@@ -49,6 +49,9 @@ class LeleBase {
   const LeleStyles *styles() const {
     return &_lele_styles;
   }
+  std::vector<std::pair<std::string, LeleWidgetFactory::Token>> &children() {
+    return _tokens;
+  }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);

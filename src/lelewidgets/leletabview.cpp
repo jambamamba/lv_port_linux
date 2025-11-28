@@ -90,7 +90,11 @@ lv_obj_t *LeleTabView::TabHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *l
     lv_obj_t *logo = lv_image_create(lele_parent->getLvObj());
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // lv_image_set_src(logo, _lv_img_dsc_map.at(_img.c_str()));
-    _images[_img] = LeleImageConverter::generateImgDsc((std::filesystem::current_path().parent_path().string() + "/res/" + _img).c_str());//osm
+    std::string img_path(std::filesystem::current_path().string() + "/res/" + _img);
+    if(!std::filesystem::exists(img_path)) {
+      LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
+    }
+    _images[_img] = LeleImageConverter::generateImgDsc(img_path.c_str());
     if(_images[_img]) {
       lv_image_set_src(logo, _images[_img].value().get());
     }
@@ -233,7 +237,11 @@ lv_obj_t *LeleTabView::setTabViewImg(lv_obj_t *tabview_header, const std::string
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // lv_image_set_src(logo, _lv_img_dsc_map.at(img));
-    _images[img] = LeleImageConverter::generateImgDsc((std::filesystem::current_path().parent_path().string() + "/res/" + img).c_str());//osm
+    std::string img_path(std::filesystem::current_path().string() + "/res/" + img);
+    if(!std::filesystem::exists(img_path)) {
+      LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
+    }
+    _images[img] = LeleImageConverter::generateImgDsc(img_path.c_str());
     if(_images[img]) {
       lv_image_set_src(logo, _images[img].value().get());
     }

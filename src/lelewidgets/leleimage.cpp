@@ -68,7 +68,10 @@ lv_obj_t *LeleImage::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
       img = LeleImageConverter::generateImgDsc(_src.c_str());
     }
     else {
-      std::string img_path(std::filesystem::current_path().parent_path().string() + "/res/" + _src);
+      std::string img_path(std::filesystem::current_path().string() + "/res/" + _src);
+      if(!std::filesystem::exists(img_path)) {
+        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
+      }
       img = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
   }
