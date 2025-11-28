@@ -8,7 +8,7 @@ LeleMessageBox::LeleMessageBox(const std::string &json_str)
   : LeleBase(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "title") {
@@ -40,7 +40,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   lv_msgbox_add_title(_lv_obj, _title.c_str());
   lv_msgbox_add_text(_lv_obj, _text.c_str());
 
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       LeleButtons::LeleButton *lele_btn = dynamic_cast<LeleButtons::LeleButton *>(value.get());

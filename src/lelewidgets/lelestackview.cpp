@@ -14,7 +14,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleStackView::LeleStackView(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
@@ -127,7 +127,7 @@ void LeleStackView::updateBreadcrumbLabels() {
 lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
   _lv_obj = LeleBase::createLvObj(lele_parent);
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       value->createLvObj(this);//osm

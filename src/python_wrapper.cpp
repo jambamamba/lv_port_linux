@@ -10,8 +10,7 @@ namespace {
 
 PyMODINIT_FUNC PyInit_lele(void);
 
-void PythonWrapper::printError() const
-{
+void PythonWrapper::printError() const {
    if (!PyErr_Occurred()) {
     return;
    }
@@ -29,8 +28,7 @@ void PythonWrapper::printError() const
     Py_DECREF(old_str);
 }
 
-bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, const std::vector<std::string> &args)
-{
+bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, const std::vector<std::string> &args) {
     PyObject *pFunc = PyObject_GetAttrString(py_module, func);
     if (!pFunc) {
         if (PyErr_Occurred())
@@ -92,8 +90,7 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
     return true;
 }
 
-PyObject *PythonWrapper::loadModule(const std::string &py_script) const
-{
+PyObject *PythonWrapper::loadModule(const std::string &py_script) const {
     setlocale(LC_ALL, "en_US.UTF-8");
     PyImport_AppendInittab("lele", &PyInit_lele);
 
@@ -165,4 +162,10 @@ bool PythonWrapper::load(
     //     return false;
     // }
     return true;    
+}
+
+void PythonWrapper::pyCallback(PyObject *py_callback) {
+    PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
+    PyObject *res = PyObject_CallObject(py_callback, arglist);
+    if(res) { Py_DECREF(res); }
 }

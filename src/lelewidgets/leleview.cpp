@@ -16,7 +16,7 @@ lv_obj_t *LeleViews::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 }
 std::vector<LeleView*> LeleViews::getChildren() const {
     std::vector<LeleView*> ret;
-    for(const auto &pair: _tokens) {
+    for(const auto &pair: _nodes) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "view") {
@@ -58,7 +58,7 @@ void LeleViews::hide(){
 LeleViewHeader::LeleViewHeader(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "name") {
@@ -72,7 +72,7 @@ LeleViewHeader::LeleViewHeader(const std::string &json_str)
 }
 lv_obj_t *LeleViewHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = LeleBase::createLvObj(lele_parent);
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       value->createLvObj(this);
@@ -92,7 +92,7 @@ LeleView::LeleView(const std::string &json_str)
 }
 lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = LeleBase::createLvObj(lele_parent);
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       value->createLvObj(this);

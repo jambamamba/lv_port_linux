@@ -5,6 +5,8 @@
 #include <vector>
 #include <Python.h>
 
+struct _object;
+typedef struct _object PyObject;
 class PythonWrapper {
 public:
     ~PythonWrapper();
@@ -13,6 +15,7 @@ public:
         std::function<bool(const std::string &config_json)> loadConfig = nullptr
     );
     static void unload();
+    static void pyCallback(PyObject *py_callback);
 protected:
     PythonWrapper() = default;
     PyObject *loadModule(const std::string &py_script) const;

@@ -3,7 +3,7 @@
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
 #include "lelebase.h"
-
+#include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -65,8 +65,8 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 LeleBase::LeleBase(const std::string &json_str)
 : _class_name(__func__ ) {
 
-  _tokens = LeleWidgetFactory::fromJson(json_str);
-  for (const auto &[key, token]: _tokens) {
+  _nodes = LeleWidgetFactory::fromJson(json_str);
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       if(key == "style") {
         auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
@@ -416,7 +416,7 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
 std::vector<LeleBase *> LeleBase::getLeleObj(const std::string &obj_name) const {
   std::vector<LeleBase *> res;
-  for(const auto &pair: _tokens) {
+  for(const auto &pair: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
       if(pair.first == obj_name) {
@@ -450,10 +450,16 @@ bool LeleBase::eventCallback(LeleEvent &&e) {
   // LOG(DEBUG, LVSIM, "LeleBase::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
     // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
 
+  for(auto *py_callback:_py_callbacks) {
+    PythonWrapper::pyCallback(py_callback);
+  }
   if(_lele_parent) {
     return _lele_parent->eventCallback(std::move(e));
   }
   return true;
+}
+void LeleBase::addEventHandler(PyObject *py_callback) {
+  _py_callbacks.push_back(py_callback);
 }
 std::ostream& operator<<(std::ostream& os, const LeleBase& p) {
     // os << "LeleStyles id: " << p._id << ", ";

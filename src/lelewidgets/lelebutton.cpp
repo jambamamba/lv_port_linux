@@ -11,7 +11,7 @@ LeleButtons::LeleButtons(const std::string &json_str)
 }
 lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       value->createLvObj(lele_parent);
@@ -21,7 +21,7 @@ lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 }
 int LeleButtons::count() const {
     int idx = 0;
-    for(const auto &pair: _tokens) {
+    for(const auto &pair: _nodes) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "button") {
@@ -36,7 +36,7 @@ int LeleButtons::count() const {
 }
 LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
     int idx = 0;
-    for(const auto &pair: _tokens) {
+    for(const auto &pair: _nodes) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "button") {
@@ -58,7 +58,7 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
   : LeleBase(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "text") {

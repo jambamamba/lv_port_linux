@@ -10,7 +10,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
     static GraphicsBackend _graphics_backend;
-    static std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
+    static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
 
     //Functions that py script can call
     static PyObject* _mymodule_version(PyObject *self, PyObject *args) {
@@ -22,17 +22,23 @@ namespace {
         return dict;
     }
     static PyObject* _mymodule_addEventHandler(PyObject *self, PyObject *args) {
-        char *str = nullptr;
+        char *id = nullptr;
         PyObject *callback = nullptr;
-        if(!PyArg_ParseTuple(args, "sO", //str, obj
-            &str,
+        if(!PyArg_ParseTuple(args, "sO", //id, obj
+            &id,
             &callback)) {
             return PyLong_FromLong(0);
         }
-        LOG(DEBUG, LVSIM, "_mymodule_addEventHandler id:'%s'\n", str);
+        LOG(DEBUG, LVSIM, "_mymodule_addEventHandler id:'%s'\n", id);
         // PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
         // PyObject *res = PyObject_CallObject(callback, arglist);
         // if(res) { Py_DECREF(res); }
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleBase &lele_base){
+            if(lele_base.id() == id){
+                lele_base.addEventHandler(callback);
+            }
+            return true;
+        });
 
         return PyLong_FromLong(1);
     }
@@ -98,11 +104,10 @@ namespace {
             input_file = std::filesystem::current_path().string() + "/" + input_file;
         }
         if((std::filesystem::exists(input_file))) {
-            _tokens = LeleWidgetFactory::fromConfig(input_file);
-            if(_tokens.size() == 0) {
+            _nodes = LeleWidgetFactory::fromConfig(input_file);
+            if(_nodes.size() == 0) {
                 return PyLong_FromLong(0);
             }
-            LeleWidgetFactory::iterateNodes(_tokens);
         }
         return PyLong_FromLong(1);
     }

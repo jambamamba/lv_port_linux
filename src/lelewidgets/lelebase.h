@@ -8,7 +8,7 @@
 #include <optional>
 #include <typeinfo>
 
-//need to include all the types in   using Token = std::variant<
+//need to include all the types in   using Node = std::variant<
 #include "leleevent.h"
 #include "lelestyle.h"
 
@@ -22,6 +22,8 @@ typedef enum {
     DISP_LARGE,
 } disp_size_t;
 
+struct _object;
+typedef struct _object PyObject;
 class LeleBase {
   public:
   LeleBase(const std::string &json_str = "");
@@ -49,8 +51,8 @@ class LeleBase {
   const LeleStyles *styles() const {
     return &_lele_styles;
   }
-  std::vector<std::pair<std::string, LeleWidgetFactory::Token>> &children() {
-    return _tokens;
+  std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children() {
+    return _nodes;
   }
   virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle(lv_obj_t *lv_obj);
@@ -60,6 +62,7 @@ class LeleBase {
   virtual void hide();
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
+  void addEventHandler(PyObject *callback);
   protected:
   void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
@@ -72,6 +75,7 @@ class LeleBase {
   LeleBase *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;
-  std::vector<std::pair<std::string, LeleWidgetFactory::Token>> _tokens;
+  std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
   LeleStyles _lele_styles;
+  std::vector<PyObject *> _py_callbacks;
 };

@@ -6,7 +6,7 @@ LeleImage::LeleImage(const std::string &json_str)
   : LeleBase(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "src") {

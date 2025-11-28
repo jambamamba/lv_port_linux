@@ -30,7 +30,7 @@ LeleTabView::Tab* LeleTabView::Tabs::getAt(int index) const {
 }
 std::vector<LeleTabView::Tab*> LeleTabView::Tabs::getChildren() const {
     std::vector<LeleTabView::Tab*> ret;
-    for(const auto &pair: _tokens) {
+    for(const auto &pair: _nodes) {
       if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
         auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
         if(pair.first == "tab") {
@@ -73,7 +73,7 @@ LeleTabView::TabContent *LeleTabView::Tab::getTabContent() const {
 LeleTabView::TabHeader::TabHeader(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "name") {
@@ -119,7 +119,7 @@ LeleTabView::TabContent::TabContent(const std::string &json_str)
 }
 lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
       value->createLvObj(lele_parent);
@@ -132,7 +132,7 @@ lv_obj_t *LeleTabView::TabContent::createLvObj(LeleBase *lele_parent, lv_obj_t *
 LeleTabView::LeleTabView(const std::string &json_str)
   : LeleBase(json_str) {
     _class_name = __func__ ;//
-  for (const auto &[key, token]: _tokens) {
+  for (const auto &[key, token]: _nodes) {
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
     if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleBase>>(token);
