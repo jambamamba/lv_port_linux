@@ -4,6 +4,8 @@
 
 #include "python_wrapper.h"
 
+LOG_CATEGORY(LVSIM, "LVSIM");
+
 namespace {
     static PythonWrapper *_py;
 }//namespace
@@ -165,6 +167,7 @@ bool PythonWrapper::load(
 }
 
 void PythonWrapper::pyCallback(PyObject *py_callback) {
+    LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
     PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
     PyObject *res = PyObject_CallObject(py_callback, arglist);//osm todo, this should call into py , but its not working
     if(res) { Py_DECREF(res); }

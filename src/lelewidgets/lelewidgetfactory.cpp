@@ -208,24 +208,24 @@ void iterateNodes(
     std::function<bool(LeleBase &lele_base)> on_visit_lele_base_obj
     ) {
     for (const auto &[key,token]: nodes) {
-        LOG(DEBUG, LVSIM, "ITER key:%s\n", key.c_str());
+        // LOG(DEBUG, LVSIM, "ITER key:%s\n", key.c_str());
         if (std::holds_alternative<std::unique_ptr<LeleEvent>>(token)) {
             auto &lele_event = std::get<std::unique_ptr<LeleEvent>>(token);
-            LOG(DEBUG, LVSIM, "         lele_event:%s\n", " ");
+            // LOG(DEBUG, LVSIM, "         lele_event:%s\n", " ");
         }
         else if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
             auto &lele_style = std::get<std::unique_ptr<LeleStyle>>(token);
-            LOG(DEBUG, LVSIM, "         lele_style:%s\n", " ");
+            // LOG(DEBUG, LVSIM, "         lele_style:%s\n", " ");
         }
         else if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
             auto &lele_base = std::get<std::unique_ptr<LeleBase>>(token);
-            LOG(DEBUG, LVSIM, "         (%i) lele_base:%s\n", depth, lele_base->id().c_str());
+            // LOG(DEBUG, LVSIM, "         (%i) lele_base:%s\n", depth, lele_base->id().c_str());
             if(on_visit_lele_base_obj) {
                 if(!on_visit_lele_base_obj(*lele_base.get())){
                     return;
                 }
             }
-            LeleWidgetFactory::iterateNodes(lele_base->children(), depth+1);
+            LeleWidgetFactory::iterateNodes(lele_base->children(), depth+1, on_visit_lele_base_obj);
         }
     }
 }

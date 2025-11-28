@@ -34,7 +34,9 @@ namespace {
         // PyObject *res = PyObject_CallObject(callback, arglist);
         // if(res) { Py_DECREF(res); }
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleBase &lele_base){
-            if(lele_base.id() == id){
+            // LOG(DEBUG, LVSIM, "@@@ lele_base.id():'%s'\n", lele_base.id().c_str());
+            if(lele_base.id() == id) {
+                LOG(DEBUG, LVSIM, "add event handler _mymodule_addEventHandler id:'%s', callback:%p\n", id, callback);
                 lele_base.addEventHandler(callback);
             }
             return true;
