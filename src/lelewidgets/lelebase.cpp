@@ -3,7 +3,7 @@
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
 #include "lelebase.h"
-#include "python_wrapper.h"
+#include "python/python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -451,7 +451,7 @@ bool LeleBase::eventCallback(LeleEvent &&e) {
     // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
 
   for(auto *py_callback:_py_callbacks) {
-    PythonWrapper::pyCallback(py_callback);
+    PythonWrapper::pyCallback(py_callback, std::move(e), _id);
   }
   if(_lele_parent) {
     return _lele_parent->eventCallback(std::move(e));

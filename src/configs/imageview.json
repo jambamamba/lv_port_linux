@@ -36,19 +36,20 @@
             "style":{"id":"views/view0/label","x":"0","y":"0","width":"50%","height":"5%"}
         },  
         "button":{
+            "id":"push_button0",
             "type":"push",
             "style":{"id":"button0","class_name":"view/button"},
             "text":"> Push button0",
-            "event":{"type":"clicked","action":"","args":{}}
+            "event":{"type":"clicked","action":"action0","args":{}}
         },  
         "button":{
-            "id":"slider",
+            "id":"slider0",
             "type":"slider",
             "style":{"id":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
             "xstyle":{"id":"slider_style1","class_name":"slider0","border":"solid-1px-#f00","osm todo":"this border should override border from top slider_style0, line:6"},
             "xstyle":{"id":"slider_style2","border":"solid-1px-#f00","osm todo":"this should apply, along with slider_style0 and slider_style1"},
             "value":"10",
-            "event":{"type":"clicked","action":"","args":{}}
+            "event":{"type":"clicked","action":"action0","args":{}}
         }
     }
 }

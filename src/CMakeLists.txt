@@ -79,7 +79,8 @@ function(buildLvglSim PYTHON_LIB)
     )
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
     set(sources
-        python_binding.cpp
+        python/python_binding.cpp
+        python/leleevent.cpp
         graphics_backend.cpp
         # mainwindow.cpp 
         # chart.cpp 
@@ -137,7 +138,7 @@ function(buildLvglSim PYTHON_LIB)
     target_include_directories(lele_ui PRIVATE ${inc_dirs})
     add_dependencies(lele_ui lv_image_convert python)
 
-    add_executable(lvglsim main.cpp python_wrapper.cpp)
+    add_executable(lvglsim main.cpp python/python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
     target_link_directories(lvglsim PRIVATE ${link_dirs})
     target_link_libraries(lvglsim PRIVATE ${link_libs} lele_ui)

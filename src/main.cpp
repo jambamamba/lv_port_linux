@@ -34,7 +34,7 @@
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
 
-#include "src/python_wrapper.h"
+#include "src/python/python_wrapper.h"
 #include "src/graphics_backend.h"
 #include "src/lelewidgets/lelebase.h"
 

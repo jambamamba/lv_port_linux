@@ -19,7 +19,7 @@ namespace {
         PyObject *dict = PyDict_New();
         PyDict_SetItem(dict, PyUnicode_FromString("Major"), PyLong_FromDouble(major_version));
         PyDict_SetItem(dict, PyUnicode_FromString("Minor"), PyLong_FromDouble(minor_version));
-        return dict;
+            return dict;
     }
     static PyObject* _mymodule_addEventHandler(PyObject *self, PyObject *args) {
         char *id = nullptr;
@@ -29,19 +29,14 @@ namespace {
             &callback)) {
             return PyLong_FromLong(0);
         }
-        LOG(DEBUG, LVSIM, "_mymodule_addEventHandler id:'%s'\n", id);
-        // PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
-        // PyObject *res = PyObject_CallObject(callback, arglist);
-        // if(res) { Py_DECREF(res); }
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleBase &lele_base){
-            // LOG(DEBUG, LVSIM, "@@@ lele_base.id():'%s'\n", lele_base.id().c_str());
+        // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleBase &lele_base) {
             if(lele_base.id() == id) {
-                LOG(DEBUG, LVSIM, "add event handler _mymodule_addEventHandler id:'%s', callback:%p\n", id, callback);
+                Py_XINCREF(callback);
                 lele_base.addEventHandler(callback);
             }
             return true;
         });
-
         return PyLong_FromLong(1);
     }
     static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
@@ -133,12 +128,21 @@ namespace {
     };
 }//namespace
 
+/////////////////////////////////////////////////////////////////////
 PyMODINIT_FUNC PyInit_lele(void) {
     if(!_graphics_backend.load()) {
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return nullptr;
     }
     PyObject *mod = PyModule_Create(&_mymodule);
-    PyModule_AddObject(mod, "event", PyUnicode_FromString("bar"));
+
+    PyLeleEvent_Type.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&PyLeleEvent_Type) < 0){
+        return nullptr;
+    }
+    Py_INCREF(&PyLeleEvent_Type);
+    PyModule_AddObject(mod, "Event", (PyObject *)&PyLeleEvent_Type);
+
+    // PyModule_AddObject(mod, "event", PyUnicode_FromString("bar"));
     return mod;
 }    

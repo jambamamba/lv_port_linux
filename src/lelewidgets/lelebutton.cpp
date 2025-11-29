@@ -199,6 +199,7 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
         lv_obj_t *slider = lv_event_get_target_obj(lv_event);
         int value = slider ? lv_slider_get_value(slider) : 0;
         LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, value);
+        return LeleBase::eventCallback(LeleEvent(e, lv_event, value));
     }
     return LeleBase::eventCallback(std::move(e));
 }

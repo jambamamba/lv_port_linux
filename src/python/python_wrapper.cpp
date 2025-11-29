@@ -2,6 +2,7 @@
 #include <iostream>
 #include <debug_logger/debug_logger.h>
 
+#include <lelewidgets/leleevent.h>
 #include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -166,9 +167,14 @@ bool PythonWrapper::load(
     return true;    
 }
 
-void PythonWrapper::pyCallback(PyObject *py_callback) {
-    LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
-    PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
-    PyObject *res = PyObject_CallObject(py_callback, arglist);//osm todo, this should call into py , but its not working
+void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e, const std::string &target_obj_id) {
+
+    // LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_code_t code = lv_event_get_code(lv_event);
+    // code, e.ivalue
+
+    PyObject *py_event = Py_BuildValue("(O)", PyLeleEvent_new(&PyLeleEvent_Type, &e, target_obj_id));
+    PyObject *res = PyObject_CallObject(py_callback, py_event);
     if(res) { Py_DECREF(res); }
 }
