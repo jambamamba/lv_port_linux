@@ -9,7 +9,7 @@
 
 
 
-class LeleBase;
+class LeleObject;
 class LeleStyle {
   public:
   enum BorderTypeE {
@@ -33,8 +33,8 @@ class LeleStyle {
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
-  void setLeleParent(LeleBase *lele_parent) { _lele_parent = lele_parent; }
-  LeleBase *getLeleParent() const { return _lele_parent; }
+  void setLeleParent(LeleObject *lele_parent) { _lele_parent = lele_parent; }
+  LeleObject *getLeleParent() const { return _lele_parent; }
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
   static std::optional<LeleStyle::Rotation> parseRotation(const std::string &json_str);
@@ -45,7 +45,7 @@ class LeleStyle {
   std::string className() const;
   std::optional<StyleValue> getValue(const std::string &key, std::string class_name = "") const;
   protected:
-  LeleBase *_lele_parent = nullptr;
+  LeleObject *_lele_parent = nullptr;
   std::string _class_name;
   std::string _id;
   std::map<std::string, std::optional<StyleValue>> _style = {
@@ -87,7 +87,7 @@ class LeleStyles {
   public:
   LeleStyles(const std::string &json_str = "");
   friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
-  void setLeleParent(LeleBase *lele_parent);
+  void setLeleParent(LeleObject *lele_parent);
   void addStyle(LeleStyle* lele_style);
   size_t size() const { return _lele_styles.size(); }
   LeleStyles &operator+=(LeleStyles &);
@@ -97,6 +97,6 @@ class LeleStyles {
   std::string _id;
   LeleStyle _null_pos;
   std::vector<LeleStyle *>_lele_styles;
-  LeleBase *_lele_parent = nullptr;
+  LeleObject *_lele_parent = nullptr;
 };
 

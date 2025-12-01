@@ -4,7 +4,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleTextbox::LeleTextbox(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
 
     _class_name = __func__ ;//
   for (const auto &[key, token]: _nodes) {
@@ -24,9 +24,9 @@ LeleTextbox::LeleTextbox(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleTextbox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
-  _lv_obj = LeleBase::createLvObj(lele_parent,
+  _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_textarea_create(lele_parent->getLvObj()));
 
   lv_textarea_set_text(_lv_obj, _text.c_str());
@@ -34,7 +34,7 @@ lv_obj_t *LeleTextbox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   lv_textarea_set_text_selection(_lv_obj, true);
   lv_textarea_set_max_length(_lv_obj, _max_length);
   lv_textarea_set_one_line(_lv_obj, _multiline);
-  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+  lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
@@ -48,5 +48,5 @@ bool LeleTextbox::eventCallback(LeleEvent &&e) {
         const char * text = lv_textarea_get_text(_lv_obj);
         LOG(DEBUG, LVSIM, "Textarea Clicked: %s\n", text);
     }
-    return LeleBase::eventCallback(std::move(e));
+    return LeleObject::eventCallback(std::move(e));
 }

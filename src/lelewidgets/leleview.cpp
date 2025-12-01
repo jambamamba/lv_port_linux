@@ -6,19 +6,19 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 ////////////////////////////////////////////////////////////////////////
 LeleViews::LeleViews(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
     _class_name = __func__ ;//
     LOG(DEBUG, LVSIM, "LeleViews json_str:%s\n", json_str.c_str());
 }
-lv_obj_t *LeleViews::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleViews::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   return _lv_obj;
 }
 std::vector<LeleView*> LeleViews::getChildren() const {
     std::vector<LeleView*> ret;
     for(const auto &pair: _nodes) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+      if (std::holds_alternative<std::unique_ptr<LeleObject>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleObject>>(pair.second);
         if(pair.first == "view") {
           LeleView *view = dynamic_cast<LeleView*> (value.get());
           if(view) {
@@ -56,7 +56,7 @@ void LeleViews::hide(){
 }
 ////////////////////////////////////////////////////////////////////////
 LeleViewHeader::LeleViewHeader(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
     _class_name = __func__ ;//
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
@@ -70,11 +70,11 @@ LeleViewHeader::LeleViewHeader(const std::string &json_str)
     }
   }
 }
-lv_obj_t *LeleViewHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  _lv_obj = LeleBase::createLvObj(lele_parent);
+lv_obj_t *LeleViewHeader::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
+  _lv_obj = LeleObject::createLvObj(lele_parent);
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       value->createLvObj(this);
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -87,14 +87,14 @@ lv_obj_t *LeleViewHeader::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 
 
 LeleView::LeleView(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
-  _lv_obj = LeleBase::createLvObj(lele_parent);
+lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
+  _lv_obj = LeleObject::createLvObj(lele_parent);
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       value->createLvObj(this);
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -116,14 +116,14 @@ lv_obj_t *LeleView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
       // }
     }
   }
-  lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+  lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
 bool LeleView::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
     lv_event_code_t code = lv_event_get_code(lv_event);
-    LeleBase *base = static_cast<LeleBase*>(lv_event->user_data);
+    LeleObject *base = static_cast<LeleObject*>(lv_event->user_data);
     // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->className().c_str());
     
     //uncheck all other buttons in the group, only one button should be checked at a time
@@ -131,7 +131,7 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     lv_obj_t *act_cb = lv_event_get_target_obj(lv_event);//Get the object originally targeted by the event. It's the same even if the event is bubbled. 
     if(act_cb == container) {
       // LOG(DEBUG, LVSIM, "Do nothing, the container was clicked, not the button\n");
-      return LeleBase::eventCallback(std::move(e));//Do nothing if the container was clicked
+      return LeleObject::eventCallback(std::move(e));//Do nothing if the container was clicked
     }
     for(int idx = 0; idx < lv_obj_get_child_count(container); ++idx) {
       lv_obj_t *old_cb = lv_obj_get_child(container, idx);
@@ -141,6 +141,6 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     _active_child_idx = lv_obj_get_index(act_cb);
 
     // LOG(DEBUG, LVSIM, "_lele_parent %s\n", _lele_parent->className().c_str());
-    return LeleBase::eventCallback(std::move(e));
+    return LeleObject::eventCallback(std::move(e));
 }
 ////////////////////////////////////////////////////////////////////////

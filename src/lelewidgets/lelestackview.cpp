@@ -12,12 +12,12 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleStackView::LeleStackView(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
     _class_name = __func__ ;//
   for (const auto &[key, token]: _nodes) {
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       if(key == "views") {
           _views = dynamic_cast<LeleViews*> (value.get());
       }
@@ -57,7 +57,7 @@ static void event_cb1(lv_event_t * e) {
 }
 
 LeleViewHeader *LeleStackView::getViewHeader(const LeleView *view) const {
-  std::vector<LeleBase *> objs = view->getLeleObj("view_header");
+  std::vector<LeleObject *> objs = view->getLeleObj("view_header");
   if(objs.size() > 0) {
     return dynamic_cast<LeleViewHeader*>(objs.front());
   }
@@ -65,21 +65,21 @@ LeleViewHeader *LeleStackView::getViewHeader(const LeleView *view) const {
 }
 
 LeleViewHeader *LeleStackView::getBreadcrumbBar() const {
-  std::vector<LeleBase *> objs = getLeleObj("view_header");
+  std::vector<LeleObject *> objs = getLeleObj("view_header");
   if(objs.size() > 0) {
     return dynamic_cast<LeleViewHeader*>(objs.front());
   }
   return nullptr;
 }
 
-std::vector<LeleBase*> LeleStackView::getBreadcrumbLabels() const {
+std::vector<LeleObject*> LeleStackView::getBreadcrumbLabels() const {
   LeleViewHeader *breadcrumb_bar = LeleStackView::getBreadcrumbBar();
-  std::vector<LeleBase *> objs = breadcrumb_bar->getLeleObj("label");
+  std::vector<LeleObject *> objs = breadcrumb_bar->getLeleObj("label");
   return objs;
 }
 
 void LeleStackView::updateBreadcrumbLabels() {
-  std::vector<LeleBase*> labels = getBreadcrumbLabels();
+  std::vector<LeleObject*> labels = getBreadcrumbLabels();
   auto label_it = labels.begin();
   auto stack_it = _stack.begin();
   if(_stack.size() >= labels.size()) {
@@ -124,12 +124,12 @@ void LeleStackView::updateBreadcrumbLabels() {
   }
 }
 
-lv_obj_t *LeleStackView::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleStackView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
-  _lv_obj = LeleBase::createLvObj(lele_parent);
+  _lv_obj = LeleObject::createLvObj(lele_parent);
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       value->createLvObj(this);//osm
       // LOG(DEBUG, LVSIM, "stackview obj: %s:%s\n", key.c_str(), value->id().c_str());
     }
@@ -241,5 +241,5 @@ bool LeleStackView::eventCallback(LeleEvent &&e) {
       popView();
     }
   }
-  return LeleBase::eventCallback(std::move(e));
+  return LeleObject::eventCallback(std::move(e));
 }

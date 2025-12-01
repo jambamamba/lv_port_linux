@@ -1,53 +1,53 @@
 #pragma once
 
-#include "lelebase.h"
+#include "leleobject.h"
 #include "lelewidgetfactory.h"
 
 #include <smart_pointer/auto_free_ptr.h>
 #include <optional>
 
 class LeleViewHeader;
-class LeleTabView : public LeleBase {
+class LeleTabView : public LeleObject {
   public:
-  class TabHeader : public LeleBase {
+  class TabHeader : public LeleObject {
     public:
     TabHeader(const std::string &json_str);
     const std::string &name() const { return _name; }
     const std::string &img() const { return _img; }
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     protected:
     std::string _name;
     std::string _img;
     std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
   };
-  class TabContent : public LeleBase {
+  class TabContent : public LeleObject {
     public:
     TabContent(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     protected:
-    std::vector<std::unique_ptr<LeleBase>> _widgets;
+    std::vector<std::unique_ptr<LeleObject>> _widgets;
   };
-  class Tab : public LeleBase {
+  class Tab : public LeleObject {
     public:
     Tab(const std::string &json_str = "");
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     TabHeader *getTabHeader() const;
     TabContent *getTabContent() const;
     protected:
-    std::vector<std::unique_ptr<LeleBase>> _tab_button;
-    std::vector<std::unique_ptr<LeleBase>> _tab_content;
+    std::vector<std::unique_ptr<LeleObject>> _tab_button;
+    std::vector<std::unique_ptr<LeleObject>> _tab_content;
   };
-  class Tabs : public LeleBase {
+  class Tabs : public LeleObject {
     public:
     Tabs(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     int count() const;
     LeleTabView::Tab* getAt(int idx) const;
     std::vector<LeleTabView::Tab*> getChildren() const;
     protected:
   };
   LeleTabView(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 
   protected:
   static void tabViewDeleteEventCb(lv_event_t * e);

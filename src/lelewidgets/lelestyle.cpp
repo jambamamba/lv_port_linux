@@ -4,7 +4,7 @@
 
 #include "lelestyle.h"
 #include "lelewidgetfactory.h"
-#include "lelebase.h"
+#include "leleobject.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -421,11 +421,11 @@ LeleStyles::LeleStyles(const std::string &json_str) {
     }
   }
 }
-// lv_obj_t *LeleStyles::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+// lv_obj_t *LeleStyles::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 //   setParent(lele_parent);
 //   return _lv_obj;
 // }
-void LeleStyles::setLeleParent(LeleBase *lele_parent) {
+void LeleStyles::setLeleParent(LeleObject *lele_parent) {
     for(auto *lele_style : _lele_styles) {
       if(!lele_style->getLeleParent()) {
         lele_style->setLeleParent(lele_parent);

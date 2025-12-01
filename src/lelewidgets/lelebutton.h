@@ -1,18 +1,18 @@
 #pragma once
 
-#include "lelebase.h"
+#include "leleobject.h"
 
-class LeleGroup : public LeleBase {
+class LeleGroup : public LeleObject {
   public:
   LeleGroup(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   protected:
   int _active_child_idx = -1;
 };
-class LeleButtons : public LeleBase {
+class LeleButtons : public LeleObject {
   public:
-  class LeleButton : public LeleBase  {
+  class LeleButton : public LeleObject  {
     public:
     enum Type {
       Push,
@@ -23,7 +23,7 @@ class LeleButtons : public LeleBase {
       Slider
     };
     LeleButton(const std::string &json_str);
-    virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+    virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
     bool isChecked() const { return _checked; }
@@ -38,7 +38,7 @@ class LeleButtons : public LeleBase {
     std::vector<LeleEvent*> _events;
   };
   LeleButtons(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   int count() const;
   LeleButton* getAt(int idx) const;
   protected:

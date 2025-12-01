@@ -3,7 +3,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleLabel::LeleLabel(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   for (const auto &[key, token]: _nodes) {
@@ -16,9 +16,9 @@ LeleLabel::LeleLabel(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleLabel::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleLabel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
-  _lv_obj = LeleBase::createLvObj(lele_parent,
+  _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_label_create(lele_parent->getLvObj()));
 
   lv_label_set_text(_lv_obj, _text.c_str());

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "lelebase.h"
+#include "leleobject.h"
 #include "lelewidgetfactory.h"
 #include <stack>
 
@@ -11,16 +11,16 @@ class LeleViewHeader;
 class LeleLabel;
 class LeleViews;
 class LeleView;
-class LeleStackView : public LeleBase {
+class LeleStackView : public LeleObject {
   public:
   LeleStackView(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
 
   protected:
   LeleViewHeader *getViewHeader(const LeleView *view) const;
   LeleViewHeader *getBreadcrumbBar() const;
-  std::vector<LeleBase*> getBreadcrumbLabels() const;
+  std::vector<LeleObject*> getBreadcrumbLabels() const;
   void updateBreadcrumbLabels();
   lv_obj_t *setStackViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setStackViewTitle(lv_obj_t *tabview_header, const std::string &title);

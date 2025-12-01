@@ -2,7 +2,7 @@
 #include <lvgl/lvgl_private.h>
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
-#include "lelebase.h"
+#include "leleobject.h"
 #include "python/python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -62,7 +62,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 
 }//namespace
 
-LeleBase::LeleBase(const std::string &json_str)
+LeleObject::LeleObject(const std::string &json_str)
 : _class_name(__func__ ) {
 
   _nodes = LeleWidgetFactory::fromJson(json_str);
@@ -87,7 +87,7 @@ LeleBase::LeleBase(const std::string &json_str)
   // std::cout << "styles:" << _lele_styles << "\n";
 }
 
-LeleBase::~LeleBase() {
+LeleObject::~LeleObject() {
     // lv_style_reset(&_style);
 }
 
@@ -127,7 +127,7 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
-void LeleBase::setStyle(lv_obj_t *lv_obj) {
+void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
   auto value = _lele_styles.getValue("corner_radius");
   if(value) {
@@ -285,7 +285,7 @@ void LeleBase::setStyle(lv_obj_t *lv_obj) {
   lv_obj_add_style(lv_obj, &_style, LV_PART_MAIN);
 }
 
-void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
+void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
   //osm todo: apply these in the same order they are defined in the json
     lv_obj_t *lv_img = lv_image_create(_lv_obj);
     if(!lv_img) {
@@ -365,7 +365,7 @@ void LeleBase::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, i
     lv_image_set_src(lv_img, _bg_img.value().get());
 }
 
-std::tuple<int,int> LeleBase::parseBackgroundPosition(
+std::tuple<int,int> LeleObject::parseBackgroundPosition(
   const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const {
   int x = 0;
   int y = 0;
@@ -379,7 +379,7 @@ std::tuple<int,int> LeleBase::parseBackgroundPosition(
   }
   return std::tuple<int,int>(x, y);
 }
-void LeleBase::setObjAlignStyle(lv_obj_t *lv_obj) {
+void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
   auto value = _lele_styles.getValue("align");
   if(value) {
     lv_obj_align(lv_obj, 
@@ -390,7 +390,7 @@ void LeleBase::setObjAlignStyle(lv_obj_t *lv_obj) {
   }
 }
 
-void LeleBase::setTextAlignStyle(lv_obj_t *lv_obj) {
+void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
 
   auto value = _lele_styles.getValue("text_align");
   if(value) {
@@ -401,7 +401,7 @@ void LeleBase::setTextAlignStyle(lv_obj_t *lv_obj) {
   }
 }
 
-lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   if(!lv_obj) {
     _lv_obj = lv_obj_create(lele_parent->getLvObj());
@@ -414,11 +414,11 @@ lv_obj_t *LeleBase::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 
-std::vector<LeleBase *> LeleBase::getLeleObj(const std::string &obj_name) const {
-  std::vector<LeleBase *> res;
+std::vector<LeleObject *> LeleObject::getLeleObj(const std::string &obj_name) const {
+  std::vector<LeleObject *> res;
   for(const auto &pair: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(pair.second)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(pair.second);
       if(pair.first == obj_name) {
         res.push_back(value.get());
       }
@@ -427,27 +427,27 @@ std::vector<LeleBase *> LeleBase::getLeleObj(const std::string &obj_name) const 
   return res;
 }
 
-void LeleBase::EventCallback(lv_event_t *e) {
+void LeleObject::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
-    LeleBase *base = static_cast<LeleBase*>(e->user_data);
+    LeleObject *base = static_cast<LeleObject*>(e->user_data);
     if(base) {
       base->eventCallback(LeleEvent(e));
     }
 }
 
-void LeleBase::hide() {
+void LeleObject::hide() {
   // int width = lv_obj_get_width(getLvObj());
   // int height = lv_obj_get_height(getLvObj());
   // lv_obj_set_size(getLvObj(), 0, 0);
   lv_obj_add_flag(getLvObj(), LV_OBJ_FLAG_HIDDEN);
 }
 
-void LeleBase::show() {
+void LeleObject::show() {
   lv_obj_remove_flag(getLvObj(), LV_OBJ_FLAG_HIDDEN);
 }
 
-bool LeleBase::eventCallback(LeleEvent &&e) {
-  // LOG(DEBUG, LVSIM, "LeleBase::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
+bool LeleObject::eventCallback(LeleEvent &&e) {
+  // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
     // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
 
   for(auto *py_callback:_py_callbacks) {
@@ -458,10 +458,10 @@ bool LeleBase::eventCallback(LeleEvent &&e) {
   }
   return true;
 }
-void LeleBase::addEventHandler(PyObject *py_callback) {
+void LeleObject::addEventHandler(PyObject *py_callback) {
   _py_callbacks.push_back(py_callback);
 }
-std::ostream& operator<<(std::ostream& os, const LeleBase& p) {
+std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     // os << "LeleStyles id: " << p._id << ", ";
     os << "_id:" << p._id << ",";
     os << "_class_name:" << p._class_name << ",";

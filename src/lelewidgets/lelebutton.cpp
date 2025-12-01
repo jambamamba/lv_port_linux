@@ -6,14 +6,14 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleButtons::LeleButtons(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
     _class_name = __func__ ;//
 }
-lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleButtons::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       value->createLvObj(lele_parent);
     }
   }
@@ -22,8 +22,8 @@ lv_obj_t *LeleButtons::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
 int LeleButtons::count() const {
     int idx = 0;
     for(const auto &pair: _nodes) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+      if (std::holds_alternative<std::unique_ptr<LeleObject>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleObject>>(pair.second);
         if(pair.first == "button") {
           LeleButtons::LeleButton *button = dynamic_cast<LeleButtons::LeleButton*> (value.get());
           if(button) {
@@ -37,8 +37,8 @@ int LeleButtons::count() const {
 LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
     int idx = 0;
     for(const auto &pair: _nodes) {
-      if (std::holds_alternative<std::unique_ptr<LeleBase>>(pair.second)) {
-        auto &value = std::get<std::unique_ptr<LeleBase>>(pair.second);
+      if (std::holds_alternative<std::unique_ptr<LeleObject>>(pair.second)) {
+        auto &value = std::get<std::unique_ptr<LeleObject>>(pair.second);
         if(pair.first == "button") {
           LeleButtons::LeleButton *button = dynamic_cast<LeleButtons::LeleButton*> (value.get());
           if(button) {
@@ -55,7 +55,7 @@ LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
 }
 
 LeleButtons::LeleButton::LeleButton(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   for (const auto &[key, token]: _nodes) {
@@ -100,11 +100,11 @@ LeleButtons::LeleButton::LeleButton(const std::string &json_str)
     }
   }
 }
-lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   switch(_type) {
     case LeleButtons::LeleButton::Type::Checkbox:{
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
@@ -112,7 +112,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
       break;
     }
     case LeleButtons::LeleButton::Type::Radio:{
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
@@ -120,20 +120,20 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
       break;
     }
     case LeleButtons::LeleButton::Type::Switch:{
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_switch_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       break;
     }
     case LeleButtons::LeleButton::Type::Slider:{
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_slider_create(lele_parent->getLvObj()));
         lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
       break;
     }
     case LeleButtons::LeleButton::Type::Close: {
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *img = lv_image_create(_lv_obj);
       lv_image_set_src(img, LV_SYMBOL_CLOSE);
@@ -142,7 +142,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
     }
     case LeleButtons::LeleButton::Type::Push:
     default: {
-      _lv_obj = LeleBase::createLvObj(lele_parent, 
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *label = lv_label_create(_lv_obj);
       lv_label_set_text(label, _text.c_str());
@@ -172,7 +172,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleBase *lele_parent, lv_obj_t *
   if(view && view->isGroup()) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);//bubble events to the parent if parent is a group
   }
-  // lv_obj_add_event_cb(_lv_obj, LeleBase::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+  // lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
@@ -191,7 +191,7 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
           if(event->type() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);
             // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
-            return LeleBase::eventCallback(LeleEvent(*event, lv_event));
+            return LeleObject::eventCallback(LeleEvent(*event, lv_event));
           }
         }
     }
@@ -199,7 +199,7 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
         lv_obj_t *slider = lv_event_get_target_obj(lv_event);
         int value = slider ? lv_slider_get_value(slider) : 0;
         LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, value);
-        return LeleBase::eventCallback(LeleEvent(e, lv_event, value));
+        return LeleObject::eventCallback(LeleEvent(e, lv_event, value));
     }
-    return LeleBase::eventCallback(std::move(e));
+    return LeleObject::eventCallback(std::move(e));
 }

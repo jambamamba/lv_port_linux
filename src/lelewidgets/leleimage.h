@@ -1,15 +1,15 @@
 #pragma once
 
-#include "lelebase.h"
+#include "leleobject.h"
 
 #include <map>
 #include <optional>
 #include <lv_image_converter/lv_image_converter.h>
 
-class LeleImage : public LeleBase  {
+class LeleImage : public LeleObject  {
   public:
   LeleImage(const std::string &json_str);
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   std::string getSrc() const;
 
 

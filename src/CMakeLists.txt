@@ -63,7 +63,7 @@ function(buildLvglSim PYTHON_LIB)
     message(STATUS "buildLvglSim() PYTHON_LIB:${PYTHON_LIB}")
 
     set(LELE_WIDGETS
-        lelewidgets/lelebase.cpp
+        lelewidgets/leleobject.cpp
         lelewidgets/lelebutton.cpp
         lelewidgets/leleevent.cpp
         lelewidgets/leleimage.cpp

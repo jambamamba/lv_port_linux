@@ -4,7 +4,7 @@
 
 #include "python_wrapper.h"
 #include "graphics_backend.h"
-#include "lelewidgets/lelebase.h"
+#include "lelewidgets/leleobject.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -30,7 +30,7 @@ namespace {
             return PyLong_FromLong(0);
         }
         // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleBase &lele_base) {
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleObject &lele_base) {
             if(lele_base.id() == id) {
                 Py_XINCREF(callback);
                 lele_base.addEventHandler(callback);

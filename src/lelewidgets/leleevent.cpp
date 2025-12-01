@@ -1,6 +1,6 @@
 #include "leleevent.h"
 
-#include "lelebase.h"
+#include "leleobject.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 

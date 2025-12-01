@@ -24,11 +24,11 @@ typedef enum {
 
 struct _object;
 typedef struct _object PyObject;
-class LeleBase {
+class LeleObject {
   public:
-  LeleBase(const std::string &json_str = "");
-  virtual ~LeleBase();
-  friend std::ostream& operator<<(std::ostream& os, const LeleBase& p);
+  LeleObject(const std::string &json_str = "");
+  virtual ~LeleObject();
+  friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
   const std::string &className() const {
     return _class_name;
@@ -36,7 +36,7 @@ class LeleBase {
   const std::string &id() const {
     return _id;
   }
-  std::vector<LeleBase *> getLeleObj(const std::string &obj_name) const;
+  std::vector<LeleObject *> getLeleObj(const std::string &obj_name) const;
   bool enabled() const { return _enabled; }
   lv_obj_t *getLvObj() const {
     return _lv_obj;
@@ -44,7 +44,7 @@ class LeleBase {
   void setLvObj(lv_obj_t *obj) {
     _lv_obj = obj;
   }
-  void setParent(LeleBase *parent) {
+  void setParent(LeleObject *parent) {
     _lele_parent = parent;
     _lele_styles.setLeleParent(parent);
   }
@@ -54,7 +54,7 @@ class LeleBase {
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children() {
     return _nodes;
   }
-  virtual lv_obj_t *createLvObj(LeleBase *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
+  virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
@@ -72,7 +72,7 @@ class LeleBase {
   std::string _id;
   bool _enabled = true;
   lv_obj_t *_lv_obj = nullptr;
-  LeleBase *_lele_parent = nullptr;
+  LeleObject *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;

@@ -5,7 +5,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleMessageBox::LeleMessageBox(const std::string &json_str)
-  : LeleBase(json_str) {
+  : LeleObject(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   for (const auto &[key, token]: _nodes) {
@@ -22,8 +22,8 @@ LeleMessageBox::LeleMessageBox(const std::string &json_str)
       LeleEvent *event = std::get<std::unique_ptr<LeleEvent>>(token).get();
       _events.push_back(event);
     }
-    // else if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-    //   auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    // else if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+    //   auto &value = std::get<std::unique_ptr<LeleObject>>(token);
     //   value->createLvObj(this);//osm
     //   // if(key == "button") {
     //   //   _btn = std::make_unique<LeleButtons::LeleButton>(value);
@@ -32,17 +32,17 @@ LeleMessageBox::LeleMessageBox(const std::string &json_str)
   }
 }
 
-lv_obj_t *LeleMessageBox::createLvObj(LeleBase *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
-  _lv_obj = LeleBase::createLvObj(lele_parent,
+  _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_msgbox_create(nullptr));
 
   lv_msgbox_add_title(_lv_obj, _title.c_str());
   lv_msgbox_add_text(_lv_obj, _text.c_str());
 
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleBase>>(token)) {
-      auto &value = std::get<std::unique_ptr<LeleBase>>(token);
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       LeleButtons::LeleButton *lele_btn = dynamic_cast<LeleButtons::LeleButton *>(value.get());
       if(!lele_btn) {
         continue;
@@ -88,12 +88,12 @@ bool LeleMessageBox::eventCallback(LeleEvent &&e) {
           if(event->type() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);
             // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
-            return LeleBase::eventCallback(LeleEvent(*event, lv_event));
+            return LeleObject::eventCallback(LeleEvent(*event, lv_event));
           }
         }
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
         LOG(DEBUG, LVSIM, "%s: value changed\n", _class_name.c_str());
     }
-    return LeleBase::eventCallback(std::move(e));
+    return LeleObject::eventCallback(std::move(e));
 }
