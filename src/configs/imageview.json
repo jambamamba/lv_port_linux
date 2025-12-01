@@ -31,7 +31,7 @@
             "xalign":"tile"
         },
         "label":{
-            "id":"views:0/view/label",
+            "id":"/views:0/view/label",
             "text":"hello world0",
             "style":{"id":"views/view0/label","x":"0","y":"0","width":"50%","height":"5%"}
         },  

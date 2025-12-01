@@ -1,9 +1,10 @@
 #include <lelewidgets/leleevent.h>
+#include <lelewidgets/leleobject.h>
 
 static void
 PyLeleEvent_dealloc(PyLeleEvent* self) {
     Py_XDECREF(self->_event_id);
-    Py_XDECREF(self->_object_id);
+    Py_XDECREF(self->_object);
     Py_XDECREF(self->_type);
     Py_XDECREF(self->_action);
     Py_XDECREF(self->_args);
@@ -11,14 +12,15 @@ PyLeleEvent_dealloc(PyLeleEvent* self) {
 }
 
 PyObject *
-PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event, const std::string &target_obj_id) {
+PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event, const LeleObject *target_obj) {
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->_object_id = PyUnicode_FromString(target_obj_id.size() ? target_obj_id.c_str() : "");
-        if (self->_object_id == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
+        self->_object = PyLeleObject_new(&PyLeleObject_Type, target_obj);
+        // self->_object_id = PyUnicode_FromString(target_obj_id.size() ? target_obj_id.c_str() : "");
+        // if (self->_object_id == nullptr) {
+        //     Py_DECREF(self);
+        //     return nullptr;
+        // }
         self->_event_id = PyUnicode_FromString(lele_event ? lele_event->id().c_str() : "");
         if (self->_event_id == nullptr) {
             Py_DECREF(self);
@@ -53,7 +55,7 @@ PyLeleEvent_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
 static int
 PyLeleEvent_init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     self->_event_id = PyUnicode_FromString("event_id");
-    self->_object_id = PyUnicode_FromString("object_id");
+    self->_object = PyLeleObject_new(&PyLeleObject_Type, nullptr);
     self->_type = PyUnicode_FromString("type");
     self->_action = PyUnicode_FromString("action");
     self->_args = PyUnicode_FromString("args");
@@ -64,7 +66,7 @@ PyLeleEvent_init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
 
 static PyMemberDef PyLeleEvent_members[] = {
     {"event_id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _event_id), 0, "event_id"},
-    {"object_id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object_id), 0, "object_id"},
+    {"object", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object), 0, "object"},
     {"type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "type"},
     {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},
     {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},

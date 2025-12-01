@@ -81,6 +81,7 @@ function(buildLvglSim PYTHON_LIB)
     set(sources
         python/python_binding.cpp
         python/leleevent.cpp
+        python/leleobject.cpp
         graphics_backend.cpp
         # mainwindow.cpp 
         # chart.cpp 

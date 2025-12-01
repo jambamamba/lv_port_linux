@@ -205,7 +205,7 @@ void fromJson(const std::string &json_str, std::function<void (const std::string
 void iterateNodes(
     std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &nodes, 
     int depth,
-    std::function<bool(LeleObject &lele_base)> on_visit_lele_base_obj
+    std::function<void(LeleObject &lele_object)> on_visit_lele_base_obj
     ) {
     for (const auto &[key,token]: nodes) {
         // LOG(DEBUG, LVSIM, "ITER key:%s\n", key.c_str());
@@ -218,14 +218,12 @@ void iterateNodes(
             // LOG(DEBUG, LVSIM, "         lele_style:%s\n", " ");
         }
         else if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
-            auto &lele_base = std::get<std::unique_ptr<LeleObject>>(token);
-            // LOG(DEBUG, LVSIM, "         (%i) lele_base:%s\n", depth, lele_base->id().c_str());
+            auto &lele_object = std::get<std::unique_ptr<LeleObject>>(token);
+            // LOG(DEBUG, LVSIM, "         (%i) lele_object:%s\n", depth, lele_object->id().c_str());
             if(on_visit_lele_base_obj) {
-                if(!on_visit_lele_base_obj(*lele_base.get())){
-                    return;
-                }
+                on_visit_lele_base_obj(*lele_object.get());
             }
-            LeleWidgetFactory::iterateNodes(lele_base->children(), depth+1, on_visit_lele_base_obj);
+            LeleWidgetFactory::iterateNodes(lele_object->children(), depth+1, on_visit_lele_base_obj);
         }
     }
 }

@@ -79,3 +79,13 @@ class LeleObject {
   LeleStyles _lele_styles;
   std::vector<PyObject *> _py_callbacks;
 };
+
+
+typedef struct {
+    PyObject_HEAD
+    // Type-specific fields go here
+    PyObject *_id = nullptr;
+} PyLeleObject;
+
+extern PyTypeObject PyLeleObject_Type;
+PyObject *PyLeleObject_new(PyTypeObject *type, const LeleObject *lele_object = nullptr);

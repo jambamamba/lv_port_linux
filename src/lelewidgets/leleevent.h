@@ -37,7 +37,7 @@ typedef struct {
     PyObject_HEAD
     // Type-specific fields go here
     PyObject *_event_id = nullptr;
-    PyObject *_object_id = nullptr;
+    PyObject *_object = nullptr;
     PyObject *_type = nullptr;
     PyObject *_action = nullptr;
     PyObject *_args = nullptr;
@@ -46,4 +46,4 @@ typedef struct {
 } PyLeleEvent;
 
 extern PyTypeObject PyLeleEvent_Type;
-PyObject *PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event = nullptr, const std::string &target_obj_id = "");
+PyObject *PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event = nullptr, const LeleObject *target_obj = nullptr);

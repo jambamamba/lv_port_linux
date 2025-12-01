@@ -28,11 +28,12 @@ bool GraphicsBackend::load() {
     }
     return true;
 }
+
 bool GraphicsBackend::handleEvents() {
     // LOG(DEBUG, LVSIM, "@@@@@ handleEvents\n");
     if (lv_wayland_timer_handler()) {
         // Wait only if the cycle was completed
-        usleep(LV_DEF_REFR_PERIOD * 1000);
+        usleep(LV_DEF_REFR_PERIOD * 1000);//osm: adjust this LV_DEF_REFR_PERIOD for device
     }
     // Run until the last window closes
     if (!lv_wayland_window_is_open(NULL)) {
@@ -41,4 +42,3 @@ bool GraphicsBackend::handleEvents() {
     }
     return true;
 }
-

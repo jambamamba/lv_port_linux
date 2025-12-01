@@ -451,7 +451,7 @@ bool LeleObject::eventCallback(LeleEvent &&e) {
     // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
 
   for(auto *py_callback:_py_callbacks) {
-    PythonWrapper::pyCallback(py_callback, std::move(e), _id);
+    PythonWrapper::pyCallback(py_callback, std::move(e), this);
   }
   if(_lele_parent) {
     return _lele_parent->eventCallback(std::move(e));

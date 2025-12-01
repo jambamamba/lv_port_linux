@@ -30,14 +30,41 @@ namespace {
             return PyLong_FromLong(0);
         }
         // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleObject &lele_base) {
-            if(lele_base.id() == id) {
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleObject &lele_object) {
+            if(lele_object.id() == id) {
                 Py_XINCREF(callback);
-                lele_base.addEventHandler(callback);
+                lele_object.addEventHandler(callback);
             }
-            return true;
         });
         return PyLong_FromLong(1);
+    }
+    static PyObject* _mymodule_getObjectById(PyObject *self, PyObject *args) {
+        char *id = nullptr;
+        if(!PyArg_ParseTuple(args, "s", //id
+            &id)) {
+            return PyLong_FromLong(0);
+        }
+        std::vector<PyObject*> py_objects;
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
+            if(lele_object.id() == id) {
+                py_objects.emplace_back(PyLeleObject_new(&PyLeleObject_Type, &lele_object));
+            }
+        });
+        if(py_objects.size() == 0) {
+            return Py_None;
+        }
+        else if(py_objects.size() == 1) {
+            Py_INCREF(py_objects.at(0));
+            return py_objects.at(0);
+        }
+        else {//(py_objects.size() > 1) 
+            PyObject *list = PyList_New(0);
+            for(PyObject *py_object : py_objects){
+                PyList_Append(list, py_object);
+            }
+            Py_INCREF(list);
+            return list;
+        }
     }
     static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
         int num = 0;
@@ -120,6 +147,7 @@ namespace {
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
         {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
         {"addEventHandler", _mymodule_addEventHandler, METH_VARARGS, "lele.addEventHandler(callback)"},
+        {"getObjectById", _mymodule_getObjectById, METH_VARARGS, "lele.getObjectById(id)"},
         {NULL, NULL, 0, NULL}
     };
     static PyModuleDef _mymodule = {
@@ -140,8 +168,13 @@ PyMODINIT_FUNC PyInit_lele(void) {
     if (PyType_Ready(&PyLeleEvent_Type) < 0){
         return nullptr;
     }
-    Py_INCREF(&PyLeleEvent_Type);
-    PyModule_AddObject(mod, "Event", (PyObject *)&PyLeleEvent_Type);
+    PyLeleObject_Type.tp_new = PyType_GenericNew;
+    if (PyType_Ready(&PyLeleObject_Type) < 0){
+        return nullptr;
+    }
+
+    // Py_INCREF(&PyLeleEvent_Type);
+    // PyModule_AddObject(mod, "Event", (PyObject *)&PyLeleEvent_Type);
 
     // PyModule_AddObject(mod, "event", PyUnicode_FromString("bar"));
     return mod;
