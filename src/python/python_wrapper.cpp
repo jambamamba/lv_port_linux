@@ -167,14 +167,14 @@ bool PythonWrapper::load(
     return true;    
 }
 
-void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e, const LeleObject *target_obj) {
+void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e, LeleObject *target_obj) {
 
     // LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
     lv_event_code_t code = lv_event_get_code(lv_event);
     // code, e.ivalue
 
-    PyObject *py_event = Py_BuildValue("(O)", PyLeleEvent_new(&PyLeleEvent_Type, &e, target_obj));
+    PyObject *py_event = Py_BuildValue("(O)", PyLeleEvent::createPyObject(&e, target_obj));
     PyObject *res = PyObject_CallObject(py_callback, py_event);
     if(res) { Py_DECREF(res); }
 }

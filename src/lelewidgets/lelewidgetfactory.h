@@ -32,3 +32,4 @@ namespace LeleWidgetFactory {
   bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values = {});
   std::string trim(const std::string& str);
 }//LeleWidgetFactory
+

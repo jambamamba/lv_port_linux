@@ -80,12 +80,19 @@ class LeleObject {
   std::vector<PyObject *> _py_callbacks;
 };
 
-
-typedef struct {
-    PyObject_HEAD
+struct PyLeleObject {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    // static PyMethodDef _methods[];
+    static void dealloc(PyObject* self);
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static PyObject *createPyObject(LeleObject *lele_object);
     // Type-specific fields go here
     PyObject *_id = nullptr;
-} PyLeleObject;
+};
 
-extern PyTypeObject PyLeleObject_Type;
-PyObject *PyLeleObject_new(PyTypeObject *type, const LeleObject *lele_object = nullptr);
+#define PY_LELEOBJECT_MEMBERS() \
+    {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"}, \
+
+

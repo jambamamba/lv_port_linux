@@ -1,21 +1,12 @@
 #include <lelewidgets/leleevent.h>
 #include <lelewidgets/leleobject.h>
 
-static void
-PyLeleEvent_dealloc(PyLeleEvent* self) {
-    Py_XDECREF(self->_event_id);
-    Py_XDECREF(self->_object);
-    Py_XDECREF(self->_type);
-    Py_XDECREF(self->_action);
-    Py_XDECREF(self->_args);
-    Py_TYPE(self)->tp_free((PyObject*)self);
-}
-
-PyObject *
-PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event, const LeleObject *target_obj) {
+PyObject *PyLeleEvent::createPyObject(LeleEvent *lele_event, LeleObject *target_obj) {
+    PyTypeObject *type = &PyLeleEvent::_obj_type;
+    PyType_Ready(type);
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->_object = PyLeleObject_new(&PyLeleObject_Type, target_obj);
+        self->_object = PyLeleObject::createPyObject(target_obj);
         // self->_object_id = PyUnicode_FromString(target_obj_id.size() ? target_obj_id.c_str() : "");
         // if (self->_object_id == nullptr) {
         //     Py_DECREF(self);
@@ -47,15 +38,9 @@ PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event, const LeleObjec
     return (PyObject *)self;
 }
 
-static PyObject *
-PyLeleEvent_new(PyTypeObject *type, PyObject *args, PyObject *kwds) {
-    return PyLeleEvent_new(type);
-}
-
-static int
-PyLeleEvent_init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
+int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     self->_event_id = PyUnicode_FromString("event_id");
-    self->_object = PyLeleObject_new(&PyLeleObject_Type, nullptr);
+    self->_object = PyLeleObject::createPyObject(nullptr);
     self->_type = PyUnicode_FromString("type");
     self->_action = PyUnicode_FromString("action");
     self->_args = PyUnicode_FromString("args");
@@ -64,7 +49,16 @@ PyLeleEvent_init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
-static PyMemberDef PyLeleEvent_members[] = {
+void PyLeleEvent::dealloc(PyLeleEvent* self) {
+    Py_XDECREF(self->_event_id);
+    Py_XDECREF(self->_object);
+    Py_XDECREF(self->_type);
+    Py_XDECREF(self->_action);
+    Py_XDECREF(self->_args);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyMemberDef PyLeleEvent::_members[] = {
     {"event_id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _event_id), 0, "event_id"},
     {"object", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object), 0, "object"},
     {"type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "type"},
@@ -92,12 +86,12 @@ static PyMemberDef PyLeleEvent_members[] = {
 //     {nullptr}  /* Sentinel */
 // };
 
-PyTypeObject PyLeleEvent_Type = {
+PyTypeObject PyLeleEvent::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "lele.Event",             /* tp_name */
     sizeof(PyLeleEvent), /* tp_basicsize */
     0,                         /* tp_itemsize */
-    (destructor)PyLeleEvent_dealloc, /* tp_dealloc */
+    (destructor)PyLeleEvent::dealloc, /* tp_dealloc */
     0,                         /* tp_print */
     0,                         /* tp_getattr */
     0,                         /* tp_setattr */
@@ -121,14 +115,14 @@ PyTypeObject PyLeleEvent_Type = {
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
     0,//PyLeleEvent_methods,             /* tp_methods */
-    PyLeleEvent_members,             /* tp_members */
+    PyLeleEvent::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    (initproc)PyLeleEvent_init,      /* tp_init */
+    (initproc)PyLeleEvent::init,      /* tp_init */
     0,                         /* tp_alloc */
-    PyLeleEvent_new,                 /* tp_new */
+    PyType_GenericNew,                 /* tp_new */
 };

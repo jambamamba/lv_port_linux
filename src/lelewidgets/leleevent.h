@@ -33,8 +33,14 @@ class LeleEvent {
 };
 
 
-typedef struct {
-    PyObject_HEAD
+struct PyLeleEvent {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    // static PyMethodDef _methods[];
+    static void dealloc(PyLeleEvent* self);
+    static int init(PyLeleEvent *self, PyObject *args, PyObject *kwds);
+    static PyObject *createPyObject(LeleEvent *lele_event, LeleObject *target_obj);
     // Type-specific fields go here
     PyObject *_event_id = nullptr;
     PyObject *_object = nullptr;
@@ -43,7 +49,4 @@ typedef struct {
     PyObject *_args = nullptr;
     int _event_code = 0;
     int _value = 0;
-} PyLeleEvent;
-
-extern PyTypeObject PyLeleEvent_Type;
-PyObject *PyLeleEvent_new(PyTypeObject *type, const LeleEvent *lele_event = nullptr, const LeleObject *target_obj = nullptr);
+};

@@ -46,8 +46,8 @@ namespace {
         }
         std::vector<PyObject*> py_objects;
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
-            if(lele_object.id() == id) {
-                py_objects.emplace_back(PyLeleObject_new(&PyLeleObject_Type, &lele_object));
+            if(lele_object.id() == id) {//osm todo: replace all 50,41:                 py_objects.emplace_back(PyLeleObject::createPyObject(&lele_object)); with 50,41:                 py_objects.emplace_back(PyLeleObjectFactory::createPyObject(&lele_object)); create the subclass object: if(lele_object && lele_object->className() == "LeleLabel") {
+                py_objects.emplace_back(PyLeleObject::createPyObject(&lele_object));
             }
         });
         if(py_objects.size() == 0) {
@@ -164,18 +164,6 @@ PyMODINIT_FUNC PyInit_lele(void) {
     }
     PyObject *mod = PyModule_Create(&_mymodule);
 
-    PyLeleEvent_Type.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&PyLeleEvent_Type) < 0){
-        return nullptr;
-    }
-    PyLeleObject_Type.tp_new = PyType_GenericNew;
-    if (PyType_Ready(&PyLeleObject_Type) < 0){
-        return nullptr;
-    }
-
-    // Py_INCREF(&PyLeleEvent_Type);
-    // PyModule_AddObject(mod, "Event", (PyObject *)&PyLeleEvent_Type);
-
-    // PyModule_AddObject(mod, "event", PyUnicode_FromString("bar"));
+    // PyModule_AddObject(mod, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
     return mod;
 }    

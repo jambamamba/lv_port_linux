@@ -1,15 +1,18 @@
-#include <lelewidgets/leleobject.h>
+#include <lelewidgets/lelelabel.h>
 
-PyObject *PyLeleObject::createPyObject(LeleObject *lele_object) {
-    PyTypeObject *type = &PyLeleObject::_obj_type;
+PyObject *PyLeleLabel::createPyObject(LeleObject *lele_object) {
+    PyTypeObject *type = &PyLeleLabel::_obj_type;
     PyType_Ready(type);
-    PyLeleObject *self = (PyLeleObject *)type->tp_alloc(type, 0);
+    PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->_id = PyUnicode_FromString(
-            lele_object ? 
-                lele_object->id().size() ? lele_object->id().c_str() : "" : 
-                "");
-        if (self->_id == nullptr) {
+        if(lele_object && lele_object->className() == "LeleLabel") {
+            LeleLabel *lele_label = dynamic_cast<LeleLabel *>(lele_object);
+            self->_text = PyUnicode_FromString(lele_label->getText().c_str());
+        }
+        else {
+            self->_text = PyUnicode_FromString("");
+        }
+        if (self->_text == nullptr) {
             Py_DECREF(self);
             return nullptr;
         }
@@ -17,20 +20,21 @@ PyObject *PyLeleObject::createPyObject(LeleObject *lele_object) {
     return (PyObject *)self;
 }
 
-int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    self->_id = PyUnicode_FromString("id");
+int PyLeleLabel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
+    PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
+    self->_text = PyUnicode_FromString("text");
     return 0;
 }
 
-void PyLeleObject::dealloc(PyObject* self_) {
-    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    Py_XDECREF(self->_id);
+void PyLeleLabel::dealloc(PyObject* self_) {
+    PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
+    Py_XDECREF(self->_text);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyMemberDef PyLeleObject::_members[] = {
+PyMemberDef PyLeleLabel::_members[] = {
     PY_LELEOBJECT_MEMBERS()
+    PY_LELELABEL_MEMBERS()
     {nullptr}  /* Sentinel */
 };
 
@@ -51,12 +55,12 @@ PyMemberDef PyLeleObject::_members[] = {
 //     {nullptr}  /* Sentinel */
 // };
 
-PyTypeObject PyLeleObject::_obj_type = {
+PyTypeObject PyLeleLabel::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "lele.Object",             /* tp_name */
-    sizeof(PyLeleObject), /* tp_basicsize */
+    "lele.Label",             /* tp_name */
+    sizeof(PyLeleLabel), /* tp_basicsize */
     0,                         /* tp_itemsize */
-    (destructor)PyLeleObject::dealloc, /* tp_dealloc */
+    (destructor)PyLeleLabel::dealloc, /* tp_dealloc */
     0,                         /* tp_print */
     0,                         /* tp_getattr */
     0,                         /* tp_setattr */
@@ -79,15 +83,15 @@ PyTypeObject PyLeleObject::_obj_type = {
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    0,//PyLeleObject_methods,             /* tp_methods */
-    PyLeleObject::_members,             /* tp_members */
+    0,//PyLeleLabel::_methods,             /* tp_methods */
+    PyLeleLabel::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    (initproc)PyLeleObject::init,      /* tp_init */
+    (initproc)PyLeleLabel::init,      /* tp_init */
     0,                         /* tp_alloc */
     PyType_GenericNew,                 /* tp_new */
 };
