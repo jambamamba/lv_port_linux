@@ -1,17 +1,12 @@
 #include <lelewidgets/lelelabel.h>
 
-PyObject *PyLeleLabel::createPyObject(LeleObject *lele_object) {
+PyObject *LeleLabel::createPyObject() {
     PyTypeObject *type = &PyLeleLabel::_obj_type;
     PyType_Ready(type);
     PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        if(lele_object && lele_object->className() == "LeleLabel") {
-            LeleLabel *lele_label = dynamic_cast<LeleLabel *>(lele_object);
-            self->_text = PyUnicode_FromString(lele_label->getText().c_str());
-        }
-        else {
-            self->_text = PyUnicode_FromString("");
-        }
+        self->ob_base._lele_obj = this;
+        self->_text = PyUnicode_FromString(_text.c_str());
         if (self->_text == nullptr) {
             Py_DECREF(self);
             return nullptr;
@@ -38,22 +33,36 @@ PyMemberDef PyLeleLabel::_members[] = {
     {nullptr}  /* Sentinel */
 };
 
-// static PyObject *
-// PyLeleEvent_id(PyLeleEvent* self) {
-//     if (self->_id == nullptr) {
-//         PyErr_SetString(PyExc_AttributeError, "id");
-//         return nullptr;
-//     }
-//     return PyUnicode_FromFormat("%S", self->_id);
-// }
+PyObject *PyLeleLabel::getText(PyObject *self_, PyObject *arg) {
+    PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
+    if (!self->_text) {
+        PyErr_SetString(PyExc_AttributeError, "getText");
+        return nullptr;
+    }
+    return self->_text;
+}
 
-// static PyMethodDef PyLeleEvent::methods[] = {
-//     {"id", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the id"},
-//     {"type", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the type"},
-//     {"action", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the action"},
-//     {"args", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the args"},
-//     {nullptr}  /* Sentinel */
-// };
+PyObject *PyLeleLabel::setText(PyObject *self_, PyObject *args) {
+    PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
+    LeleLabel *lele_obj = dynamic_cast<LeleLabel *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        char *str = nullptr;
+        if(!PyArg_ParseTuple(args, "s", &str)) {
+            return Py_None;
+        }
+        if(str) {
+            lele_obj->setText(str);
+            self->_text = PyUnicode_FromString(str);
+        }
+    }
+    return Py_None;
+}
+
+PyMethodDef PyLeleLabel::_methods[] = {
+    PY_LELEOBJECT_METHODS()
+    PY_LELELABEL_METHODS()
+    {nullptr}  /* Sentinel */
+};
 
 PyTypeObject PyLeleLabel::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -83,7 +92,7 @@ PyTypeObject PyLeleLabel::_obj_type = {
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    0,//PyLeleLabel::_methods,             /* tp_methods */
+    PyLeleLabel::_methods,             /* tp_methods */
     PyLeleLabel::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */

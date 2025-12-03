@@ -1,28 +1,28 @@
 #include <lelewidgets/leleevent.h>
 #include <lelewidgets/leleobject.h>
 
-PyObject *PyLeleEvent::createPyObject(LeleEvent *lele_event, LeleObject *target_obj) {
+PyObject *LeleEvent::createPyObject() {
     PyTypeObject *type = &PyLeleEvent::_obj_type;
     PyType_Ready(type);
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->_object = PyLeleObject::createPyObject(target_obj);
+        self->_object = _target_obj->createPyObject();
         // self->_object_id = PyUnicode_FromString(target_obj_id.size() ? target_obj_id.c_str() : "");
         // if (self->_object_id == nullptr) {
         //     Py_DECREF(self);
         //     return nullptr;
         // }
-        self->_event_id = PyUnicode_FromString(lele_event ? lele_event->id().c_str() : "");
+        self->_event_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
         if (self->_event_id == nullptr) {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_type = PyUnicode_FromString(lele_event ? lele_event->type().c_str() : "");
+        self->_type = PyUnicode_FromString(_type.size() ? _type.c_str() : "");
         if (self->_type == nullptr) {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_action = PyUnicode_FromString(lele_event ? lele_event->action().c_str() : "");
+        self->_action = PyUnicode_FromString(_action.size() ? _action.c_str() : "");
         if (self->_action == nullptr) {
             Py_DECREF(self);
             return nullptr;
@@ -32,15 +32,15 @@ PyObject *PyLeleEvent::createPyObject(LeleEvent *lele_event, LeleObject *target_
             Py_DECREF(self);
             return nullptr;
         }
-        self->_event_code = lele_event ? lele_event->code() : 0;
-        self->_value = lele_event ? lele_event->value() : 0;
+        self->_event_code = _code;
+        self->_value = _ivalue;
     }
     return (PyObject *)self;
 }
 
 int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     self->_event_id = PyUnicode_FromString("event_id");
-    self->_object = PyLeleObject::createPyObject(nullptr);
+    self->_object = Py_None;
     self->_type = PyUnicode_FromString("type");
     self->_action = PyUnicode_FromString("action");
     self->_args = PyUnicode_FromString("args");

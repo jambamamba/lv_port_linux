@@ -60,6 +60,7 @@ class LeleObject {
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();
   virtual void hide();
+  virtual PyObject *createPyObject();
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
@@ -84,15 +85,19 @@ struct PyLeleObject {
     PyObject ob_base;
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
-    // static PyMethodDef _methods[];
+    static PyMethodDef _methods[];
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
-    static PyObject *createPyObject(LeleObject *lele_object);
     // Type-specific fields go here
+    LeleObject *_lele_obj = nullptr;
     PyObject *_id = nullptr;
+    PyObject *_class_name = nullptr;
+    static PyObject *getClassName(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
     {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"}, \
 
+#define PY_LELEOBJECT_METHODS() \
+  {"className()", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
 

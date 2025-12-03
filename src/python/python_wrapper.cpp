@@ -3,6 +3,8 @@
 #include <debug_logger/debug_logger.h>
 
 #include <lelewidgets/leleevent.h>
+#include <lelewidgets/leleobject.h>
+
 #include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -27,7 +29,9 @@ void PythonWrapper::printError() const {
     PyObject *old_str = PyObject_Str(value);
     Py_XINCREF(type);
     PyErr_Clear();
-    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << (PyUnicode_AsUTF8(old_str)) << "\n";
+    // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << (PyUnicode_AsUTF8(old_str)) << "\n";
+    LOG(WARNING, LVSIM, "%s\n", PyUnicode_AsUTF8(old_str));
+    PyErr_Print();
     Py_DECREF(old_str);
 }
 
@@ -36,13 +40,15 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
     if (!pFunc) {
         if (PyErr_Occurred())
         {PyErr_Print();}
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Cannot find function '" << func << "'\n";
+        // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Cannot find function '" << func << "'\n";
+        LOG(WARNING, LVSIM, "Cannot find function '%s'\n", func);
         return false;
     }
     else if (!PyCallable_Check(pFunc)) {
         if (PyErr_Occurred())
         {PyErr_Print();}
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "This is not a callable function: '" << func << "'\n";
+        // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "This is not a callable function: '" << func << "'\n";
+        LOG(WARNING, LVSIM, "This is not a callable function: '%s'\n", func);
         Py_DECREF(pFunc);
         return false;
     }
@@ -53,7 +59,8 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
         const std::string delimiter(":");
         auto npos = arg.find(delimiter);
         if(npos == arg.npos) {
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << " No delimiter found" << "\n";
+            // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << " No delimiter found" << "\n";
+            LOG(WARNING, LVSIM, "No delimiter found\n");
             break;
         }
         std::string lhs = arg.substr(0, npos);
@@ -69,7 +76,8 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
         if (!pValue) {
             Py_DECREF(pFunc);
             Py_DECREF(pArgs);
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Cannot convert argument" << "\n";
+            // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Cannot convert argument" << "\n";
+            LOG(WARNING, LVSIM, "Cannot convert argument\n");
             return false;
         }
         // pValue reference stolen here:
@@ -81,11 +89,13 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
         Py_DECREF(pFunc);
         Py_DECREF(pArgs);
         PyErr_Print();
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Call failed" << "\n";
+        // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Call failed" << "\n";
+        LOG(WARNING, LVSIM, "Call failed\n");
         return false;
     }
 
-    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Result of call: " << PyLong_AsLong(pValue) << "\n";
+    // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Result of call: " << PyLong_AsLong(pValue) << "\n";
+    LOG(WARNING, LVSIM, "Result of call: %d\n", PyLong_AsLong(pValue));
     Py_DECREF(pFunc);
     Py_DECREF(pArgs);
     Py_DECREF(pValue);
@@ -120,15 +130,16 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const {
     PyWideStringList_Append(&config.module_search_paths, py_script_dir_ws.c_str());
     Py_InitializeFromConfig(&config);
  
-    //osm todo: use LOG(DEBUG instead of cout
-    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Loading py script: " << py_script << "\n";
+    // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Loading py script: " << py_script << "\n";
+    LOG(DEBUG, LVSIM, "Loading py script: '%s'\n", py_script.c_str());
  
    PyObject *obj = PyUnicode_FromString(path.stem().c_str());
    PyObject *py_module =  PyImport_Import(obj);
    Py_DECREF(obj);
 
    if(!py_module) {
-       std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Failed to load " << py_script.c_str() << "\n";
+    //    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Failed to load " << py_script.c_str() << "\n";
+       LOG(WARNING, LVSIM, "Failed to load: '%s'\n", py_script.c_str());
        printError();
        return nullptr;
    }
@@ -152,12 +163,14 @@ bool PythonWrapper::load(
 
     static PythonWrapper py;
     if(py._py_module) {
-        std::cout << "Already loaded, refusing to load another script\n";
+        // std::cout << "Already loaded, refusing to load another script\n";
+        LOG(WARNING, LVSIM, "Already loaded, refusing to load another script\n");
         return false;
     }
     py._py_module = py.loadModule(py_script);
     if(!py._py_module) {
-        std::cout << "Failed to load another script: '" << py_script.c_str() << "'\n";
+        // std::cout << "Failed to load another script: '" << py_script.c_str() << "'\n";
+        LOG(WARNING, LVSIM, "Failed to load the script: '%s'\n", py_script.c_str());
         return false;
     }
     _py = &py;
@@ -167,14 +180,14 @@ bool PythonWrapper::load(
     return true;    
 }
 
-void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e, LeleObject *target_obj) {
+void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e) {
 
     // LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
     lv_event_code_t code = lv_event_get_code(lv_event);
     // code, e.ivalue
 
-    PyObject *py_event = Py_BuildValue("(O)", PyLeleEvent::createPyObject(&e, target_obj));
+    PyObject *py_event = Py_BuildValue("(O)", e.createPyObject());
     PyObject *res = PyObject_CallObject(py_callback, py_event);
     if(res) { Py_DECREF(res); }
 }

@@ -46,8 +46,8 @@ namespace {
         }
         std::vector<PyObject*> py_objects;
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
-            if(lele_object.id() == id) {//osm todo: replace all 50,41:                 py_objects.emplace_back(PyLeleObject::createPyObject(&lele_object)); with 50,41:                 py_objects.emplace_back(PyLeleObjectFactory::createPyObject(&lele_object)); create the subclass object: if(lele_object && lele_object->className() == "LeleLabel") {
-                py_objects.emplace_back(PyLeleObject::createPyObject(&lele_object));
+            if(lele_object.id() == id) {
+                py_objects.emplace_back(lele_object.createPyObject());
             }
         });
         if(py_objects.size() == 0) {

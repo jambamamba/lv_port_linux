@@ -21,7 +21,8 @@ def pushButtonPressed(event):
    if event.code == 10: #clicked
       print(f"@@@py button pressed: {event.object.id}, event.type: {event.type}, event.action: {event.action}")
       obj = lele.getObjectById("/views:0/view/label")
-      print(f"@@@py getObjectById {obj}")
+      print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
+      obj.setText("Choco bean!")
    pass
 
 res = lele.foo(

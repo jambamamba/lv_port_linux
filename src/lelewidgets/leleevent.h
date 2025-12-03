@@ -9,13 +9,16 @@
 class LeleEvent {
   public:
   LeleEvent(const std::string &json_str);
-  LeleEvent(lv_event_t *e) : _lv_event(e) {}
+  LeleEvent(lv_event_t *e, LeleObject *target_obj) : _lv_event(e), _target_obj(target_obj) {}
   LeleEvent(const LeleEvent& rhs, const lv_event_t *e = nullptr, int ivalue = 0);
   const std::string &action() const { return _action; }
   const std::string &type() const { return _type; }
   const std::string &id() const { return _id; }
   void setId(const std::string &id) { _id = id; }
   const lv_event_t *lv_event() const { return _lv_event; }
+  LeleObject *targetObj() const { return _target_obj; }
+  void setTargetObj(LeleObject *target_obj) { _target_obj = target_obj; }
+  virtual PyObject *createPyObject();
   const std::map<std::string, std::string> &args() const { return _args; }
   int code() const { return _code; }
   int value() const { return _ivalue; }
@@ -28,6 +31,7 @@ class LeleEvent {
   std::string _action;
   std::map<std::string, std::string> _args;
   const lv_event_t *_lv_event = nullptr;
+  LeleObject *_target_obj = nullptr;
   int _code = 0;
   int _ivalue = 0;
 };
@@ -40,7 +44,6 @@ struct PyLeleEvent {
     // static PyMethodDef _methods[];
     static void dealloc(PyLeleEvent* self);
     static int init(PyLeleEvent *self, PyObject *args, PyObject *kwds);
-    static PyObject *createPyObject(LeleEvent *lele_event, LeleObject *target_obj);
     // Type-specific fields go here
     PyObject *_event_id = nullptr;
     PyObject *_object = nullptr;

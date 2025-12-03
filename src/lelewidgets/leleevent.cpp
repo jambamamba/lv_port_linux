@@ -32,6 +32,7 @@ LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalu
 , _action(rhs._action)
 , _args(rhs._args)
 , _lv_event(lv_event)
+, _target_obj(rhs._target_obj)
 , _code(lv_event ? lv_event_get_code(const_cast<lv_event_t*>(lv_event)) : 0)
 , _ivalue(ivalue) {
 }

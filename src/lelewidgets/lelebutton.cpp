@@ -191,6 +191,7 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
           if(event->type() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);
             // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
+            event->setTargetObj(e.targetObj());
             return LeleObject::eventCallback(LeleEvent(*event, lv_event));
           }
         }

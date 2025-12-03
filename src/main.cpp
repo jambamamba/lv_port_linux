@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
         while(backend.handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
-        if(!PythonWrapper::load(input_file)){
+        if(!PythonWrapper::load(input_file)) {
             LOG(FATAL, LVSIM, "Failed to load Python module\n");
         }
     }

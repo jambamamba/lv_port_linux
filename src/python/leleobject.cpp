@@ -1,15 +1,20 @@
 #include <lelewidgets/leleobject.h>
 
-PyObject *PyLeleObject::createPyObject(LeleObject *lele_object) {
+PyObject *LeleObject::createPyObject() {
     PyTypeObject *type = &PyLeleObject::_obj_type;
     PyType_Ready(type);
     PyLeleObject *self = (PyLeleObject *)type->tp_alloc(type, 0);
     if (self != nullptr) {
+        self->_lele_obj = this;
         self->_id = PyUnicode_FromString(
-            lele_object ? 
-                lele_object->id().size() ? lele_object->id().c_str() : "" : 
-                "");
+            _id.size() ? _id.c_str() : "");
         if (self->_id == nullptr) {
+            Py_DECREF(self);
+            return nullptr;
+        }
+        self->_class_name = PyUnicode_FromString(
+            _class_name.size() ? _class_name.c_str() : "");
+        if (self->_class_name == nullptr) {
             Py_DECREF(self);
             return nullptr;
         }
@@ -20,6 +25,7 @@ PyObject *PyLeleObject::createPyObject(LeleObject *lele_object) {
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     self->_id = PyUnicode_FromString("id");
+    self->_class_name = PyUnicode_FromString("class_name");
     return 0;
 }
 
@@ -34,22 +40,19 @@ PyMemberDef PyLeleObject::_members[] = {
     {nullptr}  /* Sentinel */
 };
 
-// static PyObject *
-// PyLeleEvent_id(PyLeleEvent* self) {
-//     if (self->_id == nullptr) {
-//         PyErr_SetString(PyExc_AttributeError, "id");
-//         return nullptr;
-//     }
-//     return PyUnicode_FromFormat("%S", self->_id);
-// }
+PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    if (!self->_class_name) {
+        PyErr_SetString(PyExc_AttributeError, "class_name");
+        return nullptr;
+    }
+    return self->_class_name;
+}
 
-// static PyMethodDef PyLeleEvent::methods[] = {
-//     {"id", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the id"},
-//     {"type", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the type"},
-//     {"action", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the action"},
-//     {"args", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the args"},
-//     {nullptr}  /* Sentinel */
-// };
+PyMethodDef PyLeleObject::_methods[] = {
+    PY_LELEOBJECT_METHODS()
+    {nullptr}  /* Sentinel */
+};
 
 PyTypeObject PyLeleObject::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
@@ -79,7 +82,7 @@ PyTypeObject PyLeleObject::_obj_type = {
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    0,//PyLeleObject_methods,             /* tp_methods */
+    PyLeleObject::_methods,             /* tp_methods */
     PyLeleObject::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */

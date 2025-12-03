@@ -17,7 +17,7 @@ public:
         std::function<bool(const std::string &config_json)> loadConfig = nullptr
     );
     static void unload();
-    static void pyCallback(PyObject *py_callback, LeleEvent &&e, LeleObject *target_obj);
+    static void pyCallback(PyObject *py_callback, LeleEvent &&e);
 protected:
     PythonWrapper() = default;
     PyObject *loadModule(const std::string &py_script) const;
