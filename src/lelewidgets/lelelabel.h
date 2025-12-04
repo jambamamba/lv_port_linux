@@ -22,13 +22,12 @@ struct PyLeleLabel {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    PyObject *_text = nullptr;
     static PyObject *getText(PyObject *, PyObject *);
     static PyObject *setText(PyObject *, PyObject *);
 };
 
 #define PY_LELELABEL_MEMBERS() \
-  {"text", Py_T_OBJECT_EX, offsetof(PyLeleLabel, _text), 0, "text"},\
+  {nullptr},\
 
 #define PY_LELELABEL_METHODS() \
   {"getText", (PyCFunction)PyLeleLabel::getText, METH_NOARGS, "Get the text"},\

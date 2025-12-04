@@ -55,7 +55,7 @@ LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
 }
 
 LeleButtons::LeleButton::LeleButton(const std::string &json_str)
-  : LeleObject(json_str) {
+  : LeleLabel(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   for (const auto &[key, token]: _nodes) {

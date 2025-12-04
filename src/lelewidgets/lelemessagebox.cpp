@@ -47,7 +47,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
       if(!lele_btn) {
         continue;
       }
-      else if(lele_btn->type() == LeleButtons::LeleButton::Type::Close) {
+      else if(lele_btn->getType() == LeleButtons::LeleButton::Type::Close) {
         lv_obj_t *lv_btn = lv_msgbox_add_header_button(_lv_obj, LV_SYMBOL_CLOSE);
         lele_btn->setStyle(lv_btn);
         lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
@@ -56,7 +56,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
           lv_msgbox_close(mbox);
         }, LV_EVENT_CLICKED, lele_btn);
       }
-      else if(lele_btn->type() == LeleButtons::LeleButton::Type::Push) {
+      else if(lele_btn->getType() == LeleButtons::LeleButton::Type::Push) {
         lv_obj_t *lv_btn = lv_msgbox_add_footer_button(_lv_obj, lele_btn->text().c_str());
         lele_btn->setStyle(lv_btn);
         lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){

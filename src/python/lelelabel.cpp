@@ -6,40 +6,27 @@ PyObject *LeleLabel::createPyObject() {
     PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
     if (self != nullptr) {
         self->ob_base._lele_obj = this;
-        self->_text = PyUnicode_FromString(_text.c_str());
-        if (self->_text == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
     }
     return (PyObject *)self;
 }
 
 int PyLeleLabel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
-    self->_text = PyUnicode_FromString("text");
+    // PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
     return 0;
 }
 
 void PyLeleLabel::dealloc(PyObject* self_) {
     PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
-    Py_XDECREF(self->_text);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyMemberDef PyLeleLabel::_members[] = {
-    PY_LELEOBJECT_MEMBERS()
-    PY_LELELABEL_MEMBERS()
-    {nullptr}  /* Sentinel */
-};
-
 PyObject *PyLeleLabel::getText(PyObject *self_, PyObject *arg) {
     PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
-    if (!self->_text) {
-        PyErr_SetString(PyExc_AttributeError, "getText");
-        return nullptr;
+    LeleLabel *lele_obj = dynamic_cast<LeleLabel *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyUnicode_FromString(lele_obj->getText().c_str());
     }
-    return self->_text;
+    return Py_None;
 }
 
 PyObject *PyLeleLabel::setText(PyObject *self_, PyObject *args) {
@@ -52,11 +39,16 @@ PyObject *PyLeleLabel::setText(PyObject *self_, PyObject *args) {
         }
         if(str) {
             lele_obj->setText(str);
-            self->_text = PyUnicode_FromString(str);
         }
     }
     return Py_None;
 }
+
+PyMemberDef PyLeleLabel::_members[] = {
+    PY_LELEOBJECT_MEMBERS()
+    PY_LELELABEL_MEMBERS()
+    {nullptr}  /* Sentinel */
+};
 
 PyMethodDef PyLeleLabel::_methods[] = {
     PY_LELEOBJECT_METHODS()

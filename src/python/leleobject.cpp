@@ -35,11 +35,6 @@ void PyLeleObject::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyMemberDef PyLeleObject::_members[] = {
-    PY_LELEOBJECT_MEMBERS()
-    {nullptr}  /* Sentinel */
-};
-
 PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     if (!self->_class_name) {
@@ -48,6 +43,11 @@ PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
     }
     return self->_class_name;
 }
+
+PyMemberDef PyLeleObject::_members[] = {
+    PY_LELEOBJECT_MEMBERS()
+    {nullptr}  /* Sentinel */
+};
 
 PyMethodDef PyLeleObject::_methods[] = {
     PY_LELEOBJECT_METHODS()
