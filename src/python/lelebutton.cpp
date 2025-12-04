@@ -1,34 +1,5 @@
 #include <lelewidgets/lelebutton.h>
 
-namespace {
-static PyObject* createPyEnum(const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
-    std::string enum_str = 
-    "from enum import Enum\n"
-    "class Type(Enum):\n";
-    for(auto &[key,value] : enum_map) {
-        enum_str += "    " + key + " = " + std::to_string(value) + "\n";
-    }
-    enum_str += "";
-    PyObject *global_dict=nullptr, *should_be_none=nullptr, *output=nullptr;
-    global_dict = PyDict_New();
-    if (!global_dict) goto cleanup;
-    should_be_none = PyRun_String(enum_str.c_str(), Py_file_input, global_dict, global_dict);
-    if (!should_be_none) goto cleanup;
-    // extract Color from global_dict
-    output = PyDict_GetItemString(global_dict, "Type");
-    if (!output) {
-        // PyDict_GetItemString does not set exceptions
-        PyErr_SetString(PyExc_KeyError, "could not get 'Type'");
-    } else {
-        Py_INCREF(output); // PyDict_GetItemString returns a borrow reference
-    }
-    cleanup:
-    Py_XDECREF(global_dict);
-    Py_XDECREF(should_be_none);
-    return output;
-}
-}//namespace
-
 PyObject *LeleButtons::LeleButton::createPyObject() {
     PyTypeObject *type = &PyLeleButton::_obj_type;
     PyType_Ready(type);

@@ -55,12 +55,13 @@ class LeleObject {
     return _nodes;
   }
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
+  virtual PyObject *createPyObject();
+  PyObject* createPyEnum(const std::map<std::string,int> &&enum_map);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();
   virtual void hide();
-  virtual PyObject *createPyObject();
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
