@@ -45,13 +45,11 @@ PyObject *PyLeleLabel::setText(PyObject *self_, PyObject *args) {
 }
 
 PyMemberDef PyLeleLabel::_members[] = {
-    PY_LELEOBJECT_MEMBERS()
     PY_LELELABEL_MEMBERS()
     {nullptr}  /* Sentinel */
 };
 
 PyMethodDef PyLeleLabel::_methods[] = {
-    PY_LELEOBJECT_METHODS()
     PY_LELELABEL_METHODS()
     {nullptr}  /* Sentinel */
 };

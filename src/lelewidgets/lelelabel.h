@@ -27,9 +27,10 @@ struct PyLeleLabel {
 };
 
 #define PY_LELELABEL_MEMBERS() \
-  {nullptr},\
+  PY_LELEOBJECT_MEMBERS()
 
 #define PY_LELELABEL_METHODS() \
+  PY_LELEOBJECT_METHODS() \
   {"getText", (PyCFunction)PyLeleLabel::getText, METH_NOARGS, "Get the text"},\
-  {"setText", (PyCFunction)PyLeleLabel::setText, METH_VARARGS, "Set the text"},\
+  {"setText", (PyCFunction)PyLeleLabel::setText, METH_VARARGS, "Set the text"},
 

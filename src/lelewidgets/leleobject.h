@@ -96,8 +96,8 @@ struct PyLeleObject {
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
-    {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"}, \
+    {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
 
 #define PY_LELEOBJECT_METHODS() \
-  {"className()", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
+  {"className()", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},
 

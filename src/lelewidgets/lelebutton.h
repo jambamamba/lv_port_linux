@@ -54,6 +54,7 @@ struct PyLeleButton {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
+    PyObject *_type = nullptr;
     static PyObject *isCheckable(PyObject *, PyObject *);
     static PyObject *isChecked(PyObject *, PyObject *);
     static PyObject *setChecked(PyObject *, PyObject *);
@@ -61,11 +62,13 @@ struct PyLeleButton {
 };
 
 #define PY_LELEBUTTON_MEMBERS() \
-  {nullptr},\
+  PY_LELELABEL_MEMBERS() \
+  {"Type", Py_T_OBJECT_EX, offsetof(PyLeleButton, _type), 0, "Type"},
 
 #define PY_LELEBUTTON_METHODS() \
+  PY_LELELABEL_METHODS() \
   {"isCheckable", (PyCFunction)PyLeleButton::isCheckable, METH_NOARGS, "Is the button checkable?"},\
   {"isChecked", (PyCFunction)PyLeleButton::isChecked, METH_NOARGS, "Is the button checked?"},\
   {"setChecked", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Make the button checked"},\
-  {"getType", (PyCFunction)PyLeleButton::getType, METH_VARARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},\
+  {"getType", (PyCFunction)PyLeleButton::getType, METH_VARARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},
 
