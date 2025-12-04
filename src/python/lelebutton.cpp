@@ -34,7 +34,7 @@ PyObject *LeleButtons::LeleButton::createPyObject() {
     PyType_Ready(type);
     PyLeleButton *self = (PyLeleButton *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->ob_base._lele_obj = this;
+        self->ob_base.ob_base._lele_obj = this;
         self->_type = createPyEnum({
                 {"Push",LeleButton::Type::Push},
                 {"Checkbox",LeleButton::Type::Checkbox},
@@ -65,7 +65,7 @@ void PyLeleButton::dealloc(PyObject* self_) {
 
 PyObject *PyLeleButton::isCheckable(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
-    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base._lele_obj);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if (lele_obj) {
         return PyBool_FromLong(lele_obj->isCheckable());
     }
@@ -74,7 +74,7 @@ PyObject *PyLeleButton::isCheckable(PyObject *self_, PyObject *arg) {
 
 PyObject *PyLeleButton::isChecked(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
-    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base._lele_obj);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if (lele_obj) {
         return PyBool_FromLong(lele_obj->isChecked());
     }
@@ -83,7 +83,7 @@ PyObject *PyLeleButton::isChecked(PyObject *self_, PyObject *arg) {
 
 PyObject *PyLeleButton::setChecked(PyObject *self_, PyObject *args) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
-    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base._lele_obj);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if(lele_obj && args) {
         long value = 0;
         if(!PyArg_ParseTuple(args, "i", &value)) {
@@ -96,7 +96,7 @@ PyObject *PyLeleButton::setChecked(PyObject *self_, PyObject *args) {
 
 PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
-    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base._lele_obj);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if (lele_obj) {
         return PyLong_FromLong(lele_obj->getType());//osm todo: should return const string
     }
@@ -115,7 +115,7 @@ PyMethodDef PyLeleButton::_methods[] = {
 
 PyTypeObject PyLeleButton::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "lele.Label",             /* tp_name */
+    "lele.Button",             /* tp_name */
     sizeof(PyLeleButton), /* tp_basicsize */
     0,                         /* tp_itemsize */
     (destructor)PyLeleButton::dealloc, /* tp_dealloc */

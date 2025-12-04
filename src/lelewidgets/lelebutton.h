@@ -47,7 +47,7 @@ class LeleButtons : public LeleObject {
 
 
 struct PyLeleButton {
-    PyLeleObject ob_base;
+    PyLeleLabel ob_base;
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
     static PyMethodDef _methods[];

@@ -2,15 +2,15 @@ import sys
 print(sys.path)
 import lele
 
-print("hello from python")
-print(f"lele.version(): {lele.version()}")
+print("@@@py hello from python")
+print(f"@@@py lele.version(): {lele.version()}")
 
 # event = lele.Event()
 # print(f"event.id: {event.event_id}")
 # print(f"===========================================")
 
 def callback(str):
-   print(str)
+   print(f"@@@py str:'{str}'")
 
 def sliderMoved(event):
    if event.code == 35: #value changed
@@ -31,13 +31,20 @@ res = lele.foo(
         ["/home", "/tmp"], 
         {"flags":"bar", "sue": "sal"},
         lambda percent: callback(percent))
-print(f"foo result:{res}")
+print(f"@@@py foo result:{res}")
 
 res = lele.loadConfig("/repos/lv_port_linux/src/configs/imageview.json")
-print(f"loadConfig result:{res}")
+print(f"@@@py loadConfig result:{res}")
 
 lele.addEventHandler("slider0", lambda event: sliderMoved(event))
 lele.addEventHandler("push_button0", lambda event: pushButtonPressed(event))
+
+obj = lele.getObjectById("/views:0/view/label")
+print(f"@@@py obj: {obj}")
+obj = lele.getObjectById("push_button0")
+print(f"@@@py obj: {obj}")
+for button_type in obj.Type:
+    print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
 
 while lele.handleEvents():
     pass
