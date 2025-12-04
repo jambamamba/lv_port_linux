@@ -41,7 +41,7 @@ struct PyLeleEvent {
     PyObject ob_base;
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
-    // static PyMethodDef _methods[];
+    static PyMethodDef _methods[];
     static void dealloc(PyLeleEvent* self);
     static int init(PyLeleEvent *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here

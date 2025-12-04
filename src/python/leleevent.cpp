@@ -32,7 +32,7 @@ PyObject *LeleEvent::createPyObject() {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_event_code = _code;
+        self->_event_code = _code;//osm todo: should be python enum type, not a magic number
         self->_value = _ivalue;
     }
     return (PyObject *)self;
@@ -69,6 +69,10 @@ PyMemberDef PyLeleEvent::_members[] = {
     {nullptr}  /* Sentinel */
 };
 
+PyMethodDef PyLeleEvent::_methods[] = {
+    {nullptr}  /* Sentinel */
+
+};
 // static PyObject *
 // PyLeleEvent_id(PyLeleEvent* self) {
 //     if (self->_id == nullptr) {
