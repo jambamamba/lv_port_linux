@@ -55,7 +55,7 @@ PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
     LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base._lele_obj);
     if (lele_obj) {
-        return PyLong_FromLong(lele_obj->getType());
+        return PyLong_FromLong(lele_obj->getType());//osm todo: should return const string
     }
     return PyLong_FromLong(0);
 }
