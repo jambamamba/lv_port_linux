@@ -1,6 +1,8 @@
 import sys
 print(sys.path)
+import traceback
 import lele
+
 
 print("@@@py hello from python")
 print(f"@@@py lele.version(): {lele.version()}")
@@ -46,8 +48,15 @@ print(f"@@@py obj: {obj}")
 for button_type in obj.Type:
     print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
 
-while lele.handleEvents():
-    pass
+try:
+   while lele.handleEvents():
+      pass
+except:
+   print(traceback.format_exc())
+   # with open('dump.py', 'a') as f:
+   #    f.write(traceback.format_exc())
+   # traceback.print_exc() #osm
+   # traceback.print_stack(file=f) #osm
 
 
 

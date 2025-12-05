@@ -232,12 +232,12 @@ void LeleStackView::popView() {
 }
 
 bool LeleStackView::eventCallback(LeleEvent &&e) {
-  if(e.type() == "clicked") {
-    LOG(DEBUG, LVSIM, "LeleStackView::eventCallback, type:%s, action:%s\n", e.type().c_str(), e.action().c_str());
-    if(e.action() == "stackview.push"){
-      pushView(e.args());
+  if(e.getType() == "clicked") {
+    LOG(DEBUG, LVSIM, "LeleStackView::eventCallback, type:%s, action:%s\n", e.getType().c_str(), e.getAction().c_str());
+    if(e.getAction() == "stackview.push"){
+      pushView(e.getArgs());
     }
-    else if(e.action() == "stackview.pop"){
+    else if(e.getAction() == "stackview.pop"){
       popView();
     }
   }

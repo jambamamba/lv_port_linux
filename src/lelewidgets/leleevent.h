@@ -7,22 +7,25 @@
 
 // struct lv_event_t;
 class LeleEvent {
-  public:
+public:
   LeleEvent(const std::string &json_str);
   LeleEvent(lv_event_t *e, LeleObject *target_obj) : _lv_event(e), _target_obj(target_obj) {}
   LeleEvent(const LeleEvent& rhs, const lv_event_t *e = nullptr, int ivalue = 0);
-  const std::string &action() const { return _action; }
-  const std::string &type() const { return _type; }
-  const std::string &id() const { return _id; }
+  const std::string &getAction() const { return _action; }
+  const std::string &getType() const { return _type; }
+  const std::string &getId() const { return _id; }
   void setId(const std::string &id) { _id = id; }
-  const lv_event_t *lv_event() const { return _lv_event; }
-  LeleObject *targetObj() const { return _target_obj; }
+  const lv_event_t *getLvEvent() const { return _lv_event; }
+  LeleObject *getTargetObj() const { return _target_obj; }
   void setTargetObj(LeleObject *target_obj) { _target_obj = target_obj; }
   virtual PyObject *createPyObject();
-  const std::map<std::string, std::string> &args() const { return _args; }
-  int code() const { return _code; }
-  int value() const { return _ivalue; }
-  protected:
+  const std::map<std::string, std::string> &getArgs() const { return _args; }
+  enum Type {
+      Clicked = 10,
+      ValueChanged = 35
+    };
+  int getValue() const { return _ivalue; }
+protected:
   void parseArgs(const std::string &json_str);
 
   std::string _class_name;
@@ -50,6 +53,6 @@ struct PyLeleEvent {
     PyObject *_type = nullptr;
     PyObject *_action = nullptr;
     PyObject *_args = nullptr;
-    int _event_code = 0;
+    int _code = 0;
     int _value = 0;
 };

@@ -17,11 +17,6 @@ PyObject *LeleEvent::createPyObject() {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_type = PyUnicode_FromString(_type.size() ? _type.c_str() : "");
-        if (self->_type == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
         self->_action = PyUnicode_FromString(_action.size() ? _action.c_str() : "");
         if (self->_action == nullptr) {
             Py_DECREF(self);
@@ -32,7 +27,12 @@ PyObject *LeleEvent::createPyObject() {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_event_code = _code;//osm todo: should be python enum type, not a magic number
+        self->_type = _target_obj->createPyEnum("Type", {
+                {"Clicked",LeleEvent::Type::Clicked},
+                {"ValueChanged",LeleEvent::Type::ValueChanged}
+            }
+        );
+        self->_code = _code;
         self->_value = _ivalue;
     }
     return (PyObject *)self;
@@ -44,7 +44,7 @@ int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     self->_type = PyUnicode_FromString("type");
     self->_action = PyUnicode_FromString("action");
     self->_args = PyUnicode_FromString("args");
-    self->_event_code = 0;
+    self->_code = 0;
     self->_value = 0;
     return 0;
 }
@@ -64,7 +64,7 @@ PyMemberDef PyLeleEvent::_members[] = {
     {"type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "type"},
     {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},
     {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},
-    {"code", Py_T_INT, offsetof(PyLeleEvent, _event_code), 0, "code"},
+    {"code", Py_T_INT, offsetof(PyLeleEvent, _code), 0, "code"},
     {"value", Py_T_INT, offsetof(PyLeleEvent, _value), 0, "value"},
     {nullptr}  /* Sentinel */
 };

@@ -121,7 +121,7 @@ lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   return _lv_obj;
 }
 bool LeleView::eventCallback(LeleEvent &&e) {
-    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
     LeleObject *base = static_cast<LeleObject*>(lv_event->user_data);
     // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->className().c_str());

@@ -27,6 +27,9 @@ void PythonWrapper::printError() const {
         return;
     }
     PyObject *old_str = PyObject_Str(value);
+    if (traceback) {
+        PyTraceBack_Print(traceback, PySys_GetObject("stderr"));
+    }
     Py_XINCREF(type);
     PyErr_Clear();
     // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << (PyUnicode_AsUTF8(old_str)) << "\n";
@@ -140,6 +143,7 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const {
    if(!py_module) {
     //    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Failed to load " << py_script.c_str() << "\n";
        LOG(WARNING, LVSIM, "Failed to load: '%s'\n", py_script.c_str());
+    //    printPyBacktrace();
        printError();
        return nullptr;
    }
@@ -183,7 +187,7 @@ bool PythonWrapper::load(
 void PythonWrapper::pyCallback(PyObject *py_callback, LeleEvent &&e) {
 
     // LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
-    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
     // code, e.ivalue
 

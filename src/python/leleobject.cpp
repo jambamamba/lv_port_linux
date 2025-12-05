@@ -22,10 +22,13 @@ PyObject *LeleObject::createPyObject() {
     return (PyObject *)self;
 }
 
-PyObject* LeleObject::createPyEnum(const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
-    std::string enum_str = 
+PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
+    std::string enum_str =
     "from enum import Enum\n"
-    "class Type(Enum):\n";
+    "class ";
+    enum_str += enum_name;
+    enum_str += "(Enum):\n";
+
     for(auto &[key,value] : enum_map) {
         enum_str += "    " + key + " = " + std::to_string(value) + "\n";
     }
@@ -48,6 +51,7 @@ PyObject* LeleObject::createPyEnum(const std::map<std::string,int> &&enum_map) {
     Py_XDECREF(should_be_none);
     return output;
 }
+
 
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);

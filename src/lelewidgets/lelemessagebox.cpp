@@ -79,13 +79,13 @@ std::string LeleMessageBox::getText() const {
 }
 
 bool LeleMessageBox::eventCallback(LeleEvent &&e) {
-    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
 
     if(code == LV_EVENT_CLICKED) {
         // LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
         for(LeleEvent *event: _events) {
-          if(event->type() == "clicked"){
+          if(event->getType() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);
             // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
             return LeleObject::eventCallback(LeleEvent(*event, lv_event));

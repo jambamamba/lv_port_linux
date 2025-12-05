@@ -56,7 +56,7 @@ class LeleObject {
   }
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
-  PyObject* createPyEnum(const std::map<std::string,int> &&enum_map);
+  PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);

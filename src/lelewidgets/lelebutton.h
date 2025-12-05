@@ -34,7 +34,7 @@ class LeleButtons : public LeleObject {
     protected:
     bool _checkable = false;
     bool _checked = false;
-    Type _type = Push;
+    Type _type = Type::Push;
     int _value = 0;
     std::vector<LeleEvent*> _events;
   };

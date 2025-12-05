@@ -6,7 +6,7 @@ PyObject *LeleButtons::LeleButton::createPyObject() {
     PyLeleButton *self = (PyLeleButton *)type->tp_alloc(type, 0);
     if (self != nullptr) {
         self->ob_base.ob_base._lele_obj = this;
-        self->_type = createPyEnum({
+        self->_type = createPyEnum("Type", {
                 {"Push",LeleButton::Type::Push},
                 {"Checkbox",LeleButton::Type::Checkbox},
                 {"Radio",LeleButton::Type::Radio},

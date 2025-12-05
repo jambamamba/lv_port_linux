@@ -40,7 +40,7 @@ lv_obj_t *LeleTextbox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 }
 
 bool LeleTextbox::eventCallback(LeleEvent &&e) {
-    lv_event_t* lv_event = const_cast<lv_event_t*>(e.lv_event());
+    lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
 
     if(code == LV_EVENT_CLICKED 
