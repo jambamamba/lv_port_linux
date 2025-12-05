@@ -39,13 +39,7 @@ PyObject *LeleEvent::createPyObject() {
 }
 
 int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
-    self->_event_id = PyUnicode_FromString("event_id");
-    self->_object = Py_None;
-    self->_type = PyUnicode_FromString("type");
-    self->_action = PyUnicode_FromString("action");
-    self->_args = PyUnicode_FromString("args");
-    self->_code = 0;
-    self->_value = 0;
+    // PyLeleEvent *self = reinterpret_cast<PyLeleEvent *>(self_);
     return 0;
 }
 
@@ -61,7 +55,7 @@ void PyLeleEvent::dealloc(PyLeleEvent* self) {
 PyMemberDef PyLeleEvent::_members[] = {
     {"event_id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _event_id), 0, "event_id"},
     {"object", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object), 0, "object"},
-    {"type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "type"},
+    {"Type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "Type"},
     {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},
     {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},
     {"code", Py_T_INT, offsetof(PyLeleEvent, _code), 0, "code"},

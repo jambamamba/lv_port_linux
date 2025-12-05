@@ -20,6 +20,9 @@ def sliderMoved(event):
    pass
 
 def pushButtonPressed(event):
+   print(f"@@@py event: {event}")
+   for event_type in event.Type:
+      print(f"@@@py enum event.Type: Name: {event_type.name}, Value: {event_type.value}")
    if event.code == 10: #clicked
       print(f"@@@py button pressed: {event.object.id}, event.type: {event.type}, event.action: {event.action}")
       obj = lele.getObjectById("/views:0/view/label")
