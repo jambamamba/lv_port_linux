@@ -4,22 +4,29 @@ PyObject *LeleObject::createPyObject() {
     PyTypeObject *type = &PyLeleObject::_obj_type;
     PyType_Ready(type);
     PyLeleObject *self = (PyLeleObject *)type->tp_alloc(type, 0);
-    if (self != nullptr) {
-        self->_lele_obj = this;
-        self->_id = PyUnicode_FromString(
-            _id.size() ? _id.c_str() : "");
-        if (self->_id == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
-        self->_class_name = PyUnicode_FromString(
-            _class_name.size() ? _class_name.c_str() : "");
-        if (self->_class_name == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
+    if(!initPyObject(self)) {
+        Py_DECREF(self);
+        return nullptr;
     }
     return (PyObject *)self;
+}
+
+bool LeleObject::initPyObject(PyLeleObject *py_obj) {
+    if(!py_obj) {
+        return false;
+    }
+    py_obj->_lele_obj = this;
+    py_obj->_id = PyUnicode_FromString(
+        _id.size() ? _id.c_str() : "");
+    if (py_obj->_id == nullptr) {
+        return false;
+    }
+    py_obj->_class_name = PyUnicode_FromString(
+        _class_name.size() ? _class_name.c_str() : "");
+    if (py_obj->_class_name == nullptr) {
+        return false;
+    }
+    return true;
 }
 
 PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
@@ -52,11 +59,10 @@ PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     return output;
 }
 
-
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    self->_id = PyUnicode_FromString("id");
-    self->_class_name = PyUnicode_FromString("class_name");
+    // self->_id = PyUnicode_FromString("id");
+    // self->_class_name = PyUnicode_FromString("class_name");
     return 0;
 }
 
@@ -70,7 +76,7 @@ PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     if (!self->_class_name) {
         PyErr_SetString(PyExc_AttributeError, "class_name");
-        return nullptr;
+        return Py_None;
     }
     return self->_class_name;
 }

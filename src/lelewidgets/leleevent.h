@@ -48,7 +48,7 @@ struct PyLeleEvent {
     static void dealloc(PyLeleEvent* self);
     static int init(PyLeleEvent *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    PyObject *_event_id = nullptr;
+    PyObject *_id = nullptr;
     PyObject *_object = nullptr;
     PyObject *_type = nullptr;
     PyObject *_action = nullptr;
@@ -56,3 +56,15 @@ struct PyLeleEvent {
     int _code = 0;
     int _value = 0;
 };
+
+#define PY_LELEEVENT_MEMBERS() \
+    {"id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _id), 0, "id"},\
+    {"object", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object), 0, " "},\
+    {"Type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "Type"},\
+    {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},\
+    {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},\
+    {"code", Py_T_INT, offsetof(PyLeleEvent, _code), 0, "code"},\
+    {"value", Py_T_INT, offsetof(PyLeleEvent, _value), 0, "value"},
+
+#define PY_LELEEVENT_METHODS() \
+

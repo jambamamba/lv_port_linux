@@ -2,6 +2,7 @@
 
 #include "lelelabel.h"
 
+struct PyLeleButton;
 class LeleGroup : public LeleObject {
   public:
   LeleGroup(const std::string &json_str);
@@ -25,6 +26,7 @@ class LeleButtons : public LeleObject {
     LeleButton(const std::string &json_str);
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual PyObject *createPyObject() override;
+    bool initPyObject(PyLeleButton *py_obj);
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
     bool isChecked() const { return _checked; }
@@ -70,5 +72,5 @@ struct PyLeleButton {
   {"isCheckable", (PyCFunction)PyLeleButton::isCheckable, METH_NOARGS, "Is the button checkable?"},\
   {"isChecked", (PyCFunction)PyLeleButton::isChecked, METH_NOARGS, "Is the button checked?"},\
   {"setChecked", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Make the button checked"},\
-  {"getType", (PyCFunction)PyLeleButton::getType, METH_VARARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},
+  {"getType", (PyCFunction)PyLeleButton::getType, METH_NOARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},
 

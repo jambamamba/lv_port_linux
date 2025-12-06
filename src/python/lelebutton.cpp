@@ -4,23 +4,30 @@ PyObject *LeleButtons::LeleButton::createPyObject() {
     PyTypeObject *type = &PyLeleButton::_obj_type;
     PyType_Ready(type);
     PyLeleButton *self = (PyLeleButton *)type->tp_alloc(type, 0);
-    if (self != nullptr) {
-        self->ob_base.ob_base._lele_obj = this;
-        self->_type = createPyEnum("Type", {
-                {"Push",LeleButton::Type::Push},
-                {"Checkbox",LeleButton::Type::Checkbox},
-                {"Radio",LeleButton::Type::Radio},
-                {"Switch",LeleButton::Type::Switch},
-                {"Close",LeleButton::Type::Close},
-                {"Slider",LeleButton::Type::Slider}
-            }
-        );
-        if (self->_type == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
+    if(!initPyObject(self)) {
+        Py_DECREF(self);
+        return nullptr;
     }
     return (PyObject *)self;
+}
+
+bool LeleButtons::LeleButton::initPyObject(PyLeleButton *py_obj) {
+    if(!py_obj) {
+        return false;
+    }
+    py_obj->_type = createPyEnum("Type", {
+            {"Push",LeleButton::Type::Push},
+            {"Checkbox",LeleButton::Type::Checkbox},
+            {"Radio",LeleButton::Type::Radio},
+            {"Switch",LeleButton::Type::Switch},
+            {"Close",LeleButton::Type::Close},
+            {"Slider",LeleButton::Type::Slider}
+        }
+    );
+    if (py_obj->_type == nullptr) {
+        return false;
+    }
+    return LeleLabel::initPyObject(&py_obj->ob_base);
 }
 
 int PyLeleButton::init(PyObject *self_, PyObject *args, PyObject *kwds) {
@@ -115,7 +122,7 @@ PyTypeObject PyLeleButton::_obj_type = {
     PyLeleButton::_methods,             /* tp_methods */
     PyLeleButton::_members,             /* tp_members */
     0,                         /* tp_getset */
-    0,                         /* tp_base */
+    &PyLeleLabel::_obj_type,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */

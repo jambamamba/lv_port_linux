@@ -23,6 +23,7 @@ typedef enum {
 } disp_size_t;
 
 struct _object;
+struct PyLeleObject;
 typedef struct _object PyObject;
 class LeleObject {
   public:
@@ -56,6 +57,7 @@ class LeleObject {
   }
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
+  bool initPyObject(PyLeleObject *py_obj);
   PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
@@ -97,8 +99,8 @@ struct PyLeleObject {
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
-    {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
+  {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
 
 #define PY_LELEOBJECT_METHODS() \
-  {"className()", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},
+  {"className", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},
 

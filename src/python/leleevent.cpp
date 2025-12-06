@@ -12,8 +12,8 @@ PyObject *LeleEvent::createPyObject() {
         //     Py_DECREF(self);
         //     return nullptr;
         // }
-        self->_event_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
-        if (self->_event_id == nullptr) {
+        self->_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
+        if (self->_id == nullptr) {
             Py_DECREF(self);
             return nullptr;
         }
@@ -44,7 +44,7 @@ int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
 }
 
 void PyLeleEvent::dealloc(PyLeleEvent* self) {
-    Py_XDECREF(self->_event_id);
+    Py_XDECREF(self->_id);
     Py_XDECREF(self->_object);
     Py_XDECREF(self->_type);
     Py_XDECREF(self->_action);
@@ -53,17 +53,12 @@ void PyLeleEvent::dealloc(PyLeleEvent* self) {
 }
 
 PyMemberDef PyLeleEvent::_members[] = {
-    {"event_id", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _event_id), 0, "event_id"},
-    {"object", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _object), 0, "object"},
-    {"Type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "Type"},
-    {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},
-    {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},
-    {"code", Py_T_INT, offsetof(PyLeleEvent, _code), 0, "code"},
-    {"value", Py_T_INT, offsetof(PyLeleEvent, _value), 0, "value"},
+    PY_LELEEVENT_MEMBERS() \
     {nullptr}  /* Sentinel */
 };
 
 PyMethodDef PyLeleEvent::_methods[] = {
+    PY_LELEEVENT_METHODS() \
     {nullptr}  /* Sentinel */
 
 };

@@ -4,10 +4,18 @@ PyObject *LeleLabel::createPyObject() {
     PyTypeObject *type = &PyLeleLabel::_obj_type;
     PyType_Ready(type);
     PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
-    if (self != nullptr) {
-        self->ob_base._lele_obj = this;
+    if(!initPyObject(self)) {
+        Py_DECREF(self);
+        return nullptr;
     }
     return (PyObject *)self;
+}
+
+bool LeleLabel::initPyObject(PyLeleLabel *py_obj) {
+    if(!py_obj) {
+        return false;
+    }
+    return LeleObject::initPyObject(&py_obj->ob_base);
 }
 
 int PyLeleLabel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
@@ -85,7 +93,7 @@ PyTypeObject PyLeleLabel::_obj_type = {
     PyLeleLabel::_methods,             /* tp_methods */
     PyLeleLabel::_members,             /* tp_members */
     0,                         /* tp_getset */
-    0,                         /* tp_base */
+    &PyLeleObject::_obj_type,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
