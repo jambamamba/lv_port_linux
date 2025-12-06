@@ -161,12 +161,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
       lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN | LV_STATE_CHECKED); // Green when checked
     }
   }
-  if(_checked) {
-    lv_obj_add_state(_lv_obj, LV_STATE_CHECKED);
-  }
-  else {
-    lv_obj_remove_state(_lv_obj, LV_STATE_CHECKED);
-  }
+  setChecked(_checked);
 
   LeleView *view = dynamic_cast<LeleView*>(_lele_parent);
   if(view && view->isGroup()) {
@@ -175,6 +170,16 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
   // lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
+}
+
+void LeleButtons::LeleButton::setChecked(bool checked) { 
+  _checked = checked; 
+  if(_checked) {
+    lv_obj_add_state(_lv_obj, LV_STATE_CHECKED);
+  }
+  else {
+    lv_obj_remove_state(_lv_obj, LV_STATE_CHECKED);
+  }
 }
 
 bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {

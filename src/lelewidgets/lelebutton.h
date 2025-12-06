@@ -30,7 +30,7 @@ class LeleButtons : public LeleObject {
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
     bool isChecked() const { return _checked; }
-    void setChecked(bool checked) { _checked = checked; }//osm todo: should actually change the widget appearance to show a check mark
+    void setChecked(bool checked);
     Type getType() const { return _type; }
     const std::string &text() const { return _text; }
     protected:
