@@ -81,6 +81,15 @@ PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
     return PyLong_FromLong(0);
 }
 
+PyObject *PyLeleButton::click(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        PyBool_FromLong(false);
+    }
+    return PyBool_FromLong(lele_obj->click());
+}
+
 PyMemberDef PyLeleButton::_members[] = {
     PY_LELEBUTTON_MEMBERS()
     {nullptr}  /* Sentinel */

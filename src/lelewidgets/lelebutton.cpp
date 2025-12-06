@@ -182,6 +182,10 @@ void LeleButtons::LeleButton::setChecked(bool checked) {
   }
 }
 
+bool LeleButtons::LeleButton::click() {
+  return LV_RESULT_OK == lv_obj_send_event(_lv_obj, LV_EVENT_CLICKED, nullptr);
+}
+
 bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);

@@ -31,6 +31,7 @@ class LeleButtons : public LeleObject {
     bool isCheckable() const { return _checkable; }
     bool isChecked() const { return _checked; }
     void setChecked(bool checked);
+    bool click();
     Type getType() const { return _type; }
     const std::string &text() const { return _text; }
     protected:
@@ -61,6 +62,7 @@ struct PyLeleButton {
     static PyObject *isChecked(PyObject *, PyObject *);
     static PyObject *setChecked(PyObject *, PyObject *);
     static PyObject *getType(PyObject *, PyObject *);
+    static PyObject *click(PyObject *, PyObject *);
 };
 
 #define PY_LELEBUTTON_MEMBERS() \
@@ -72,5 +74,6 @@ struct PyLeleButton {
   {"isCheckable", (PyCFunction)PyLeleButton::isCheckable, METH_NOARGS, "Is the button checkable?"},\
   {"isChecked", (PyCFunction)PyLeleButton::isChecked, METH_NOARGS, "Is the button checked?"},\
   {"setChecked", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Make the button checked"},\
-  {"getType", (PyCFunction)PyLeleButton::getType, METH_NOARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},
+  {"getType", (PyCFunction)PyLeleButton::getType, METH_NOARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},\
+  {"click", (PyCFunction)PyLeleButton::click, METH_NOARGS, "Click the button"},\
 
