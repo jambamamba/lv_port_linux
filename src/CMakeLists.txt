@@ -84,6 +84,7 @@ function(buildLvglSim PYTHON_LIB)
         python/leleobject.cpp
         python/lelelabel.cpp
         python/lelebutton.cpp
+        python/lelemessagebox.cpp
         graphics_backend.cpp
         # mainwindow.cpp 
         # chart.cpp 
