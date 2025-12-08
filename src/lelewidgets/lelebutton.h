@@ -29,11 +29,12 @@ class LeleButtons : public LeleObject {
     bool initPyObject(PyLeleButton *py_obj);
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
-    bool isChecked() const { return _checked; }
+    bool getChecked() const { return _checked; }
     void setChecked(bool checked);
     bool click();
     Type getType() const { return _type; }
-    const std::string &text() const { return _text; }
+    int getValue() const { return _value; }
+    void setValue(int value);
     protected:
     bool _checkable = false;
     bool _checked = false;
@@ -59,10 +60,12 @@ struct PyLeleButton {
     // Type-specific fields go here
     PyObject *_type = nullptr;
     static PyObject *isCheckable(PyObject *, PyObject *);
-    static PyObject *isChecked(PyObject *, PyObject *);
+    static PyObject *getChecked(PyObject *, PyObject *);
     static PyObject *setChecked(PyObject *, PyObject *);
     static PyObject *getType(PyObject *, PyObject *);
     static PyObject *click(PyObject *, PyObject *);
+    static PyObject *getValue(PyObject *, PyObject *);
+    static PyObject *setValue(PyObject *, PyObject *);
 };
 
 #define PY_LELEBUTTON_MEMBERS() \
@@ -72,8 +75,10 @@ struct PyLeleButton {
 #define PY_LELEBUTTON_METHODS() \
   PY_LELELABEL_METHODS() \
   {"isCheckable", (PyCFunction)PyLeleButton::isCheckable, METH_NOARGS, "Is the button checkable?"},\
-  {"isChecked", (PyCFunction)PyLeleButton::isChecked, METH_NOARGS, "Is the button checked?"},\
+  {"getChecked", (PyCFunction)PyLeleButton::getChecked, METH_NOARGS, "Is the button checked?"},\
   {"setChecked", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Make the button checked"},\
   {"getType", (PyCFunction)PyLeleButton::getType, METH_NOARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},\
   {"click", (PyCFunction)PyLeleButton::click, METH_NOARGS, "Click the button"},\
+  {"getValue", (PyCFunction)PyLeleButton::getChecked, METH_NOARGS, "Get the value of the slider"},\
+  {"setValue", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Set the value of the slider"},\
 

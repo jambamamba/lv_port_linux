@@ -57,7 +57,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
         }, LV_EVENT_CLICKED, lele_btn);
       }
       else if(lele_btn->getType() == LeleButtons::LeleButton::Type::Push) {
-        lv_obj_t *lv_btn = lv_msgbox_add_footer_button(_lv_obj, lele_btn->text().c_str());
+        lv_obj_t *lv_btn = lv_msgbox_add_footer_button(_lv_obj, lele_btn->getText().c_str());
         lele_btn->setStyle(lv_btn);
         lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
           lv_obj_t *btn = static_cast<lv_obj_t *>(lv_event_get_current_target(e));

@@ -50,11 +50,11 @@ PyObject *PyLeleButton::isCheckable(PyObject *self_, PyObject *arg) {
     return PyBool_FromLong(false);
 }
 
-PyObject *PyLeleButton::isChecked(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleButton::getChecked(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
     LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if (lele_obj) {
-        return PyBool_FromLong(lele_obj->isChecked());
+        return PyBool_FromLong(lele_obj->getChecked());
     }
     return PyBool_FromLong(false);
 }
@@ -88,6 +88,28 @@ PyObject *PyLeleButton::click(PyObject *self_, PyObject *arg) {
         PyBool_FromLong(false);
     }
     return PyBool_FromLong(lele_obj->click());
+}
+
+PyObject *PyLeleButton::getValue(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getValue());
+    }
+    return PyBool_FromLong(false);
+}
+
+PyObject *PyLeleButton::setValue(PyObject *self_, PyObject *args) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if(lele_obj && args) {
+        long value = 0;
+        if(!PyArg_ParseTuple(args, "i", &value)) {
+            return Py_None;
+        }
+        lele_obj->setValue(value);
+    }
+    return Py_None;
 }
 
 PyMemberDef PyLeleButton::_members[] = {

@@ -186,6 +186,13 @@ bool LeleButtons::LeleButton::click() {
   return LV_RESULT_OK == lv_obj_send_event(_lv_obj, LV_EVENT_CLICKED, nullptr);
 }
 
+void LeleButtons::LeleButton::setValue(int value) {
+  _value = value; 
+  if(_type = LeleButtons::LeleButton::Type::Slider) {
+    lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);//osm todo : test this
+  }
+}
+
 bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
@@ -207,9 +214,9 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
         lv_obj_t *slider = lv_event_get_target_obj(lv_event);
-        int value = slider ? lv_slider_get_value(slider) : 0;
-        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, value);
-        return LeleObject::eventCallback(LeleEvent(e, lv_event, value));
+        _value = slider ? lv_slider_get_value(slider) : _value;
+        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, _value);
+        return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
     }
     return LeleObject::eventCallback(std::move(e));
 }
