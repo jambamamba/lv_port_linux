@@ -138,6 +138,9 @@ namespace {
         }
         LOG(DEBUG, LVSIM, "Load config '%s'\n", str);
 
+        std::string dir = LeleObject::getPyScriptDir();
+        LOG(FATAL, LVSIM, "SCRIPT dir '%s'\n", dir.c_str());
+
         std::string input_file(str);
         if(input_file.size() > 2 && str[0] == '.' && str[1] == '/') {
             input_file = std::filesystem::current_path().string() + "/" + input_file.substr(2);
