@@ -37,8 +37,8 @@ function buildelf() {
 }
 
 function run() {
-    local py_script="$(pwd)/src/py/main.py"
-    local config_json="$(pwd)/src/configs/testview.json"
+    local py_script="$(pwd)/src/examples/hello-world/hello-world.py"
+    local config_json="$(pwd)/src/examples/hello-world/hello-world.json"
 
     parseArgs $@
     local input_file
