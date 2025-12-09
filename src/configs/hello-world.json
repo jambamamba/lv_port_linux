@@ -5,7 +5,14 @@
         "label":{
             "id":"/hello-world/label",
             "text":"hello world",
-            "style":{"id":"/hello-world/style","x":"40%","y":"40%","width":"15%","height":"5%","xmargin":"100","xpadding":"100","border":"solid-1px-#555"}
+            "style":{
+                "id":"/hello-world/style",
+                "x":"40%","y":"40%",
+                "width":"15%","height":"5%",
+                "osm-todo-margin":"100",
+                "osm-todo-padding":"100",
+                "border":"solid-1px-#555"
+            }
         }
     }
 }
