@@ -19,7 +19,7 @@
             "text":"",
             "style":{
                 "id":"/hello-world/style",
-                "x":"40%","y":"45%",
+                "x":"40%","y":"40%",
                 "width":"30%","height":"10%",
                 "osm-todo-margin":"100",
                 "osm-todo-padding":"100",
