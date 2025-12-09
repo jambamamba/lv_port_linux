@@ -13,6 +13,18 @@
                 "osm-todo-padding":"100",
                 "border":"solid-1px-#555"
             }
+        },
+        "label":{
+            "id":"/hello-world/specs",
+            "text":"",
+            "style":{
+                "id":"/hello-world/style",
+                "x":"20%","y":"45%",
+                "width":"30%","height":"10%",
+                "osm-todo-margin":"100",
+                "osm-todo-padding":"100",
+                "border":"solid-1px-#555"
+            }
         }
     }
 }
