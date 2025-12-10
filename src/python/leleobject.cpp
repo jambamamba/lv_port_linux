@@ -55,14 +55,18 @@ PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     enum_str += "";
     RAII $;
     $.global_dict = PyDict_New();
-    if (!$.global_dict) { return Py_None; }
+    if (!$.global_dict) { 
+        return Py_None; 
+    }
     $.should_be_none = PyRun_String(enum_str.c_str(), Py_file_input, $.global_dict, $.local_dict);
-    if (!$.should_be_none) { return Py_None; }
+    if (!$.should_be_none) { 
+        return Py_None; 
+    }
     // extract Type from global_dict
-    PyObject *output = PyDict_GetItemString($.global_dict, "Type");
+    PyObject *output = PyDict_GetItemString($.global_dict, enum_name.c_str());
     if (!output) {
         // PyDict_GetItemString does not set exceptions
-        PyErr_SetString(PyExc_KeyError, "could not get 'Type'");
+        PyErr_SetString(PyExc_KeyError, "could not get enum_name");
         return Py_None;
     } else {
         Py_INCREF(output); // PyDict_GetItemString returns a borrow reference
@@ -70,41 +74,7 @@ PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     return output;
 }
 
-std::string LeleObject::getPyScriptDir() {
-    std::string code =
-    "import os\n"
-    "res=os.getcwd()\n";
-    
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-    RAII $;
-    $.global_dict = PyDict_New();
-    if (!$.global_dict) { return ""; }
-    $.should_be_none = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-    if (!$.should_be_none) { return ""; }
-    // extract Type from global_dict
-    PyObject *output = PyDict_GetItemString($.global_dict, "res");
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-    if (!output) {
-        // PyDict_GetItemString does not set exceptions
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-        PyErr_SetString(PyExc_KeyError, "could not get 'res'");
-        return "";
-    } else {
-        Py_INCREF(output); // PyDict_GetItemString returns a borrow reference
-    }
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-
-    char *path = nullptr;
-    if(!PyArg_ParseTuple(output, "s", &path)) {
-        return "";
-    }    
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
-    return path;
-}
-
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    printf("@@@@@@@@@@@@@@@@@ %i\n", __LINE__); 
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     // self->_id = PyUnicode_FromString("id");
     // self->_class_name = PyUnicode_FromString("class_name");

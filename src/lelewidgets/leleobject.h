@@ -59,7 +59,6 @@ class LeleObject {
   virtual PyObject *createPyObject();
   bool initPyObject(PyLeleObject *py_obj);
   PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) const;
-  static std::string getPyScriptDir();
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);

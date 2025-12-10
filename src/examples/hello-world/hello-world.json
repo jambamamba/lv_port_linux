@@ -4,11 +4,11 @@
         "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0"},
         "label":{
             "id":"/hello-world/label",
-            "text":"hello world",
+            "text":"Hello World",
             "style":{
                 "id":"/hello-world/style",
                 "x":"40%","y":"40%",
-                "width":"15%","height":"5%",
+                "width":"15%","height":"10%",
                 "osm-todo-margin":"100",
                 "osm-todo-padding":"100",
                 "border":"solid-1px-#555"

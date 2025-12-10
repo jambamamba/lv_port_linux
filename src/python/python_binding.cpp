@@ -11,16 +11,65 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 namespace {
     static GraphicsBackend _graphics_backend;
     static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
-    // static PyObject* createPyModule();
 
-    // static PyObject* _mymodule_exec(PyObject* spec) {
-    //     LOG(FATAL, LVSIM, "_mymodule_exec\n");
-    //     return nullptr;
-    // }
-    // static PyObject* _mymodule_create(PyObject* spec) {
-    //     PyObject *module = createPyModule();
-    //     return module;
-    // }
+    struct RAII {
+        PyObject *global_dict=nullptr;
+        PyObject *local_dict=nullptr;
+        PyObject *should_be_none=nullptr;
+        ~RAII() {
+            Py_XDECREF(global_dict);
+            Py_XDECREF(local_dict);
+            Py_XDECREF(should_be_none);            
+        }
+    };
+    std::string getPyScriptDir() {
+        std::string code =
+        "import os\n"
+        "res = os.getcwd()\n"
+        "";
+        
+        RAII $;
+        $.global_dict = PyDict_New();
+        if (!$.global_dict) { return ""; }
+        $.local_dict = PyDict_New();
+        if (!$.local_dict) { return ""; }
+        $.should_be_none = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
+
+        if (!$.should_be_none) { 
+            LOG(WARNING, LVSIM, "Failed in PyRun_String!\n");
+            return ""; 
+        }
+        // extract Type from global_dict
+        PyObject *output = PyDict_GetItemString($.local_dict, "res");
+        if (!output) {
+            // PyDict_GetItemString does not set exceptions
+            LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
+            PyErr_SetString(PyExc_KeyError, "could not get 'res'");
+            return "";
+        } else {
+            Py_INCREF(output); // PyDict_GetItemString returns a borrow reference
+        }
+
+        const char *path = PyUnicode_AsUTF8(output);
+        if(!path) {
+            LOG(WARNING, LVSIM, "Failed in PyUnicode_AsUTF8!\n");
+            return "";
+        }
+
+        return path;
+    }
+#ifdef MULTI_PHASE_INIT
+    static PyObject* createPyModule();
+
+    static PyObject* _mymodule_exec(PyObject* spec) {
+        LOG(FATAL, LVSIM, "_mymodule_exec\n");
+        return nullptr;
+    }
+    static PyObject* _mymodule_create(PyObject* spec) {
+        PyObject *module = createPyModule();
+        return module;
+    }
+#endif//MULTI_PHASE_INIT
     //Functions that py script can call
     static PyObject* _mymodule_version(PyObject *self, PyObject *args) {
         int major_version = 1;//(int)(This->GetVersion().toFloat());
@@ -138,8 +187,8 @@ namespace {
         }
         LOG(DEBUG, LVSIM, "Load config '%s'\n", str);
 
-        std::string dir = LeleObject::getPyScriptDir();
-        LOG(FATAL, LVSIM, "SCRIPT dir '%s'\n", dir.c_str());
+        // std::string dir = getPyScriptDir();
+        // LOG(FATAL, LVSIM, "SCRIPT dir '%s'\n", dir.c_str());
 
         std::string input_file(str);
         if(input_file.size() > 2 && str[0] == '.' && str[1] == '/') {
@@ -172,45 +221,50 @@ namespace {
         {"getObjectById", _mymodule_getObjectById, METH_VARARGS, "lele.getObjectById(id)"},
         {nullptr, nullptr, 0, nullptr} // Sentinel
     };
+#ifdef MULTI_PHASE_INIT
     static PyModuleDef_Slot _mymodule_slots[] = {
-        // {Py_mod_create, (void*)_mymodule_create},
-        // {Py_mod_exec, _mymodule_exec},
+        {Py_mod_create, (void*)_mymodule_create},
+        {Py_mod_exec, (void*) _mymodule_exec},
         {0, nullptr} // Sentinel to mark the end of the array
     };    
+#endif
     static PyModuleDef _mymodule = {
         PyModuleDef_HEAD_INIT, //m_base
         "lele", //m_name
         nullptr, //m_doc
         0, //m_size // m_size must be non-negative (0) for multi-phase init, and can be -1 
         _mymodule_methods, //m_methods
-        nullptr,// _mymodule_slots, //m_slots //PyModule_Create is incompatible with m_slots
+#ifdef MULTI_PHASE_INIT
+        _mymodule_slots, //m_slots //PyModule_Create is incompatible with m_slots
+#else
+        nullptr, //m_slots
+#endif
         nullptr, //m_traverse
         nullptr, //m_clear
         nullptr //m_free
     };
-    // static PyObject* createPyModule() {
-    //     // PyObject *module_spec = PyObject_CallFunctionObjArgs((PyObject *)&PyModuleSpec_Type, nullptr);
+#ifdef MULTI_PHASE_INIT
+    static PyObject* createPyModule() {
+        // PyObject *module_spec = PyObject_CallFunctionObjArgs((PyObject *)&PyModuleSpec_Type, nullptr);
 
-    //     // PyObject *module_spec = PyObject_GetAttr(mod, &_Py_ID(__spec__));
-    //     PyObject *name = PyUnicode_FromString("lele");
-    //     PyObject *attrs = Py_BuildValue("{sO}", "name", name);
-    //     PyObject *module_spec = _PyNamespace_New(attrs);
+        // PyObject *module_spec = PyObject_GetAttr(mod, &_Py_ID(__spec__));
+        PyObject* module_name = PyUnicode_FromString("lele");
 
-    //     PyObject* module_name = PyUnicode_FromString("lele");
-    //     PyObject_SetAttrString(module_spec, "name", module_name);
-    //     Py_DECREF(module_name); // Decrement reference count for the name object
+        PyObject *module_spec = Py_BuildValue("s", module_name);
+        PyObject_SetAttrString(module_spec, "name", module_name);
+        Py_DECREF(module_name); // Decrement reference count for the name object
 
-    //     PyObject* origin = PyObject_GetAttrString(module_spec, "origin");
-    //     PyObject_SetAttrString(module_spec, "__file__", origin);
-    //     Py_DECREF(origin);
+        PyObject *script_dir = PyUnicode_FromString("/repos/lv_port_linux/src/examples/hello-world/hello-world.py");
+        PyObject_SetAttrString(module_spec, "__file__", script_dir);
+        Py_DECREF(script_dir);
 
-    //     PyObject *module = PyModule_FromDefAndSpec(&_mymodule, module_spec);
-    //     PyModule_ExecDef(module, &_mymodule);
+        PyObject *module = PyModule_FromDefAndSpec(&_mymodule, module_spec);
+        PyModule_ExecDef(module, &_mymodule);
 
-    //     // PyModule_AddObject(mod, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
-    //     return module;
-    // }
-    
+        // PyModule_AddObject(mod, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
+        return module;
+    }
+#endif//MULTI_PHASE_INIT
 }//namespace
 
 /////////////////////////////////////////////////////////////////////
@@ -219,8 +273,9 @@ PyMODINIT_FUNC PyInit_lele(void) {
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return nullptr;
     }
-   //Either  multi-phase initialization:
-    // return PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
-    //Or single stage:
+#ifdef MULTI_PHASE_INIT
+    return PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
+#else
     return PyModule_Create(&_mymodule);
+#endif
 }

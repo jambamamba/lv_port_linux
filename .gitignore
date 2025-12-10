@@ -63,4 +63,5 @@ lv_image_converter/build
 lv_image_converter/libpng
 qtcreator.jpg
 qt.png
-src/py/__pycache__/
+src/examples/*/__pycache__/
+src/py
