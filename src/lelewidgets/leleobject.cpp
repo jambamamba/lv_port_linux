@@ -449,9 +449,8 @@ void LeleObject::show() {
 bool LeleObject::eventCallback(LeleEvent &&e) {
   // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
     // _id.c_str(), _class_name.c_str(), _lele_parent->className().c_str());
-
   for(auto *py_callback:_py_callbacks) {
-    PythonWrapper::pyCallback(py_callback, std::move(e));
+    LeleObject::pyCallback(py_callback, std::move(e));
   }
   if(_lele_parent) {
     return _lele_parent->eventCallback(std::move(e));

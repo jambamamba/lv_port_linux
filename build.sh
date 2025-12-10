@@ -64,14 +64,12 @@ function run() {
     # popd
 
     # pushd src/examples/hello-world
-    # LD_LIBRARY_PATH=/usr/local/lib gdb --args python hello-world.py
-    # popd
-}
-
-function main() {
-    buildelf
+    #  LD_LIBRARY_PATH=/usr/local/lib ::
     # buildpy
     # run
 }
 
+function main() {
+    buildelf
+}
 main $@ |tee x86-build/build.log

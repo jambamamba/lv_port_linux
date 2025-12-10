@@ -246,16 +246,13 @@ endfunction()
 
 function(buildLeleCpython)
     set(PYTHON_LIB_OUTPUT "lele.cpython-314-x86_64-linux-gnu.so")
-    add_custom_command(
-        TARGET lvglsim PRE_BUILD
-        COMMENT "Building ${PYTHON_LIB_OUTPUT}..."
-    )
     cmake_host_system_information(RESULT ncores QUERY NUMBER_OF_LOGICAL_CORES)
     add_custom_command(
-        TARGET lvglsim POST_BUILD #will run this command after lvglsim is built
+        TARGET lele_ui POST_BUILD #will run this command after the specified target is built
         COMMAND CXX=clang++ LD_LIBRARY_PATH=/usr/local/lib python3 ${CMAKE_BINARY_DIR}/setup.py build_ext --verbose --build-lib=. --build-temp=${CMAKE_SOURCE_DIR}/py-build -j ${ncores}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Finished building ${PYTHON_LIB_OUTPUT}"
+        DEPENDS ${CMAKE_BINARY_DIR}/src/liblele_ui.so
         VERBATIM
         ALL
     )

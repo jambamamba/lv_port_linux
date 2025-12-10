@@ -67,6 +67,7 @@ class LeleObject {
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
+  static void pyCallback(PyObject *py_callback, LeleEvent &&e);
   protected:
   void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
