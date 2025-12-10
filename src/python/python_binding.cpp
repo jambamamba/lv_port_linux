@@ -72,8 +72,8 @@ namespace {
 #endif//MULTI_PHASE_INIT
     //Functions that py script can call
     static PyObject* _mymodule_version(PyObject *self, PyObject *args) {
-        int major_version = 1;//(int)(This->GetVersion().toFloat());
-        int minor_version = 0;//(int)((This->GetVersion().toFloat() - major_version) * 100.);
+        int major_version = LELE_VERSION_MAJOR;//(int)(This->GetVersion().toFloat());
+        int minor_version = LELE_VERSION_MINOR;//(int)((This->GetVersion().toFloat() - major_version) * 100.);
         PyObject *dict = PyDict_New();
         PyDict_SetItem(dict, PyUnicode_FromString("Major"), PyLong_FromDouble(major_version));
         PyDict_SetItem(dict, PyUnicode_FromString("Minor"), PyLong_FromDouble(minor_version));

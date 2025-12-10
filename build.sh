@@ -16,7 +16,7 @@ function buildpy() {
     python3 setup.py build_ext --verbose\
     --build-lib='py-build' \
     --build-temp='/tmp/py-build' \
-    --parallel=$(nproc)
+    -j $(nproc)
     # python setup.py bdist_wheel
 }
 
@@ -31,7 +31,7 @@ function buildelf() {
     local cwd=$(pwd)
     mkdir -p x86-build
     pushd x86-build
-    cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
+    cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug ..
     ninja install
     popd
 }

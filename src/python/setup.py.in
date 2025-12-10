@@ -1,0 +1,64 @@
+from setuptools import setup, Extension
+from setuptools.command.build_ext import build_ext
+import distutils.ccompiler
+from pathlib import Path
+import os
+
+#This did not work, it was attempt to set different flags for C files vs CPP files
+#I ended up creating symlinks for C files to equivalent CPP files and used the same flags on all files
+#cpp_compile_args=[]
+## cpp_compile_args=['-std=c++17']
+#c_compile_args=['-std=c99']
+#class custom_build_ext(build_ext):
+#    def build_extension(self, ext):
+#        # Store original flags
+#        original_extra_compile_args = list(ext.extra_compile_args)
+#        
+#        # Iterate over source files to check for specific flags
+#        for source in ext.sources:
+#            # Get the base filename for mapping
+#            filename = os.path.basename(source)
+#            # filetype = os.path.extension(source)
+#            root, extension = os.path.splitext(source)
+#            # print(f"@@@ filename:{filename}, extension:{extension}")
+#            
+#            # Apply specific flags if found in the mapping
+#            if extension == '.cpp':
+#                ext.extra_compile_args = c_compile_args
+#                # print(f"Applying flags {c_compile_args} to {filename}")
+#            else:
+#                # print(f"Applying flags {original_extra_compile_args} to {filename}")
+#                ext.extra_compile_args = original_extra_compile_args
+#            
+#            # Compile the file using the parent method
+#            # The 'sources' list is temporarily modified to contain only the current file
+#            # for the parent build_extension method to process it individually.
+#            original_sources = list(ext.sources)
+#            ext.sources = [source]
+#            build_ext.build_extension(self, ext)
+#            ext.sources = original_sources
+#            
+#        # Restore original flags and sources (though not strictly necessary here, good practice)
+#        ext.extra_compile_args = original_extra_compile_args
+
+setup(name='lele',
+      version='@LELE_VERSION_MAJOR@.@LELE_VERSION_MINOR@',
+      description='lele_ui',
+      ext_modules=[
+        Extension('lele',
+            sources=[ #all source files must be cpp, because the extra_compile_args get applied to all, and if applied to c files, it gives a compiler error
+                @LVGL_SOURCES@
+            ],
+            include_dirs=[@LVGL_INC_DIRS@],
+            library_dirs=[@LVGL_LINK_DIRS@],
+            libraries=[@LVGL_LINK_LIBS@],
+            define_macros=[@LVGL_MACROS@],
+            undef_macros=['LV_USE_EVDEV'],
+            extra_compile_args=['-O0', '-g', '-UNDEBUG', '-std=c++20'], # Additional compiler flags (optional)
+            extra_link_args=['-g'],
+            parallel=True,
+            language='c++' # Specify the language as C++
+        )
+      ]
+    #   ,cmdclass={'build_ext': custom_build_ext} 
+    )

@@ -1,5 +1,15 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON) #-fPIC
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(LELE_VERSION_MAJOR 1)
+set(LELE_VERSION_MINOR 0)
+
+add_compile_definitions(LELE_VERSION_MAJOR=${LELE_VERSION_MAJOR})
+add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
+
+set(LV_CONF_INCLUDE_SIMPLE 1)
+set(LV_USE_WAYLAND 1)
 
 function(buildPythonLib OUT_VAR_PYTHON_LIB_OUTPUT)
     message(STATUS "buildPython()")
@@ -59,7 +69,14 @@ function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
     # message(FATAL_ERROR "@@@ BUILT {LV_IMG_DSC_SRC} ${LV_IMG_DSC_SRC}")
 endfunction()
 
-function(buildLvglSim PYTHON_LIB)
+function(buildLvglSim 
+    PYTHON_LIB
+    OUT_VAR_SOURCES
+    OUT_VAR_PROPS
+    OUT_VAR_LINK_DIRS
+    OUT_VAR_LINK_LIBS
+    OUT_VAR_INC_DIRS    
+    )
     message(STATUS "buildLvglSim() PYTHON_LIB:${PYTHON_LIB}")
 
     set(LELE_WIDGETS
@@ -133,6 +150,11 @@ function(buildLvglSim PYTHON_LIB)
     message(STATUS "==================================")
     message(STATUS "@@@ {inc_dirs} ${inc_dirs}")
     message(STATUS "==================================")
+    set(${OUT_VAR_SOURCES} "${sources}" PARENT_SCOPE)
+    set(${OUT_VAR_PROPS} "${props}" PARENT_SCOPE)
+    set(${OUT_VAR_LINK_DIRS} "${link_dirs}" PARENT_SCOPE)
+    set(${OUT_VAR_LINK_LIBS} "${link_libs}" PARENT_SCOPE)
+    set(${OUT_VAR_INC_DIRS} ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR} ${inc_dirs} PARENT_SCOPE)
     # message(FATAL_ERROR "==================================")
 
     add_library(lele_ui SHARED ${sources})
@@ -163,6 +185,82 @@ function(buildLvglSim PYTHON_LIB)
 
 endfunction()
 
+function(buildCommaSeparatedString MY_LIST APPEND_PATH OUT_STR)
+    set(STR "")
+    foreach(item IN LISTS MY_LIST)
+        if(APPEND_PATH)
+            string(SUBSTRING "${item}" 0 1 first_char)
+            if(NOT "${first_char}" STREQUAL "/")
+                string(PREPEND item "${CMAKE_CURRENT_SOURCE_DIR}/")
+            endif()
+            string(LENGTH ${item} item_len)
+            if(item_len GREATER 2)
+                math(EXPR extension_pos "${item_len} - 2")
+                string(SUBSTRING "${item}" ${extension_pos} 2 last_chars)
+                if("${last_chars}" STREQUAL ".c")
+                    string(APPEND item "pp")
+                endif()
+            endif()
+        endif()
+        if(NOT item MATCHES "::")
+            set(STR "${STR}
+                    '${item}',")
+        endif()
+    endforeach()
+    set(${OUT_STR} "${STR}" PARENT_SCOPE)
+endfunction()
+
+function(generateSetupPyFile 
+    LVGL_SOURCES_LIST 
+    LVGL_PROPS_LIST 
+    LVGL_LINK_DIRS_LIST 
+    LVGL_LINK_LIBS_LIST 
+    LVGL_INC_DIRS_LIST
+    )
+    message(STATUS "generateSetupPyFile()")
+
+    set(LVGL_MACROS "
+                ('LV_CONF_INCLUDE_SIMPLE', '${LV_CONF_INCLUDE_SIMPLE}'),
+                ('LV_USE_WAYLAND', '${LV_USE_WAYLAND}'),
+                ('LELE_VERSION_MAJOR', '${LELE_VERSION_MAJOR}'),
+                ('LELE_VERSION_MINOR', '${LELE_VERSION_MINOR}'),
+        ")
+
+    buildCommaSeparatedString("${LVGL_SOURCES_LIST}" TRUE LVGL_SOURCES)
+    buildCommaSeparatedString("${LVGL_PROPS_LIST}" FALSE LVGL_PROPS)
+    buildCommaSeparatedString("${LVGL_LINK_DIRS_LIST}" TRUE LVGL_LINK_DIRS)
+    buildCommaSeparatedString("${LVGL_LINK_LIBS_LIST}" FALSE LVGL_LINK_LIBS)
+    buildCommaSeparatedString("${LVGL_INC_DIRS_LIST}" TRUE LVGL_INC_DIRS)
+
+    string(PREPEND LVGL_LINK_LIBS "
+                'lele_ui',")
+    string(PREPEND LVGL_LINK_DIRS "
+                '${CMAKE_CURRENT_SOURCE_DIR}',")
+
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py.in"
+        "${CMAKE_BINARY_DIR}/setup.py"
+        @ONLY
+    )
+endfunction()
+
+function(buildLeleCpython)
+    set(PYTHON_LIB_OUTPUT "lele.cpython-314-x86_64-linux-gnu.so")
+    add_custom_command(
+        TARGET lvglsim PRE_BUILD
+        COMMENT "Building ${PYTHON_LIB_OUTPUT}..."
+    )
+    cmake_host_system_information(RESULT ncores QUERY NUMBER_OF_LOGICAL_CORES)
+    add_custom_command(
+        TARGET lvglsim POST_BUILD #will run this command after lvglsim is built
+        COMMAND CXX=clang++ LD_LIBRARY_PATH=/usr/local/lib python3 ${CMAKE_BINARY_DIR}/setup.py build_ext --verbose --build-lib=. --build-temp=${CMAKE_SOURCE_DIR}/py-build -j ${ncores}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Finished building ${PYTHON_LIB_OUTPUT}"
+        VERBATIM
+        ALL
+    )
+endfunction()
+
 function(buildTests)
     add_subdirectory(googletest)
     include_directories(googletest/include googletest)
@@ -184,12 +282,23 @@ endif()
 
 buildPythonLib(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
-buildLvglSim(${PYTHON_LIB_OUTPUT})
+buildLvglSim(
+    ${PYTHON_LIB_OUTPUT}
+    LVGL_SOURCES
+    LVGL_PROPS
+    LVGL_LINK_DIRS
+    LVGL_LINK_LIBS
+    LVGL_INC_DIRS
+)
+generateSetupPyFile(
+    "${LVGL_SOURCES}" 
+    "${LVGL_PROPS}"
+    "${LVGL_LINK_DIRS}"
+    "${LVGL_LINK_LIBS}"
+    "${LVGL_INC_DIRS}"
+)
+buildLeleCpython() #this lets us run py file using python: LD_LIBRARY_PATH=/usr/local/lib python hello-world.py
 buildTests()
 runTests()
 install(TARGETS lele_ui LIBRARY DESTINATION /usr/local/lib)
 
-# libutils.so => not found
-# libdebug_logger.so => not found
-# libjson_utils.so => not found
-# libimage_converter.so
