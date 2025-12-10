@@ -63,15 +63,15 @@ function run() {
     # ./lvglsim ../../src/py/main.py #must be in x86-build/bin folder to run like this
     # popd
 
-    # pushd src/py
-    # LD_LIBRARY_PATH=/usr/local/lib gdb --args python main.py
+    # pushd src/examples/hello-world
+    # LD_LIBRARY_PATH=/usr/local/lib gdb --args python hello-world.py
     # popd
 }
 
 function main() {
     buildelf
     # buildpy
-    run
+    # run
 }
 
 main $@ |tee x86-build/build.log
