@@ -1,5 +1,7 @@
 #include <lelewidgets/leleobject.h>
 
+LOG_CATEGORY(LVSIM, "LVSIM");
+
 PyObject *LeleObject::createPyObject() {
     PyTypeObject *type = &PyLeleObject::_obj_type;
     PyType_Ready(type);
@@ -54,7 +56,35 @@ namespace {
     };
 }//namespace
 
-PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) const {//https://stackoverflow.com/a/69290003
+PyObject* LeleObject::getPyEnumValue(const std::string &enum_value) {
+    std::string code = 
+    "import lele\n"
+    "res=";
+    code += enum_value;
+    RAII $;
+    $.global_dict = PyDict_New();
+    if (!$.global_dict) { return Py_None; }
+    $.local_dict = PyDict_New();
+    if (!$.local_dict) { return Py_None; }
+    $.should_be_none = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
+
+    if (!$.should_be_none) { 
+        LOG(WARNING, LVSIM, "Failed in PyRun_String! '%s'\n", code.c_str());
+        return Py_None; 
+    }
+    PyObject *output = PyDict_GetItemString($.local_dict, "res");
+    if (!output) {
+        // PyDict_GetItemString does not set exceptions
+        LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
+        PyErr_SetString(PyExc_KeyError, "could not get 'res'");
+        return Py_None;
+    } else {
+        Py_INCREF(output);
+    }
+    return output;
+}
+
+PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
     std::string enum_str =
     "from enum import Enum\n"
     "class ";
@@ -74,14 +104,13 @@ PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     if (!$.should_be_none) { 
         return Py_None; 
     }
-    // extract Type from global_dict
     PyObject *output = PyDict_GetItemString($.global_dict, enum_name.c_str());
     if (!output) {
         // PyDict_GetItemString does not set exceptions
         PyErr_SetString(PyExc_KeyError, "could not get enum_name");
         return Py_None;
     } else {
-        Py_INCREF(output); // PyDict_GetItemString returns a borrow reference
+        Py_INCREF(output);
     }
     return output;
 }

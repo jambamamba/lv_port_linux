@@ -6,12 +6,7 @@ PyObject *LeleEvent::createPyObject() {
     PyType_Ready(type);
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
     if (self != nullptr) {
-        self->_object = _target_obj->createPyObject();
-        // self->_object_id = PyUnicode_FromString(target_obj_id.size() ? target_obj_id.c_str() : "");
-        // if (self->_object_id == nullptr) {
-        //     Py_DECREF(self);
-        //     return nullptr;
-        // }
+        self->_object = _target_obj ? _target_obj->createPyObject() : Py_None;
         self->_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
         if (self->_id == nullptr) {
             Py_DECREF(self);
@@ -27,12 +22,18 @@ PyObject *LeleEvent::createPyObject() {
             Py_DECREF(self);
             return nullptr;
         }
-        self->_type = _target_obj->createPyEnum("Type", {
+        self->_type = LeleObject::createPyEnum("Type", {
                 {"Clicked",LeleEvent::Type::Clicked},
                 {"ValueChanged",LeleEvent::Type::ValueChanged}
             }
         );
-        self->_code = _code;
+        switch(_code) {
+            case LeleEvent::Type::Clicked: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.Clicked"); break;
+            case LeleEvent::Type::ValueChanged: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.ValueChanged"); break;
+            default: self->_code = Py_None;
+        }
+        // self->_code = PyLong_FromLong(_code);
+        // self->_code = _code;
         self->_value = _ivalue;
     }
     return (PyObject *)self;
@@ -49,6 +50,7 @@ void PyLeleEvent::dealloc(PyLeleEvent* self) {
     Py_XDECREF(self->_type);
     Py_XDECREF(self->_action);
     Py_XDECREF(self->_args);
+    Py_XDECREF(self->_code);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 

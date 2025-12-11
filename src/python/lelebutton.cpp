@@ -15,7 +15,7 @@ bool LeleButtons::LeleButton::initPyObject(PyLeleButton *py_obj) {
     if(!py_obj) {
         return false;
     }
-    py_obj->_type = createPyEnum("Type", {
+    py_obj->_type = LeleObject::createPyEnum("Type", {
             {"Push",LeleButton::Type::Push},
             {"Checkbox",LeleButton::Type::Checkbox},
             {"Radio",LeleButton::Type::Radio},
@@ -76,9 +76,20 @@ PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
     LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
     if (lele_obj) {
-        return PyLong_FromLong(lele_obj->getType());//osm todo: should return const string
+        std::string enum_type = "";
+        switch(lele_obj->getType()) {
+            case LeleButtons::LeleButton::Type::Push: enum_type = "lele.Button.Push"; break;
+            case LeleButtons::LeleButton::Type::Checkbox: enum_type = "lele.Button.Checkbox"; break;
+            case LeleButtons::LeleButton::Type::Radio: enum_type = "lele.Button.Radio"; break;
+            case LeleButtons::LeleButton::Type::Switch: enum_type = "lele.Button.Switch"; break;
+            case LeleButtons::LeleButton::Type::Close: enum_type = "lele.Button.Close"; break;
+            case LeleButtons::LeleButton::Type::Slider: enum_type = "lele.Button.Slider"; break;
+            default: return Py_None;
+        }
+        // return PyLong_FromLong(lele_obj->getType());//osm todo: should return const string
+        return LeleObject::getPyEnumValue(enum_type);
     }
-    return PyLong_FromLong(0);
+    return Py_None;
 }
 
 PyObject *PyLeleButton::click(PyObject *self_, PyObject *arg) {

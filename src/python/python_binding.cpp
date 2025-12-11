@@ -5,6 +5,8 @@
 #include "python_wrapper.h"
 #include "graphics_backend.h"
 #include "lelewidgets/leleobject.h"
+#include "lelewidgets/leleevent.h"
+#include "lelewidgets/lelebutton.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -39,7 +41,6 @@ namespace {
             LOG(WARNING, LVSIM, "Failed in PyRun_String!\n");
             return ""; 
         }
-        // extract Type from global_dict
         PyObject *output = PyDict_GetItemString($.local_dict, "res");
         if (!output) {
             // PyDict_GetItemString does not set exceptions
@@ -187,18 +188,30 @@ namespace {
         }
         LOG(DEBUG, LVSIM, "Load config '%s'\n", str);
 
-        // std::string dir = getPyScriptDir();
-        // LOG(FATAL, LVSIM, "SCRIPT dir '%s'\n", dir.c_str());
-
         std::string input_file(str);
-        if(input_file.size() > 2 && str[0] == '.' && str[1] == '/') {
-            input_file = std::filesystem::current_path().string() + "/" + input_file.substr(2);
+        if(str[0] != '/') {
+            while(true) {
+                std::string path = std::filesystem::current_path().string() + "/" + str;
+                LOG(WARNING, LVSIM, "Try to load config: '%s'\n", path.c_str());
+                if(std::filesystem::exists(path)) {
+                    input_file = path;
+                    break;
+                }
+                std::string script_dir = getPyScriptDir();
+                if(std::filesystem::current_path().string() != script_dir) {
+                    path = script_dir + "/" + str;
+                    LOG(WARNING, LVSIM, "Try to load config: '%s'\n", path.c_str());
+                    if(std::filesystem::exists(path)) {
+                        input_file = path;
+                        break;
+                    }
+                }
+                LOG(WARNING, LVSIM, "Failed to load config, file not found: '%s'\n", str);
+                return PyBool_FromLong(false);
+            }
         }
 
-        if(!std::filesystem::exists(input_file)) {
-            LOG(WARNING, LVSIM, "Failed to load config, file not found: '%s'\n", input_file.c_str());
-            return PyBool_FromLong(false);
-        }
+        LOG(DEBUG, LVSIM, "Loading config: '%s'\n", input_file.c_str());
         _nodes = LeleWidgetFactory::fromConfig(input_file);
         if(_nodes.size() == 0) {
             LOG(WARNING, LVSIM, "Failed to load config: '%s'\n", input_file.c_str());
@@ -274,8 +287,15 @@ PyMODINIT_FUNC PyInit_lele(void) {
         return nullptr;
     }
 #ifdef MULTI_PHASE_INIT
-    return PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
+    PyObject *module = PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
 #else
-    return PyModule_Create(&_mymodule);
+    PyObject *module = PyModule_Create(&_mymodule);
 #endif
+    // PyModule_AddObject(module, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
+    // LeleObject obj;
+    LeleEvent event;
+    PyModule_AddObject(module, "Event", event.createPyObject());
+    LeleButtons::LeleButton obj;
+    PyModule_AddObject(module, "Button", obj.createPyObject());
+    return module;
 }

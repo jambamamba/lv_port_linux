@@ -8,7 +8,7 @@
 // struct lv_event_t;
 class LeleEvent {
 public:
-  LeleEvent(const std::string &json_str);
+  LeleEvent(const std::string &json_str = "");
   LeleEvent(lv_event_t *e, LeleObject *target_obj) : _lv_event(e), _target_obj(target_obj) {}
   LeleEvent(const LeleEvent& rhs, const lv_event_t *e = nullptr, int ivalue = 0);
   const std::string &getAction() const { return _action; }
@@ -53,7 +53,8 @@ struct PyLeleEvent {
     PyObject *_type = nullptr;
     PyObject *_action = nullptr;
     PyObject *_args = nullptr;
-    int _code = 0;
+    PyObject *_code = nullptr;
+    // int _code = 0;
     int _value = 0;
 };
 
@@ -63,7 +64,7 @@ struct PyLeleEvent {
     {"Type", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _type), 0, "Type"},\
     {"action", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _action), 0, "action"},\
     {"args", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _args), 0, "args"},\
-    {"code", Py_T_INT, offsetof(PyLeleEvent, _code), 0, "code"},\
+    {"code", Py_T_OBJECT_EX, offsetof(PyLeleEvent, _code), 0, "code"},\
     {"value", Py_T_INT, offsetof(PyLeleEvent, _value), 0, "value"},
 
 #define PY_LELEEVENT_METHODS() \

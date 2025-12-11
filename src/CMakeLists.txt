@@ -249,7 +249,7 @@ function(buildLeleCpython)
     cmake_host_system_information(RESULT ncores QUERY NUMBER_OF_LOGICAL_CORES)
     add_custom_command(
         TARGET lele_ui POST_BUILD #will run this command after the specified target is built
-        COMMAND CXX=clang++ LD_LIBRARY_PATH=/usr/local/lib python3 ${CMAKE_BINARY_DIR}/setup.py build_ext --verbose --build-lib=. --build-temp=${CMAKE_SOURCE_DIR}/py-build -j ${ncores}
+        COMMAND CXX=clang++ LD_LIBRARY_PATH=/usr/local/lib python3 ${CMAKE_BINARY_DIR}/setup.py build_ext --verbose --build-lib=/usr/local/lib/ --build-temp=${CMAKE_SOURCE_DIR}/py-build -j ${ncores}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Finished building ${PYTHON_LIB_OUTPUT}"
         DEPENDS ${CMAKE_BINARY_DIR}/src/liblele_ui.so
@@ -294,7 +294,7 @@ generateSetupPyFile(
     "${LVGL_LINK_LIBS}"
     "${LVGL_INC_DIRS}"
 )
-buildLeleCpython() #this lets us run py file using python: LD_LIBRARY_PATH=/usr/local/lib python hello-world.py
+buildLeleCpython() #commented out becasue it is slow. This lets us run py file using python
 buildTests()
 runTests()
 install(TARGETS lele_ui LIBRARY DESTINATION /usr/local/lib)

@@ -23,7 +23,7 @@ class LeleButtons : public LeleObject {
       Close,
       Slider
     };
-    LeleButton(const std::string &json_str);
+    LeleButton(const std::string &json_str = "");
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual PyObject *createPyObject() override;
     bool initPyObject(PyLeleButton *py_obj);

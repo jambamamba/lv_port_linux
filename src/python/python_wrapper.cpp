@@ -121,9 +121,15 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const {
      extern int Py_NoSiteFlag;
      Py_NoSiteFlag = 1;
 #endif
+    const char* PYTHONHOME = std::getenv("PYTHONHOME"); 
+    LOG(DEBUG, LVSIM, "PYTHONHOME: %s\n", PYTHONHOME);
+    std::string _py_home_dir(
+        PYTHONHOME ? 
+            PYTHONHOME : 
+            std::filesystem::current_path().string() + "/Python");
+    LOG(DEBUG, LVSIM, "Using _py_home_dir: %s\n", _py_home_dir.c_str());
+
     std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-    std::string _py_home_dir(std::filesystem::current_path().string() + "/Python");
-    std::cout << "Using _py_home_dir: " << _py_home_dir << "\n";
     std::wstring home_ws(converter.from_bytes(_py_home_dir.c_str()));
     PyWideStringList_Append(&config.module_search_paths, home_ws.c_str());
     std::string _py_lib_dir(_py_home_dir + "/Lib");

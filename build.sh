@@ -38,32 +38,32 @@ function buildelf() {
 }
 
 function run() {
-    local input_file="$(pwd)/src/examples/hello-world/hello-world.py"
-    # local input_file="$(pwd)/src/examples/hello-world/hello-world.json"
-    local method="py"
+    local example="imageview" # hello-world | imageview | messagebox | stackview | tabview | testview
+    local method="elfpy" # elfpy | elf | py
 
     parseArgs $@
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     echo "set confirm off" |sudo tee ~/.gdbinit
+    local gdb=''
+    if [ "${debug}" == "true" ]; then 
+        gdb='gdb -ex "run" --args'
+    fi
 
+    pushd ./src/examples/${example}/
     case ${method} in
         elf)
-            pushd x86-build/bin
-            # gdb -ex "run" --args ./lvglsim ${input_file}
-            ./lvglsim ${input_file}
-            popd
+            ${gdb} ../../../x86-build/bin/lvglsim "${example}.json"
             ;;
-        py)
-            pushd ./src/examples/hello-world/
-            LD_LIBRARY_PATH=/usr/local/lib PYTHONPATH=../../../x86-build/ python hello-world.py
-            popd
+        elfpy)
+            PYTHONHOME=../../../x86-build/bin/Python/ ${gdb} ../../../x86-build/bin/lvglsim "${example}.py"
+            ;;
+        py) #needs buildLeleCpython
+            LD_LIBRARY_PATH=/usr/local/lib PYTHONPATH=/usr/local/lib ${gdb} python3 "${example}.py"
             ;;
         *);;
     esac
+    popd
 }
 
-function main() {
-    buildelf
-    run
-}
-main $@ |tee x86-build/build.log
+buildelf $@ |tee x86-build/build.log
+run

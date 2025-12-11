@@ -58,7 +58,6 @@ class LeleObject {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   bool initPyObject(PyLeleObject *py_obj);
-  PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) const;
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
@@ -68,6 +67,8 @@ class LeleObject {
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
   static void pyCallback(PyObject *py_callback, LeleEvent &&e);
+  static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
+  static PyObject* getPyEnumValue(const std::string &enum_value = "lele.Event.Clicked");
   protected:
   void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(

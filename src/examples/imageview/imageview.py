@@ -15,7 +15,8 @@ def callback(str):
    print(f"@@@py str:'{str}'")
 
 def sliderMoved(event):
-   if event.code == event.Type.ValueChanged.value:
+   # print(f"@@@py res:{lele.Event.Type} lele.Event.Type.Clicked:{lele.Event.Type.Clicked.value}")
+   if event.code == lele.Event.Type.ValueChanged:
         print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
    pass
 
@@ -28,15 +29,26 @@ def pushButtonPressed(event):
    # print(user_attributes)
    # for event_type in event.Type:
    #    print(f"@@@py enum event.Type: Name: {event_type.name}, Value: {event_type.value}")
-   if event.code == event.Type.Clicked.value:
-      print(f"@@@py event: {event}")
-      user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
-      print(user_attributes)
-      print(f"@@@py button pressed, event.object: {event.object}")
-      user_attributes = [attr for attr in dir(event.object) if not attr.startswith('__')]
-      print(user_attributes)
-      print(f"@@@py event.object.getText(): {event.object.getText()}")
-      print(f"@@@py event.object: {event.object.id}")
+   # for name, value in globals().items():
+   #    if not name.startswith('__'):
+   #       print(f"{name}: {value}")
+   # print("...")
+   # user_attributes = [attr for attr in dir(lele.Button) if not attr.startswith('__')]
+   # print(f"@@@py:33 lele.Button attributes: {user_attributes}")
+   # print(f"@@@py:34 res:{lele.Button.Type} lele.Button.Type.Push:{lele.Button.Type.Push.value}")
+   # print(f"@@@py:35 res:{lele.Event.Type} lele.Event.Type.Clicked:{lele.Event.Type.Clicked}")
+   if event.code == lele.Event.Type.Clicked:
+      # print(f"@@@py: event: {event}")
+      # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
+      # print(user_attributes)
+      # print(f"@@@py: event.Type.Clicked: {event.Type.Clicked}")
+      # user_attributes = [attr for attr in dir(event.Type.Clicked) if not attr.startswith('__')]
+      # print(user_attributes)
+      # print(f"@@@py button pressed, event.object: {event.object}")
+      # user_attributes = [attr for attr in dir(event.object) if not attr.startswith('__')]
+      # print(user_attributes)
+      # print(f"@@@py event.object.getText(): {event.object.getText()}")
+      # print(f"@@@py event.object: {event.object.id}")
       obj = lele.getObjectById("/views:0/view/label")
       print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
       obj.setText("Cocoa bean!")
@@ -50,7 +62,10 @@ res = lele.foo(
         lambda percent: callback(percent))
 print(f"@@@py foo result:{res}")
 
-res = lele.loadConfig("/repos/lv_port_linux/src/configs/imageview.json")
+# res = lele.loadConfig("/repos/lv_port_linux/src/examples/imageview/imageview.json")
+res = lele.loadConfig("imageview.json")
+if not res:
+   print(f"@@@py Failed to load config. loadConfig result:{res}")
 print(f"@@@py loadConfig result:{res}")
 
 lele.addEventHandler("slider0", lambda event: sliderMoved(event))
