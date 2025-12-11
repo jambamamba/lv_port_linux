@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
         if(!PythonWrapper::load(input_file)) {
-            LOG(FATAL, LVSIM, "Failed to load Python module\n");
+            LOG(FATAL, LVSIM, "Failed to run Python module: '%s'\n", input_file.c_str());
         }
     }
     else {

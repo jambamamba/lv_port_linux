@@ -6,7 +6,7 @@
 struct PyLeleMessageBox;
 class LeleEvent;
 class LeleMessageBox : public LeleLabel  {
-  public:
+public:
   LeleMessageBox(const std::string &json_str);
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
@@ -14,11 +14,15 @@ class LeleMessageBox : public LeleLabel  {
   virtual bool eventCallback(LeleEvent &&e) override;
   void setTitle(const std::string &text);
   std::string getTitle() const;
-  protected:
+  LeleButtons::LeleButton *getButtonClicked() const;
+protected:
+  void addEventCallback(LeleButtons::LeleButton *lele_btn, lv_obj_t *lv_btn) const;
+
   mutable std::string _title;
   lv_obj_t *_lv_title = nullptr;
   std::unique_ptr<LeleButtons::LeleButton> _btn;
   std::vector<LeleEvent*> _events;
+  LeleButtons::LeleButton *_btn_clicked = nullptr;
 };
 
 
@@ -32,6 +36,8 @@ struct PyLeleMessageBox {
     // Type-specific fields go here
     static PyObject *getTitle(PyObject *, PyObject *);
     static PyObject *setTitle(PyObject *, PyObject *);
+    static PyObject *addEventHandler(PyObject *, PyObject *);
+    static PyObject *getButtonClicked(PyObject *, PyObject *);
 };
 
 #define PY_LELEMESSAGEBOX_MEMBERS() \
@@ -41,4 +47,6 @@ struct PyLeleMessageBox {
   PY_LELELABEL_METHODS() \
   {"getTitle", (PyCFunction)PyLeleMessageBox::getTitle, METH_NOARGS, "Get message box title"},\
   {"setTitle", (PyCFunction)PyLeleMessageBox::setTitle, METH_VARARGS, "Set message box title"},\
+  {"addEventHandler", (PyCFunction)PyLeleMessageBox::addEventHandler, METH_VARARGS, "Sets the event handler"},\
+  {"getButtonClicked", (PyCFunction)PyLeleMessageBox::getButtonClicked, METH_NOARGS, "Get the clicked button"},\
 

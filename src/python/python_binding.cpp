@@ -82,20 +82,20 @@ namespace {
     }
     static PyObject* _mymodule_addEventHandler(PyObject *self, PyObject *args) {
         char *id = nullptr;
-        PyObject *callback = nullptr;
+        PyObject *py_callback = nullptr;
         if(!PyArg_ParseTuple(args, "sO", //id, obj
             &id,
-            &callback)) {
-            return PyLong_FromLong(0);
+            &py_callback)) {
+            return PyBool_FromLong(false);
         }
         // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, callback](LeleObject &lele_object) {
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, py_callback](LeleObject &lele_object) {
             if(lele_object.id() == id) {
-                Py_XINCREF(callback);
-                lele_object.addEventHandler(callback);
+                Py_XINCREF(py_callback);
+                lele_object.addEventHandler(py_callback);
             }
         });
-        return PyLong_FromLong(1);
+        return PyBool_FromLong(true);
     }
     static PyObject* _mymodule_getObjectById(PyObject *self, PyObject *args) {
         char *id = nullptr;
@@ -135,13 +135,13 @@ namespace {
         char *str = nullptr;
         PyObject *list = nullptr;
         PyObject *dic = nullptr;
-        PyObject *callback = nullptr;
+        PyObject *py_callback = nullptr;
         if(!PyArg_ParseTuple(args, "isOOO", //int,str,obj,obj,obj
             &num,
             &str,
             &list,
             &dic,
-            &callback)) {
+            &py_callback)) {
             return PyLong_FromLong(0);
         }
         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "num: " << num << "\n";
@@ -169,9 +169,9 @@ namespace {
         // Py_DECREF(dic);     
 
         PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
-        PyObject *res = PyObject_CallObject(callback, arglist);
+        PyObject *res = PyObject_CallObject(py_callback, arglist);
         if(res) { Py_DECREF(res); }
-        // Py_DECREF(callback);
+        // Py_DECREF(py_callback);
 
         return PyLong_FromLong(1);
     }

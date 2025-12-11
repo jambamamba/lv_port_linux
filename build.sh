@@ -38,15 +38,17 @@ function buildelf() {
 }
 
 function run() {
-    local example="imageview" # hello-world | imageview | messagebox | stackview | tabview | testview
+    local example="messagebox" # hello-world | imageview | messagebox | stackview | tabview | testview
     local method="elfpy" # elfpy | elf | py
+    local debug="true"
 
     parseArgs $@
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     echo "set confirm off" |sudo tee ~/.gdbinit
     local gdb=''
     if [ "${debug}" == "true" ]; then 
-        gdb='gdb -ex "run" --args'
+        gdb='gdb -ex run --args'
+        # gdb='gdb --args'
     fi
 
     pushd ./src/examples/${example}/

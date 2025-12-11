@@ -294,7 +294,7 @@ generateSetupPyFile(
     "${LVGL_LINK_LIBS}"
     "${LVGL_INC_DIRS}"
 )
-buildLeleCpython() #commented out becasue it is slow. This lets us run py file using python
+# buildLeleCpython() #commented out becasue it is slow. This lets us run py file using python
 buildTests()
 runTests()
 install(TARGETS lele_ui LIBRARY DESTINATION /usr/local/lib)

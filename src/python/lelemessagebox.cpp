@@ -1,5 +1,7 @@
 #include <lelewidgets/lelemessagebox.h>
 
+LOG_CATEGORY(LVSIM, "LVSIM");
+
 PyObject *LeleMessageBox::createPyObject() {
     PyTypeObject *type = &PyLeleMessageBox::_obj_type;
     PyType_Ready(type);
@@ -28,6 +30,22 @@ void PyLeleMessageBox::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+PyObject *PyLeleMessageBox::getButtonClicked(PyObject *self_, PyObject *arg) {
+    LOG(DEBUG, LVSIM, "PyLeleMessageBox::getButtonClicked\n");
+    PyLeleMessageBox *self = reinterpret_cast<PyLeleMessageBox *>(self_);
+    LeleMessageBox *lele_obj = dynamic_cast<LeleMessageBox *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        LeleButtons::LeleButton *lele_btn = lele_obj->getButtonClicked();
+        if(lele_btn) {
+            PyObject *py_btn = lele_btn->createPyObject();
+            // Py_XINCREF(py_btn);
+            return py_btn;
+            // return lele_btn->createPyObject();
+        }
+    }
+    return Py_None;
+}
+
 PyObject *PyLeleMessageBox::getTitle(PyObject *self_, PyObject *arg) {
     PyLeleMessageBox *self = reinterpret_cast<PyLeleMessageBox *>(self_);
     LeleMessageBox *lele_obj = dynamic_cast<LeleMessageBox *>(self->ob_base.ob_base._lele_obj);
@@ -49,6 +67,23 @@ PyObject *PyLeleMessageBox::setTitle(PyObject *self_, PyObject *args) {
             return Py_None;
         }
         lele_obj->setTitle(value);
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleMessageBox::addEventHandler(PyObject *self_, PyObject *args) {
+    PyLeleMessageBox *self = reinterpret_cast<PyLeleMessageBox *>(self_);
+    LeleMessageBox *lele_obj = dynamic_cast<LeleMessageBox *>(self->ob_base.ob_base._lele_obj);
+    if(lele_obj && args) {
+        PyObject *py_callback = nullptr;
+        if(!PyArg_ParseTuple(args, "O", //obj
+            &py_callback)) {
+            return PyBool_FromLong(false);
+        }
+        Py_XINCREF(py_callback);
+        LOG(DEBUG, LVSIM, "PyLeleMessageBox::addEventHandler:'%p'\n", py_callback);
+        lele_obj->addEventHandler(py_callback);
+        return PyBool_FromLong(true);
     }
     return Py_None;
 }

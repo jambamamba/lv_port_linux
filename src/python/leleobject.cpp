@@ -33,12 +33,15 @@ bool LeleObject::initPyObject(PyLeleObject *py_obj) {
 
 void LeleObject::pyCallback(PyObject *py_callback, LeleEvent &&e) {
 
-    // LOG(DEBUG, LVSIM, "PythonWrapper::pyCallback:'%p'\n", py_callback);
+    LOG(DEBUG, LVSIM, "LeleObject::pyCallback:'%p'\n", py_callback);
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
-    // code, e.ivalue
 
     PyObject *py_event = Py_BuildValue("(O)", e.createPyObject());
+    if(!py_event) {
+        LOG(WARNING, LVSIM, "LeleObject::pyCallback: Py_BuildValue FAILED to create event PyObject\n");
+        return;
+    }
     PyObject *res = PyObject_CallObject(py_callback, py_event);
     if(res) { Py_DECREF(res); }
 }

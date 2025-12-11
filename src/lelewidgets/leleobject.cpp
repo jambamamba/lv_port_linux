@@ -411,6 +411,7 @@ lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   }
   setParent(lele_parent);
   setStyle(_lv_obj);
+  _lv_obj->user_data = this;
   return _lv_obj;
 }
 
@@ -430,6 +431,7 @@ std::vector<LeleObject *> LeleObject::getLeleObj(const std::string &obj_name) co
 void LeleObject::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleObject *base = static_cast<LeleObject*>(e->user_data);
+    LOG(DEBUG, LVSIM, "LeleObject::EventCallback LeleObject: %s, \n", base->_class_name.c_str());
     if(base) {
       base->eventCallback(LeleEvent(e, base));
     }

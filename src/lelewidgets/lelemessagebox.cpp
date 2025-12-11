@@ -45,27 +45,27 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
         continue;
       }
       else if(lele_btn->getType() == LeleButtons::LeleButton::Type::Close) {
-        lv_obj_t *lv_btn = lv_msgbox_add_header_button(_lv_obj, LV_SYMBOL_CLOSE);
-        lele_btn->setStyle(lv_btn);
-        lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
-          lv_obj_t *btn = static_cast<lv_obj_t *>(lv_event_get_current_target(e));
-          lv_obj_t *mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
-          //osm todo: call into python
-          lv_msgbox_close(mbox);
-        }, LV_EVENT_CLICKED, lele_btn);
+        addEventCallback(lele_btn, lv_msgbox_add_header_button(_lv_obj, LV_SYMBOL_CLOSE));
       }
       else if(lele_btn->getType() == LeleButtons::LeleButton::Type::Push) {
-        lv_obj_t *lv_btn = lv_msgbox_add_footer_button(_lv_obj, lele_btn->getText().c_str());
-        lele_btn->setStyle(lv_btn);
-        lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
-          lv_obj_t *btn = static_cast<lv_obj_t *>(lv_event_get_current_target(e));
-          lv_obj_t *mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
-          //osm todo: call into python
-        }, LV_EVENT_CLICKED, lele_btn);
+        addEventCallback(lele_btn, lv_msgbox_add_footer_button(_lv_obj, lele_btn->getText().c_str()));
       }
     }
   }
   return _lv_obj;
+}
+
+void LeleMessageBox::addEventCallback(LeleButtons::LeleButton *lele_btn, lv_obj_t *lv_btn) const {
+  lele_btn->setLvObj(lv_btn);
+  lele_btn->setStyle(lv_btn);
+  lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
+    lv_obj_t *btn = static_cast<lv_obj_t *>(lv_event_get_current_target(e));
+    lv_obj_t *mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
+    LeleMessageBox *self = static_cast<LeleMessageBox*>(mbox->user_data);
+    self->_btn_clicked = static_cast<LeleButtons::LeleButton *>(btn->user_data);
+    EventCallback(e);
+    lv_msgbox_close(mbox);
+  }, LV_EVENT_CLICKED, const_cast<LeleMessageBox *>(this));
 }
 
 void LeleMessageBox::setTitle(const std::string &text) {
@@ -78,12 +78,18 @@ std::string LeleMessageBox::getTitle() const {
   return _title;
 }
 
+LeleButtons::LeleButton *LeleMessageBox::getButtonClicked() const { 
+  return _btn_clicked;
+}
+
 bool LeleMessageBox::eventCallback(LeleEvent &&e) {
+    LOG(DEBUG, LVSIM, "LeleMessageBox::eventCallback, class:%s, btn_clicked.id:%s\n", 
+      _class_name.c_str(), _btn_clicked ? _btn_clicked->id().c_str() : "");
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
 
     if(code == LV_EVENT_CLICKED) {
-        // LOG(DEBUG, LVSIM, "%s: clicked. button type:%i\n", _class_name.c_str(), _type);
+        LOG(DEBUG, LVSIM, "%s: clicked\n", _class_name.c_str());
         for(LeleEvent *event: _events) {
           if(event->getType() == "clicked"){
             // e->copy(event.id(), event->type(), event->action(), event->args);

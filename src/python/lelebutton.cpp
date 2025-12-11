@@ -86,7 +86,6 @@ PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
             case LeleButtons::LeleButton::Type::Slider: enum_type = "lele.Button.Slider"; break;
             default: return Py_None;
         }
-        // return PyLong_FromLong(lele_obj->getType());//osm todo: should return const string
         return LeleObject::getPyEnumValue(enum_type);
     }
     return Py_None;

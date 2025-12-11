@@ -43,6 +43,7 @@ class LeleObject {
     return _lv_obj;
   }
   void setLvObj(lv_obj_t *obj) {
+    obj->user_data = this;
     _lv_obj = obj;
   }
   void setParent(LeleObject *parent) {
