@@ -64,7 +64,6 @@ void LeleMessageBox::addEventCallback(LeleButtons::LeleButton *lele_btn, lv_obj_
     LeleMessageBox *self = static_cast<LeleMessageBox*>(mbox->user_data);
     self->_btn_clicked = static_cast<LeleButtons::LeleButton *>(btn->user_data);
     EventCallback(e);
-    lv_msgbox_close(mbox);
   }, LV_EVENT_CLICKED, const_cast<LeleMessageBox *>(this));
 }
 
@@ -92,12 +91,18 @@ bool LeleMessageBox::eventCallback(LeleEvent &&e) {
         LOG(DEBUG, LVSIM, "%s: clicked\n", _class_name.c_str());
         for(LeleEvent *event: _events) {
           if(event->getType() == "clicked"){
-            // e->copy(event.id(), event->type(), event->action(), event->args);
-            // LOG(DEBUG, LVSIM, "LeleButtons::LeleButton::eventCallback\n");
             event->setTargetObj(e.getTargetObj());
-            return LeleObject::eventCallback(LeleEvent(*event, lv_event));
+            if(!LeleObject::eventCallback(LeleEvent(*event, lv_event))) {
+              return false;
+            }
           }
         }
     }
-    return LeleObject::eventCallback(std::move(e));
+    if(!LeleObject::eventCallback(std::move(e))) {
+      return false;
+    }
+    if(e.getTargetObj()) {
+      lv_msgbox_close(e.getTargetObj()->getLvObj());
+    }
+    return true;
 }

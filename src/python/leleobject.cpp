@@ -31,19 +31,25 @@ bool LeleObject::initPyObject(PyLeleObject *py_obj) {
     return true;
 }
 
-void LeleObject::pyCallback(PyObject *py_callback, LeleEvent &&e) {
+bool LeleObject::pyCallback(PyObject *py_callback, LeleEvent &&e) {
 
     LOG(DEBUG, LVSIM, "LeleObject::pyCallback:'%p'\n", py_callback);
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
+    bool ret = false;
 
     PyObject *py_event = Py_BuildValue("(O)", e.createPyObject());
     if(!py_event) {
         LOG(WARNING, LVSIM, "LeleObject::pyCallback: Py_BuildValue FAILED to create event PyObject\n");
-        return;
+        return ret;
     }
     PyObject *res = PyObject_CallObject(py_callback, py_event);
-    if(res) { Py_DECREF(res); }
+    if(res) { 
+        ret = PyObject_IsTrue(res) == 1;
+        LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned '%i'\n", ret);
+        Py_DECREF(res); 
+    }
+    return ret;
 }
 
 namespace {

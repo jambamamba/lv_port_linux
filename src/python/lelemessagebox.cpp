@@ -37,10 +37,7 @@ PyObject *PyLeleMessageBox::getButtonClicked(PyObject *self_, PyObject *arg) {
     if (lele_obj) {
         LeleButtons::LeleButton *lele_btn = lele_obj->getButtonClicked();
         if(lele_btn) {
-            PyObject *py_btn = lele_btn->createPyObject();
-            // Py_XINCREF(py_btn);
-            return py_btn;
-            // return lele_btn->createPyObject();
+            return lele_btn->createPyObject();
         }
     }
     return Py_None;
