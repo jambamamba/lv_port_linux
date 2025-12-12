@@ -228,9 +228,13 @@ void iterateNodes(
     }
 }
 
-std::vector<std::pair<std::string, Node>> fromConfig(const std::string &config_json) {
-    static LeleObject _root_widget;
-    _root_widget.setLvObj(lv_screen_active());
+std::vector<std::pair<std::string, Node>> fromConfig(
+    LeleObject *parent,
+    const std::string &config_json) {
+
+    if(!parent->getLvObj()) {
+        parent->setLvObj(lv_screen_active());
+    }
     if(!std::filesystem::exists(config_json)) {
         LOG(FATAL, LVSIM, "File does not exist: '%s'\n", config_json.c_str());
         return std::vector<std::pair<std::string, LeleWidgetFactory::Node>>();
@@ -240,15 +244,15 @@ std::vector<std::pair<std::string, Node>> fromConfig(const std::string &config_j
         LOG(FATAL, LVSIM, "Failed to load file: '%s'\n", config_json.c_str());
         return std::vector<std::pair<std::string, LeleWidgetFactory::Node>>();
     }
-    auto tokens = LeleWidgetFactory::fromJson(cJSON_Print(root));
-    for (const auto &[key, token]: tokens) {
-        LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
-        if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
-            auto &value = std::get<std::unique_ptr<LeleObject>>(token);
-            value->createLvObj(&_root_widget);
+    auto nodes = LeleWidgetFactory::fromJson(cJSON_Print(root));
+    for (const auto &[key, node]: nodes) {
+        LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
+        if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
+            auto &value = std::get<std::unique_ptr<LeleObject>>(node);
+            value->createLvObj(parent);
         }
     }
-    return tokens;
+    return nodes;
 }
 
 bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {

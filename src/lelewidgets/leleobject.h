@@ -59,7 +59,6 @@ public:
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   bool initPyObject(PyLeleObject *py_obj);
-  bool loadConfig(const std::string &config_file);
   virtual bool fromJson(const std::string &json_str);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
@@ -98,9 +97,10 @@ struct PyLeleObject {
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
     LeleObject *_lele_obj = nullptr;
+    std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _child_nodes;
     PyObject *_id = nullptr;
     PyObject *_class_name = nullptr;
-    static PyObject *loadConfig(PyObject *, PyObject *);
+    static PyObject *addChild(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
 };
@@ -109,7 +109,7 @@ struct PyLeleObject {
   {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
 
 #define PY_LELEOBJECT_METHODS() \
-  {"loadConfig", (PyCFunction)PyLeleObject::loadConfig, METH_NOARGS, "Loads a configuration file with JSON describing how to construct the object"},\
+  {"addChild", (PyCFunction)PyLeleObject::addChild, METH_NOARGS, "Adds one more more children from a configuration file with JSON description of the objects"},\
   {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
 

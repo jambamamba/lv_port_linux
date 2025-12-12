@@ -146,16 +146,23 @@ void PyLeleObject::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyObject *PyLeleObject::loadConfig(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
-    if (lele_obj) {
-        const char* config = PyUnicode_AsUTF8(arg);
-        if(lele_obj->loadConfig(config)){
-            return Py_True;
-        }
+    const char* config = PyUnicode_AsUTF8(arg);
+    if(!config) {
+        LOG(WARNING, LVSIM, "Could not get config file\n");
+        return Py_False;
     }
-    return Py_False;
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj) {
+        LOG(FATAL, LVSIM, "There is no parent object.\n");
+        return Py_False;
+    }
+    auto nodes = LeleWidgetFactory::fromConfig(lele_obj, config);
+    self->_child_nodes.insert(
+        self->_child_nodes.end(), 
+        std::make_move_iterator(nodes.begin()), std::make_move_iterator(nodes.end()));
+    return Py_True;
 }
 
 PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {

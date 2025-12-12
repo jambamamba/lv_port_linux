@@ -53,7 +53,8 @@ int main(int argc, char **argv) {
     if(std::filesystem::path(input_file).extension() == ".json") {
         GraphicsBackend backend;
         backend.load();
-        auto tokens = LeleWidgetFactory::fromConfig(input_file);
+        static LeleObject _root_widget;
+        auto tokens = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
         while(backend.handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {

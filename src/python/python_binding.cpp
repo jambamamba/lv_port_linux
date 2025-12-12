@@ -13,7 +13,8 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
     static GraphicsBackend _graphics_backend;
-    static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
+    static LeleObject _root_widget;
+    static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _root_nodes;
 
     struct RAII {
         PyObject *global_dict=nullptr;
@@ -90,7 +91,7 @@ namespace {
             return PyBool_FromLong(false);
         }
         // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id, py_callback](LeleObject &lele_object) {
+        LeleWidgetFactory::iterateNodes(_root_nodes, 0, [id, py_callback](LeleObject &lele_object) {
             if(lele_object.id() == id) {
                 Py_XINCREF(py_callback);
                 lele_object.addEventHandler(py_callback);
@@ -105,7 +106,7 @@ namespace {
             return PyLong_FromLong(0);
         }
         std::vector<PyObject*> py_objects;
-        LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
+        LeleWidgetFactory::iterateNodes(_root_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
             if(lele_object.id() == id) {
                 PyObject *py_obj = lele_object.createPyObject();
                 if(!py_obj){
@@ -213,8 +214,8 @@ namespace {
         }
 
         LOG(DEBUG, LVSIM, "Loading config: '%s'\n", input_file.c_str());
-        _nodes = LeleWidgetFactory::fromConfig(input_file);
-        if(_nodes.size() == 0) {
+        _root_nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
+        if(_root_nodes.size() == 0) {
             LOG(WARNING, LVSIM, "Failed to load config: '%s'\n", input_file.c_str());
             return PyBool_FromLong(false);
         }
