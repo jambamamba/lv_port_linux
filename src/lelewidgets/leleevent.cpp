@@ -7,6 +7,9 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleEvent::LeleEvent(const std::string &json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
+  fromJson(json_str);
+}
+bool LeleEvent::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -24,6 +27,7 @@ LeleEvent::LeleEvent(const std::string &json_str) {
       }
     }
   }
+  return true;
 }
 
 LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalue) 

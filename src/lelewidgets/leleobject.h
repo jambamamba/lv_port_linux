@@ -26,7 +26,7 @@ struct _object;
 struct PyLeleObject;
 typedef struct _object PyObject;
 class LeleObject {
-  public:
+public:
   LeleObject(const std::string &json_str = "");
   virtual ~LeleObject();
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
@@ -59,6 +59,8 @@ class LeleObject {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   bool initPyObject(PyLeleObject *py_obj);
+  bool loadConfig(const std::string &config_file);
+  virtual bool fromJson(const std::string &json_str);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
@@ -70,7 +72,7 @@ class LeleObject {
   static bool pyCallback(PyObject *py_callback, LeleEvent &&e);
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
   static PyObject* getPyEnumValue(const std::string &enum_value = "lele.Event.Clicked");
-  protected:
+protected:
   void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
     const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const;
@@ -98,6 +100,7 @@ struct PyLeleObject {
     LeleObject *_lele_obj = nullptr;
     PyObject *_id = nullptr;
     PyObject *_class_name = nullptr;
+    static PyObject *loadConfig(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
 };
@@ -106,6 +109,7 @@ struct PyLeleObject {
   {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
 
 #define PY_LELEOBJECT_METHODS() \
+  {"loadConfig", (PyCFunction)PyLeleObject::loadConfig, METH_NOARGS, "Loads a configuration file with JSON describing how to construct the object"},\
   {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
 

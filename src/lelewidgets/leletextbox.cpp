@@ -6,7 +6,10 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleTextbox::LeleTextbox(const std::string &json_str)
   : LeleObject(json_str) {
 
-    _class_name = __func__ ;//
+  _class_name = __func__ ;//
+  fromJson(json_str);
+}
+bool LeleTextbox::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -22,8 +25,8 @@ LeleTextbox::LeleTextbox(const std::string &json_str)
       }
     }
   }
+  return true;
 }
-
 lv_obj_t *LeleTextbox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   _lv_obj = LeleObject::createLvObj(lele_parent,

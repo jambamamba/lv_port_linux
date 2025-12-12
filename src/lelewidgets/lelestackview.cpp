@@ -13,7 +13,12 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleStackView::LeleStackView(const std::string &json_str)
   : LeleObject(json_str) {
-    _class_name = __func__ ;//
+  _class_name = __func__ ;//
+  fromJson(json_str);
+  // std::cout << "StackView: styles: " << _lele_styles << "\n";
+}
+
+bool LeleStackView::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: _nodes) {
     LOG(DEBUG, LVSIM, "Process token with key: %s\n", key.c_str());
     if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
@@ -49,7 +54,7 @@ LeleStackView::LeleStackView(const std::string &json_str)
       }
     }
   }
-  std::cout << "StackView: styles: " << _lele_styles << "\n";
+  return true;
 }
 
 static void event_cb1(lv_event_t * e) {

@@ -12,12 +12,13 @@ class LeleLabel;
 class LeleViews;
 class LeleView;
 class LeleStackView : public LeleObject {
-  public:
+public:
   LeleStackView(const std::string &json_str);
+  virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
 
-  protected:
+protected:
   LeleViewHeader *getViewHeader(const LeleView *view) const;
   LeleViewHeader *getBreadcrumbBar() const;
   std::vector<LeleObject*> getBreadcrumbLabels() const;

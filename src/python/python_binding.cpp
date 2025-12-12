@@ -7,6 +7,7 @@
 #include "lelewidgets/leleobject.h"
 #include "lelewidgets/leleevent.h"
 #include "lelewidgets/lelebutton.h"
+#include "lelewidgets/lelemessagebox.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -189,7 +190,7 @@ namespace {
         LOG(DEBUG, LVSIM, "Load config '%s'\n", str);
 
         std::string input_file(str);
-        if(str[0] != '/') {
+        if(*str && str[0] != '/') {
             while(true) {
                 std::string path = std::filesystem::current_path().string() + "/" + str;
                 LOG(DEBUG, LVSIM, "Try to load config: '%s'\n", path.c_str());
@@ -292,10 +293,15 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyObject *module = PyModule_Create(&_mymodule);
 #endif
     // PyModule_AddObject(module, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
-    // LeleObject obj;
     LeleEvent event;
     PyModule_AddObject(module, "Event", event.createPyObject());
-    LeleButtons::LeleButton obj;
-    PyModule_AddObject(module, "Button", obj.createPyObject());
+    LeleObject obj;
+    PyModule_AddObject(module, "Object", obj.createPyObject());
+    LeleLabel label;
+    PyModule_AddObject(module, "Label", label.createPyObject());
+    LeleMessageBox msgbox;
+    PyModule_AddObject(module, "MessageBox", msgbox.createPyObject());
+    LeleButtons::LeleButton btn;
+    PyModule_AddObject(module, "Button", btn.createPyObject());
     return module;
 }

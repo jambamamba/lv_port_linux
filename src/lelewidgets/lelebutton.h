@@ -5,7 +5,7 @@
 struct PyLeleButton;
 class LeleGroup : public LeleObject {
   public:
-  LeleGroup(const std::string &json_str);
+  LeleGroup(const std::string &json_str = "");
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   protected:
@@ -24,6 +24,7 @@ class LeleButtons : public LeleObject {
       Slider
     };
     LeleButton(const std::string &json_str = "");
+    virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual PyObject *createPyObject() override;
     bool initPyObject(PyLeleButton *py_obj);
@@ -42,7 +43,8 @@ class LeleButtons : public LeleObject {
     int _value = 0;
     std::vector<LeleEvent*> _events;
   };
-  LeleButtons(const std::string &json_str);
+  LeleButtons(const std::string &json_str = "");
+  virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   int count() const;
   LeleButton* getAt(int idx) const;

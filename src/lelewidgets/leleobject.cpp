@@ -63,8 +63,41 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 }//namespace
 
 LeleObject::LeleObject(const std::string &json_str)
-: _class_name(__func__ ) {
+  : _class_name(__func__ ) {
+  fromJson(json_str);
+  // std::cout << "styles:" << _lele_styles << "\n";
+}
 
+LeleObject::~LeleObject() {
+    // lv_style_reset(&_style);
+}
+
+bool LeleObject::loadConfig(const std::string &config_file) {
+    if(config_file.size() == 0){
+      LOG(FATAL, LVSIM, "ERROR: Cannot load config file because none was given\n");
+      return false;
+    }
+    std::string filepath(config_file);
+    if(config_file.at(0) != '/') {
+        filepath = std::filesystem::current_path().string() + "/" + config_file;
+    }
+    LOG(DEBUG, LVSIM, "Try to load config: '%s'\n", filepath.c_str());
+    if(!std::filesystem::exists(filepath)) {
+        LOG(FATAL, LVSIM, "ERROR: Cannot load config file because file does not exist: '%s'\n", filepath.c_str());
+        return false;
+    }
+    std::stringstream buffer;
+    std::ifstream stream(filepath);
+    if(stream.is_open())
+    {
+        buffer << stream.rdbuf();
+        stream.close();
+    }
+    std::string value = buffer.str();
+    return fromJson(buffer.str());
+}
+
+bool LeleObject::fromJson(const std::string &json_str) {
   _nodes = LeleWidgetFactory::fromJson(json_str);
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
@@ -84,11 +117,7 @@ LeleObject::LeleObject(const std::string &json_str)
       }
     }
   }
-  // std::cout << "styles:" << _lele_styles << "\n";
-}
-
-LeleObject::~LeleObject() {
-    // lv_style_reset(&_style);
+  return true;
 }
 
 namespace {

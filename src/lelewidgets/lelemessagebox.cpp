@@ -8,6 +8,9 @@ LeleMessageBox::LeleMessageBox(const std::string &json_str)
   : LeleLabel(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
+  fromJson(json_str);
+}
+bool LeleMessageBox::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -27,8 +30,8 @@ LeleMessageBox::LeleMessageBox(const std::string &json_str)
     //   // }
     // }
   }
+  return true;
 }
-
 lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   _lv_obj = LeleObject::createLvObj(lele_parent,

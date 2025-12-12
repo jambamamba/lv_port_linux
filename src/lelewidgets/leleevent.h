@@ -9,6 +9,7 @@
 class LeleEvent {
 public:
   LeleEvent(const std::string &json_str = "");
+  virtual bool fromJson(const std::string &json_str);
   LeleEvent(lv_event_t *e, LeleObject *target_obj) : _lv_event(e), _target_obj(target_obj) {}
   LeleEvent(const LeleEvent& rhs, const lv_event_t *e = nullptr, int ivalue = 0);
   const std::string &getAction() const { return _action; }

@@ -146,6 +146,18 @@ void PyLeleObject::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+PyObject *PyLeleObject::loadConfig(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if (lele_obj) {
+        const char* config = PyUnicode_AsUTF8(arg);
+        if(lele_obj->loadConfig(config)){
+            return Py_True;
+        }
+    }
+    return Py_False;
+}
+
 PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     if (!self->_class_name) {

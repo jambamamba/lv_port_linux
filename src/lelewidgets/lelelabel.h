@@ -5,7 +5,8 @@
 struct PyLeleLabel;
 class LeleLabel : public LeleObject  {
   public:
-  LeleLabel(const std::string &json_str);
+  LeleLabel(const std::string &json_str = "");
+  virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   bool initPyObject(PyLeleLabel *py_obj);

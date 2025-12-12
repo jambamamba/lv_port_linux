@@ -11,7 +11,7 @@
 
 class LeleObject;
 class LeleStyle {
-  public:
+public:
   enum BorderTypeE {
     None=-1,Solid,Dashed,Dotted
   };
@@ -32,6 +32,7 @@ class LeleStyle {
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+  virtual bool fromJson(const std::string &json_str);
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   void setLeleParent(LeleObject *lele_parent) { _lele_parent = lele_parent; }
   LeleObject *getLeleParent() const { return _lele_parent; }
@@ -44,7 +45,7 @@ class LeleStyle {
   static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
   std::string className() const;
   std::optional<StyleValue> getValue(const std::string &key, std::string class_name = "") const;
-  protected:
+protected:
   LeleObject *_lele_parent = nullptr;
   std::string _class_name;
   std::string _id;

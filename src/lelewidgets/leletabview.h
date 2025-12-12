@@ -8,48 +8,53 @@
 
 class LeleViewHeader;
 class LeleTabView : public LeleObject {
-  public:
+public:
   class TabHeader : public LeleObject {
-    public:
+  public:
     TabHeader(const std::string &json_str);
+    virtual bool fromJson(const std::string &json_str) override;
     const std::string &name() const { return _name; }
     const std::string &img() const { return _img; }
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    protected:
+  protected:
     std::string _name;
     std::string _img;
     std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
   };
   class TabContent : public LeleObject {
-    public:
+  public:
     TabContent(const std::string &json_str);
+    virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    protected:
+  protected:
     std::vector<std::unique_ptr<LeleObject>> _widgets;
   };
   class Tab : public LeleObject {
-    public:
+  public:
     Tab(const std::string &json_str = "");
+    virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     TabHeader *getTabHeader() const;
     TabContent *getTabContent() const;
-    protected:
+  protected:
     std::vector<std::unique_ptr<LeleObject>> _tab_button;
     std::vector<std::unique_ptr<LeleObject>> _tab_content;
   };
   class Tabs : public LeleObject {
-    public:
+  public:
     Tabs(const std::string &json_str);
+    virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     int count() const;
     LeleTabView::Tab* getAt(int idx) const;
     std::vector<LeleTabView::Tab*> getChildren() const;
-    protected:
+  protected:
   };
   LeleTabView(const std::string &json_str);
+  virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 
-  protected:
+protected:
   static void tabViewDeleteEventCb(lv_event_t * e);
   lv_obj_t *setTabViewImg(lv_obj_t *tabview_header, const std::string &logo_img);
   lv_obj_t *setTabViewTitle(lv_obj_t *tabview_header, const std::string &title);
