@@ -68,23 +68,6 @@ PyObject *PyLeleMessageBox::setTitle(PyObject *self_, PyObject *args) {
     return Py_None;
 }
 
-PyObject *PyLeleMessageBox::addEventHandler(PyObject *self_, PyObject *args) {
-    PyLeleMessageBox *self = reinterpret_cast<PyLeleMessageBox *>(self_);
-    LeleMessageBox *lele_obj = dynamic_cast<LeleMessageBox *>(self->ob_base.ob_base._lele_obj);
-    if(lele_obj && args) {
-        PyObject *py_callback = nullptr;
-        if(!PyArg_ParseTuple(args, "O", //obj
-            &py_callback)) {
-            return PyBool_FromLong(false);
-        }
-        Py_XINCREF(py_callback);
-        LOG(DEBUG, LVSIM, "PyLeleMessageBox::addEventHandler:'%p'\n", py_callback);
-        lele_obj->addEventHandler(py_callback);
-        return PyBool_FromLong(true);
-    }
-    return Py_None;
-}
-
 PyMemberDef PyLeleMessageBox::_members[] = {
     PY_LELEMESSAGEBOX_MEMBERS()
     {nullptr}  /* Sentinel */

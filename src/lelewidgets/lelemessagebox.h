@@ -36,7 +36,6 @@ struct PyLeleMessageBox {
     // Type-specific fields go here
     static PyObject *getTitle(PyObject *, PyObject *);
     static PyObject *setTitle(PyObject *, PyObject *);
-    static PyObject *addEventHandler(PyObject *, PyObject *);
     static PyObject *getButtonClicked(PyObject *, PyObject *);
 };
 
@@ -47,6 +46,5 @@ struct PyLeleMessageBox {
   PY_LELELABEL_METHODS() \
   {"getTitle", (PyCFunction)PyLeleMessageBox::getTitle, METH_NOARGS, "Get message box title"},\
   {"setTitle", (PyCFunction)PyLeleMessageBox::setTitle, METH_VARARGS, "Set message box title"},\
-  {"addEventHandler", (PyCFunction)PyLeleMessageBox::addEventHandler, METH_VARARGS, "Sets the event handler"},\
   {"getButtonClicked", (PyCFunction)PyLeleMessageBox::getButtonClicked, METH_NOARGS, "Get the clicked button"},\
 

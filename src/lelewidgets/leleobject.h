@@ -99,11 +99,13 @@ struct PyLeleObject {
     PyObject *_id = nullptr;
     PyObject *_class_name = nullptr;
     static PyObject *getClassName(PyObject *, PyObject *);
+    static PyObject *addEventHandler(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
   {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
 
 #define PY_LELEOBJECT_METHODS() \
-  {"className", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},
+  {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
+  {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
 

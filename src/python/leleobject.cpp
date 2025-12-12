@@ -45,8 +45,17 @@ bool LeleObject::pyCallback(PyObject *py_callback, LeleEvent &&e) {
     }
     PyObject *res = PyObject_CallObject(py_callback, py_event);
     if(res) { 
-        ret = PyObject_IsTrue(res) == 1;
-        LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned '%i'\n", ret);
+        if(res == Py_None) {
+            LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned nothing\n");
+            ret = true;
+        }
+        else {
+            int iret = PyObject_IsTrue(res);
+            LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned iret:%i\n", iret);
+            if(iret == 1) {
+                ret = true;
+            }//else //We got Py_False or Error
+        }
         Py_DECREF(res); 
     }
     return ret;
@@ -144,6 +153,23 @@ PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
         return Py_None;
     }
     return self->_class_name;
+}
+
+PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(lele_obj && args) {
+        PyObject *py_callback = nullptr;
+        if(!PyArg_ParseTuple(args, "O", //obj
+            &py_callback)) {
+            return PyBool_FromLong(false);
+        }
+        Py_XINCREF(py_callback);
+        LOG(DEBUG, LVSIM, "PyLeleObject::addEventHandler:'%p'\n", py_callback);
+        lele_obj->addEventHandler(py_callback);
+        return PyBool_FromLong(true);
+    }
+    return Py_None;
 }
 
 PyMemberDef PyLeleObject::_members[] = {

@@ -192,7 +192,7 @@ namespace {
         if(str[0] != '/') {
             while(true) {
                 std::string path = std::filesystem::current_path().string() + "/" + str;
-                LOG(WARNING, LVSIM, "Try to load config: '%s'\n", path.c_str());
+                LOG(DEBUG, LVSIM, "Try to load config: '%s'\n", path.c_str());
                 if(std::filesystem::exists(path)) {
                     input_file = path;
                     break;
@@ -200,7 +200,7 @@ namespace {
                 std::string script_dir = getPyScriptDir();
                 if(std::filesystem::current_path().string() != script_dir) {
                     path = script_dir + "/" + str;
-                    LOG(WARNING, LVSIM, "Try to load config: '%s'\n", path.c_str());
+                    LOG(DEBUG, LVSIM, "Try to load config: '%s'\n", path.c_str());
                     if(std::filesystem::exists(path)) {
                         input_file = path;
                         break;
