@@ -50,8 +50,18 @@ def pushButtonPressed(event):
       # print(f"@@@py event.object.getText(): {event.object.getText()}")
       # print(f"@@@py event.object: {event.object.id}")
       obj = lele.getObjectById("/views:0/view/label")
-      print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
+      # print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
       obj.setText("Cocoa bean!")
+
+      print(f"@@@py======================================")
+      print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
+      root = lele.getObjectById("/views:0/view")
+      msgbox = root.addChild("/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
+      #osm todo: test above msgbox can do handle events
+
+      msgbox = lele.MessageBox(root, "/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
+      #osm todo: test above msgbox can do handle events
+      #osm: now we have above 2 ways of loading an object from its config!
    pass
 
 res = lele.foo(

@@ -38,7 +38,7 @@ function buildelf() {
 }
 
 function run() {
-    local example="messagebox" # hello-world | imageview | messagebox | stackview | tabview | testview
+    local example="testview" # hello-world | imageview | messagebox | stackview | tabview | testview
     local method="elfpy" # elfpy | elf | py
     local debug="true"
 

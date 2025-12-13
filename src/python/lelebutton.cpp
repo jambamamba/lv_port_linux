@@ -4,14 +4,15 @@ PyObject *LeleButtons::LeleButton::createPyObject() {
     PyTypeObject *type = &PyLeleButton::_obj_type;
     PyType_Ready(type);
     PyLeleButton *self = (PyLeleButton *)type->tp_alloc(type, 0);
-    if(!initPyObject(self)) {
+    if(!initPyObject(reinterpret_cast<PyLeleObject *>(self))) {
         Py_DECREF(self);
         return nullptr;
     }
     return (PyObject *)self;
 }
 
-bool LeleButtons::LeleButton::initPyObject(PyLeleButton *py_obj) {
+bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
+    PyLeleButton *py_obj = reinterpret_cast<PyLeleButton *>(py_obj_);
     if(!py_obj) {
         return false;
     }
@@ -27,7 +28,7 @@ bool LeleButtons::LeleButton::initPyObject(PyLeleButton *py_obj) {
     if (py_obj->_type == nullptr) {
         return false;
     }
-    return LeleLabel::initPyObject(&py_obj->ob_base);
+    return LeleLabel::initPyObject(reinterpret_cast<PyLeleObject *>(&py_obj->ob_base));
 }
 
 int PyLeleButton::init(PyObject *self_, PyObject *args, PyObject *kwds) {

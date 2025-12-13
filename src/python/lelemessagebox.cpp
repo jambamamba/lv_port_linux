@@ -6,22 +6,24 @@ PyObject *LeleMessageBox::createPyObject() {
     PyTypeObject *type = &PyLeleMessageBox::_obj_type;
     PyType_Ready(type);
     PyLeleMessageBox *self = (PyLeleMessageBox *)type->tp_alloc(type, 0);
-    if(!initPyObject(self)) {
+    if(!initPyObject(reinterpret_cast<PyLeleObject *>(self))) {
         Py_DECREF(self);
         return nullptr;
     }
     return (PyObject *)self;
 }
 
-bool LeleMessageBox::initPyObject(PyLeleMessageBox *py_obj) {
+bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) {
+    PyLeleMessageBox *py_obj = reinterpret_cast<PyLeleMessageBox *>(py_obj_);
     if(!py_obj) {
         return false;
     }
-    return LeleLabel::initPyObject(&py_obj->ob_base);
+    return LeleLabel::initPyObject(reinterpret_cast<PyLeleObject *>(&py_obj->ob_base));
 }
 
 int PyLeleMessageBox::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    // PyLeleMessageBox *self = reinterpret_cast<PyLeleMessageBox *>(self_);
+    //osm todo: repeat this for all other Py*::init functions:
+    PyLeleObject::fromConfig(self_, args);
     return 0;
 }
 

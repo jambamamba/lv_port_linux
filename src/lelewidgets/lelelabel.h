@@ -9,7 +9,7 @@ class LeleLabel : public LeleObject  {
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
-  bool initPyObject(PyLeleLabel *py_obj);
+  virtual bool initPyObject(PyLeleObject *py_obj) override;
   void setText(const std::string &text);
   std::string getText() const;
   protected:

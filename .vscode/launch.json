@@ -1,0 +1,18 @@
+{
+    "configurations": [
+    {
+        "name": "Launch LLDB",
+        "request": "launch",
+        "type": "lldb",
+        "program": "${workspaceFolder}/x86-build/bin/lvglsim",
+        "cwd": "${workspaceFolder}/src/examples/imageview",
+        "args": [
+            "${workspaceFolder}/src/examples/imageview/imageview.py"
+        ],
+        "env":{
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/",
+            "PYTHONHOME":"${workspaceFolder}/x86-build/bin/Python/"
+        }
+    }
+    ],
+}

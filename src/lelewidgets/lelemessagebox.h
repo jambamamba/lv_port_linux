@@ -11,7 +11,7 @@ public:
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
-  bool initPyObject(PyLeleMessageBox *py_obj);
+  virtual bool initPyObject(PyLeleObject *py_obj) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   void setTitle(const std::string &text);
   std::string getTitle() const;

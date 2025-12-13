@@ -146,23 +146,102 @@ void PyLeleObject::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleObject::pyListOrPyObjectFromStdVector(const std::vector<PyObject*> &py_objects) {
+    if(py_objects.size() == 0) {
+        return Py_None;
+    }
+    else if(py_objects.size() == 1) {
+        Py_INCREF(py_objects.at(0));
+        return py_objects.at(0);
+    }
+    else {//(py_objects.size() > 1) 
+        PyObject *list = PyList_New(0);
+        for(PyObject *py_object : py_objects){
+            PyList_Append(list, py_object);
+        }
+        Py_INCREF(list);
+        return list;
+    }
+}
+
+PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    const char* config = PyUnicode_AsUTF8(arg);
+    const char* config = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //str
+                &config)) {
+        LOG(WARNING, LVSIM, "Failed to parse args\n");
+        return Py_None;
+    }
     if(!config) {
         LOG(WARNING, LVSIM, "Could not get config file\n");
-        return Py_False;
+        return Py_None;
     }
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(!lele_obj) {
-        LOG(FATAL, LVSIM, "There is no parent object.\n");
-        return Py_False;
+        LOG(WARNING, LVSIM, "This object (the parent) is not initialized and cannot be used to add a child object. Was it loaded from a config file?\n");
+        return Py_None;
     }
     auto nodes = LeleWidgetFactory::fromConfig(lele_obj, config);
-    self->_child_nodes.insert(
-        self->_child_nodes.end(), 
+    std::vector<PyObject*> py_objects;
+    for (const auto &[key,token]: nodes) {
+        if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+            LeleObject *lele_obj = std::get<std::unique_ptr<LeleObject>>(token).get();
+            PyObject *py_obj = lele_obj->createPyObject();
+            if(!py_obj){
+                LOG(WARNING, LVSIM, "Could not create PyObject!\n");
+                return Py_None;
+            }
+            py_objects.emplace_back(py_obj);
+        }
+    }
+    if(py_objects.size() > 0) {
+        lele_obj->children().insert(
+            lele_obj->children().end(), 
+            std::make_move_iterator(nodes.begin()), std::make_move_iterator(nodes.end()));
+    }
+    return pyListOrPyObjectFromStdVector(py_objects);
+}
+
+PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    const char* config = nullptr;
+    PyObject *parent = nullptr;
+    if(!PyArg_ParseTuple(args, "Os", //parent obj, str
+                &parent,
+                &config)) {
+        LOG(WARNING, LVSIM, "Failed to parse args\n");
+        return Py_None;
+    }
+    if(!parent) {
+        LOG(WARNING, LVSIM, "Could not get parent\n");
+        return Py_None;
+    }
+    if(!config) {
+        LOG(WARNING, LVSIM, "Could not get config file\n");
+        return Py_None;
+    }
+    //osm todo: get lele_parent from py parent
+    PyLeleObject *py_parent = reinterpret_cast<PyLeleObject *>(parent);
+    LeleObject *lele_parent = dynamic_cast<LeleObject *>(py_parent->_lele_obj);
+    if(!lele_parent) {
+        LOG(WARNING, LVSIM, "Could not get parent\n");
+        return Py_None;
+    }
+    auto nodes = LeleWidgetFactory::fromConfig(lele_parent, config);
+    for (const auto &[key,token]: nodes) {
+        if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+            self->_lele_obj = std::get<std::unique_ptr<LeleObject>>(token).get();
+            if(!self->_lele_obj->initPyObject(self)) {
+                Py_DECREF(self);
+                return nullptr;
+            }
+            break;//osm todo: ensure the json config has just one object, becasue we only instantiate one object
+        }
+    }
+    self->_lele_obj->children().insert(
+        self->_lele_obj->children().end(), 
         std::make_move_iterator(nodes.begin()), std::make_move_iterator(nodes.end()));
-    return Py_True;
+    return reinterpret_cast<PyObject *>(self_);
 }
 
 PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {

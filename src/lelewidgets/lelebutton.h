@@ -27,7 +27,7 @@ class LeleButtons : public LeleObject {
     virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     virtual PyObject *createPyObject() override;
-    bool initPyObject(PyLeleButton *py_obj);
+    virtual bool initPyObject(PyLeleObject *py_obj) override;
     virtual bool eventCallback(LeleEvent &&e) override;
     bool isCheckable() const { return _checkable; }
     bool getChecked() const { return _checked; }

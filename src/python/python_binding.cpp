@@ -13,7 +13,6 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
     static GraphicsBackend _graphics_backend;
-    static LeleObject _root_widget;
     static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _root_nodes;
 
     struct RAII {
@@ -116,21 +115,7 @@ namespace {
                 py_objects.emplace_back(py_obj);
             }
         });
-        if(py_objects.size() == 0) {
-            return Py_None;
-        }
-        else if(py_objects.size() == 1) {
-            Py_INCREF(py_objects.at(0));
-            return py_objects.at(0);
-        }
-        else {//(py_objects.size() > 1) 
-            PyObject *list = PyList_New(0);
-            for(PyObject *py_object : py_objects){
-                PyList_Append(list, py_object);
-            }
-            Py_INCREF(list);
-            return list;
-        }
+        return PyLeleObject::pyListOrPyObjectFromStdVector(py_objects);
     }
     static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
         int num = 0;
@@ -214,6 +199,7 @@ namespace {
         }
 
         LOG(DEBUG, LVSIM, "Loading config: '%s'\n", input_file.c_str());
+        static LeleObject _root_widget;
         _root_nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
         if(_root_nodes.size() == 0) {
             LOG(WARNING, LVSIM, "Failed to load config: '%s'\n", input_file.c_str());
@@ -296,13 +282,18 @@ PyMODINIT_FUNC PyInit_lele(void) {
     // PyModule_AddObject(module, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
     LeleEvent event;
     PyModule_AddObject(module, "Event", event.createPyObject());
+    // PyModule_AddType(module, &PyLeleEvent::_obj_type);
     LeleObject obj;
-    PyModule_AddObject(module, "Object", obj.createPyObject());
+    // PyModule_AddObject(module, "Object", obj.createPyObject());
+    PyModule_AddType(module, &PyLeleObject::_obj_type);
     LeleLabel label;
-    PyModule_AddObject(module, "Label", label.createPyObject());
+    // PyModule_AddObject(module, "Label", label.createPyObject());
+    PyModule_AddType(module, &PyLeleLabel::_obj_type);
     LeleMessageBox msgbox;
-    PyModule_AddObject(module, "MessageBox", msgbox.createPyObject());
+    // PyModule_AddObject(module, "MessageBox", msgbox.createPyObject());
+    PyModule_AddType(module, &PyLeleMessageBox::_obj_type);
     LeleButtons::LeleButton btn;
-    PyModule_AddObject(module, "Button", btn.createPyObject());
+    // PyModule_AddObject(module, "Button", btn.createPyObject());
+    PyModule_AddType(module, &PyLeleButton::_obj_type);
     return module;
 }

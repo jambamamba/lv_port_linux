@@ -58,7 +58,7 @@ dkms.conf
 wl_protocols
 
 x86-build
-.vscode
+.vscode/settings.json
 lv_image_converter/build
 lv_image_converter/libpng
 qtcreator.jpg

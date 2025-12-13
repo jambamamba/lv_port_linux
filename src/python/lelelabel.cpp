@@ -4,18 +4,19 @@ PyObject *LeleLabel::createPyObject() {
     PyTypeObject *type = &PyLeleLabel::_obj_type;
     PyType_Ready(type);
     PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
-    if(!initPyObject(self)) {
+    if(!initPyObject(reinterpret_cast<PyLeleObject *>(self))) {
         Py_DECREF(self);
         return nullptr;
     }
     return (PyObject *)self;
 }
 
-bool LeleLabel::initPyObject(PyLeleLabel *py_obj) {
+bool LeleLabel::initPyObject(PyLeleObject *py_obj_) {
+    PyLeleLabel *py_obj = reinterpret_cast<PyLeleLabel *>(py_obj_);
     if(!py_obj) {
         return false;
     }
-    return LeleObject::initPyObject(&py_obj->ob_base);
+    return LeleObject::initPyObject(reinterpret_cast<PyLeleObject *>(&py_obj->ob_base));
 }
 
 int PyLeleLabel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
