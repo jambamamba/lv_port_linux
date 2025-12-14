@@ -35,6 +35,8 @@ namespace LeleWidgetFactory {
     std::function<void (const std::string &key, const std::string &value)> callback);
   std::vector<std::pair<std::string, Node>> fromJson(
     const std::string &json_str = "");
+  std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
+    const std::string &config);
   bool parsePercentValues(
     const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values = {});
   std::string trim(

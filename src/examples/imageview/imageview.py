@@ -20,6 +20,10 @@ def sliderMoved(event):
         print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
    pass
 
+def msgboxEvent(event):
+   print(f"@@@py msgboxEvent, button clicked: {event.object.getButtonClicked().id}, button text: {event.object.getButtonClicked().getText()}")
+   return True
+
 def pushButtonPressed(event):
    # print(f"@@@py event: {event}")
    # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
@@ -56,10 +60,11 @@ def pushButtonPressed(event):
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
       root = lele.getObjectById("/views:0/view")
-      msgbox = root.addChild("/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
+      msgbox = root.addChild("../messagebox/messagebox.json")
+      msgbox.addEventHandler(lambda event: msgboxEvent(event))
       #osm todo: test above msgbox can do handle events
 
-      msgbox = lele.MessageBox(root, "/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
+      # msgbox = lele.MessageBox(root, "/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
       #osm todo: test above msgbox can do handle events
       #osm: now we have above 2 ways of loading an object from its config!
    pass

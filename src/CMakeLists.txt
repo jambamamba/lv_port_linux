@@ -80,31 +80,30 @@ function(buildLvglSim
     message(STATUS "buildLvglSim() PYTHON_LIB:${PYTHON_LIB}")
 
     set(LELE_WIDGETS
-        lelewidgets/leleobject.cpp
         lelewidgets/lelebutton.cpp
+        lelewidgets/lelebutton.py.cpp
         lelewidgets/leleevent.cpp
+        lelewidgets/leleevent.py.cpp
         lelewidgets/leleimage.cpp
         lelewidgets/lelelabel.cpp
+        lelewidgets/lelelabel.py.cpp
+        lelewidgets/lelemessagebox.cpp
+        lelewidgets/lelemessagebox.py.cpp
         lelewidgets/lelenullwidget.cpp
+        lelewidgets/leleobject.cpp
+        lelewidgets/leleobject.py.cpp
         lelewidgets/lelestackview.cpp
         lelewidgets/lelestyle.cpp
+        lelewidgets/lelestyle.py.cpp        
         lelewidgets/leletabview.cpp
         lelewidgets/leletextbox.cpp
         lelewidgets/leleview.cpp
-        lelewidgets/lelemessagebox.cpp
         lelewidgets/lelewidgetfactory.cpp
+        lelewidgets/python_binding.cpp
     )
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
     set(sources
-        python/python_binding.cpp
-        python/leleevent.cpp
-        python/leleobject.cpp
-        python/lelelabel.cpp
-        python/lelebutton.cpp
-        python/lelemessagebox.cpp
         graphics_backend.cpp
-        # mainwindow.cpp 
-        # chart.cpp 
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 
@@ -164,7 +163,7 @@ function(buildLvglSim
     target_include_directories(lele_ui PRIVATE ${inc_dirs})
     add_dependencies(lele_ui lv_image_convert python)
 
-    add_executable(lvglsim main.cpp python/python_wrapper.cpp)
+    add_executable(lvglsim main.cpp lelewidgets/python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
     target_link_directories(lvglsim PRIVATE ${link_dirs})
     target_link_libraries(lvglsim PRIVATE ${link_libs} lele_ui)
@@ -238,7 +237,7 @@ function(generateSetupPyFile
                 '${CMAKE_CURRENT_SOURCE_DIR}',")
 
     configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/python/setup.py.in"
+        "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in"
         "${CMAKE_BINARY_DIR}/setup.py"
         @ONLY
     )

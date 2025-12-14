@@ -143,6 +143,7 @@ int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
 void PyLeleObject::dealloc(PyObject* self_) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     Py_XDECREF(self->_id);
+    Py_XDECREF(self->_class_name);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -204,8 +205,8 @@ PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *args) {
 
 PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    const char* config = nullptr;
     PyObject *parent = nullptr;
+    const char* config = nullptr;
     if(!PyArg_ParseTuple(args, "Os", //parent obj, str
                 &parent,
                 &config)) {
@@ -220,7 +221,6 @@ PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "Could not get config file\n");
         return Py_None;
     }
-    //osm todo: get lele_parent from py parent
     PyLeleObject *py_parent = reinterpret_cast<PyLeleObject *>(parent);
     LeleObject *lele_parent = dynamic_cast<LeleObject *>(py_parent->_lele_obj);
     if(!lele_parent) {

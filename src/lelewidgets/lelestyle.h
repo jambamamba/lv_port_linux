@@ -1,15 +1,20 @@
 #pragma once
 
 
+#include <debug_logger/debug_logger.h>
 #include <json_utils/json_utils.h>
 #include <lvgl/lvgl_private.h>
+#include <map>
+#include <memory>
 #include <optional>
 #include <string>
 #include <variant>
-
-
+#include <vector>
+#include <Python.h>
 
 class LeleObject;
+struct PyLeleStyle;
+typedef struct _object PyObject;
 class LeleStyle {
 public:
   enum BorderTypeE {
@@ -33,6 +38,8 @@ public:
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
   virtual bool fromJson(const std::string &json_str);
+  virtual PyObject *createPyObject();
+  virtual bool initPyObject(PyLeleStyle *py_obj);
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   void setLeleParent(LeleObject *lele_parent) { _lele_parent = lele_parent; }
   LeleObject *getLeleParent() const { return _lele_parent; }
@@ -85,7 +92,7 @@ protected:
   int _parent_height = 0;
 };
 class LeleStyles {
-  public:
+public:
   LeleStyles(const std::string &json_str = "");
   friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
   void setLeleParent(LeleObject *lele_parent);
@@ -100,4 +107,27 @@ class LeleStyles {
   std::vector<LeleStyle *>_lele_styles;
   LeleObject *_lele_parent = nullptr;
 };
+
+struct PyLeleStyle {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static PyMethodDef _methods[];
+    static void dealloc(PyObject* self);
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    // Type-specific fields go here
+    std::vector<std::unique_ptr<LeleStyle>> _lele_styles;
+    LeleStyle* _lele_style = nullptr;
+    PyObject *_id = nullptr;
+    PyObject *_class_name = nullptr;
+    static PyObject *fromConfig(PyObject *, PyObject *);
+    static PyObject *getClassName(PyObject *, PyObject *);
+};
+
+#define PY_LELESTYLE_MEMBERS() \
+  {"id", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _id), 0, "id"},
+
+#define PY_LELESTYLE_METHODS() \
+  {"fromConfig", (PyCFunction)PyLeleStyle::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
+  {"getClassName", (PyCFunction)PyLeleStyle::getClassName, METH_NOARGS, "Get the class name"},\
 

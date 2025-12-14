@@ -87,6 +87,49 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
     // }
     return res;
 }
+
+
+const cJSON* jsonFromConfig(const std::string &config_json) {
+
+    if(!std::filesystem::exists(config_json)) {
+        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", config_json.c_str());
+        return nullptr;
+    }
+    const cJSON* root = readJson(config_json.c_str());
+    if(!root) {
+        LOG(FATAL, LVSIM, "Failed to load file: '%s'\n", config_json.c_str());
+        return nullptr;
+    }
+    return root;
+}
+
+auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
+    auto nodes = LeleWidgetFactory::fromJson(json_str);
+    for (const auto &[key, node]: nodes) {
+        LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
+        if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
+            auto &value = std::get<std::unique_ptr<LeleObject>>(node);
+            value->createLvObj(parent);
+        }
+    }
+    return nodes;
+}
+
+auto leleStylesFromJson(const std::string &json_str) {
+    std::vector<std::unique_ptr<LeleStyle>> styles;
+    auto nodes = LeleWidgetFactory::fromJson(json_str);
+    for (auto &[key, token]: nodes) {
+        if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
+            if(key == "style") {
+                styles.emplace_back(
+                    std::move(
+                        std::get<std::unique_ptr<LeleStyle>>(token)));
+            }
+        }
+    }
+    return styles;
+}
+
 }//namespace
 
 namespace LeleWidgetFactory {
@@ -230,30 +273,25 @@ void iterateNodes(
 
 std::vector<std::pair<std::string, Node>> fromConfig(
     LeleObject *parent,
-    const std::string &config_json) {
+    const std::string &config) {
 
     if(!parent->getLvObj()) {
         parent->setLvObj(lv_screen_active());
     }
-    if(!std::filesystem::exists(config_json)) {
-        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", config_json.c_str());
-        return std::vector<std::pair<std::string, LeleWidgetFactory::Node>>();
-    }
-    const cJSON* root = readJson(config_json.c_str());
-    if(!root) {
-        LOG(FATAL, LVSIM, "Failed to load file: '%s'\n", config_json.c_str());
-        return std::vector<std::pair<std::string, LeleWidgetFactory::Node>>();
-    }
-    auto nodes = LeleWidgetFactory::fromJson(cJSON_Print(root));
-    for (const auto &[key, node]: nodes) {
-        LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
-        if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
-            auto &value = std::get<std::unique_ptr<LeleObject>>(node);
-            value->createLvObj(parent);
-        }
-    }
-    return nodes;
+    return leleObjectsFromJson(
+        parent,
+        cJSON_Print(
+            jsonFromConfig(config)));
 }
+
+std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
+    const std::string &config) {
+
+    return leleStylesFromJson(
+        cJSON_Print(
+            jsonFromConfig(config)));
+}
+
 
 bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
   bool ret = false;

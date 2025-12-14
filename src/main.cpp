@@ -34,9 +34,9 @@
 #include <lvgl/demos/lv_demos.h>
 #include <res/img_dsc.h>
 
-#include "src/python/python_wrapper.h"
 #include "src/graphics_backend.h"
 #include "src/lelewidgets/leleobject.h"
+#include "src/lelewidgets/python_wrapper.h"
 
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
         GraphicsBackend backend;
         backend.load();
         static LeleObject _root_widget;
-        auto tokens = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
+        auto nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
         while(backend.handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {

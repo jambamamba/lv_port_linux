@@ -3,7 +3,7 @@
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
 #include "leleobject.h"
-#include "python/python_wrapper.h"
+#include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
