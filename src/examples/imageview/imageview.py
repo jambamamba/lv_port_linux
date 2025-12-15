@@ -57,6 +57,27 @@ def pushButtonPressed(event):
       # print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
       obj.setText("Cocoa bean!")
 
+      print(f"@@@py change text color to white")
+      style = lele.Style('{"style":{"fgcolor":"#fff"}}')
+      obj.addStyle(style)
+
+      print(f"@@@py change rotation angle to 100 degrees")
+      obj = lele.getObjectById("/view/with_bg_img")
+      style = lele.Style("""{
+         "style":{
+            "id":"img",
+            "background":{
+               "image":"firefox-logo.png",
+               "position":"20",
+               "rotation":{"angle":"100","pivot":{"x":"10","y":"0"}},
+               "size":{"x":"20%","y":"20%"},
+               "repeat":"repeat",
+               "color":"#0f0"
+            }
+         }
+      }""")
+      obj.addStyle(style)
+
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
       root = lele.getObjectById("/views:0/view")
@@ -91,6 +112,7 @@ user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
 obj = lele.getObjectById("push_button0")
 for button_type in obj.Type:
     print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
+
 
 try:
    while lele.handleEvents():

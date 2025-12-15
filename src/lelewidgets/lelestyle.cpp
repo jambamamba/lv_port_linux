@@ -428,17 +428,15 @@ LeleStyles::LeleStyles(const std::string &json_str) {
 //   setParent(lele_parent);
 //   return _lv_obj;
 // }
-void LeleStyles::setLeleParent(LeleObject *lele_parent) {
-    for(auto *lele_style : _lele_styles) {
+void LeleStyles::setLeleParent(const LeleObject *lele_parent) {
+    for(LeleStyle *lele_style : _lele_styles) {
       if(!lele_style->getLeleParent()) {
         lele_style->setLeleParent(lele_parent);
       }
     }
     _lele_parent = lele_parent;
 }
-// void LeleStyles::addStyle(LeleStyle* lele_style) {
-//   _lele_styles.push_back(lele_style);
-// }
+
 LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
   _lele_styles.insert(_lele_styles.end(), lele_styles._lele_styles.begin(), lele_styles._lele_styles.end());
   return *this;
@@ -446,6 +444,11 @@ LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
 LeleStyles &LeleStyles::operator+=(LeleStyle &lele_style) {
   _lele_styles.push_back(&lele_style);
   return *this;
+}
+void LeleStyles::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
+  for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
+    _lele_styles.push_back(lele_style.get());
+  }
 }
 std::optional<LeleStyle::StyleValue> LeleStyles::getValue(const std::string &key, std::string class_name) const {
   std::optional<LeleStyle::StyleValue> final_value;

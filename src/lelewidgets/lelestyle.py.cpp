@@ -33,9 +33,7 @@ bool LeleStyle::initPyObject(PyLeleStyle *py_obj) {
 }
 
 int PyLeleStyle::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
-    // self->_id = PyUnicode_FromString("id");
-    // self->_class_name = PyUnicode_FromString("class_name");
+    PyLeleStyle::fromConfig(self_, args);
     return 0;
 }
 

@@ -280,20 +280,16 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyObject *module = PyModule_Create(&_mymodule);
 #endif
     // PyModule_AddObject(module, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
+    PyModule_AddType(module, &PyLeleObject::_obj_type);
+    PyModule_AddType(module, &PyLeleLabel::_obj_type);
+    PyModule_AddType(module, &PyLeleMessageBox::_obj_type);
+    PyModule_AddType(module, &PyLeleStyle::_obj_type);
+
+    //Use PyModule_AddObject for these types because of Enum types in them that we want to use in Python, like lele.Event.Type.Clicked, lele.Button.Type.Push
     LeleEvent event;
     PyModule_AddObject(module, "Event", event.createPyObject());
-    // PyModule_AddType(module, &PyLeleEvent::_obj_type);
-    LeleObject obj;
-    // PyModule_AddObject(module, "Object", obj.createPyObject());
-    PyModule_AddType(module, &PyLeleObject::_obj_type);
-    LeleLabel label;
-    // PyModule_AddObject(module, "Label", label.createPyObject());
-    PyModule_AddType(module, &PyLeleLabel::_obj_type);
-    LeleMessageBox msgbox;
-    // PyModule_AddObject(module, "MessageBox", msgbox.createPyObject());
-    PyModule_AddType(module, &PyLeleMessageBox::_obj_type);
     LeleButtons::LeleButton btn;
-    // PyModule_AddObject(module, "Button", btn.createPyObject());
-    PyModule_AddType(module, &PyLeleButton::_obj_type);
+    PyModule_AddObject(module, "Button", btn.createPyObject());
+
     return module;
 }

@@ -95,6 +95,39 @@ bool LeleObject::fromJson(const std::string &json_str) {
   return true;
 }
 
+const std::string &LeleObject::className() const {
+  return _class_name;
+}
+const std::string &LeleObject::id() const {
+  return _id;
+}
+
+bool LeleObject::enabled() const { 
+  return _enabled; 
+}
+
+lv_obj_t *LeleObject::getLvObj() const {
+  return _lv_obj;
+}
+
+void LeleObject::setLvObj(lv_obj_t *obj) {
+  obj->user_data = this;
+  _lv_obj = obj;
+}
+
+void LeleObject::setParent(LeleObject *parent) {
+  _lele_parent = parent;
+  _lele_styles.setLeleParent(parent);
+}
+
+const LeleStyles *LeleObject::styles() const {
+  return &_lele_styles;
+}
+
+std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &LeleObject::children() {
+  return _nodes;
+}
+
 namespace {
 //Extending current theme:
 // https://docs.lvgl.io/master/details/common-widget-features/styles/styles.html#extending-the-current-theme
@@ -383,6 +416,18 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   }
   return std::tuple<int,int>(x, y);
 }
+
+void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
+  if(lele_styles.size()){
+    _lele_styles.addStyle(lele_styles);
+    setStyle(_lv_obj);
+  }
+}
+
+void LeleObject::removeStyle(const std::string &style_id) {
+  //osm todo
+}
+
 void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
   auto value = _lele_styles.getValue("align");
   if(value) {

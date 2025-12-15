@@ -5,6 +5,7 @@
         "style":{"id":"view/button","class_name":"view/button","border":"solid-1px-#0f0","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
         "xstyle":{"id":"slider_style0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
         "view":{
+            "id":"/view/with_bg_img",
             "style":{"id":"img","border":"solid-1px-#0f0","x":"0","y":"0","width":"80%","height":"50%","scrollbar":"off",
                 "background":{
                     "image":"firefox-logo.png",
@@ -33,7 +34,7 @@
         "label":{
             "id":"/views:0/view/label",
             "text":"hello world0",
-            "style":{"id":"views/view0/label","x":"0","y":"0","width":"50%","height":"5%"}
+            "style":{"id":"views/view0/label","x":"0","y":"0","width":"50%","height":"5%","fgcolor":"#f00"}
         },  
         "button":{
             "id":"push_button0",

@@ -20,7 +20,7 @@ bool LeleLabel::initPyObject(PyLeleObject *py_obj_) {
 }
 
 int PyLeleLabel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    // PyLeleLabel *self = reinterpret_cast<PyLeleLabel *>(self_);
+    PyLeleObject::fromConfig(self_, args);
     return 0;
 }
 

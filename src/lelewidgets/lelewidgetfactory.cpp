@@ -91,15 +91,21 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
 
 const cJSON* jsonFromConfig(const std::string &config_json) {
 
-    if(!std::filesystem::exists(config_json)) {
-        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", config_json.c_str());
-        return nullptr;
+    const cJSON* root = nullptr;
+    std::error_code ec;
+    if(std::filesystem::exists(config_json, ec)) {
+        LOG(DEBUG, LVSIM, "Loading JSON from file: '%s'.\n", config_json.c_str());
+        root = readJson(config_json.c_str());
     }
-    const cJSON* root = readJson(config_json.c_str());
+    else {
+        LOG(DEBUG, LVSIM, "Not a file: '%s', next check if it is a JSON string.\n", config_json.c_str());
+        root = cJSON_Parse(config_json.c_str());
+    }
     if(!root) {
-        LOG(FATAL, LVSIM, "Failed to load file: '%s'\n", config_json.c_str());
+        LOG(WARNING, LVSIM, "Failed to load JSON: '%s'\n", config_json.c_str());
         return nullptr;
     }
+    LOG(DEBUG, LVSIM, "Successfully loaded JSON: '%s'\n", config_json.c_str());
     return root;
 }
 

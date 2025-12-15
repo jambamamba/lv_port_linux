@@ -22,7 +22,6 @@ bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) {
 }
 
 int PyLeleMessageBox::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    //osm todo: repeat this for all other Py*::init functions:
     PyLeleObject::fromConfig(self_, args);
     return 0;
 }

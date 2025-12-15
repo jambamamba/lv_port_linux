@@ -134,9 +134,7 @@ PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<
 }
 
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    // self->_id = PyUnicode_FromString("id");
-    // self->_class_name = PyUnicode_FromString("class_name");
+    PyLeleObject::fromConfig(self_, args);
     return 0;
 }
 
@@ -256,16 +254,41 @@ PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
 PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    PyObject *py_callback = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //obj
+        &py_callback)) {
+        return PyBool_FromLong(false);
+    }
+    Py_XINCREF(py_callback);
+    LOG(DEBUG, LVSIM, "PyLeleObject::addEventHandler:'%p'\n", py_callback);
+    lele_obj->addEventHandler(py_callback);
+    return PyBool_FromLong(true);
+}
+
+PyObject *PyLeleObject::addStyle(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    PyLeleStyle *py_style = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //obj
+        &py_style)) {
+        return PyBool_FromLong(false);
+    }
+    Py_XINCREF(py_style);
+    lele_obj->addStyle(py_style->_lele_styles);
+    return PyBool_FromLong(true);
+}
+
+PyObject *PyLeleObject::removeStyle(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(lele_obj && args) {
-        PyObject *py_callback = nullptr;
-        if(!PyArg_ParseTuple(args, "O", //obj
-            &py_callback)) {
-            return PyBool_FromLong(false);
-        }
-        Py_XINCREF(py_callback);
-        LOG(DEBUG, LVSIM, "PyLeleObject::addEventHandler:'%p'\n", py_callback);
-        lele_obj->addEventHandler(py_callback);
-        return PyBool_FromLong(true);
+        //osm todo
     }
     return Py_None;
 }

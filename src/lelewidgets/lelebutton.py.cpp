@@ -32,7 +32,7 @@ bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
 }
 
 int PyLeleButton::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    // PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    PyLeleObject::fromConfig(self_, args);
     return 0;
 }
 

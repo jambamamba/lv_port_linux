@@ -31,36 +31,23 @@ public:
   virtual ~LeleObject();
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
-  const std::string &className() const {
-    return _class_name;
-  }
-  const std::string &id() const {
-    return _id;
-  }
+  const std::string &className() const;
+  const std::string &id() const;
+
   std::vector<LeleObject *> getLeleObj(const std::string &obj_name) const;
-  bool enabled() const { return _enabled; }
-  lv_obj_t *getLvObj() const {
-    return _lv_obj;
-  }
-  void setLvObj(lv_obj_t *obj) {
-    obj->user_data = this;
-    _lv_obj = obj;
-  }
-  void setParent(LeleObject *parent) {
-    _lele_parent = parent;
-    _lele_styles.setLeleParent(parent);
-  }
-  const LeleStyles *styles() const {
-    return &_lele_styles;
-  }
-  std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children() {
-    return _nodes;
-  }
+  bool enabled() const;
+  lv_obj_t *getLvObj() const;
+  void setLvObj(lv_obj_t *obj);
+  void setParent(LeleObject *parent);
+  const LeleStyles *styles() const;
+  std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleObject *py_obj);
   virtual bool fromJson(const std::string &json_str);
   virtual void setStyle(lv_obj_t *lv_obj);
+  virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
+  virtual void removeStyle(const std::string &style_id);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();
@@ -104,6 +91,8 @@ struct PyLeleObject {
     static PyObject *fromConfig(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
+    static PyObject *addStyle(PyObject *, PyObject *);
+    static PyObject *removeStyle(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
@@ -114,4 +103,6 @@ struct PyLeleObject {
   {"fromConfig", (PyCFunction)PyLeleObject::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
   {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
+  {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
+  {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
 
