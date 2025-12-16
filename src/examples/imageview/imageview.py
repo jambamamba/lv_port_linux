@@ -17,7 +17,20 @@ def callback(str):
 def sliderMoved(event):
    # print(f"@@@py res:{lele.Event.Type} lele.Event.Type.Clicked:{lele.Event.Type.Clicked.value}")
    if event.code == lele.Event.Type.ValueChanged:
-        print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
+         print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
+         obj = lele.getObjectById("/views:0/view/label")
+         obj.setText(f"Angle: {event.value}°")
+         print(f"@@@py change rotation angle by 10 degrees")
+         obj = lele.getObjectById("/view/with_bg_img")
+         style = lele.Style(
+            '{'
+            '"style":{'
+            '   "background":{'
+            '      "rotation":{"angle":"' + str(event.value) + '","pivot":{"x":"256","y":"271"}}'
+            '   }'
+            '  }'
+            '}')
+         obj.addStyle(style)
    pass
 
 def msgboxEvent(event):
@@ -61,29 +74,11 @@ def pushButtonPressed(event):
       style = lele.Style('{"style":{"fgcolor":"#fff"}}')
       obj.addStyle(style)
 
-      print(f"@@@py change rotation angle to 100 degrees")
-      obj = lele.getObjectById("/view/with_bg_img")
-      style = lele.Style("""{
-         "style":{
-            "id":"img",
-            "background":{
-               "image":"firefox-logo.png",
-               "position":"20",
-               "rotation":{"angle":"100","pivot":{"x":"10","y":"0"}},
-               "size":{"x":"20%","y":"20%"},
-               "repeat":"repeat",
-               "color":"#0f0"
-            }
-         }
-      }""")
-      obj.addStyle(style)
-
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
       root = lele.getObjectById("/views:0/view")
       msgbox = root.addChild("../messagebox/messagebox.json")
       msgbox.addEventHandler(lambda event: msgboxEvent(event))
-      #osm todo: test above msgbox can do handle events
 
       # msgbox = lele.MessageBox(root, "/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
       #osm todo: test above msgbox can do handle events

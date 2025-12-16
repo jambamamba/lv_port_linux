@@ -6,16 +6,16 @@
         "xstyle":{"id":"slider_style0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
         "view":{
             "id":"/view/with_bg_img",
-            "style":{"id":"img","border":"solid-1px-#0f0","x":"0","y":"0","width":"80%","height":"50%","scrollbar":"off",
+            "style":{"id":"img","border":"solid-1px-#0f0","x":"0","y":"0","width":"80%","height":"70%","scrollbar":"off",
                 "background":{
                     "image":"firefox-logo.png",
-                    "position":"20",
+                    "xposition":"20",
                     "xposition":{"x":"20","y":"20"},
-                    "rotation":{"angle":"90","pivot":{"x":"10","y":"0"}},
+                    "rotation":{"angle":"0","pivot":{"x":"256","y":"271"}},
                     "xsize":"contain",
                     "xsize":"cover",
                     "xsize":"20%",
-                    "size":{"x":"20%","y":"20%"},
+                    "xsize":{"x":"20%","y":"20%"},
                     "repeat":"repeat",
                     "color":"#0f0"
                 }
