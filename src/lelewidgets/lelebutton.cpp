@@ -197,7 +197,7 @@ bool LeleButtons::LeleButton::click() {
 void LeleButtons::LeleButton::setValue(int value) {
   _value = value; 
   if(_type = LeleButtons::LeleButton::Type::Slider) {
-    lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);//osm todo : test this
+    lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
   }
 }
 

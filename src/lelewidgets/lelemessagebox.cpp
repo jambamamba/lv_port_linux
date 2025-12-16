@@ -22,13 +22,6 @@ bool LeleMessageBox::fromJson(const std::string &json_str) {
       LeleEvent *event = std::get<std::unique_ptr<LeleEvent>>(token).get();
       _events.push_back(event);
     }
-    // else if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
-    //   auto &value = std::get<std::unique_ptr<LeleObject>>(token);
-    //   value->createLvObj(this);//osm
-    //   // if(key == "button") {
-    //   //   _btn = std::make_unique<LeleButtons::LeleButton>(value);
-    //   // }
-    // }
   }
   return true;
 }
