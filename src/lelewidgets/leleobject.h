@@ -49,6 +49,8 @@ public:
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
   virtual void addStyle(LeleStyle* lele_style);
+  bool addStyle(const std::string &key, const std::string &value);
+  std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyle() const;
   virtual void removeStyle(const std::string &style_id);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
@@ -94,6 +96,7 @@ struct PyLeleObject {
     static PyObject *fromConfig(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
+    static PyObject *getStyle(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
     static PyObject *removeStyle(PyObject *, PyObject *);
 };
@@ -106,6 +109,7 @@ struct PyLeleObject {
   {"fromConfig", (PyCFunction)PyLeleObject::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
   {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
+  {"getStyle", (PyCFunction)PyLeleObject::getStyle, METH_VARARGS, "Get the style attributes for this object"},\
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
   {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
 

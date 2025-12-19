@@ -167,10 +167,10 @@ static void new_theme_init_and_set(void)
 }//namespace
 
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
-  if(_id == "push_button0" && key == "bgcolor") {
-    int x = 0;
-    x = 1;
-  }
+  // if(_id == "push_button0" && key == "bgcolor") {
+  //   int x = 0;
+  //   x = 1;
+  // }
   std::optional<LeleStyle::StyleValue> final_value;
   for(auto *lele_style :  _lele_styles) {
     auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
@@ -420,6 +420,10 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   }
   return std::tuple<int,int>(x, y);
 }
+std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle() const {
+  std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;//osm todo
+  return ret;
+}
 
 void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
   if(lele_styles.size()){
@@ -433,6 +437,20 @@ void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) 
 void LeleObject::addStyle(LeleStyle* lele_style) {
   _lele_styles.emplace_back(lele_style);
   setStyle(_lv_obj);
+}
+
+bool LeleObject::addStyle(const std::string &key, const std::string &value) {
+  bool ret = false;  
+  for(LeleStyle *lele_style : _lele_styles) {
+      ret = lele_style->setValue(key, value);
+      if(ret) {
+        break;
+      }
+    }
+    if(ret) {
+      setStyle(_lv_obj);
+    }
+    return ret;
 }
 
 void LeleObject::removeStyle(const std::string &style_id) {

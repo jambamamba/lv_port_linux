@@ -268,20 +268,46 @@ PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     return PyBool_FromLong(true);
 }
 
+
+PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    lele_obj->getStyle();//osm todo: return a dictionary of all style key values pairs
+    return PyBool_FromLong(true);
+}
+
 PyObject *PyLeleObject::addStyle(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(!lele_obj || !args) {
         return PyBool_FromLong(false);
     }
-    PyLeleStyle *py_style = nullptr;
-    if(!PyArg_ParseTuple(args, "O", //obj
-        &py_style)) {
-        return PyBool_FromLong(false);
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args == 1) {
+        PyLeleStyle *py_style = nullptr;
+        if(!PyArg_ParseTuple(args, "O", //obj
+            &py_style)) {
+            return PyBool_FromLong(false);
+        }
+        Py_XINCREF(py_style);
+        lele_obj->addStyle(py_style->_lele_styles);
+        return PyBool_FromLong(true);
     }
-    Py_XINCREF(py_style);
-    lele_obj->addStyle(py_style->_lele_styles);
-    return PyBool_FromLong(true);
+    else if(num_args == 2) {
+        const char *py_key = nullptr;
+        const char *py_value = nullptr;
+        if(!PyArg_ParseTuple(args, "ss", //key, value
+            &py_key,&py_value)) {
+            return PyBool_FromLong(false);
+        }
+        return PyBool_FromLong(
+            lele_obj->addStyle(py_key, py_value));
+    }
+    return PyBool_FromLong(false);
+    
 }
 
 PyObject *PyLeleObject::removeStyle(PyObject *self_, PyObject *args) {

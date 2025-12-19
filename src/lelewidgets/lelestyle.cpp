@@ -18,172 +18,9 @@ bool LeleStyle::fromJson(const std::string &json_str) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       std::string key = ref_key;// to print error: reference to local binding 'key' declared in enclosing function 'LeleStyle::LeleStyle' : _style[key + "/" + subkey] = value;
-      if(key == "class_name") {
-        _class_name = value;
-      }
-      else if(key == "id") {
-        _id = value;
-      }
-      else if(key == "x") {
-        _style[key] = parsePercentValue(value, _parent_width);
-      }
-      else if(key == "y") {
-        _style[key] = parsePercentValue(value, _parent_height);
-      }
-      else if(key == "width") {
-        _style[key] = parsePercentValue(value, _parent_width);
-      }
-      else if(key == "height") {
-        _style[key] = parsePercentValue(value, _parent_height);
-      }
-      else if(key == "corner_radius") {
-        _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
-      }
-      else if(key == "padding") {
-        std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
-      }
-      else if(key == "margin") {
-        std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
-      }
-      else if(key == "border") {
-        std::tie(_style["border/type"], _style["border/width"], _style["border/color"]) = LeleStyle::parseBorder(value); 
-      }
-      else if(key == "layout") {
-        if(strncmp(value.c_str(), "flex", 4)==0) {
-          _style[key] = LV_LAYOUT_FLEX;
-        }
-        else if(strncmp(value.c_str(), "grid", 4)==0) {
-          _style[key] = LV_LAYOUT_GRID;
-        }
-        else {//if(strncmp(value.c_str(), "none", 4)==0) {
-          _style[key] = LV_LAYOUT_NONE;
-        }
-      }
-      else if(key == "flow") {
-        if(strncmp(value.c_str(), "row", 3)==0) {
-          _style[key] = LV_FLEX_FLOW_ROW;
-        }
-        else if(strncmp(value.c_str(), "row_wrap", 8)==0) {
-          _style[key] = LV_FLEX_FLOW_ROW_WRAP;
-        }
-        else if(strncmp(value.c_str(), "row_reverse", 11)==0){
-          _style[key] = LV_FLEX_FLOW_ROW_REVERSE;
-        }
-        else if(strncmp(value.c_str(), "row_wrap_reverse", 16)==0){
-          _style[key] = LV_FLEX_FLOW_ROW_WRAP_REVERSE;
-        }
-        else if(strncmp(value.c_str(), "column", 6)==0) {
-          _style[key] = LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
-        }
-        else if(strncmp(value.c_str(), "column_wrap", 11)==0){
-          _style[key] = LV_FLEX_FLOW_COLUMN_WRAP;
-        }
-        else if(strncmp(value.c_str(), "column_reverse", 14)==0){
-          _style[key] = LV_FLEX_FLOW_COLUMN_REVERSE;
-        }
-        else if(strncmp(value.c_str(), "column_wrap_reverse", 19)==0){
-          _style[key] = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
-        }
-        else {
-          _style[key] = std::nullopt;
-        }
-      }
-      else if(key == "grow") {
-        _style[key] = std::stoi(value);
-      }
-      else if(key == "scrollbar") {
-        if(strncmp(value.c_str(), "off", 3)==0 || strncmp(value.c_str(), "none", 4)==0 || strncmp(value.c_str(), "false", 4)==0) {
-          _style[key] = LV_SCROLLBAR_MODE_OFF;
-        }
-        else if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "always", 6)==0 || strncmp(value.c_str(), "true", 4)==0) {
-          _style[key] = LV_SCROLLBAR_MODE_ON;
-        }
-        else if(strncmp(value.c_str(), "active", 6)==0) {
-          _style[key] = LV_SCROLLBAR_MODE_ACTIVE;
-        }
-        else {// "auto"
-          _style[key] = LV_SCROLLBAR_MODE_AUTO;
-        }
-      }
-      else if(key == "fgcolor") {
-        _style[key] = LeleStyle::parseColorCode(value);
-      }
-      else if(key == "bgcolor") {
-        _style[key] = LeleStyle::parseColorCode(value);
-      }
-      else if(key == "checked_color") {
-        _style[key] = LeleStyle::parseColorCode(value);
-      }
-      else if(key == "align") {
-        if(strncmp(value.c_str(), "center", strlen("center"))==0){
-          _style[key] = LV_ALIGN_CENTER;
-        }
-        else if(strncmp(value.c_str(), "top_left", strlen("top_left"))==0){
-          _style[key] = LV_ALIGN_TOP_LEFT;
-        }
-        else if(strncmp(value.c_str(), "top_mid", strlen("top_mid"))==0){
-          _style[key] = LV_ALIGN_TOP_MID;
-        }
-        else if(strncmp(value.c_str(), "top_right", strlen("top_right"))==0){
-          _style[key] = LV_ALIGN_TOP_RIGHT;
-        }
-        else if(strncmp(value.c_str(), "bottom_left", strlen("bottom_left"))==0){
-          _style[key] = LV_ALIGN_BOTTOM_LEFT;
-        }
-        else if(strncmp(value.c_str(), "bottom_mid", strlen("bottom_mid"))==0){
-          _style[key] = LV_ALIGN_BOTTOM_MID;
-        }
-        else if(strncmp(value.c_str(), "bottom_right", strlen("bottom_right"))==0){
-          _style[key] = LV_ALIGN_BOTTOM_RIGHT;
-        }
-        else if(strncmp(value.c_str(), "left_mid", strlen("left_mid"))==0){
-          _style[key] = LV_ALIGN_LEFT_MID;
-        }
-        else if(strncmp(value.c_str(), "right_mid", strlen("right_mid"))==0){
-          _style[key] = LV_ALIGN_RIGHT_MID;
-        }
-        else {
-          _style[key] = LV_ALIGN_DEFAULT;
-        }
-      }
-      else if(key == "text_align") {
-        if(strncmp(value.c_str(), "center", 6)==0){
-          _style[key] = LV_TEXT_ALIGN_CENTER;
-        }
-        else if(strncmp(value.c_str(), "right", 5)==0){
-          _style[key] = LV_TEXT_ALIGN_RIGHT;
-        }
-        else if(strncmp(value.c_str(), "left", 4)==0){
-          _style[key] = LV_TEXT_ALIGN_LEFT;
-        }
-        else {
-          _style[key] = LV_TEXT_ALIGN_AUTO;
-        }
-      }
-      else if(key == "background") {
-        LeleWidgetFactory::fromJson(value, [this, &key](const std::string &subkey, const std::string &value){
-          if(subkey == "color") {
-            _style[key + "/" + subkey] = parseColorCode(value);
-          }
-          else if(subkey == "rotation") {
-            auto rotation = parseRotation(value);
-            if(rotation) {
-              _style[key + "/" + subkey] = rotation.value();
-            }
-          }
-          else if(subkey == "image") {
-            _style[key + "/" + subkey] = value;
-          }
-          else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-            _style[key + "/" + subkey] = value;
-          }
-          else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
-            _style[key + "/" + subkey] = value;
-          }
-          else if(subkey == "repeat") {
-            _style[key + "/" + subkey] = value;
-          }
-        });
+      if(!setValue(key, value)) {
+        LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+        return false;
       }
     }
   }
@@ -414,6 +251,184 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
     return _lele_parent->getStyle(key, class_name);
   }
   return std::nullopt;
+}
+
+bool LeleStyle::setValue(
+    const std::string &key, 
+    const std::string &value) {
+
+    if(_style.find(key) == _style.end()){
+      LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+      return false;
+    }
+    if(key == "class_name") {
+        _class_name = value;
+    }
+    else if(key == "id") {
+      _id = value;
+    }
+    else if(key == "x") {
+      _style[key] = parsePercentValue(value, _parent_width);
+    }
+    else if(key == "y") {
+      _style[key] = parsePercentValue(value, _parent_height);
+    }
+    else if(key == "width") {
+      _style[key] = parsePercentValue(value, _parent_width);
+    }
+    else if(key == "height") {
+      _style[key] = parsePercentValue(value, _parent_height);
+    }
+    else if(key == "corner_radius") {
+      _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
+    }
+    else if(key == "padding") {//osm todo: parse individual keys
+      std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
+    }
+    else if(key == "margin") {//osm todo: parse individual keys
+      std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
+    }
+    else if(key == "border") {//osm todo: parse individual keys
+      std::tie(_style["border/type"], _style["border/width"], _style["border/color"]) = LeleStyle::parseBorder(value); 
+    }
+    else if(key == "layout") {
+      if(strncmp(value.c_str(), "flex", 4)==0) {
+        _style[key] = LV_LAYOUT_FLEX;
+      }
+      else if(strncmp(value.c_str(), "grid", 4)==0) {
+        _style[key] = LV_LAYOUT_GRID;
+      }
+      else {//if(strncmp(value.c_str(), "none", 4)==0) {
+        _style[key] = LV_LAYOUT_NONE;
+      }
+    }
+    else if(key == "flow") {
+      if(strncmp(value.c_str(), "row", 3)==0) {
+        _style[key] = LV_FLEX_FLOW_ROW;
+      }
+      else if(strncmp(value.c_str(), "row_wrap", 8)==0) {
+        _style[key] = LV_FLEX_FLOW_ROW_WRAP;
+      }
+      else if(strncmp(value.c_str(), "row_reverse", 11)==0){
+        _style[key] = LV_FLEX_FLOW_ROW_REVERSE;
+      }
+      else if(strncmp(value.c_str(), "row_wrap_reverse", 16)==0){
+        _style[key] = LV_FLEX_FLOW_ROW_WRAP_REVERSE;
+      }
+      else if(strncmp(value.c_str(), "column", 6)==0) {
+        _style[key] = LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
+      }
+      else if(strncmp(value.c_str(), "column_wrap", 11)==0){
+        _style[key] = LV_FLEX_FLOW_COLUMN_WRAP;
+      }
+      else if(strncmp(value.c_str(), "column_reverse", 14)==0){
+        _style[key] = LV_FLEX_FLOW_COLUMN_REVERSE;
+      }
+      else if(strncmp(value.c_str(), "column_wrap_reverse", 19)==0){
+        _style[key] = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
+      }
+      else {
+        _style[key] = std::nullopt;
+      }
+    }
+    else if(key == "grow") {
+      _style[key] = std::stoi(value);
+    }
+    else if(key == "scrollbar") {
+      if(strncmp(value.c_str(), "off", 3)==0 || strncmp(value.c_str(), "none", 4)==0 || strncmp(value.c_str(), "false", 4)==0) {
+        _style[key] = LV_SCROLLBAR_MODE_OFF;
+      }
+      else if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "always", 6)==0 || strncmp(value.c_str(), "true", 4)==0) {
+        _style[key] = LV_SCROLLBAR_MODE_ON;
+      }
+      else if(strncmp(value.c_str(), "active", 6)==0) {
+        _style[key] = LV_SCROLLBAR_MODE_ACTIVE;
+      }
+      else {// "auto"
+        _style[key] = LV_SCROLLBAR_MODE_AUTO;
+      }
+    }
+    else if(key == "fgcolor") {
+      _style[key] = LeleStyle::parseColorCode(value);
+    }
+    else if(key == "bgcolor") {
+      _style[key] = LeleStyle::parseColorCode(value);
+    }
+    else if(key == "checked_color") {
+      _style[key] = LeleStyle::parseColorCode(value);
+    }
+    else if(key == "align") {
+      if(strncmp(value.c_str(), "center", strlen("center"))==0){
+        _style[key] = LV_ALIGN_CENTER;
+      }
+      else if(strncmp(value.c_str(), "top_left", strlen("top_left"))==0){
+        _style[key] = LV_ALIGN_TOP_LEFT;
+      }
+      else if(strncmp(value.c_str(), "top_mid", strlen("top_mid"))==0){
+        _style[key] = LV_ALIGN_TOP_MID;
+      }
+      else if(strncmp(value.c_str(), "top_right", strlen("top_right"))==0){
+        _style[key] = LV_ALIGN_TOP_RIGHT;
+      }
+      else if(strncmp(value.c_str(), "bottom_left", strlen("bottom_left"))==0){
+        _style[key] = LV_ALIGN_BOTTOM_LEFT;
+      }
+      else if(strncmp(value.c_str(), "bottom_mid", strlen("bottom_mid"))==0){
+        _style[key] = LV_ALIGN_BOTTOM_MID;
+      }
+      else if(strncmp(value.c_str(), "bottom_right", strlen("bottom_right"))==0){
+        _style[key] = LV_ALIGN_BOTTOM_RIGHT;
+      }
+      else if(strncmp(value.c_str(), "left_mid", strlen("left_mid"))==0){
+        _style[key] = LV_ALIGN_LEFT_MID;
+      }
+      else if(strncmp(value.c_str(), "right_mid", strlen("right_mid"))==0){
+        _style[key] = LV_ALIGN_RIGHT_MID;
+      }
+      else {
+        _style[key] = LV_ALIGN_DEFAULT;
+      }
+    }
+    else if(key == "text_align") {
+      if(strncmp(value.c_str(), "center", 6)==0){
+        _style[key] = LV_TEXT_ALIGN_CENTER;
+      }
+      else if(strncmp(value.c_str(), "right", 5)==0){
+        _style[key] = LV_TEXT_ALIGN_RIGHT;
+      }
+      else if(strncmp(value.c_str(), "left", 4)==0){
+        _style[key] = LV_TEXT_ALIGN_LEFT;
+      }
+      else {
+        _style[key] = LV_TEXT_ALIGN_AUTO;
+      }
+    }
+    else if(key == "background") {
+      LeleWidgetFactory::fromJson(value, [this, &key](const std::string &subkey, const std::string &value){
+        if(subkey == "color") {//osm todo: parse individual keys
+          _style[key + "/" + subkey] = parseColorCode(value);
+        }
+        else if(subkey == "rotation") {
+          auto rotation = parseRotation(value);
+          if(rotation) {//osm todo: parse individual keys
+            _style[key + "/" + subkey] = rotation.value();
+          }
+        }
+        else if(subkey == "image") {//osm todo: parse individual keys
+          _style[key + "/" + subkey] = value;
+        }
+        else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
+          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+        }
+        else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
+          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+        }
+        else if(subkey == "repeat") {
+          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+        }
+      });
+    }
+    return true;
 }
 
 //////////////////////////////////////////////////////////////////////

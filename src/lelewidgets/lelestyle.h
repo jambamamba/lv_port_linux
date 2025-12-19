@@ -52,6 +52,7 @@ public:
   static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
   std::string getClassName() const;
   std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
+  bool setValue(const std::string &key, const std::string &value);
 protected:
   const LeleObject *_lele_parent = nullptr;
   std::string _class_name;
