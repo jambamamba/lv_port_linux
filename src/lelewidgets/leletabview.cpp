@@ -203,11 +203,11 @@ lv_obj_t *LeleTabView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   const lv_font_t *font_normal = &lv_font_montserrat_16;
   lv_obj_set_style_text_font(_lv_obj, font_normal, 0);
-  auto fgcolor =_lele_styles.getValue("fgcolor");
+  auto fgcolor = getStyle("fgcolor");
   if(fgcolor) {
     lv_obj_set_style_text_color(_lv_obj, lv_color_hex(std::get<int>(fgcolor.value())), LV_PART_MAIN);
   }
-  auto bgcolor =_lele_styles.getValue("bgcolor");
+  auto bgcolor = getStyle("bgcolor");
   if(bgcolor) {
     lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(bgcolor.value())), LV_PART_MAIN);
   }

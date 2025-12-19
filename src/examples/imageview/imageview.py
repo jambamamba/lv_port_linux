@@ -103,10 +103,12 @@ lele.addEventHandler("slider0", lambda event: sliderMoved(event))
 lele.addEventHandler("push_button0", lambda event: pushButtonPressed(event))
 
 obj = lele.getObjectById("/views:0/view/label")
-user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
+if obj:
+   user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
 obj = lele.getObjectById("push_button0")
-for button_type in obj.Type:
-    print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
+if obj:
+   for button_type in obj.Type:
+      print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
 
 
 try:

@@ -381,12 +381,23 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
   return std::tuple<int,int,int,int>{top,right,bottom,left};
 }
 
-std::string LeleStyle::className() const {
+std::string LeleStyle::getClassName() const {
   return _class_name;
 }
+//   std::optional<LeleStyle::StyleValue> final_value;
+//   for(auto *lele_style : _lele_styles) {
+//     auto value = lele_style->getValue(key, class_name);
+//     if(value) {
+//       final_value = value;
+//     }
+//   }
+//   // if(!final_value && _lele_parent) {
+//     // final_value = _lele_parent->styles()->getValue(key, class_name);
+//   // }
+//   return final_value;
 
-std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, std::string class_name) const {
-  if(class_name == _class_name) {
+std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
+  if(class_name == _class_name || _class_name.empty()) {
     auto it = _style.find(key);
     if(it != _style.end() && it->second) {
       // if(it->second.has_value()){
@@ -400,75 +411,74 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
     }
   }
   if(_lele_parent) {
-    std::string cls = class_name.empty() ? _class_name : class_name;
-    return _lele_parent->styles()->getValue(key, cls);
+    return _lele_parent->getStyle(key, class_name);
   }
   return std::nullopt;
 }
 
 //////////////////////////////////////////////////////////////////////
-LeleStyles::LeleStyles(const std::string &json_str) {
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-    // if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
-    //   auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-    //   if(key == "style") {
-    //     _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
-    //   }
-    // }
-    // else
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "id") {
-        _id = value;
-      }
-    }
-  }
-}
+// LeleStyles::LeleStyles(const std::string &json_str) {
+//   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+//     // if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
+//     //   auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
+//     //   if(key == "style") {
+//     //     _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
+//     //   }
+//     // }
+//     // else
+//     if (std::holds_alternative<std::string>(token)) {
+//       const std::string &value = std::get<std::string>(token);
+//       if(key == "id") {
+//         _id = value;
+//       }
+//     }
+//   }
+// }
 // lv_obj_t *LeleStyles::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 //   setParent(lele_parent);
 //   return _lv_obj;
 // }
-void LeleStyles::setLeleParent(const LeleObject *lele_parent) {
-    for(LeleStyle *lele_style : _lele_styles) {
-      if(!lele_style->getLeleParent()) {
-        lele_style->setLeleParent(lele_parent);
-      }
-    }
-    _lele_parent = lele_parent;
-}
+// void LeleStyles::setLeleParent(const LeleObject *lele_parent) {
+//     for(LeleStyle *lele_style : _lele_styles) {
+//       if(!lele_style->getLeleParent()) {
+//         lele_style->setLeleParent(lele_parent);
+//       }
+//     }
+//     _lele_parent = lele_parent;
+// }
 
-LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
-  _lele_styles.insert(_lele_styles.end(), lele_styles._lele_styles.begin(), lele_styles._lele_styles.end());
-  return *this;
-}
-LeleStyles &LeleStyles::operator+=(LeleStyle &lele_style) {
-  _lele_styles.push_back(&lele_style);
-  return *this;
-}
-void LeleStyles::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
-  for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
-    _lele_styles.push_back(lele_style.get());
-  }
-}
-std::optional<LeleStyle::StyleValue> LeleStyles::getValue(const std::string &key, std::string class_name) const {
-  std::optional<LeleStyle::StyleValue> final_value;
-  for(auto *lele_style : _lele_styles) {
-    auto value = lele_style->getValue(key, class_name);
-    if(value) {
-      final_value = value;
-    }
-  }
-  if(!final_value && _lele_parent) {
-    final_value = _lele_parent->styles()->getValue(key, class_name);
-  }
-  return final_value;
-}
+// LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
+//   _lele_styles.insert(_lele_styles.end(), lele_styles._lele_styles.begin(), lele_styles._lele_styles.end());
+//   return *this;
+// }
+// LeleStyles &LeleStyles::operator+=(LeleStyle &lele_style) {
+//   _lele_styles.push_back(&lele_style);
+//   return *this;
+// }
+// void LeleStyles::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
+//   for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
+//     _lele_styles.push_back(lele_style.get());
+//   }
+// }
+// std::optional<LeleStyle::StyleValue> LeleStyles::getValue(const std::string &key, std::string class_name) const {
+//   std::optional<LeleStyle::StyleValue> final_value;
+//   for(auto *lele_style : _lele_styles) {
+//     auto value = lele_style->getValue(key, class_name);
+//     if(value) {
+//       final_value = value;
+//     }
+//   }
+//   // if(!final_value && _lele_parent) {
+//     // final_value = _lele_parent->styles()->getValue(key, class_name);
+//   // }
+//   return final_value;
+// }
 ////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
-    os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
-    os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+    // os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
+    // os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
     for(const auto [style, value]: p._style) {
       if(value.has_value()) {
         os << style << ":";
@@ -489,14 +499,14 @@ std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "}\n";
     return os;
 }
-std::ostream& operator<<(std::ostream& os, const LeleStyles& p) {
-    // os << "LeleStyles id: " << p._id << ", ";
-    os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
-    os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
-    os << "\nStyles {\n";
-    for(const LeleStyle *lele_style : p._lele_styles) {
-      os << "\t" << *lele_style << ",\n";
-    }
-    os << "}\n";
-    return os;
-}
+// std::ostream& operator<<(std::ostream& os, const LeleStyles& p) {
+//     // os << "LeleStyles id: " << p._id << ", ";
+//     // os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
+//     // os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+//     os << "\nStyles {\n";
+//     for(const LeleStyle *lele_style : p._lele_styles) {
+//       os << "\t" << *lele_style << ",\n";
+//     }
+//     os << "}\n";
+//     return os;
+// }

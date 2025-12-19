@@ -79,7 +79,7 @@ bool LeleObject::fromJson(const std::string &json_str) {
       if(key == "style") {
         auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
         LeleStyle *lele_style = dynamic_cast<LeleStyle*> (value.get());
-        _lele_styles += *lele_style;
+        _lele_styles.emplace_back(lele_style);
       }
     }
     else if (std::holds_alternative<std::string>(token)) {
@@ -116,13 +116,15 @@ void LeleObject::setLvObj(lv_obj_t *obj) {
 }
 
 void LeleObject::setParent(LeleObject *parent) {
+  for(LeleStyle *lele_style : _lele_styles) {
+    lele_style->setLeleParent(parent);
+  }
   _lele_parent = parent;
-  _lele_styles.setLeleParent(parent);
 }
 
-const LeleStyles *LeleObject::styles() const {
-  return &_lele_styles;
-}
+// const LeleStyles *LeleObject::styles() const {
+//   return &_lele_styles;
+// }
 
 std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &LeleObject::children() {
   return _nodes;
@@ -164,152 +166,154 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
+  if(_id == "push_button0" && key == "bgcolor") {
+    int x = 0;
+    x = 1;
+  }
+  std::optional<LeleStyle::StyleValue> final_value;
+  for(auto *lele_style :  _lele_styles) {
+    auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
+    if(value) {
+      final_value = value;
+    }
+  }
+  // if(!final_value && _lele_parent) {
+  //   final_value = _lele_parent->getStyle(key, class_name);
+  // }
+  return final_value;
+}
+
 void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
-  auto value = _lele_styles.getValue("corner_radius");
-  if(value) {
-    lv_style_set_radius(&_style, std::get<int>(value.value()));
-  }
-  int obj_width = -1;
-  value = _lele_styles.getValue("width");
-  if(value) {
-    obj_width = std::get<int>(value.value());
-    lv_style_set_width(&_style, obj_width);
-    // lv_obj_set_width(obj, lv_pct(100));//to set an object's size as a percentage of its parent's size
-    // LV_SIZE_CONTENT //to make an object automatically size itself to fit its children
-  }
-  int obj_height = -1;
-  value = _lele_styles.getValue("height");
-  if(value) {
-    obj_height = std::get<int>(value.value());
-    lv_style_set_height(&_style, obj_height);
-    // lv_obj_set_height(obj, lv_pct(100));//to set an object's size as a percentage of its parent's size
-    // LV_SIZE_CONTENT //to make an object automatically size itself to fit its children
-  }
-  value = _lele_styles.getValue("x");
-  if(value) {
-    lv_style_set_x(&_style, lv_pct(std::get<int>(value.value())));
-  }
-  value = _lele_styles.getValue("y");
-  if(value) {
-    lv_style_set_y(&_style, lv_pct(std::get<int>(value.value())));
-  }
+  // if(_id == "push_button0") {
+  //   int brk = 1;
+  //   brk = 0;
+  // }
 
-  value = _lele_styles.getValue("padding/top");
-  if(value) {
-    lv_style_set_pad_top(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("padding/right");
-  if(value) {
-    lv_style_set_pad_right(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("padding/bottom");
-  if(value) {
-    lv_style_set_pad_bottom(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("padding/left");
-  if(value) {
-    lv_style_set_pad_left(&_style, std::get<int>(value.value()));
-  }
-
-  value = _lele_styles.getValue("margin/top");
-  if(value) {
-    lv_style_set_margin_top(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("margin/right");
-  if(value) {
-    lv_style_set_margin_right(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("margin/bottom");
-  if(value) {
-    lv_style_set_margin_bottom(&_style, std::get<int>(value.value()));
-  }
-  value = _lele_styles.getValue("margin/left");
-  if(value) {
-    lv_style_set_margin_left(&_style, std::get<int>(value.value()));
-  }
-
-  value = _lele_styles.getValue("border/type");
-  if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::None) {
-    lv_style_set_border_width(&_style, 0);
-  }
-  else {
-    value = _lele_styles.getValue("border/color");
-    if(value) {
-      lv_style_set_border_color(&_style, lv_color_hex(std::get<int>(value.value())));
-    }
-    value = _lele_styles.getValue("border/width");
-    if(value) {
-      lv_style_set_border_width(&_style, std::get<int>(value.value()));
-    }
-  }
-
-  value = _lele_styles.getValue("x");
+  auto value = getStyle("x");
   if(value) {
     lv_obj_set_x(lv_obj, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("y");
+  value = getStyle("y");
   if(value) {
     lv_obj_set_y(lv_obj, std::get<int>(value.value()));
   }
-  value = _lele_styles.getValue("width");
+  int obj_width = -1;
+  value = getStyle("width");
   if(value) {
     obj_width = std::get<int>(value.value());
     lv_obj_set_width(lv_obj, obj_width);
   }
-  value = _lele_styles.getValue("height");
+  int obj_height = -1;
+  value = getStyle("height");
   if(value) {
     obj_height = std::get<int>(value.value());
     lv_obj_set_height(lv_obj, obj_height);
   }
 
-  value =_lele_styles.getValue("fgcolor");
+  value = getStyle("corner_radius");
+  if(value) {
+    lv_style_set_radius(&_style, std::get<int>(value.value()));
+  }
+
+  value = getStyle("padding/top");
+  if(value) {
+    lv_style_set_pad_top(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("padding/right");
+  if(value) {
+    lv_style_set_pad_right(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("padding/bottom");
+  if(value) {
+    lv_style_set_pad_bottom(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("padding/left");
+  if(value) {
+    lv_style_set_pad_left(&_style, std::get<int>(value.value()));
+  }
+
+  value = getStyle("margin/top");
+  if(value) {
+    lv_style_set_margin_top(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("margin/right");
+  if(value) {
+    lv_style_set_margin_right(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("margin/bottom");
+  if(value) {
+    lv_style_set_margin_bottom(&_style, std::get<int>(value.value()));
+  }
+  value = getStyle("margin/left");
+  if(value) {
+    lv_style_set_margin_left(&_style, std::get<int>(value.value()));
+  }
+
+  value = getStyle("border/type");
+  if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::None) {
+    lv_style_set_border_width(&_style, 0);
+  }
+  else {
+    value = getStyle("border/color");
+    if(value) {
+      lv_style_set_border_color(&_style, lv_color_hex(std::get<int>(value.value())));
+    }
+    value = getStyle("border/width");
+    if(value) {
+      lv_style_set_border_width(&_style, std::get<int>(value.value()));
+    }
+  }
+
+  value =getStyle("fgcolor");
   if(value) {
     lv_obj_set_style_text_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
-  value =_lele_styles.getValue("bgcolor");
+  value =getStyle("bgcolor");
   if(value) {
+    int bgcolor = std::get<int>(value.value());
     lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
 
-  value = _lele_styles.getValue("layout");
+  value = getStyle("layout");
   if(value) {
     lv_obj_set_style_layout(lv_obj, 
       std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
       LV_STYLE_STATE_CMP_SAME);
   }
-  value = _lele_styles.getValue("flow");
+  value = getStyle("flow");
   if(value) {
     lv_obj_set_style_flex_flow(lv_obj, 
       std::get<lv_flex_flow_t>(value.value()), //LV_FLEX_FLOW_ROW or LV_FLEX_FLOW_COLUMN or ...
       LV_STYLE_STATE_CMP_SAME);
 
-    value = _lele_styles.getValue("grow");
+    value = getStyle("grow");
     if(value) {
       lv_obj_set_style_flex_grow(lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
     }
   }
 
-  value = _lele_styles.getValue("align");
+  value = getStyle("align");
   if(value) {
     lv_obj_align(lv_obj, 
       static_cast<lv_align_t>(std::get<int>(value.value())), 0, 0);
   }
-  value = _lele_styles.getValue("text_align");
+  value = getStyle("text_align");
   if(value) {
     lv_obj_set_style_text_align(lv_obj, 
       static_cast<lv_text_align_t>(std::get<int>(value.value())), 0);
   }
 
-  value = _lele_styles.getValue("background/color");
+  value = getStyle("background/color");
   if(value) {
     lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
-  value = _lele_styles.getValue("background/image");
+  value = getStyle("background/image");
   if(value) {
     drawBackgroundImage(value, obj_width, obj_height);
   }
-  value = _lele_styles.getValue("scrollbar");
+  value = getStyle("scrollbar");
   if(value) {
     lv_obj_set_scrollbar_mode(lv_obj, std::get<lv_scrollbar_mode_t>(value.value()));
   }
@@ -345,7 +349,7 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
         LOG(FATAL, LVSIM, "Failed in generating image description");
         return;
     }
-    value = _lele_styles.getValue("background/size");
+    value = getStyle("background/size");
     if(value) {
       std::string val = std::get<std::string>(value.value());
       if(val == "cover") {
@@ -364,16 +368,16 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
     }
     int offset_x = 0;
     int offset_y = 0;
-    value = _lele_styles.getValue("background/position");
+    value = getStyle("background/position");
     if(value) {
       std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
     }
-    value = _lele_styles.getValue("background/rotation");
+    value = getStyle("background/rotation");
     if(value) {
       LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
       _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
     }
-    value = _lele_styles.getValue("background/repeat");
+    value = getStyle("background/repeat");
     if(value) {
       std::string val = std::get<std::string>(value.value());
       if(val == "repeat-x"){
@@ -419,9 +423,16 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
 
 void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
   if(lele_styles.size()){
-    _lele_styles.addStyle(lele_styles);
+    for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
+      _lele_styles.emplace_back(lele_style.get());
+    }
     setStyle(_lv_obj);
   }
+}
+
+void LeleObject::addStyle(LeleStyle* lele_style) {
+  _lele_styles.emplace_back(lele_style);
+  setStyle(_lv_obj);
 }
 
 void LeleObject::removeStyle(const std::string &style_id) {
@@ -429,7 +440,7 @@ void LeleObject::removeStyle(const std::string &style_id) {
 }
 
 void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
-  auto value = _lele_styles.getValue("align");
+  auto value = getStyle("align");
   if(value) {
     lv_obj_align(lv_obj, 
       static_cast<lv_align_t>(
@@ -441,7 +452,7 @@ void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
 
 void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
 
-  auto value = _lele_styles.getValue("text_align");
+  auto value = getStyle("text_align");
   if(value) {
     lv_obj_set_style_text_align(lv_obj, 
       static_cast<lv_text_align_t>(
@@ -518,6 +529,8 @@ std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     os << "_id:" << p._id << ",";
     os << "_class_name:" << p._class_name << ",";
     os << "\nStyles {\n";
-    os << p._lele_styles;
+    for(LeleStyle *lele_style : p._lele_styles) {
+      os << lele_style;
+    }
     return os;
 }

@@ -164,7 +164,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
 
   if(_checkable) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_CHECKABLE);
-    auto value =_lele_styles.getValue("checked_color");
+    auto value = getStyle("checked_color");
     if(value) {
       lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN | LV_STATE_CHECKED); // Green when checked
     }

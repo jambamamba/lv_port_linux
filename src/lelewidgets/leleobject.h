@@ -39,7 +39,8 @@ public:
   lv_obj_t *getLvObj() const;
   void setLvObj(lv_obj_t *obj);
   void setParent(LeleObject *parent);
-  const LeleStyles *styles() const;
+  // const LeleStyles *styles() const;
+  std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
@@ -47,6 +48,7 @@ public:
   virtual bool fromJson(const std::string &json_str);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
+  virtual void addStyle(LeleStyle* lele_style);
   virtual void removeStyle(const std::string &style_id);
   virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   virtual void setTextAlignStyle(lv_obj_t *lv_obj);
@@ -71,7 +73,8 @@ protected:
   lv_style_t _style = {0};
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
-  LeleStyles _lele_styles;
+  // LeleStyles _lele_styles;
+  std::vector<LeleStyle *>_lele_styles;
   std::vector<PyObject *> _py_callbacks;
 };
 

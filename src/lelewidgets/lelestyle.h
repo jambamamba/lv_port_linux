@@ -50,8 +50,8 @@ public:
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
   static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
-  std::string className() const;
-  std::optional<StyleValue> getValue(const std::string &key, std::string class_name = "") const;
+  std::string getClassName() const;
+  std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
 protected:
   const LeleObject *_lele_parent = nullptr;
   std::string _class_name;
@@ -91,22 +91,22 @@ protected:
   int _parent_width = 0;
   int _parent_height = 0;
 };
-class LeleStyles {
-public:
-  LeleStyles(const std::string &json_str = "");
-  friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
-  void setLeleParent(const LeleObject *lele_parent);
-  size_t size() const { return _lele_styles.size(); }
-  void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
-  LeleStyles &operator+=(LeleStyles &);
-  LeleStyles &operator+=(LeleStyle &);
-  std::optional<LeleStyle::StyleValue> getValue(const std::string &key, std::string class_name = "") const;
-  protected:
-  std::string _id;
-  LeleStyle _null_pos;
-  std::vector<LeleStyle *>_lele_styles;
-  const LeleObject *_lele_parent = nullptr;
-};
+// class LeleStyles {
+// public:
+//   LeleStyles(const std::string &json_str = "");
+//   friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
+//   // void setLeleParent(const LeleObject *lele_parent);
+//   size_t size() const { return _lele_styles.size(); }
+//   void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
+//   LeleStyles &operator+=(LeleStyles &);
+//   LeleStyles &operator+=(LeleStyle &);
+//   std::optional<LeleStyle::StyleValue> getValue(const std::string &key, std::string class_name = "") const;
+//   protected:
+//   std::string _id;
+//   LeleStyle _null_pos;
+//   std::vector<LeleStyle *>_lele_styles;
+//   // const LeleObject *_lele_parent = nullptr;
+// };
 
 struct PyLeleStyle {
     PyObject ob_base;
