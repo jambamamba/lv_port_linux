@@ -19,7 +19,6 @@ bool LeleStyle::fromJson(const std::string &json_str) {
       const std::string &value = std::get<std::string>(token);
       std::string key = ref_key;// to print error: reference to local binding 'key' declared in enclosing function 'LeleStyle::LeleStyle' : _style[key + "/" + subkey] = value;
       if(!setValue(key, value)) {
-        LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
         return false;
       }
     }
@@ -257,15 +256,21 @@ bool LeleStyle::setValue(
     const std::string &key, 
     const std::string &value) {
 
-    if(_style.find(key) == _style.end()){
-      LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
-      return false;
-    }
     if(key == "class_name") {
         _class_name = value;
     }
     else if(key == "id") {
-      _id = value;
+        _id = value;
+    }
+    else if(
+      key != "padding" && 
+      key != "margin" && 
+      key != "border" && 
+      key != "background" && 
+      _style.find(key) == _style.end()){
+
+      LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+      return false;
     }
     else if(key == "x") {
       _style[key] = parsePercentValue(value, _parent_width);
@@ -282,14 +287,58 @@ bool LeleStyle::setValue(
     else if(key == "corner_radius") {
       _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
     }
-    else if(key == "padding") {//osm todo: parse individual keys
+    else if(key == "padding") {
       std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
     }
-    else if(key == "margin") {//osm todo: parse individual keys
+    else if(key == "padding/top") {
+      int top, right, bottom, left;
+      std::tie(_style["padding/top"], right, bottom, left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "padding/right") {
+      int top, right, bottom, left;
+      std::tie(top, _style["padding/right"], bottom, left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "padding/bottom") {
+      int top, right, bottom, left;
+      std::tie(top, right, _style["padding/bottom"], left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "padding/left") {
+      int top, right, bottom, left;
+      std::tie(top, right, bottom, _style["padding/left"]) = parsePaddingOrMargin(value);
+    }
+    else if(key == "margin") {
       std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
     }
-    else if(key == "border") {//osm todo: parse individual keys
+    else if(key == "margin/top") {
+      int top, right, bottom, left;
+      std::tie(_style["margin/top"], right, bottom, left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "margin/right") {
+      int top, right, bottom, left;
+      std::tie(top, _style["margin/right"], bottom, left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "margin/bottom") {
+      int top, right, bottom, left;
+      std::tie(top, right, _style["margin/bottom"], left) = parsePaddingOrMargin(value);
+    }
+    else if(key == "margin/left") {
+      int top, right, bottom, left;
+      std::tie(top, right, bottom, _style["margin/left"]) = parsePaddingOrMargin(value);
+    }
+    else if(key == "border") {
       std::tie(_style["border/type"], _style["border/width"], _style["border/color"]) = LeleStyle::parseBorder(value); 
+    }
+    else if(key == "border/type") {
+      std::string type; int width,  color;
+      std::tie(_style["border/type"], width, color) = LeleStyle::parseBorder(value); 
+    }
+    else if(key == "border/width") {
+      std::string type; int width,  color;
+      std::tie(type, _style["border/width"], color) = LeleStyle::parseBorder(value); 
+    }
+    else if(key == "border/color") {
+      std::string type; int width,  color;
+      std::tie(type, width, _style["border/color"]) = LeleStyle::parseBorder(value); 
     }
     else if(key == "layout") {
       if(strncmp(value.c_str(), "flex", 4)==0) {
@@ -405,28 +454,46 @@ bool LeleStyle::setValue(
     }
     else if(key == "background") {
       LeleWidgetFactory::fromJson(value, [this, &key](const std::string &subkey, const std::string &value){
-        if(subkey == "color") {//osm todo: parse individual keys
+        if(subkey == "color") {
           _style[key + "/" + subkey] = parseColorCode(value);
         }
         else if(subkey == "rotation") {
           auto rotation = parseRotation(value);
-          if(rotation) {//osm todo: parse individual keys
+          if(rotation) {
             _style[key + "/" + subkey] = rotation.value();
           }
         }
-        else if(subkey == "image") {//osm todo: parse individual keys
+        else if(subkey == "image") {
           _style[key + "/" + subkey] = value;
         }
         else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+          _style[key + "/" + subkey] = value;
         }
         else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
-          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+          _style[key + "/" + subkey] = value;
         }
         else if(subkey == "repeat") {
-          _style[key + "/" + subkey] = value;//osm todo: parse individual keys
+          _style[key + "/" + subkey] = value;
         }
       });
+    }
+    else if(key == "background/image") {//osm todo
+        _style["background/image"] = value;
+    }
+    else if(key == "background/position") {
+        _style["background/position"] = value;
+    }
+    else if(key == "background/size") {
+        _style["background/size"] = value;
+    }
+    else if(key == "background/repeat") {
+        _style["background/repeat"] = value;
+    }
+    else if(key == "background/color") {
+        _style["background/color"] = value;
+    }
+    else if(key == "background/rotate") {
+        _style["background/rotate"] = value;
     }
     return true;
 }
