@@ -119,7 +119,6 @@ auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
         }
         else if (std::holds_alternative<std::unique_ptr<LeleStyle>>(node)) {
             auto &value = std::get<std::unique_ptr<LeleStyle>>(node);
-            // value->setLeleParent(parent);
             parent->addStyle(value.get());
         }
         else if (std::holds_alternative<std::unique_ptr<LeleEvent>>(node)) {

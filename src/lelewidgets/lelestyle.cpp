@@ -13,11 +13,11 @@ LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent)
   , _parent_height(lv_obj_get_height(parent)) {
   fromJson(json_str);
 }
+
 bool LeleStyle::fromJson(const std::string &json_str) {
-  for (const auto &[ref_key, token]: LeleWidgetFactory::fromJson(json_str)) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
-      std::string key = ref_key;// to print error: reference to local binding 'key' declared in enclosing function 'LeleStyle::LeleStyle' : _style[key + "/" + subkey] = value;
       if(!setValue(key, value)) {
         return false;
       }
@@ -110,6 +110,43 @@ std::optional<LeleStyle::Rotation> LeleStyle::parseRotation(const std::string &j
     }
   }
   return processed ? std::optional<LeleStyle::Rotation>(rotation) : std::nullopt;
+}
+
+std::vector<std::string> LeleStyle::getBackgroundAttributes() const {
+  return _background_attributes;
+}
+
+void LeleStyle::parseBackground(const std::string &value_) {
+
+  LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
+    const std::string bg("background");
+    std::string subkey(subkey_);
+    if(subkey == "color") {
+      _style[bg + "/" + subkey] = parseColorCode(value);
+    }
+    else if(subkey == "rotation") {
+      auto rotation = parseRotation(value);
+      if(rotation) {
+        _style[bg + "/" + subkey] = rotation.value();
+      }
+    }
+    else if(subkey == "image") {
+      _style[bg + "/" + subkey] = value;
+    }
+    else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
+      _style[bg + "/" + subkey] = value;
+    }
+    else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
+      _style[bg + "/" + subkey] = value;
+    }
+    else if(subkey == "repeat") {
+      _style[bg + "/" + subkey] = value;
+    }
+    else {
+      return;
+    }
+    _background_attributes.push_back(subkey);
+  });
 }
 
 std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::string &border_type_width_color) {
@@ -220,29 +257,15 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
 std::string LeleStyle::getClassName() const {
   return _class_name;
 }
-//   std::optional<LeleStyle::StyleValue> final_value;
-//   for(auto *lele_style : _lele_styles) {
-//     auto value = lele_style->getValue(key, class_name);
-//     if(value) {
-//       final_value = value;
-//     }
-//   }
-//   // if(!final_value && _lele_parent) {
-//     // final_value = _lele_parent->styles()->getValue(key, class_name);
-//   // }
-//   return final_value;
+
+const std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleStyle::getStyle() const {
+  return _style;
+}
 
 std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
   if(class_name == _class_name || _class_name.empty()) {
     auto it = _style.find(key);
     if(it != _style.end() && it->second) {
-      // if(it->second.has_value()){
-      //   if (std::holds_alternative<int>(it->second.value())) {
-      //     int value = std::get<int>(it->second.value());
-      //     int x = 0;
-      //     x = 1;
-      //   }
-      // }
       return it->second;
     }
   }
@@ -269,7 +292,7 @@ bool LeleStyle::setValue(
       key != "background" && 
       _style.find(key) == _style.end()){
 
-      LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+      LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
       return false;
     }
     else if(key == "x") {
@@ -453,31 +476,18 @@ bool LeleStyle::setValue(
       }
     }
     else if(key == "background") {
-      LeleWidgetFactory::fromJson(value, [this, &key](const std::string &subkey, const std::string &value){
-        if(subkey == "color") {
-          _style[key + "/" + subkey] = parseColorCode(value);
-        }
-        else if(subkey == "rotation") {
-          auto rotation = parseRotation(value);
-          if(rotation) {
-            _style[key + "/" + subkey] = rotation.value();
-          }
-        }
-        else if(subkey == "image") {
-          _style[key + "/" + subkey] = value;
-        }
-        else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-          _style[key + "/" + subkey] = value;
-        }
-        else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
-          _style[key + "/" + subkey] = value;
-        }
-        else if(subkey == "repeat") {
-          _style[key + "/" + subkey] = value;
-        }
-      });
+      parseBackground(value);
     }
-    else if(key == "background/image") {//osm todo
+    else if(key == "background/color") {
+        _style["background/color"] = parseColorCode(value);
+    }
+    else if(key == "background/rotate") {
+        auto rotation = parseRotation(value);
+        if(rotation) {
+          _style["background/rotate"] = rotation.value();
+        }
+    }
+    else if(key == "background/image") {
         _style["background/image"] = value;
     }
     else if(key == "background/position") {
@@ -489,73 +499,8 @@ bool LeleStyle::setValue(
     else if(key == "background/repeat") {
         _style["background/repeat"] = value;
     }
-    else if(key == "background/color") {
-        _style["background/color"] = value;
-    }
-    else if(key == "background/rotate") {
-        _style["background/rotate"] = value;
-    }
     return true;
 }
-
-//////////////////////////////////////////////////////////////////////
-// LeleStyles::LeleStyles(const std::string &json_str) {
-//   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-//     // if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
-//     //   auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-//     //   if(key == "style") {
-//     //     _lele_styles.push_back(dynamic_cast<LeleStyle*> (value.get()));
-//     //   }
-//     // }
-//     // else
-//     if (std::holds_alternative<std::string>(token)) {
-//       const std::string &value = std::get<std::string>(token);
-//       if(key == "id") {
-//         _id = value;
-//       }
-//     }
-//   }
-// }
-// lv_obj_t *LeleStyles::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
-//   setParent(lele_parent);
-//   return _lv_obj;
-// }
-// void LeleStyles::setLeleParent(const LeleObject *lele_parent) {
-//     for(LeleStyle *lele_style : _lele_styles) {
-//       if(!lele_style->getLeleParent()) {
-//         lele_style->setLeleParent(lele_parent);
-//       }
-//     }
-//     _lele_parent = lele_parent;
-// }
-
-// LeleStyles &LeleStyles::operator+=(LeleStyles &lele_styles) {
-//   _lele_styles.insert(_lele_styles.end(), lele_styles._lele_styles.begin(), lele_styles._lele_styles.end());
-//   return *this;
-// }
-// LeleStyles &LeleStyles::operator+=(LeleStyle &lele_style) {
-//   _lele_styles.push_back(&lele_style);
-//   return *this;
-// }
-// void LeleStyles::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
-//   for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
-//     _lele_styles.push_back(lele_style.get());
-//   }
-// }
-// std::optional<LeleStyle::StyleValue> LeleStyles::getValue(const std::string &key, std::string class_name) const {
-//   std::optional<LeleStyle::StyleValue> final_value;
-//   for(auto *lele_style : _lele_styles) {
-//     auto value = lele_style->getValue(key, class_name);
-//     if(value) {
-//       final_value = value;
-//     }
-//   }
-//   // if(!final_value && _lele_parent) {
-//     // final_value = _lele_parent->styles()->getValue(key, class_name);
-//   // }
-//   return final_value;
-// }
-////////////////////////////////////////////////////
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";

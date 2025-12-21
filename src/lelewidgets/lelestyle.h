@@ -43,6 +43,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   void setLeleParent(const LeleObject *lele_parent) { _lele_parent = lele_parent; }
   const LeleObject *getLeleParent() const { return _lele_parent; }
+  void parseBackground(const std::string &value);
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
   static std::optional<LeleStyle::Rotation> parseRotation(const std::string &json_str);
@@ -53,6 +54,8 @@ public:
   std::string getClassName() const;
   std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
   bool setValue(const std::string &key, const std::string &value);
+  std::vector<std::string> getBackgroundAttributes() const;
+  const std::map<std::string, std::optional<StyleValue>> getStyle() const;
 protected:
   const LeleObject *_lele_parent = nullptr;
   std::string _class_name;
@@ -89,25 +92,10 @@ protected:
     {"background/rotate", std::nullopt},
     {"scrollbar", std::nullopt}
   };
+  mutable std::vector<std::string> _background_attributes;
   int _parent_width = 0;
   int _parent_height = 0;
 };
-// class LeleStyles {
-// public:
-//   LeleStyles(const std::string &json_str = "");
-//   friend std::ostream& operator<<(std::ostream& os, const LeleStyles& p);
-//   // void setLeleParent(const LeleObject *lele_parent);
-//   size_t size() const { return _lele_styles.size(); }
-//   void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
-//   LeleStyles &operator+=(LeleStyles &);
-//   LeleStyles &operator+=(LeleStyle &);
-//   std::optional<LeleStyle::StyleValue> getValue(const std::string &key, std::string class_name = "") const;
-//   protected:
-//   std::string _id;
-//   LeleStyle _null_pos;
-//   std::vector<LeleStyle *>_lele_styles;
-//   // const LeleObject *_lele_parent = nullptr;
-// };
 
 struct PyLeleStyle {
     PyObject ob_base;

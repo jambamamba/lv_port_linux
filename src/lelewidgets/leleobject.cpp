@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <iostream>
+#include <ranges>
 #include <lvgl/lvgl_private.h>
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 
@@ -166,30 +168,55 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
-std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
-  // if(_id == "push_button0" && key == "bgcolor") {
-  //   int x = 0;
-  //   x = 1;
-  // }
-  std::optional<LeleStyle::StyleValue> final_value;
-  for(auto *lele_style :  _lele_styles) {
-    auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
-    if(value) {
-      final_value = value;
+std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle() const {
+
+  std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;
+  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+    const auto &styles = lele_style->getStyle();
+    std::vector<std::string> keys;
+    for(const auto &[key,value] : styles) {
+      keys.push_back(key);
+    }
+    for(const auto &key : keys) {
+      auto value = lele_style->getValue(key, lele_style->getClassName());
+      if(value && ret.find(key) == ret.end()) {
+        ret[key] = value;
+      }
     }
   }
-  // if(!final_value && _lele_parent) {
-  //   final_value = _lele_parent->getStyle(key, class_name);
-  // }
-  return final_value;
+  return ret;
+}
+
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
+
+  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+    auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
+    if(value) {
+      return value;
+    }
+  }
+  return std::optional<LeleStyle::StyleValue>();
+}
+
+std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> LeleObject::getBackgroundStyle(const std::string &class_name) const {
+
+  std::vector<std::string> bg_keys;
+  std::map<std::string, std::optional<LeleStyle::StyleValue>> bg_style;
+  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+    for(const std::string &key : lele_style->getBackgroundAttributes()) {
+      std::string bg_key("background/" + key);
+      auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClassName() : class_name);
+      if(value && bg_style.find(bg_key) == bg_style.end()) {
+        bg_style[bg_key] = value;
+        bg_keys.push_back(bg_key);
+      }
+    }
+  }
+  return {bg_keys, bg_style};
 }
 
 void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
-  // if(_id == "push_button0") {
-  //   int brk = 1;
-  //   brk = 0;
-  // }
 
   auto value = getStyle("x");
   if(value) {
@@ -327,8 +354,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 }
 
 void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
-  //osm todo: apply these in the same order they are defined in the json
-    lv_obj_t *lv_img = lv_image_create  (_lv_obj);
+    lv_obj_t *lv_img = lv_image_create(_lv_obj);
     if(!lv_img) {
         LOG(FATAL, LVSIM, "Failed in lv_image_create");
         return;
@@ -349,50 +375,54 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
         LOG(FATAL, LVSIM, "Failed in generating image description");
         return;
     }
-    value = getStyle("background/size");
-    if(value) {
-      std::string val = std::get<std::string>(value.value());
-      if(val == "cover") {
-        _bg_img = resizeContentToFillContainerPotentiallyCroppingContent(_bg_img.value().get(), obj_width, obj_height);
-      }
-      else if(val == "contain") {
-        _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
-      }
-      else if(!val.empty()) {
-        _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
-      }
-    }
-    if(!_bg_img) {
-      LOG(FATAL, LVSIM, "Failed in processing background/size");
-      return;
-    }
     int offset_x = 0;
     int offset_y = 0;
-    value = getStyle("background/position");
-    if(value) {
-      std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
-    }
-    value = getStyle("background/rotation");
-    if(value) {
-      LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
-      _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
-    }
-    value = getStyle("background/repeat");
-    if(value) {
-      std::string val = std::get<std::string>(value.value());
-      if(val == "repeat-x"){
-        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset_x, offset_y);
+    const auto &[keys, bg_style] = getBackgroundStyle();
+    for(const auto &key: keys) {
+      const auto &value = bg_style.at(key);
+      if(key == "background/size") {
+        std::string val = std::get<std::string>(value.value());
+        if(val == "cover") {
+          _bg_img = resizeContentToFillContainerPotentiallyCroppingContent(_bg_img.value().get(), obj_width, obj_height);
+        }
+        else if(val == "contain") {
+          _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
+        }
+        else if(!val.empty()) {
+          _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
+        }
+        if(!_bg_img) {
+          LOG(FATAL, LVSIM, "Failed in processing background/size");
+          return;
+        }
       }
-      else if(val == "repeat-y"){
-        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset_x, offset_y);
+      else if(key == "background/position") {
+        std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
       }
-      else if(val == "repeat"){
-        _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
+      else if(key == "background/rotation") {
+        LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
+        _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
+        if(!_bg_img) {
+          LOG(FATAL, LVSIM, "Failed in processing background/rotation");
+          return;
+        }
       }
-    }
-    if(!_bg_img) {
-      LOG(FATAL, LVSIM, "Failed in background/repeat");
-      return;
+      else if(key == "background/repeat") {
+        std::string val = std::get<std::string>(value.value());
+        if(val == "repeat-x"){
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset_x, offset_y);
+        }
+        else if(val == "repeat-y"){
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset_x, offset_y);
+        }
+        else if(val == "repeat"){
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
+        }
+        if(!_bg_img) {
+          LOG(FATAL, LVSIM, "Failed in background/repeat");
+          return;
+        }
+      }
     }
     if(_bg_img.value().get()->header.w > obj_width || 
         _bg_img.value().get()->header.h > obj_height) {
@@ -420,10 +450,6 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   }
   return std::tuple<int,int>(x, y);
 }
-std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle() const {
-  std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;//osm todo
-  return ret;
-}
 
 void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
   if(lele_styles.size()){
@@ -437,20 +463,6 @@ void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) 
 void LeleObject::addStyle(LeleStyle* lele_style) {
   _lele_styles.emplace_back(lele_style);
   setStyle(_lv_obj);
-}
-
-bool LeleObject::addStyle(const std::string &key, const std::string &value) {
-  bool ret = false;  
-  for(LeleStyle *lele_style : _lele_styles) {
-      ret = lele_style->setValue(key, value);
-      if(ret) {
-        break;
-      }
-    }
-    if(ret) {
-      setStyle(_lv_obj);
-    }
-    return ret;
 }
 
 void LeleObject::removeStyle(const std::string &style_id) {
