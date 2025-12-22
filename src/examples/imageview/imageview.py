@@ -3,7 +3,6 @@ print(sys.path)
 import traceback
 import lele
 
-
 print("@@@py hello from python")
 print(f"@@@py lele.version(): {lele.version()}")
 
@@ -73,6 +72,13 @@ def pushButtonPressed(event):
       print(f"@@@py change text color to white")
       style = lele.Style('{"style":{"fgcolor":"#fff"}}')
       obj.addStyle(style)
+
+      obj = lele.getObjectById("/view/with_bg_img")
+      style = obj.getStyle()
+      print(f"@@@py======================================1")
+      print(f"@@@py lele.Style.Border: {lele.Style.Border}")
+      print(f"@@@py style:{style}")
+      print(f"@@@py======================================")
 
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")

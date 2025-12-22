@@ -1,3 +1,4 @@
+#include <lelewidgets/leleobject.h>
 #include <lelewidgets/lelestyle.h>
 #include <lelewidgets/lelewidgetfactory.h>
 
@@ -27,6 +28,49 @@ bool LeleStyle::initPyObject(PyLeleStyle *py_obj) {
     py_obj->_class_name = PyUnicode_FromString(
         _class_name.size() ? _class_name.c_str() : "");
     if (py_obj->_class_name == nullptr) {
+        return false;
+    }
+    py_obj->_layout = LeleObject::createPyEnum("Layout", {
+            {"Flex",LV_LAYOUT_FLEX},
+            {"Grid",LV_LAYOUT_GRID},
+            {"No",LV_LAYOUT_NONE}
+        }
+    );
+    if (py_obj->_layout == nullptr) {
+        return false;
+    }
+    py_obj->_flow = LeleObject::createPyEnum("Flow", {
+            {"Row",LV_FLEX_FLOW_ROW},
+            {"Column",LV_FLEX_FLOW_COLUMN},
+            {"RowWrap",LV_FLEX_FLOW_ROW_WRAP},
+            {"RowReverse",LV_FLEX_FLOW_ROW_REVERSE},
+            {"RowWrapReverse",LV_FLEX_FLOW_ROW_WRAP_REVERSE},
+            {"ColumnWrap",LV_FLEX_FLOW_COLUMN_WRAP},
+            {"ColumnReverse",LV_FLEX_FLOW_COLUMN_REVERSE},
+            {"ColumnWrapReverse",LV_FLEX_FLOW_COLUMN_WRAP_REVERSE}
+        }
+    );
+    if (py_obj->_flow == nullptr) {
+        return false;
+    }
+    py_obj->_scrollbar = LeleObject::createPyEnum("Scrollbar", {
+            {"Off",LV_SCROLLBAR_MODE_OFF},
+            {"On",LV_SCROLLBAR_MODE_ON},
+            {"Active",LV_SCROLLBAR_MODE_ACTIVE},
+            {"Auto",LV_SCROLLBAR_MODE_AUTO}
+        }
+    );
+    if (py_obj->_scrollbar == nullptr) {
+        return false;
+    }
+    py_obj->_border = LeleObject::createPyEnum("Border", {
+            {"No",LeleStyle::BorderTypeE::None},
+            {"Solid",LeleStyle::BorderTypeE::Solid},
+            {"Dashed",LeleStyle::BorderTypeE::Dashed},
+            {"Dotted",LeleStyle::BorderTypeE::Dotted}
+        }
+    );
+    if (py_obj->_border == nullptr) {
         return false;
     }
     return true;

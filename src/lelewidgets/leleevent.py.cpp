@@ -27,6 +27,10 @@ PyObject *LeleEvent::createPyObject() {
                 {"ValueChanged",LeleEvent::Type::ValueChanged}
             }
         );
+        if (self->_type == nullptr) {
+            Py_DECREF(self);
+            return nullptr;
+        }
         switch(_code) {
             case LeleEvent::Type::Clicked: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.Clicked"); break;
             case LeleEvent::Type::ValueChanged: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.ValueChanged"); break;

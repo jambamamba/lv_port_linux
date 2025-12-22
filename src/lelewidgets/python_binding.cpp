@@ -18,11 +18,11 @@ namespace {
     struct RAII {
         PyObject *global_dict=nullptr;
         PyObject *local_dict=nullptr;
-        PyObject *should_be_none=nullptr;
+        PyObject *ret=nullptr;
         ~RAII() {
             Py_XDECREF(global_dict);
             Py_XDECREF(local_dict);
-            Py_XDECREF(should_be_none);            
+            Py_XDECREF(ret);            
         }
     };
     std::string getPyScriptDir() {
@@ -36,9 +36,9 @@ namespace {
         if (!$.global_dict) { return ""; }
         $.local_dict = PyDict_New();
         if (!$.local_dict) { return ""; }
-        $.should_be_none = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
+        $.ret = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
 
-        if (!$.should_be_none) { 
+        if (!$.ret) { 
             LOG(WARNING, LVSIM, "Failed in PyRun_String!\n");
             return ""; 
         }
@@ -283,9 +283,11 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyModule_AddType(module, &PyLeleObject::_obj_type);
     PyModule_AddType(module, &PyLeleLabel::_obj_type);
     PyModule_AddType(module, &PyLeleMessageBox::_obj_type);
-    PyModule_AddType(module, &PyLeleStyle::_obj_type);
+    // PyModule_AddType(module, &PyLeleStyle::_obj_type);
 
     //Use PyModule_AddObject for these types because of Enum types in them that we want to use in Python, like lele.Event.Type.Clicked, lele.Button.Type.Push
+    LeleStyle style;
+    PyModule_AddObject(module, "Style", style.createPyObject());
     LeleEvent event;
     PyModule_AddObject(module, "Event", event.createPyObject());
     LeleButtons::LeleButton btn;

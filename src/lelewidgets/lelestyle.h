@@ -31,7 +31,7 @@ public:
     lv_layout_t,
     lv_flex_flow_t,
     lv_scrollbar_mode_t,
-    BorderTypeE,
+    LeleStyle::BorderTypeE,
     LeleStyle::Rotation
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
@@ -109,14 +109,22 @@ struct PyLeleStyle {
     LeleStyle* _lele_style = nullptr;
     PyObject *_id = nullptr;
     PyObject *_class_name = nullptr;
+    PyObject *_layout = nullptr;
+    PyObject *_flow = nullptr;
+    PyObject *_scrollbar = nullptr;
+    PyObject *_border = nullptr;
     static PyObject *fromConfig(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
 };
 
 #define PY_LELESTYLE_MEMBERS() \
-  {"id", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _id), 0, "id"},
+  {"id", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _id), 0, "id"},\
+  {"Layout", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _layout), 0, "Layout"},\
+  {"Flow", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _flow), 0, "Flow"},\
+  {"Scrollbar", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _scrollbar), 0, "Scrollbar"},\
+  {"Border", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _border), 0, "Border"},\
 
 #define PY_LELESTYLE_METHODS() \
   {"fromConfig", (PyCFunction)PyLeleStyle::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
   {"getClassName", (PyCFunction)PyLeleStyle::getClassName, METH_NOARGS, "Get the class name"},\
-
+  
