@@ -320,6 +320,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     }
 
     //osm todo: split into getStyleById, and getStyleAttributes
+    //osm todo: Style, add methods: getValue->dict, setValue(dict)
 
     struct raii {
         PyObject *_dict;
