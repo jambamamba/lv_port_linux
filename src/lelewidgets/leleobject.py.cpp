@@ -319,6 +319,8 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         return PyBool_FromLong(false);
     }
 
+    //osm todo: split into getStyleById, and getStyleAttributes
+
     struct raii {
         PyObject *_dict;
         std::map<PyObject*, PyObject*> _items;
