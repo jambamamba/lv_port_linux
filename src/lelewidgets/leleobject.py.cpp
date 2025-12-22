@@ -142,8 +142,10 @@ PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     // Posted by Cyrille Pontvieux
     // Retrieved 2025-12-22, License - CC BY-SA 4.0
     
+    const char *k1;
     PyObject *attrs = PyDict_New();
     for(const auto &[name,value] : enum_map) {
+        k1 = name.c_str();
         PyObject *key = PyUnicode_FromString(name.c_str());
         PyObject *val = PyLong_FromLong(value);
         PyObject_SetItem(attrs, key, val);
@@ -170,6 +172,9 @@ PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     Py_DECREF(enum_type);
     Py_DECREF(args);
     Py_DECREF(kwargs);
+
+    PyObject *df = PyObject_GetAttrString(sub_enum_type, k1);
+    LOG(WARNING, LVSIM, "@@@@ GOT df!!!!! @@@@@@@@@@@@ df:%p, k1:%s\n", df, k1);
 
     return sub_enum_type;
 }
@@ -351,6 +356,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
                 case LV_LAYOUT_FLEX: value = LeleObject::getPyEnumValue("lele.Style().Layout.Flex"); break;
                 case LV_LAYOUT_GRID: value = LeleObject::getPyEnumValue("lele.Style().Layout.Grid"); break;
                 case LV_LAYOUT_NONE: default: value = LeleObject::getPyEnumValue("lele.Style().Layout.No"); break;
+// return PyObject_GetAttrString(self->_type, "Clicked");//osm todo: use this technique instead
             }
         }
         else if (std::holds_alternative<lv_flex_flow_t>(style.value())) {
