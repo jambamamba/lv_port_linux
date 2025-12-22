@@ -14,8 +14,8 @@ def callback(str):
    print(f"@@@py str:'{str}'")
 
 def sliderMoved(event):
-   # print(f"@@@py res:{lele.Event.Type} lele.Event.Type.Clicked:{lele.Event.Type.Clicked.value}")
-   if event.code == lele.Event.Type.ValueChanged:
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
+   if event.code == lele.Event().Type.ValueChanged:
          print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
          obj = lele.getObjectById("/views:0/view/label")
          obj.setText(f"Angle: {event.value}°")
@@ -52,8 +52,8 @@ def pushButtonPressed(event):
    # user_attributes = [attr for attr in dir(lele.Button) if not attr.startswith('__')]
    # print(f"@@@py:33 lele.Button attributes: {user_attributes}")
    # print(f"@@@py:34 res:{lele.Button.Type} lele.Button.Type.Push:{lele.Button.Type.Push.value}")
-   # print(f"@@@py:35 res:{lele.Event.Type} lele.Event.Type.Clicked:{lele.Event.Type.Clicked}")
-   if event.code == lele.Event.Type.Clicked:
+   # print(f"@@@py:35 res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked}")
+   if event.code == lele.Event().Type.Clicked:
       # print(f"@@@py: event: {event}")
       # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
       # print(user_attributes)
@@ -72,13 +72,6 @@ def pushButtonPressed(event):
       print(f"@@@py change text color to white")
       style = lele.Style('{"style":{"fgcolor":"#fff"}}')
       obj.addStyle(style)
-
-      obj = lele.getObjectById("/view/with_bg_img")
-      style = obj.getStyle()
-      print(f"@@@py======================================1")
-      print(f"@@@py lele.Style.Border: {lele.Style.Border}")
-      print(f"@@@py style:{style}")
-      print(f"@@@py======================================")
 
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
@@ -116,6 +109,39 @@ if obj:
    for button_type in obj.Type:
       print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
 
+obj = lele.getObjectById("/view/with_bg_img")
+style = obj.getStyle()
+print(f"@@@py======================================1")
+print(f"@@@py lele.Style().Border: {lele.Style().Border}")
+print(f"@@@py style:{style}")
+print(f"@@@py======================================")
+
+obj = lele.getObjectById("/views:0/view/label")
+# print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
+obj.setText("Cocoa bean!")
+
+print(f"@@@py======================================x")
+print(f"event.Type: {lele.Event().Type}")
+user_attributes = [attr for attr in dir(lele.Event().Type) if not attr.startswith('__')]
+print(f"event.Type: {user_attributes}")
+print(f"event.Type.Clicked: {lele.Event().Type.Clicked}")
+# import enum
+# lele.FooBar = enum.Enum('FooBar', dict(FOO=1, BAR=2))
+# user_attributes = [attr for attr in dir(lele.FooBar) if not attr.startswith('__')]
+# print(f"lele.FooBar: {user_attributes}")
+
+
+print(f"@@@py======================================")
+user_attributes = [attr for attr in dir(lele.Event) if not attr.startswith('__')]
+print(f"lele.Event: {user_attributes}")
+event = lele.Event()
+print(f"event: {event}")
+
+print(f"@@@py======================================")
+user_attributes = [attr for attr in dir(lele.Style()) if not attr.startswith('__')]
+print(f"lele.Style(): {user_attributes}")
+style = lele.Style('{"style":{"fgcolor":"#fff"}}')
+obj.addStyle(style)
 
 try:
    while lele.handleEvents():

@@ -1,7 +1,12 @@
 #include <lelewidgets/leleevent.h>
 #include <lelewidgets/leleobject.h>
+#include <debug_logger/debug_logger.h>
+
+LOG_CATEGORY(LVSIM, "LVSIM");
 
 PyObject *LeleEvent::createPyObject() {
+    
+    // LOG(DEBUG, LVSIM, "createPyObject\n");
     PyTypeObject *type = &PyLeleEvent::_obj_type;
     PyType_Ready(type);
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
@@ -32,8 +37,8 @@ PyObject *LeleEvent::createPyObject() {
             return nullptr;
         }
         switch(_code) {
-            case LeleEvent::Type::Clicked: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.Clicked"); break;
-            case LeleEvent::Type::ValueChanged: self->_code = LeleObject::getPyEnumValue("lele.Event.Type.ValueChanged"); break;
+            case LeleEvent::Type::Clicked: self->_code = LeleObject::getPyEnumValue("lele.Event().Type.Clicked"); break;
+            case LeleEvent::Type::ValueChanged: self->_code = LeleObject::getPyEnumValue("lele.Event().Type.ValueChanged"); break;
             default: self->_code = Py_None;
         }
         // self->_code = PyLong_FromLong(_code);
@@ -85,6 +90,12 @@ PyMethodDef PyLeleEvent::_methods[] = {
 //     {nullptr}  /* Sentinel */
 // };
 
+static PyObject *
+PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    LeleEvent obj;
+    return obj.createPyObject();
+}
 PyTypeObject PyLeleEvent::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "lele.Event",             /* tp_name */
@@ -105,7 +116,7 @@ PyTypeObject PyLeleEvent::_obj_type = {
     0,                         /* tp_getattro */
     0,                         /* tp_setattro */
     0,                         /* tp_as_buffer */
-    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
+    Py_TPFLAGS_DEFAULT|Py_TPFLAGS_BASETYPE,   /* tp_flags */
     "Event object",            /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
@@ -113,7 +124,7 @@ PyTypeObject PyLeleEvent::_obj_type = {
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    0,//PyLeleEvent_methods,             /* tp_methods */
+    PyLeleEvent::_methods,             /* tp_methods */
     PyLeleEvent::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
@@ -123,5 +134,5 @@ PyTypeObject PyLeleEvent::_obj_type = {
     0,                         /* tp_dictoffset */
     (initproc)PyLeleEvent::init,      /* tp_init */
     0,                         /* tp_alloc */
-    PyType_GenericNew,                 /* tp_new */
+    PyType_New,//PyType_GenericNew,                 /* tp_new */
 };

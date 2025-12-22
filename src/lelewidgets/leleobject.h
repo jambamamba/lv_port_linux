@@ -16,6 +16,9 @@
     #error Insufficient memory for lv_demo_widgets. Please set LV_MEM_SIZE to at least 38KB (38ul * 1024ul).  48KB is recommended.
 #endif
 
+PyObject *getPyModule();
+PyObject *getEnumModule();
+
 typedef enum {
     DISP_SMALL,
     DISP_MEDIUM,

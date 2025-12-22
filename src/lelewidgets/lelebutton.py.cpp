@@ -133,6 +133,13 @@ PyMethodDef PyLeleButton::_methods[] = {
     {nullptr}  /* Sentinel */
 };
 
+static PyObject *
+PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    LeleButtons::LeleButton obj;
+    return obj.createPyObject();
+}
+
 PyTypeObject PyLeleButton::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "lele.Button",             /* tp_name */
@@ -171,5 +178,5 @@ PyTypeObject PyLeleButton::_obj_type = {
     0,                         /* tp_dictoffset */
     (initproc)PyLeleButton::init,      /* tp_init */
     0,                         /* tp_alloc */
-    PyType_GenericNew,                 /* tp_new */
+    PyType_New,                 /* tp_new */
 };

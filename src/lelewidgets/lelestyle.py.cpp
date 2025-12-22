@@ -90,21 +90,31 @@ void PyLeleStyle::dealloc(PyObject* self_) {
 
 PyObject *PyLeleStyle::fromConfig(PyObject *self_, PyObject *args) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
+    Py_ssize_t num_args = PyTuple_Size(args);
     const char* config = nullptr;
-    if(!PyArg_ParseTuple(args, "s", //str
-                &config)) {
-        LOG(WARNING, LVSIM, "Failed to parse args\n");
-        return Py_None;
+    if(num_args == 0) {
+        const char empty[] = "{}";
+        config = empty;
     }
-    if(!config) {
-        LOG(WARNING, LVSIM, "Could not get config file\n");
-        return Py_None;
+    else {
+        if(!PyArg_ParseTuple(args, "s", //str
+                    &config)) {
+            LOG(WARNING, LVSIM, "Failed to parse args\n");
+            return Py_None;
+        }
+        if(!config) {
+            LOG(WARNING, LVSIM, "Could not get config file\n");
+            return Py_None;
+        }
     }
     self->_lele_styles = LeleWidgetFactory::stylesFromConfig(config);
-    if(self->_lele_styles.size() == 0) {
-        return Py_None;
+    if(self->_lele_styles.size() > 0) {
+        self->_lele_style = self->_lele_styles.at(0).get();
     }
-    self->_lele_style = self->_lele_styles.at(0).get();
+    else {
+        LOG(WARNING, LVSIM, "There are no styles!\n");
+        self->_lele_style = nullptr;
+    }
     return reinterpret_cast<PyObject*>(self);
 }
 
@@ -127,6 +137,13 @@ PyMethodDef PyLeleStyle::_methods[] = {
     {nullptr}  /* Sentinel */
 };
 
+static PyObject *
+PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
+{
+    LeleStyle obj;
+    return obj.createPyObject();
+}
+
 PyTypeObject PyLeleStyle::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     "lele.Style",             /* tp_name */
@@ -148,7 +165,7 @@ PyTypeObject PyLeleStyle::_obj_type = {
     0,                         /* tp_setattro */
     0,                         /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
-    "Style",            /* tp_doc */
+    "Style Object",            /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
@@ -165,5 +182,5 @@ PyTypeObject PyLeleStyle::_obj_type = {
     0,                         /* tp_dictoffset */
     (initproc)PyLeleStyle::init,      /* tp_init */
     0,                         /* tp_alloc */
-    PyType_GenericNew,                 /* tp_new */
+    PyType_New,                 /* tp_new */
 };

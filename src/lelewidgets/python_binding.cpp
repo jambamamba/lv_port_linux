@@ -268,6 +268,16 @@ namespace {
 #endif//MULTI_PHASE_INIT
 }//namespace
 
+PyObject *getPyModule() {
+    static PyObject *module = PyModule_Create(&_mymodule);
+    return module;
+}
+
+PyObject *getEnumModule() {
+    static PyObject *module = PyImport_ImportModule("enum");
+    return module;
+}
+
 /////////////////////////////////////////////////////////////////////
 PyMODINIT_FUNC PyInit_lele(void) {
     if(!_graphics_backend.load()) {
@@ -277,21 +287,23 @@ PyMODINIT_FUNC PyInit_lele(void) {
 #ifdef MULTI_PHASE_INIT
     PyObject *module = PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
 #else
-    PyObject *module = PyModule_Create(&_mymodule);
+    PyObject *enum_mod = getEnumModule();
+    PyObject *module = getPyModule();
 #endif
     // PyModule_AddObject(module, "foo", PyUnicode_FromString("bar"));//will show up in Python as lele.foo with value "bar"
     PyModule_AddType(module, &PyLeleObject::_obj_type);
     PyModule_AddType(module, &PyLeleLabel::_obj_type);
     PyModule_AddType(module, &PyLeleMessageBox::_obj_type);
-    // PyModule_AddType(module, &PyLeleStyle::_obj_type);
+    PyModule_AddType(module, &PyLeleStyle::_obj_type);
+    PyModule_AddType(module, &PyLeleEvent::_obj_type);
+    // PyModule_AddObject(module, "FooBar", 
+    //     LeleObject::createPyEnum("FooBar", {
+    //             {"FOO",1},
+    //             {"BAR",2}
+    //         }
+    //     )
+    // );
 
-    //Use PyModule_AddObject for these types because of Enum types in them that we want to use in Python, like lele.Event.Type.Clicked, lele.Button.Type.Push
-    LeleStyle style;
-    PyModule_AddObject(module, "Style", style.createPyObject());
-    LeleEvent event;
-    PyModule_AddObject(module, "Event", event.createPyObject());
-    LeleButtons::LeleButton btn;
-    PyModule_AddObject(module, "Button", btn.createPyObject());
 
     return module;
 }
