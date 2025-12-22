@@ -74,34 +74,34 @@ namespace {
     };
 }//namespace
 
-PyObject* LeleObject::getPyEnumValue(const std::string &enum_value) {
-    std::string code = 
-    "import lele\n"
-    "res=";
-    code += enum_value;
-    RAII $;
-    $.global_dict = PyDict_New();
-    if (!$.global_dict) { return Py_None; }
-    $.local_dict = PyDict_New();
-    if (!$.local_dict) { return Py_None; }
-    $.ret = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
+// PyObject* LeleObject::getPyEnumValue(const std::string &enum_value) {
+//     std::string code = 
+//     "import lele\n"
+//     "res=";
+//     code += enum_value;
+//     RAII $;
+//     $.global_dict = PyDict_New();
+//     if (!$.global_dict) { return Py_None; }
+//     $.local_dict = PyDict_New();
+//     if (!$.local_dict) { return Py_None; }
+//     $.ret = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
 
-    if (!$.ret) { 
-        PyErr_Print();
-        LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", code.c_str());
-        return Py_None; 
-    }
-    PyObject *output = PyDict_GetItemString($.local_dict, "res");
-    if (!output) {
-        // PyDict_GetItemString does not set exceptions
-        LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
-        PyErr_SetString(PyExc_KeyError, "could not get 'res'");
-        return Py_None;
-    } else {
-        Py_INCREF(output);
-    }
-    return output;
-}
+//     if (!$.ret) { 
+//         PyErr_Print();
+//         LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", code.c_str());
+//         return Py_None; 
+//     }
+//     PyObject *output = PyDict_GetItemString($.local_dict, "res");
+//     if (!output) {
+//         // PyDict_GetItemString does not set exceptions
+//         LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
+//         PyErr_SetString(PyExc_KeyError, "could not get 'res'");
+//         return Py_None;
+//     } else {
+//         Py_INCREF(output);
+//     }
+//     return output;
+// }
 
 // PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
 //     std::string enum_str =
@@ -172,9 +172,6 @@ PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     Py_DECREF(enum_type);
     Py_DECREF(args);
     Py_DECREF(kwargs);
-
-    PyObject *df = PyObject_GetAttrString(sub_enum_type, k1);
-    LOG(WARNING, LVSIM, "@@@@ GOT df!!!!! @@@@@@@@@@@@ df:%p, k1:%s\n", df, k1);
 
     return sub_enum_type;
 }
@@ -338,6 +335,8 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     if(!$._dict) {
         return PyBool_FromLong(false);
     }
+    LeleStyle lele_style("{}");
+    PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style.createPyObject());
     for(const auto &[name, style] : lele_obj->getStyle()) {
 
         if(!style) {
@@ -353,44 +352,44 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         else if (std::holds_alternative<lv_layout_t>(style.value())) {
             int ival = static_cast<int>(std::get<lv_layout_t>(style.value()));
             switch(ival) {
-                case LV_LAYOUT_FLEX: value = LeleObject::getPyEnumValue("lele.Style().Layout.Flex"); break;
-                case LV_LAYOUT_GRID: value = LeleObject::getPyEnumValue("lele.Style().Layout.Grid"); break;
-                case LV_LAYOUT_NONE: default: value = LeleObject::getPyEnumValue("lele.Style().Layout.No"); break;
-// return PyObject_GetAttrString(self->_type, "Clicked");//osm todo: use this technique instead
+                case LV_LAYOUT_FLEX: value = PyObject_GetAttrString(py_style->_layout, "Flex"); break;
+                case LV_LAYOUT_GRID: value = PyObject_GetAttrString(py_style->_layout, "Grid"); break;
+                case LV_LAYOUT_NONE: default: value = PyObject_GetAttrString(py_style->_layout, "No"); break;
             }
         }
         else if (std::holds_alternative<lv_flex_flow_t>(style.value())) {
             int ival = static_cast<int>(std::get<lv_flex_flow_t>(style.value()));
             switch(ival) {
-                case LV_FLEX_FLOW_COLUMN: value = LeleObject::getPyEnumValue("lele.Style().Flow.Column"); break;
-                case LV_FLEX_FLOW_ROW_WRAP: value = LeleObject::getPyEnumValue("lele.Style().Flow.RowWrap"); break;
-                case LV_FLEX_FLOW_ROW_REVERSE: value = LeleObject::getPyEnumValue("lele.Style().Flow.RowReverse"); break;
-                case LV_FLEX_FLOW_ROW_WRAP_REVERSE: value = LeleObject::getPyEnumValue("lele.Style().Flow.RowWrapReverse"); break;
-                case LV_FLEX_FLOW_COLUMN_WRAP: value = LeleObject::getPyEnumValue("lele.Style().Flow.ColumnWrap"); break;
-                case LV_FLEX_FLOW_COLUMN_REVERSE: value = LeleObject::getPyEnumValue("lele.Style().Flow.ColumnReverse"); break;
-                case LV_FLEX_FLOW_COLUMN_WRAP_REVERSE: value = LeleObject::getPyEnumValue("lele.Style().Flow.ColumnWrapReverse"); break;
-                case LV_FLEX_FLOW_ROW: default: value = LeleObject::getPyEnumValue("lele.Style().Flow.Row"); break;
+                case LV_FLEX_FLOW_COLUMN: value = PyObject_GetAttrString(py_style->_flow, "Column"); break;
+                case LV_FLEX_FLOW_ROW_WRAP: value = PyObject_GetAttrString(py_style->_flow, "RowWrap"); break;
+                case LV_FLEX_FLOW_ROW_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "RowReverse"); break;
+                case LV_FLEX_FLOW_ROW_WRAP_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "RowWrapReverse"); break;
+                case LV_FLEX_FLOW_COLUMN_WRAP: value = PyObject_GetAttrString(py_style->_flow, "ColumnWrap"); break;
+                case LV_FLEX_FLOW_COLUMN_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "ColumnReverse"); break;
+                case LV_FLEX_FLOW_COLUMN_WRAP_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "ColumnWrapReverse"); break;
+                case LV_FLEX_FLOW_ROW: default: value = PyObject_GetAttrString(py_style->_flow, "Row"); break;
             }
         }
         else if (std::holds_alternative<lv_scrollbar_mode_t>(style.value())) {
             int ival = static_cast<int>(std::get<lv_scrollbar_mode_t>(style.value()));
             switch(ival) {
-                case LV_SCROLLBAR_MODE_OFF: value = LeleObject::getPyEnumValue("lele.Style().Scrollbar.Off"); break;
-                case LV_SCROLLBAR_MODE_ON: value = LeleObject::getPyEnumValue("lele.Style().Scrollbar.On"); break;
-                case LV_SCROLLBAR_MODE_ACTIVE: value = LeleObject::getPyEnumValue("lele.Style().Scrollbar.Active"); break;
-                case LV_SCROLLBAR_MODE_AUTO: default: value = LeleObject::getPyEnumValue("lele.Style().Scrollbar.Auto"); break;
+                case LV_SCROLLBAR_MODE_OFF: value = PyObject_GetAttrString(py_style->_scrollbar, "Off"); break;
+                case LV_SCROLLBAR_MODE_ON: value = PyObject_GetAttrString(py_style->_scrollbar, "On"); break;
+                case LV_SCROLLBAR_MODE_ACTIVE: value = PyObject_GetAttrString(py_style->_scrollbar, "Active"); break;
+                case LV_SCROLLBAR_MODE_AUTO: default: value = PyObject_GetAttrString(py_style->_scrollbar, "Auto"); break;
             }
         }
         else if (std::holds_alternative<LeleStyle::BorderTypeE>(style.value())) {
             int ival = static_cast<int>(std::get<LeleStyle::BorderTypeE>(style.value()));
             switch(ival) {
-                case LeleStyle::BorderTypeE::Solid: value = LeleObject::getPyEnumValue("lele.Style().Border.Solid"); break;
-                case LeleStyle::BorderTypeE::Dashed: value = LeleObject::getPyEnumValue("lele.Style().Border.Dashed"); break;
-                case LeleStyle::BorderTypeE::Dotted: value = LeleObject::getPyEnumValue("lele.Style().Border.Dotted"); break;
-                case LeleStyle::BorderTypeE::None: default: value = LeleObject::getPyEnumValue("lele.Style().Border.No"); break;
+                case LeleStyle::BorderTypeE::Solid: value = PyObject_GetAttrString(py_style->_border, "Solid"); break;
+                case LeleStyle::BorderTypeE::Dashed: value = PyObject_GetAttrString(py_style->_border, "Dashed"); break;
+                case LeleStyle::BorderTypeE::Dotted: value = PyObject_GetAttrString(py_style->_border, "Dotted"); break;
+                case LeleStyle::BorderTypeE::None: default: value = PyObject_GetAttrString(py_style->_border, "No"); break;
             }
         }
-        else if (std::holds_alternative<LeleStyle::Rotation>(style.value())) {//osm todo
+        else if (std::holds_alternative<LeleStyle::Rotation>(style.value())) {
+            //osm todo
         }
         PyObject *name_ = PyUnicode_FromString(name.c_str());
         $._items[name_] = value;
@@ -398,6 +397,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
             return PyBool_FromLong(false);
         }
     }
+    Py_XDECREF(py_style);
     $._items.clear();
     PyObject *dict = $._dict;
     $._dict = nullptr;

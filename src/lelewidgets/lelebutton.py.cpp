@@ -79,12 +79,6 @@ PyObject *PyLeleButton::getType(PyObject *self_, PyObject *arg) {
     if (lele_obj) {
         std::string enum_type = "";
         switch(lele_obj->getType()) {
-            // case LeleButtons::LeleButton::Type::Push: enum_type = "lele.Button.Push"; break;
-            // case LeleButtons::LeleButton::Type::Checkbox: enum_type = "lele.Button.Checkbox"; break;
-            // case LeleButtons::LeleButton::Type::Radio: enum_type = "lele.Button.Radio"; break;
-            // case LeleButtons::LeleButton::Type::Switch: enum_type = "lele.Button.Switch"; break;
-            // case LeleButtons::LeleButton::Type::Close: enum_type = "lele.Button.Close"; break;
-            // case LeleButtons::LeleButton::Type::Slider: enum_type = "lele.Button.Slider"; break;
             case LeleButtons::LeleButton::Type::Push: return PyObject_GetAttrString(self->_type, "Push");
             case LeleButtons::LeleButton::Type::Checkbox: return PyObject_GetAttrString(self->_type, "Checkbox");
             case LeleButtons::LeleButton::Type::Radio: return PyObject_GetAttrString(self->_type, "Radio");

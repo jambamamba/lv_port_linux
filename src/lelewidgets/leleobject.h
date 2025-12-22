@@ -64,7 +64,7 @@ public:
   void addEventHandler(PyObject *callback);
   static bool pyCallback(PyObject *py_callback, LeleEvent &&e);
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
-  static PyObject* getPyEnumValue(const std::string &enum_value = "lele.Event.Clicked");
+  // static PyObject* getPyEnumValue(const std::string &enum_value = "lele.Event.Clicked");
 protected:
   void drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
