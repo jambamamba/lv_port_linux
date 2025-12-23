@@ -224,6 +224,7 @@ PyMemberDef PyLeleButtonType::_members[] = {
     {nullptr}  /* Sentinel */
 };
 
+//osm todo: google "make PyTypeObject iteratable"
 PyTypeObject PyLeleButtonType::_obj_type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "lele.Button.Type",                    /* tp_name */
@@ -264,5 +265,5 @@ PyTypeObject PyLeleButtonType::_obj_type = {
     PyLeleButtonType::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyLeleButtonType::create,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };

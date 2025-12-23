@@ -138,6 +138,7 @@ PyMemberDef PyLeleEventType::_members[] = {
     {nullptr}  /* Sentinel */
 };
 
+//osm todo: google "make PyTypeObject iteratable"
 PyTypeObject PyLeleEventType::_obj_type = {
     PyVarObject_HEAD_INIT(&PyType_Type, 0)
     "lele.Event.Type",                    /* tp_name */

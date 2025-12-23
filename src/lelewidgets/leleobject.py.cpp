@@ -74,68 +74,71 @@ namespace {
     };
 }//namespace
 
-// PyObject* LeleObject::getPyEnumValue(const std::string &enum_value) {
-//     std::string code = 
-//     "import lele\n"
-//     "res=";
-//     code += enum_value;
-//     RAII $;
-//     $.global_dict = PyDict_New();
-//     if (!$.global_dict) { return Py_None; }
-//     $.local_dict = PyDict_New();
-//     if (!$.local_dict) { return Py_None; }
-//     $.ret = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
+#if METHOD1_CREATING_PYENUM //it works, but don't like it.
+PyObject* LeleObject::getPyEnumValue(const std::string &enum_value) {
+    std::string code = 
+    "import lele\n"
+    "res=";
+    code += enum_value;
+    RAII $;
+    $.global_dict = PyDict_New();
+    if (!$.global_dict) { return Py_None; }
+    $.local_dict = PyDict_New();
+    if (!$.local_dict) { return Py_None; }
+    $.ret = PyRun_String(code.c_str(), Py_file_input, $.global_dict, $.local_dict);
 
-//     if (!$.ret) { 
-//         PyErr_Print();
-//         LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", code.c_str());
-//         return Py_None; 
-//     }
-//     PyObject *output = PyDict_GetItemString($.local_dict, "res");
-//     if (!output) {
-//         // PyDict_GetItemString does not set exceptions
-//         LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
-//         PyErr_SetString(PyExc_KeyError, "could not get 'res'");
-//         return Py_None;
-//     } else {
-//         Py_INCREF(output);
-//     }
-//     return output;
-// }
+    if (!$.ret) { 
+        PyErr_Print();
+        LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", code.c_str());
+        return Py_None; 
+    }
+    PyObject *output = PyDict_GetItemString($.local_dict, "res");
+    if (!output) {
+        // PyDict_GetItemString does not set exceptions
+        LOG(WARNING, LVSIM, "Failed in PyDict_GetItemString!\n");
+        PyErr_SetString(PyExc_KeyError, "could not get 'res'");
+        return Py_None;
+    } else {
+        Py_INCREF(output);
+    }
+    return output;
+}
 
-// PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
-//     std::string enum_str =
-//     "from enum import Enum\n"
-//     "class ";
-//     enum_str += enum_name;
-//     enum_str += "(Enum):\n";
+PyObject* LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {//https://stackoverflow.com/a/69290003
+    std::string enum_str =
+    "from enum import Enum\n"
+    "class ";
+    enum_str += enum_name;
+    enum_str += "(Enum):\n";
 
-//     for(auto &[key,value] : enum_map) {
-//         enum_str += "    " + key + " = " + std::to_string(value) + "\n";
-//     }
-//     enum_str += "";
-//     RAII $;
-//     $.global_dict = PyDict_New();
-//     if (!$.global_dict) { 
-//         return Py_None; 
-//     }
-//     $.ret = PyRun_String(enum_str.c_str(), Py_file_input, $.global_dict, $.local_dict);
-//     if (!$.ret) { 
-//         PyErr_Print();
-//         LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", enum_str.c_str());
-//         return Py_None; 
-//     }
-//     PyObject *output = PyDict_GetItemString($.global_dict, enum_name.c_str());
-//     if (!output) {
-//         // PyDict_GetItemString does not set exceptions
-//         PyErr_SetString(PyExc_KeyError, "could not get enum_name");
-//         return Py_None;
-//     } else {
-//         Py_INCREF(output);
-//     }
-//     return output;
-// }
+    for(auto &[key,value] : enum_map) {
+        enum_str += "    " + key + " = " + std::to_string(value) + "\n";
+    }
+    enum_str += "";
+    RAII $;
+    $.global_dict = PyDict_New();
+    if (!$.global_dict) { 
+        return Py_None; 
+    }
+    $.ret = PyRun_String(enum_str.c_str(), Py_file_input, $.global_dict, $.local_dict);
+    if (!$.ret) { 
+        PyErr_Print();
+        LOG(FATAL, LVSIM, "Failed in PyRun_String!\n'%s'\n", enum_str.c_str());
+        return Py_None; 
+    }
+    PyObject *output = PyDict_GetItemString($.global_dict, enum_name.c_str());
+    if (!output) {
+        // PyDict_GetItemString does not set exceptions
+        PyErr_SetString(PyExc_KeyError, "could not get enum_name");
+        return Py_None;
+    } else {
+        Py_INCREF(output);
+    }
+    return output;
+}
+#endif //METHOD1_CREATING_PYENUM
 
+#ifdef METHOD2_CREATING_PYENUM //better, but does 'enum.Enum('Color', dict(RED=1, GREEN=2))', which is different from 'class Color(enum.Enum):\n\tRED = 1\n\tGREEN = 2' and the latter is what we want
 PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map) {
 
     // Source - https://stackoverflow.com/a
@@ -177,6 +180,7 @@ PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<
 
     return sub_enum_type;
 }
+#endif//METHOD2_CREATING_PYENUM
 
 int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleObject::fromConfig(self_, args);
@@ -248,26 +252,31 @@ PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *args) {
 
 PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args != 2) {
+        LOG(WARNING, LVSIM, "Returning with empty PyLeleObject\n");
+        return self_;
+    }
     PyObject *parent = nullptr;
     const char* config = nullptr;
     if(!PyArg_ParseTuple(args, "Os", //parent obj, str
                 &parent,
                 &config)) {
-        LOG(WARNING, LVSIM, "Failed to parse args\n");
+        LOG(FATAL, LVSIM, "Failed to parse args\n");
         return Py_None;
     }
     if(!parent) {
-        LOG(WARNING, LVSIM, "Could not get parent\n");
+        LOG(FATAL, LVSIM, "Could not get parent\n");
         return Py_None;
     }
     if(!config) {
-        LOG(WARNING, LVSIM, "Could not get config file\n");
+        LOG(FATAL, LVSIM, "Could not get config file\n");
         return Py_None;
     }
     PyLeleObject *py_parent = reinterpret_cast<PyLeleObject *>(parent);
     LeleObject *lele_parent = dynamic_cast<LeleObject *>(py_parent->_lele_obj);
     if(!lele_parent) {
-        LOG(WARNING, LVSIM, "Could not get parent\n");
+        LOG(FATAL, LVSIM, "Could not get parent\n");
         return Py_None;
     }
     auto nodes = LeleWidgetFactory::fromConfig(lele_parent, config);
