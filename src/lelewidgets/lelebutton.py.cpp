@@ -21,15 +21,6 @@ bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
     if(!py_obj) {
         return false;
     }
-    // py_obj->_type = LeleObject::createPyEnum("Type", {
-    //         {"Push",LeleButton::Type::Push},
-    //         {"Checkbox",LeleButton::Type::Checkbox},
-    //         {"Radio",LeleButton::Type::Radio},
-    //         {"Switch",LeleButton::Type::Switch},
-    //         {"Close",LeleButton::Type::Close},
-    //         {"Slider",LeleButton::Type::Slider}
-    //     }
-    // );
     py_obj->_type = reinterpret_cast<PyObject*>(&PyLeleButtonType::_obj_type);
     if (py_obj->_type == nullptr) {
         return false;
