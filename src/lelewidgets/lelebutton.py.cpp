@@ -1,4 +1,9 @@
 #include <lelewidgets/lelebutton.h>
+#include <enumobject.h>
+#include <debug_logger/debug_logger.h>
+
+LOG_CATEGORY(LVSIM, "LVSIM");
+
 
 PyObject *LeleButtons::LeleButton::createPyObject() {
     PyTypeObject *type = &PyLeleButton::_obj_type;
@@ -16,15 +21,16 @@ bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
     if(!py_obj) {
         return false;
     }
-    py_obj->_type = LeleObject::createPyEnum("Type", {
-            {"Push",LeleButton::Type::Push},
-            {"Checkbox",LeleButton::Type::Checkbox},
-            {"Radio",LeleButton::Type::Radio},
-            {"Switch",LeleButton::Type::Switch},
-            {"Close",LeleButton::Type::Close},
-            {"Slider",LeleButton::Type::Slider}
-        }
-    );
+    // py_obj->_type = LeleObject::createPyEnum("Type", {
+    //         {"Push",LeleButton::Type::Push},
+    //         {"Checkbox",LeleButton::Type::Checkbox},
+    //         {"Radio",LeleButton::Type::Radio},
+    //         {"Switch",LeleButton::Type::Switch},
+    //         {"Close",LeleButton::Type::Close},
+    //         {"Slider",LeleButton::Type::Slider}
+    //     }
+    // );
+    py_obj->_type = reinterpret_cast<PyObject*>(&PyLeleButtonType::_obj_type);
     if (py_obj->_type == nullptr) {
         return false;
     }
@@ -178,4 +184,94 @@ PyTypeObject PyLeleButton::_obj_type = {
     (initproc)PyLeleButton::init,      /* tp_init */
     0,                         /* tp_alloc */
     PyType_New,                 /* tp_new */
+};
+///////////////////////////////////////////////////////////////////////////
+int PyLeleButtonType::init(PyObject *self_, PyObject *args, PyObject *kwds) {
+    PyLeleButtonType *self = reinterpret_cast<PyLeleButtonType *>(self_);
+
+    self->_push = PyLong_FromLong(LeleButtons::LeleButton::Type::Push);
+    self->_checkbox = PyLong_FromLong(LeleButtons::LeleButton::Type::Checkbox);
+    self->_radio = PyLong_FromLong(LeleButtons::LeleButton::Type::Radio);
+    self->_switch = PyLong_FromLong(LeleButtons::LeleButton::Type::Switch);
+    self->_close = PyLong_FromLong(LeleButtons::LeleButton::Type::Close);
+    self->_slider = PyLong_FromLong(LeleButtons::LeleButton::Type::Slider);
+    return 0;
+}
+
+void PyLeleButtonType::dealloc(PyObject* self_) {
+    PyLeleButtonType *self = reinterpret_cast<PyLeleButtonType *>(self_);
+    Py_XDECREF(self->_push);
+    Py_XDECREF(self->_checkbox);
+    Py_XDECREF(self->_radio);
+    Py_XDECREF(self->_switch);
+    Py_XDECREF(self->_close);
+    Py_XDECREF(self->_slider    );
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyObject *PyLeleButtonType::create(PyTypeObject *type_, PyObject *args, PyObject *kwds) {
+    PyTypeObject *type = &PyLeleButtonType::_obj_type;
+    PyType_Ready(type);
+    PyObject *self = type->tp_alloc(type, 0);
+    if(!init(self, args, kwds)) {
+        Py_DECREF(self);
+        return nullptr;
+    }
+    return (PyObject *)self;
+}
+
+int PyLeleButtonType::enum_traverse(PyObject *self, visitproc visit, void *arg) {
+    return (*PyEnum_Type.tp_traverse)(self, visit, arg);
+}
+
+PyObject *PyLeleButtonType::enum_next(PyObject *self) {
+    return (*PyEnum_Type.tp_iternext)(self);
+}
+
+PyMemberDef PyLeleButtonType::_members[] = {
+    PY_LELEBUTTON_TYPE_MEMBERS() \
+    {nullptr}  /* Sentinel */
+};
+
+PyTypeObject PyLeleButtonType::_obj_type = {
+    PyVarObject_HEAD_INIT(&PyType_Type, 0)
+    "lele.Button.Type",                    /* tp_name */
+    sizeof(PyLeleButtonType),             /* tp_basicsize */
+    0,                              /* tp_itemsize */
+    /* methods */
+    (destructor)PyLeleButtonType::dealloc, /* tp_dealloc */
+    0,                              /* tp_vectorcall_offset */
+    0,                              /* tp_getattr */
+    0,                              /* tp_setattr */
+    0,                              /* tp_as_async */
+    0,                              /* tp_repr */
+    0,                              /* tp_as_number */
+    0,                              /* tp_as_sequence */
+    0,                              /* tp_as_mapping */
+    0,                              /* tp_hash */
+    0,                              /* tp_call */
+    0,                              /* tp_str */
+    PyObject_GenericGetAttr,        /* tp_getattro */
+    0,                              /* tp_setattro */
+    0,                              /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,        /* tp_flags */
+    "Button Type",            /* tp_doc */
+    (traverseproc)&PyLeleButtonType::enum_traverse,    /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    PyObject_SelfIter,              /* tp_iter */
+    (iternextfunc)enum_next,        /* tp_iternext */
+    0,                             /* tp_methods */
+    PyLeleButtonType::_members,             /* tp_members */
+    0,                              /* tp_getset */
+    &PyEnum_Type,                              /* tp_base */
+    0,                              /* tp_dict */
+    0,                              /* tp_descr_get */
+    0,                              /* tp_descr_set */
+    0,                              /* tp_dictoffset */
+    PyLeleButtonType::init,                              /* tp_init */
+    PyType_GenericAlloc,            /* tp_alloc */
+    PyLeleButtonType::create,                       /* tp_new */
+    PyObject_GC_Del,                /* tp_free */
 };

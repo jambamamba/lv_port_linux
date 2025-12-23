@@ -1,5 +1,6 @@
 #include <lelewidgets/leleevent.h>
 #include <lelewidgets/leleobject.h>
+#include <enumobject.h>
 #include <debug_logger/debug_logger.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -10,41 +11,37 @@ PyObject *LeleEvent::createPyObject() {
     PyTypeObject *type = &PyLeleEvent::_obj_type;
     PyType_Ready(type);
     PyLeleEvent *self = (PyLeleEvent *)type->tp_alloc(type, 0);
-    if (self != nullptr) {
-        self->_object = _target_obj ? _target_obj->createPyObject() : Py_None;
-        self->_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
-        if (self->_id == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
-        self->_action = PyUnicode_FromString(_action.size() ? _action.c_str() : "");
-        if (self->_action == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
-        self->_args = PyUnicode_FromString("");
-        if (self->_args == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
-        self->_type = LeleObject::createPyEnum("Type", {
-                {"Clicked",LeleEvent::Type::Clicked},
-                {"ValueChanged",LeleEvent::Type::ValueChanged}
-            }
-        );
-        if (self->_type == nullptr) {
-            Py_DECREF(self);
-            return nullptr;
-        }
-        switch(_code) {
-            case LeleEvent::Type::Clicked: self->_code = PyObject_GetAttrString(self->_type, "Clicked"); break;
-            case LeleEvent::Type::ValueChanged: self->_code = PyObject_GetAttrString(self->_type, "ValueChanged"); break;
-            default: self->_code = Py_None;
-        }
-        // self->_code = PyLong_FromLong(_code);
-        // self->_code = _code;
-        self->_value = _ivalue;
+    if (!self) {
+        return Py_None;
     }
+    self->_object = _target_obj ? _target_obj->createPyObject() : Py_None;
+    self->_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
+    if (self->_id == nullptr) {
+        Py_DECREF(self);
+        return nullptr;
+    }
+    self->_action = PyUnicode_FromString(_action.size() ? _action.c_str() : "");
+    if (self->_action == nullptr) {
+        Py_DECREF(self);
+        return nullptr;
+    }
+    self->_args = PyUnicode_FromString("");
+    if (self->_args == nullptr) {
+        Py_DECREF(self);
+        return nullptr;
+    }
+    self->_type = reinterpret_cast<PyObject*>(&PyLeleEventType::_obj_type);
+    if (self->_type == nullptr) {
+        Py_DECREF(self);
+        return nullptr;
+    }
+    switch(_code) {
+        case LeleEvent::Type::Clicked: self->_code = PyObject_GetAttrString(self->_type, "Clicked"); break;
+        case LeleEvent::Type::ValueChanged: self->_code = PyObject_GetAttrString(self->_type, "ValueChanged"); break;
+        default: self->_code = Py_None;
+    }
+    self->_value = _ivalue;
+
     return (PyObject *)self;
 }
 
@@ -73,22 +70,6 @@ PyMethodDef PyLeleEvent::_methods[] = {
     {nullptr}  /* Sentinel */
 
 };
-// static PyObject *
-// PyLeleEvent_id(PyLeleEvent* self) {
-//     if (self->_id == nullptr) {
-//         PyErr_SetString(PyExc_AttributeError, "id");
-//         return nullptr;
-//     }
-//     return PyUnicode_FromFormat("%S", self->_id);
-// }
-
-// static PyMethodDef PyLeleEvent_methods[] = {
-//     {"id", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the id"},
-//     {"type", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the type"},
-//     {"action", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the action"},
-//     {"args", (PyCFunction)PyLeleEvent_id, METH_NOARGS, "Return the args"},
-//     {nullptr}  /* Sentinel */
-// };
 
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
@@ -135,4 +116,67 @@ PyTypeObject PyLeleEvent::_obj_type = {
     (initproc)PyLeleEvent::init,      /* tp_init */
     0,                         /* tp_alloc */
     PyType_New,//PyType_GenericNew,                 /* tp_new */
+};
+
+///////////////////////////////////////////////////////////////////////////
+int PyLeleEventType::init(PyObject *self_, PyObject *args, PyObject *kwds) {
+    PyLeleEventType *self = reinterpret_cast<PyLeleEventType *>(self_);
+    self->_clicked = PyLong_FromLong(LeleEvent::Type::Clicked);
+    self->_value_changed = PyLong_FromLong(LeleEvent::Type::ValueChanged);
+    return 0;
+}
+
+void PyLeleEventType::dealloc(PyObject* self_) {
+    PyLeleEventType *self = reinterpret_cast<PyLeleEventType *>(self_);
+    Py_XDECREF(self->_clicked);
+    Py_XDECREF(self->_value_changed);
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyMemberDef PyLeleEventType::_members[] = {
+    PY_LELEEVENT_TYPE_MEMBERS() \
+    {nullptr}  /* Sentinel */
+};
+
+PyTypeObject PyLeleEventType::_obj_type = {
+    PyVarObject_HEAD_INIT(&PyType_Type, 0)
+    "lele.Event.Type",                    /* tp_name */
+    sizeof(PyLeleEventType),             /* tp_basicsize */
+    0,                              /* tp_itemsize */
+    /* methods */
+    (destructor)PyLeleEventType::dealloc, /* tp_dealloc */
+    0,                              /* tp_vectorcall_offset */
+    0,                              /* tp_getattr */
+    0,                              /* tp_setattr */
+    0,                              /* tp_as_async */
+    0,                              /* tp_repr */
+    0,                              /* tp_as_number */
+    0,                              /* tp_as_sequence */
+    0,                              /* tp_as_mapping */
+    0,                              /* tp_hash */
+    0,                              /* tp_call */
+    0,                              /* tp_str */
+    PyObject_GenericGetAttr,        /* tp_getattro */
+    0,                              /* tp_setattro */
+    0,                              /* tp_as_buffer */
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,        /* tp_flags */
+    "Event Type",            /* tp_doc */
+    0,//(traverseproc)enum_traverse,    /* tp_traverse */
+    0,                              /* tp_clear */
+    0,                              /* tp_richcompare */
+    0,                              /* tp_weaklistoffset */
+    PyObject_SelfIter,              /* tp_iter */
+    0,//(iternextfunc)enum_next,        /* tp_iternext */
+    0,                             /* tp_methods */
+    PyLeleEventType::_members,             /* tp_members */
+    0,                              /* tp_getset */
+    &PyEnum_Type,                              /* tp_base */
+    0,                              /* tp_dict */
+    0,                              /* tp_descr_get */
+    0,                              /* tp_descr_set */
+    0,                              /* tp_dictoffset */
+    PyLeleEventType::init,                              /* tp_init */
+    PyType_GenericAlloc,            /* tp_alloc */
+    PyType_GenericNew,                       /* tp_new */
+    PyObject_GC_Del,                /* tp_free */
 };

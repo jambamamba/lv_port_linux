@@ -169,6 +169,8 @@ PyObject *LeleObject::createPyEnum(const std::string &enum_name, const std::map<
     PyObject *enum_mod = getEnumModule();//PyImport_ImportModule("enum");
     PyObject *enum_type = PyObject_GetAttrString(enum_mod, "Enum");
     PyObject *sub_enum_type = PyObject_Call(enum_type, args, kwargs);//same as calling 'enum.Enum('FooBar', dict(FOO=1, BAR=2))'
+
+    // class Color(enum.Enum):
     Py_DECREF(enum_type);
     Py_DECREF(args);
     Py_DECREF(kwargs);

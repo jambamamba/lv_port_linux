@@ -84,3 +84,30 @@ struct PyLeleButton {
   {"getValue", (PyCFunction)PyLeleButton::getChecked, METH_NOARGS, "Get the value of the slider"},\
   {"setValue", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Set the value of the slider"},\
 
+///////////////////////////////////////////////////
+struct PyLeleButtonType {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    static PyObject *create(PyTypeObject *type, PyObject *args, PyObject *kwds);
+    static int enum_traverse(PyObject *en, visitproc visit, void *arg);
+    static PyObject *enum_next(PyObject *en);
+    // Type-specific fields go here
+    PyObject *_push = nullptr;
+    PyObject *_checkbox = nullptr;
+    PyObject *_radio = nullptr;
+    PyObject *_switch = nullptr;
+    PyObject *_close = nullptr;
+    PyObject *_slider = nullptr;
+};
+
+#define PY_LELEBUTTON_TYPE_MEMBERS() \
+    {"Push", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _push), 0, "Push"},\
+    {"Checkbox", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _checkbox), 0, "Checkbox"},\
+    {"Radio", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _radio), 0, "Radio"},\
+    {"Switch", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _switch), 0, "Switch"},\
+    {"Close", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _close), 0, "Close"},\
+    {"Slider", Py_T_OBJECT_EX, offsetof(PyLeleButtonType, _slider), 0, "Slider"},\
+

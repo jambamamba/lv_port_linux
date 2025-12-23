@@ -44,6 +44,7 @@ protected:
 struct PyLeleEvent {
     PyObject ob_base;
     static PyTypeObject _obj_type;
+    static PyTypeObject _enum_type;
     static PyMemberDef _members[];
     static PyMethodDef _methods[];
     static void dealloc(PyLeleEvent* self);
@@ -69,4 +70,20 @@ struct PyLeleEvent {
     {"value", Py_T_INT, offsetof(PyLeleEvent, _value), 0, "value"},
 
 #define PY_LELEEVENT_METHODS() \
+
+///////////////////////////////////////////////////
+struct PyLeleEventType {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    // Type-specific fields go here
+    PyObject *_clicked = nullptr;
+    PyObject *_value_changed = nullptr;
+};
+
+#define PY_LELEEVENT_TYPE_MEMBERS() \
+    {"Clicked", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Clicked"},\
+    {"ValueChanged", Py_T_INT, offsetof(PyLeleEventType, _value_changed), 0, "ValueChanged"},
 

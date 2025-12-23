@@ -14,6 +14,7 @@ def callback(str):
    print(f"@@@py str:'{str}'")
 
 def sliderMoved(event):
+   print(f"@@@py SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
    # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
    if event.code == lele.Event().Type.ValueChanged:
          print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
@@ -106,8 +107,8 @@ if obj:
    user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
 obj = lele.getObjectById("push_button0")
 if obj:
-   for button_type in obj.Type:
-      print(f"@@@py enum button.Type: Name: {button_type.name}, Value: {button_type.value}")
+   user_attributes = [attr for attr in dir(obj.Type) if not attr.startswith('__')]
+   print(f"@@@py push_button0.Type {obj.Type}, user_attributes: {user_attributes}")
 
 obj = lele.getObjectById("/view/with_bg_img")
 style = obj.getStyle()
