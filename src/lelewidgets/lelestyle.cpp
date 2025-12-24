@@ -502,6 +502,10 @@ bool LeleStyle::setValue(
     return true;
 }
 
+std::string LeleStyle::getId() const {
+  return _id;
+}
+
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
     // os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";

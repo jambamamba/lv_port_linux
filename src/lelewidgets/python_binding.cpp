@@ -79,7 +79,7 @@ namespace {
         PyObject *dict = PyDict_New();
         PyDict_SetItem(dict, PyUnicode_FromString("Major"), PyLong_FromDouble(major_version));
         PyDict_SetItem(dict, PyUnicode_FromString("Minor"), PyLong_FromDouble(minor_version));
-            return dict;
+        return dict;
     }
     static PyObject* _mymodule_addEventHandler(PyObject *self, PyObject *args) {
         char *id = nullptr;

@@ -168,13 +168,15 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
-std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle() const {
+std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyleAttributes(const std::string &style_id) const {
 
   std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;
   for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
-    const auto &styles = lele_style->getStyle();
+    if(!style_id.empty() && style_id != lele_style->getId()) {
+      continue;
+    }
     std::vector<std::string> keys;
-    for(const auto &[key,value] : styles) {
+    for(const auto &[key, value] : lele_style->getStyle()) {
       keys.push_back(key);
     }
     for(const auto &key : keys) {
@@ -187,6 +189,9 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
   return ret;
 }
 
+std::vector<LeleStyle *> LeleObject::getStyles() const {
+  return _lele_styles;
+}
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
 
   for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {

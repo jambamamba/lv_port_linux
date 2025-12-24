@@ -74,6 +74,15 @@ def pushButtonPressed(event):
       style = lele.Style('{"style":{"fgcolor":"#fff"}}')
       obj.addStyle(style)
 
+      print(f"@@@py======================================1")
+      obj = lele.getObjectById("/view/with_bg_img")
+      style = obj.getStyle("img")
+      print(f"@@@py style {style}")
+      print(f"@@@py style.className() {style.getClassName()}")
+      print(f"@@@py style.getValue() {style.getValue()}")
+      style = obj.getStyle()
+      print(f"@@@py style {style}")
+
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
       root = lele.getObjectById("/views:0/view")
@@ -105,8 +114,8 @@ try:
 
    btn = lele.Button()
    print(f"@@@py btn: {btn}, attr: {[attr for attr in dir(btn.Type) if not attr.startswith('__')]}")
-   for attr in btn.Type:
-      print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
+   # for attr in btn.Type:
+   #    print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
    obj = lele.getObjectById("/views:0/view/label")
    if obj:
       user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
@@ -114,8 +123,8 @@ try:
    if obj:
       user_attributes = [attr for attr in dir(obj.Type) if not attr.startswith('__')]
       print(f"@@@py push_button0.Type {obj.Type}, user_attributes: {user_attributes}")
-      for attr in obj.Type:
-         print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
+      # for attr in obj.Type:
+      #    print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
 
    obj = lele.getObjectById("/view/with_bg_img")
    style = obj.getStyle()
@@ -151,6 +160,15 @@ try:
    style = lele.Style('{"style":{"fgcolor":"#fff"}}')
    obj.addStyle(style)
 
+   print(f"@@@py======================================")
+   user_attributes = [attr for attr in dir(style.Layout) if not attr.startswith('__')]
+   print(f"@@@py style.Layout: {style.Layout}, user_attributes: {user_attributes}.")
+   user_attributes = [attr for attr in dir(style.Flow) if not attr.startswith('__')]
+   print(f"@@@py style.Flow: {style.Flow}, user_attributes: {user_attributes}.")
+   user_attributes = [attr for attr in dir(style.Scrollbar) if not attr.startswith('__')]
+   print(f"@@@py style.Scrollbar: {style.Scrollbar}, user_attributes: {user_attributes}.")
+   user_attributes = [attr for attr in dir(style.Border) if not attr.startswith('__')]
+   print(f"@@@py style.Border: {style.Border}, user_attributes: {user_attributes}.")
 
    while lele.handleEvents():
       pass

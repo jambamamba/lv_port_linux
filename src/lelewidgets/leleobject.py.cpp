@@ -322,100 +322,36 @@ PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     return PyBool_FromLong(true);
 }
 
-
 PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(!lele_obj || !args) {
         return PyBool_FromLong(false);
     }
-
-    //osm todo: split into getStyleById, and getStyleAttributes
-    //osm todo: Style, add methods: getValue->dict, setValue(dict)
-
-    struct raii {
-        PyObject *_dict;
-        std::map<PyObject*, PyObject*> _items;
-        ~raii() {            
-            for(const auto &[name, value] : _items) {
-                Py_XDECREF(name);
-                Py_XDECREF(value);
-            }
-            Py_XDECREF(_dict);
-        }
-    }$;
-
-    $._dict = PyDict_New();
-    if(!$._dict) {
-        return PyBool_FromLong(false);
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args == 0) {
+        return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes());
     }
-    LeleStyle lele_style("{}");
-    PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style.createPyObject());
-    for(const auto &[name, style] : lele_obj->getStyle()) {
+    if(num_args != 1) {
+        return Py_None;
+    }
 
-        if(!style) {
-            continue;
-        }
-        PyObject *value = Py_None;
-        if (std::holds_alternative<int>(style.value())) {
-            value = PyLong_FromLong(std::get<int>(style.value()));
-        }
-        else if (std::holds_alternative<std::string>(style.value())) {
-            value = PyUnicode_FromString(std::get<std::string>(style.value()).c_str());
-        }
-        else if (std::holds_alternative<lv_layout_t>(style.value())) {
-            int ival = static_cast<int>(std::get<lv_layout_t>(style.value()));
-            switch(ival) {
-                case LV_LAYOUT_FLEX: value = PyObject_GetAttrString(py_style->_layout, "Flex"); break;
-                case LV_LAYOUT_GRID: value = PyObject_GetAttrString(py_style->_layout, "Grid"); break;
-                case LV_LAYOUT_NONE: default: value = PyObject_GetAttrString(py_style->_layout, "No"); break;
-            }
-        }
-        else if (std::holds_alternative<lv_flex_flow_t>(style.value())) {
-            int ival = static_cast<int>(std::get<lv_flex_flow_t>(style.value()));
-            switch(ival) {
-                case LV_FLEX_FLOW_COLUMN: value = PyObject_GetAttrString(py_style->_flow, "Column"); break;
-                case LV_FLEX_FLOW_ROW_WRAP: value = PyObject_GetAttrString(py_style->_flow, "RowWrap"); break;
-                case LV_FLEX_FLOW_ROW_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "RowReverse"); break;
-                case LV_FLEX_FLOW_ROW_WRAP_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "RowWrapReverse"); break;
-                case LV_FLEX_FLOW_COLUMN_WRAP: value = PyObject_GetAttrString(py_style->_flow, "ColumnWrap"); break;
-                case LV_FLEX_FLOW_COLUMN_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "ColumnReverse"); break;
-                case LV_FLEX_FLOW_COLUMN_WRAP_REVERSE: value = PyObject_GetAttrString(py_style->_flow, "ColumnWrapReverse"); break;
-                case LV_FLEX_FLOW_ROW: default: value = PyObject_GetAttrString(py_style->_flow, "Row"); break;
-            }
-        }
-        else if (std::holds_alternative<lv_scrollbar_mode_t>(style.value())) {
-            int ival = static_cast<int>(std::get<lv_scrollbar_mode_t>(style.value()));
-            switch(ival) {
-                case LV_SCROLLBAR_MODE_OFF: value = PyObject_GetAttrString(py_style->_scrollbar, "Off"); break;
-                case LV_SCROLLBAR_MODE_ON: value = PyObject_GetAttrString(py_style->_scrollbar, "On"); break;
-                case LV_SCROLLBAR_MODE_ACTIVE: value = PyObject_GetAttrString(py_style->_scrollbar, "Active"); break;
-                case LV_SCROLLBAR_MODE_AUTO: default: value = PyObject_GetAttrString(py_style->_scrollbar, "Auto"); break;
-            }
-        }
-        else if (std::holds_alternative<LeleStyle::BorderTypeE>(style.value())) {
-            int ival = static_cast<int>(std::get<LeleStyle::BorderTypeE>(style.value()));
-            switch(ival) {
-                case LeleStyle::BorderTypeE::Solid: value = PyObject_GetAttrString(py_style->_border, "Solid"); break;
-                case LeleStyle::BorderTypeE::Dashed: value = PyObject_GetAttrString(py_style->_border, "Dashed"); break;
-                case LeleStyle::BorderTypeE::Dotted: value = PyObject_GetAttrString(py_style->_border, "Dotted"); break;
-                case LeleStyle::BorderTypeE::None: default: value = PyObject_GetAttrString(py_style->_border, "No"); break;
-            }
-        }
-        else if (std::holds_alternative<LeleStyle::Rotation>(style.value())) {
-            //osm todo
-        }
-        PyObject *name_ = PyUnicode_FromString(name.c_str());
-        $._items[name_] = value;
-        if(PyDict_SetItem($._dict, name_, value) == -1) {
-            return PyBool_FromLong(false);
+    const char* style_id = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //str
+                &style_id)) {
+        LOG(FATAL, LVSIM, "Failed to parse args\n");
+        return Py_None;
+    }
+    if(!style_id || !*style_id) {
+        LOG(WARNING, LVSIM, "No style id was given\n");
+        return Py_None;
+    }
+    for(LeleStyle *style : lele_obj->getStyles()) {
+        if(style->getId() == style_id) {
+            return style->createPyObject();
         }
     }
-    Py_XDECREF(py_style);
-    $._items.clear();
-    PyObject *dict = $._dict;
-    $._dict = nullptr;
-    return dict;
+    // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes(style_id));
 }
 
 PyObject *PyLeleObject::addStyle(PyObject *self_, PyObject *args) {

@@ -56,6 +56,7 @@ public:
   bool setValue(const std::string &key, const std::string &value);
   std::vector<std::string> getBackgroundAttributes() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;
+  std::string getId() const;
 protected:
   const LeleObject *_lele_parent = nullptr;
   std::string _class_name;
@@ -102,6 +103,7 @@ struct PyLeleStyle {
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
     static PyMethodDef _methods[];
+    static PyObject *toPyDict(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map);
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
@@ -115,6 +117,8 @@ struct PyLeleStyle {
     PyObject *_border = nullptr;
     static PyObject *fromConfig(PyObject *, PyObject *);
     static PyObject *getClassName(PyObject *, PyObject *);
+    static PyObject *getValue(PyObject *, PyObject *);
+    static PyObject *setValue(PyObject *, PyObject *);
 };
 
 #define PY_LELESTYLE_MEMBERS() \
@@ -127,4 +131,92 @@ struct PyLeleStyle {
 #define PY_LELESTYLE_METHODS() \
   {"fromConfig", (PyCFunction)PyLeleStyle::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
   {"getClassName", (PyCFunction)PyLeleStyle::getClassName, METH_NOARGS, "Get the class name"},\
-  
+  {"getValue", (PyCFunction)PyLeleStyle::getValue, METH_VARARGS, "Get a dictionary with the style's attribute/value pairs"},\
+  {"setValue", (PyCFunction)PyLeleStyle::setValue, METH_VARARGS, "Set the style from a dictionary containing the style's attribute/value pairs"},\
+
+///////////////////////////////////////////////////
+struct PyLeleStyleLayout {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    // Type-specific fields go here
+    PyObject *_flex = nullptr;
+    PyObject *_grid = nullptr;
+    PyObject *_no = nullptr;
+};
+
+#define PY_LELESTYLE_LAYOUT_MEMBERS() \
+    {"Flex", Py_T_OBJECT_EX, offsetof(PyLeleStyleLayout, _flex), 0, "Flex"},\
+    {"Grid", Py_T_OBJECT_EX, offsetof(PyLeleStyleLayout, _grid), 0, "Grid"},\
+    {"No", Py_T_OBJECT_EX, offsetof(PyLeleStyleLayout, _no), 0, "No"},\
+
+///////////////////////////////////////////////////
+struct PyLeleStyleFlow {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    // Type-specific fields go here
+    PyObject *_row = nullptr;
+    PyObject *_column = nullptr;
+    PyObject *_row_wrap = nullptr;
+    PyObject *_row_reverse = nullptr;
+    PyObject *_row_wrap_reverse = nullptr;
+    PyObject *_column_wrap = nullptr;
+    PyObject *_column_reverse = nullptr;
+    PyObject *_column_wrap_reverse = nullptr;
+};
+
+#define PY_LELESTYLE_FLOW_MEMBERS() \
+    {"Row", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _row), 0, "Row"},\
+    {"Column", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _column), 0, "Column"},\
+    {"RowWrap", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _row_wrap), 0, "RowWrap"},\
+    {"RowReverse", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _row_reverse), 0, "RowReverse"},\
+    {"RowWrapReverse", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _row_wrap_reverse), 0, "RowWrapReverse"},\
+    {"ColumnWrap", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _column_wrap), 0, "ColumnWrap"},\
+    {"ColumnReverse", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _column_reverse), 0, "ColumnReverse"},\
+    {"ColumnWrapReverse", Py_T_OBJECT_EX, offsetof(PyLeleStyleFlow, _column_wrap_reverse), 0, "ColumnWrapReverse"},\
+
+///////////////////////////////////////////////////
+struct PyLeleStyleScrollbar {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    // Type-specific fields go here
+    PyObject *_off = nullptr;
+    PyObject *_on = nullptr;
+    PyObject *_active = nullptr;
+    PyObject *_auto = nullptr;
+};
+
+#define PY_LELESTYLE_SCROLLBAR_MEMBERS() \
+    {"Off", Py_T_OBJECT_EX, offsetof(PyLeleStyleScrollbar, _off), 0, "Off"},\
+    {"On", Py_T_OBJECT_EX, offsetof(PyLeleStyleScrollbar, _on), 0, "On"},\
+    {"Active", Py_T_OBJECT_EX, offsetof(PyLeleStyleScrollbar, _active), 0, "Active"},\
+    {"Auto", Py_T_OBJECT_EX, offsetof(PyLeleStyleScrollbar, _auto), 0, "Auto"},\
+
+///////////////////////////////////////////////////
+struct PyLeleStyleBorder {
+    PyObject ob_base;
+    static PyTypeObject _obj_type;
+    static PyMemberDef _members[];
+    static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dealloc(PyObject* self);
+    // Type-specific fields go here
+    PyObject *_no = nullptr;
+    PyObject *_solid = nullptr;
+    PyObject *_dashed = nullptr;
+    PyObject *_dotted = nullptr;
+};
+
+#define PY_LELESTYLE_BORDER_MEMBERS() \
+    {"No", Py_T_OBJECT_EX, offsetof(PyLeleStyleBorder, _no), 0, "No"},\
+    {"Solid", Py_T_OBJECT_EX, offsetof(PyLeleStyleBorder, _solid), 0, "Solid"},\
+    {"Dashed", Py_T_OBJECT_EX, offsetof(PyLeleStyleBorder, _dashed), 0, "Dashed"},\
+    {"Dotted", Py_T_OBJECT_EX, offsetof(PyLeleStyleBorder, _dotted), 0, "Dotted"},\
+
