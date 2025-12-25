@@ -18,7 +18,7 @@ bool LeleImage::fromJson(const std::string &json_str) {
       else if(key == "name") {
         _name = value;
       }
-      else if(key == "rotation") {
+      else if(key == "rotate") {
         _rotation = LeleStyle::parseRotation(value);
       }
       else if(key == "offset") {

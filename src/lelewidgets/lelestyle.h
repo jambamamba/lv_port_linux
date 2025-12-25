@@ -57,6 +57,7 @@ public:
   std::vector<std::string> getBackgroundAttributes() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;
   std::string getId() const;
+  void applyStyle();
 protected:
   const LeleObject *_lele_parent = nullptr;
   std::string _class_name;
@@ -103,7 +104,9 @@ struct PyLeleStyle {
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
     static PyMethodDef _methods[];
-    static PyObject *toPyDict(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map);
+    static PyObject *toPyDict(
+      const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
+      const std::vector<std::string> &white_list = {});
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here

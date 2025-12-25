@@ -121,13 +121,13 @@ namespace {
         int num = 0;
         char *str = nullptr;
         PyObject *list = nullptr;
-        PyObject *dic = nullptr;
+        PyObject *dict = nullptr;
         PyObject *py_callback = nullptr;
         if(!PyArg_ParseTuple(args, "isOOO", //int,str,obj,obj,obj
             &num,
             &str,
             &list,
-            &dic,
+            &dict,
             &py_callback)) {
             return PyLong_FromLong(0);
         }
@@ -141,15 +141,15 @@ namespace {
         }
         // Py_DECREF(list);
 
-        PyObject* keys = PyDict_Keys(dic); 
+        PyObject* keys = PyDict_Keys(dict); 
         Py_ssize_t size = PyList_Size(keys);
         for (Py_ssize_t i = 0; i < size; i++) {
             PyObject* key = PyList_GetItem(keys, i);
             PyObject* key_str = PyObject_Str(key);
             const char* key_c_str = PyUnicode_AsUTF8(key_str);
-            PyObject *value_str = PyDict_GetItemString(dic, key_c_str);
+            PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
             const char* value_c_str = PyUnicode_AsUTF8(value_str);
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
+            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dict key: " << key_c_str << ", value: " << value_c_str << "\n";
             Py_DECREF(key_str);
             Py_DECREF(value_str);
         }

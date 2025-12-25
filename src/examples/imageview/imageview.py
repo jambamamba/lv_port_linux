@@ -26,7 +26,7 @@ def sliderMoved(event):
             '{'
             '"style":{'
             '   "background":{'
-            '      "rotation":{"angle":"' + str(event.value) + '","pivot":{"x":"256","y":"271"}}'
+            '      "rotate":{"angle":"' + str(event.value) + '","pivot":{"x":"256","y":"271"}}'
             '   }'
             '  }'
             '}')
@@ -80,8 +80,16 @@ def pushButtonPressed(event):
       print(f"@@@py style {style}")
       print(f"@@@py style.className() {style.getClassName()}")
       print(f"@@@py style.getValue() {style.getValue()}")
-      style = obj.getStyle()
-      print(f"@@@py style {style}")
+      dic = obj.getStyle()
+      print(f"@@@py style.dic  {dic}")
+      dic = style.getValue(['background/image', 'background/repeat', 'background/rotate'])
+      print(f"@@@py style.dic {dic}")
+      print(f"@@@py set background/repeat:none")
+      style.setValue({'background/repeat':'none'})
+      print(f"@@@py get background/repeat")
+      dic = style.getValue(['background/repeat'])
+      print(f"@@@py style.dic {dic}")  
+      style.setValue({'background/rotate':{'angle':'90.0', 'pivot_x':'256', 'pivot_y':'271'}})
 
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")

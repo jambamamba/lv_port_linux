@@ -404,11 +404,11 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
       else if(key == "background/position") {
         std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
       }
-      else if(key == "background/rotation") {
+      else if(key == "background/rotate") {
         LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
         _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
         if(!_bg_img) {
-          LOG(FATAL, LVSIM, "Failed in processing background/rotation");
+          LOG(FATAL, LVSIM, "Failed in processing background/rotate");
           return;
         }
       }

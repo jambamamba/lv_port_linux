@@ -1,6 +1,7 @@
 #include <lelewidgets/leleobject.h>
 #include <lelewidgets/lelestyle.h>
 #include <lelewidgets/lelewidgetfactory.h>
+#include <ranges>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -181,18 +182,26 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
         }
     }
     else if (std::holds_alternative<LeleStyle::Rotation>(style.value())) {
-        //osm todo
+        LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(style.value());
+        PyObject *dict = PyDict_New();
+        PyDict_SetItem(dict, PyUnicode_FromString("angle"), PyUnicode_FromString(std::to_string(val._angle).c_str()));
+        PyDict_SetItem(dict, PyUnicode_FromString("pivot_x"), PyUnicode_FromString(std::to_string(val._pivot_x).c_str()));
+        PyDict_SetItem(dict, PyUnicode_FromString("pivot_y"), PyUnicode_FromString(std::to_string(val._pivot_y).c_str()));
+        value = PyDict_New();
+        PyDict_SetItem(value, PyUnicode_FromString("background/rotate"), dict);
     }
     return value;
 }
 }//namespace
 
-PyObject *PyLeleStyle::toPyDict(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map) {
+PyObject *PyLeleStyle::toPyDict(
+    const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
+    const std::vector<std::string> &white_list) {
 
-    struct raii {
+    struct RAII {
         PyObject *_dict;
         std::map<PyObject*, PyObject*> _items;
-        ~raii() {            
+        ~RAII() {            
             for(const auto &[name, value] : _items) {
                 Py_XDECREF(name);
                 Py_XDECREF(value);
@@ -203,19 +212,28 @@ PyObject *PyLeleStyle::toPyDict(const std::map<std::string, std::optional<LeleSt
 
     $._dict = PyDict_New();
     if(!$._dict) {
-        return PyBool_FromLong(false);
+        return Py_None;
     }
-    LeleStyle lele_style("{}");
+    LeleStyle lele_style;
     PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style.createPyObject());
     for(const auto &[name, value] : style_name_value_map) {
 
         if(!value) {
             continue;
         }
+        if(!white_list.empty() && 
+            std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
+            continue;
+        }
         PyObject *py_name = PyUnicode_FromString(name.c_str());
         PyObject *py_value = toPyObject(py_style, value);
+        if(!py_name || !py_value) {
+            Py_XDECREF(py_style);
+            return Py_None;
+        }
         $._items[py_name] = py_value;
         if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
+            Py_XDECREF(py_style);
             return PyBool_FromLong(false);
         }
     }
@@ -226,21 +244,108 @@ PyObject *PyLeleStyle::toPyDict(const std::map<std::string, std::optional<LeleSt
     return dict;
 }
 
-PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
     LeleStyle *lele_style = self->_lele_style;
     if(!lele_style) {
         LOG(WARNING, LVSIM, "There are no styles!\n");
         return Py_None;
     }
-    //osm todo, if given a list of names, return dict with only these name/value pairs
-    return PyLeleStyle::toPyDict(lele_style->getStyle());
-}
-PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *arg) {
-    PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
-    return Py_None;//osm todo PyLeleStyle::setValue with dict
+    std::vector<std::string> white_list;
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args == 1) {
+        PyObject *list = nullptr;
+        if(!PyArg_ParseTuple(args, "O", //list
+                    &list)) {
+            LOG(FATAL, LVSIM, "Failed to parse args\n");
+            return Py_None;
+        }
+        int len = PyList_Size(list);
+        while (len--) {
+            white_list.emplace_back(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
+        }
+    }
+    return PyLeleStyle::toPyDict(lele_style->getStyle(), white_list);
 }
 
+PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
+    PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
+    LeleStyle *lele_style = self->_lele_style;
+
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args != 1) {
+        LOG(WARNING, LVSIM, "Expected arg of dict type, but none given\n");
+        return PyBool_FromLong(false);
+    }
+    PyObject *dic = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //dict
+                &dic)) {
+        LOG(FATAL, LVSIM, "Failed to parse args\n");
+        return PyBool_FromLong(false);
+    }
+
+    bool needs_update = false;
+    PyObject* keys = PyDict_Keys(dic); 
+    Py_ssize_t size = PyList_Size(keys);
+    for (Py_ssize_t i = 0; i < size; i++) {
+        PyObject* key = PyList_GetItem(keys, i);
+        PyObject* key_str = PyObject_Str(key);
+        const char* key_c_str = PyUnicode_AsUTF8(key_str);
+        PyObject* value_str = nullptr;
+        if(!key_c_str) {
+            Py_XDECREF(key_str);
+            Py_XDECREF(key);
+            LOG(WARNING, LVSIM, "Failed to parse PyList\n");
+            continue;
+        }
+        if(strcmp(key_c_str, "background/rotate") == 0) {
+            PyObject *dict = nullptr;
+            if(!PyArg_ParseTuple(args, "O", //dict
+                &dict)) {
+                Py_XDECREF(key_str);
+                Py_XDECREF(key);
+                LOG(WARNING, LVSIM, "Failed to parse PyList\n");
+                continue;
+            }
+            std::string str_value("{");
+            PyObject* keys = PyDict_Keys(dict); 
+            Py_ssize_t size = PyList_Size(keys);
+            for (Py_ssize_t i = 0; i < size; i++) {
+                PyObject* key = PyList_GetItem(keys, i);
+                PyObject* key_str = PyObject_Str(key);
+                const char* key_c_str = PyUnicode_AsUTF8(key_str);
+                PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
+                const char* value_c_str = PyUnicode_AsUTF8(value_str);
+                // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dict key: " << key_c_str << ", value: " << value_c_str << "\n";
+                if(i > 0) { str_value += ","; }
+                str_value += "'";
+                str_value += key_c_str;
+                str_value += "':'";
+                str_value += value_c_str;
+                str_value += "'";
+                Py_DECREF(key_str);
+                Py_DECREF(value_str);
+            }
+            str_value += "}";
+            needs_update |= lele_style->setValue(key_c_str, str_value.c_str());
+        }
+        else {
+            value_str = PyDict_GetItemString(dic, key_c_str);
+            const char* value_c_str = PyUnicode_AsUTF8(value_str);
+            needs_update |= lele_style->setValue(key_c_str, value_c_str);
+        }
+        // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
+        Py_XDECREF(value_str);
+        Py_XDECREF(key_str);
+        Py_XDECREF(key);
+    }
+    if(!needs_update) {
+        return PyBool_FromLong(false);
+    }
+
+    lele_style->applyStyle();
+    return PyBool_FromLong(true);
+}
 
 PyMemberDef PyLeleStyle::_members[] = {
     PY_LELESTYLE_MEMBERS()

@@ -124,7 +124,7 @@ void LeleStyle::parseBackground(const std::string &value_) {
     if(subkey == "color") {
       _style[bg + "/" + subkey] = parseColorCode(value);
     }
-    else if(subkey == "rotation") {
+    else if(subkey == "rotate") {
       auto rotation = parseRotation(value);
       if(rotation) {
         _style[bg + "/" + subkey] = rotation.value();
@@ -504,6 +504,13 @@ bool LeleStyle::setValue(
 
 std::string LeleStyle::getId() const {
   return _id;
+}
+
+void LeleStyle::applyStyle() {
+  if(_lele_parent) {
+    (const_cast<LeleObject *>(_lele_parent))->
+      setStyle(_lele_parent->getLvObj());
+  }
 }
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {

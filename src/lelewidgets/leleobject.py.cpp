@@ -351,6 +351,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
             return style->createPyObject();
         }
     }
+    return Py_None;
     // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes(style_id));
 }
 

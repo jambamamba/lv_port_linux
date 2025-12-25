@@ -232,11 +232,11 @@ lv_obj_t *LeleTabView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
       lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
       tab->setLvObj(button);
       tab->getTabHeader()->createLvObj(tab);
-      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_CHECKED);
-      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), LV_PART_MAIN | LV_STATE_PRESSED);
+      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_PRESSED);
       if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
-        lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), LV_PART_MAIN | LV_STATE_CHECKED);
-        lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, LV_PART_MAIN | LV_STATE_CHECKED);
+        lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+        lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
       }
     }
   }
