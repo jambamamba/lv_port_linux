@@ -18,16 +18,20 @@ bool LeleImage::fromJson(const std::string &json_str) {
       else if(key == "name") {
         _name = value;
       }
-      else if(key == "rotate") {
-        _rotation = LeleStyle::parseRotation(value);
+      else if(key == "rotation/angle") {
+        _rotation_angle = std::optional<float>(std::stof(value));
+      }
+      else if(key == "rotation/pivot") {
+        _rotation_pivot = std::optional<LeleImage::XY>();
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &_rotation_pivot->_x}, {"y", &_rotation_pivot->_y}});
       }
       else if(key == "offset") {
-        _offset = std::optional<LeleImage::Offset>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_offset_x}, {"y", &_offset->_offset_y}});
+        _offset = std::optional<LeleImage::XY>();
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_x}, {"y", &_offset->_y}});
       }
       else if(key == "scale") {
-        _scale = std::optional<LeleImage::Scale>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_percent_x}, {"y", &_scale->_percent_y}});
+        _scale = std::optional<LeleImage::XY>();
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_x}, {"y", &_scale->_y}});
       }
       else if(key == "blendmode") {
         if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }
@@ -102,21 +106,23 @@ lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   if(_antialias) {
     lv_image_set_antialias(_lv_obj, _antialias.value());
   }
-  if(_rotation) {
-    lv_image_set_pivot(_lv_obj, _rotation->_pivot_x, _rotation->_pivot_y);
-    lv_image_set_rotation(_lv_obj, _rotation->_angle);
+  if(_rotation_pivot) {
+    lv_image_set_pivot(_lv_obj, _rotation_pivot->_x, _rotation_pivot->_y);
+  }
+  if(_rotation_angle) {
+    lv_image_set_rotation(_lv_obj, _rotation_angle.value());
   }
   if(_offset) {
-    lv_image_set_offset_x(_lv_obj, _offset->_offset_x);
-    lv_image_set_offset_y(_lv_obj, _offset->_offset_y);
+    lv_image_set_offset_x(_lv_obj, _offset->_x);
+    lv_image_set_offset_y(_lv_obj, _offset->_y);
   }
   if(_scale) {
-    if(_scale->_percent_x == _scale->_percent_y) {
-      lv_image_set_scale(_lv_obj, LV_SCALE_NONE * _scale->_percent_x / 100);
+    if(_scale->_x == _scale->_y) {
+      lv_image_set_scale(_lv_obj, LV_SCALE_NONE * _scale->_x / 100);
     }
     else {
-      lv_image_set_scale_x(_lv_obj, LV_SCALE_NONE * _scale->_percent_x / 100);
-      lv_image_set_scale_y(_lv_obj, LV_SCALE_NONE * _scale->_percent_y / 100);
+      lv_image_set_scale_x(_lv_obj, LV_SCALE_NONE * _scale->_x / 100);
+      lv_image_set_scale_y(_lv_obj, LV_SCALE_NONE * _scale->_y / 100);
     }
   }
   if(_align) {

@@ -20,19 +20,14 @@ public:
   enum BorderTypeE {
     None=-1,Solid,Dashed,Dotted
   };
-  struct Rotation {
-    float _angle = 0.;
-    int _pivot_x = 0;
-    int _pivot_y = 0;
-  };
   using StyleValue = std::variant<
     int,
+    float,
     std::string,
     lv_layout_t,
     lv_flex_flow_t,
     lv_scrollbar_mode_t,
-    LeleStyle::BorderTypeE,
-    LeleStyle::Rotation
+    LeleStyle::BorderTypeE
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
@@ -41,12 +36,11 @@ public:
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleStyle *py_obj);
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
-  void setLeleParent(const LeleObject *lele_parent) { _lele_parent = lele_parent; }
-  const LeleObject *getLeleParent() const { return _lele_parent; }
+  void setLeleParent(const LeleObject *lele_parent);
+  const LeleObject *getLeleParent() const;
   void parseBackground(const std::string &value);
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
-  static std::optional<LeleStyle::Rotation> parseRotation(const std::string &json_str);
   static std::string trim(const std::string& str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
@@ -91,7 +85,10 @@ protected:
     {"background/size", std::nullopt},
     {"background/repeat", std::nullopt},
     {"background/color", std::nullopt},
-    {"background/rotate", std::nullopt},
+    {"background/rotation/angle", std::nullopt},
+    {"background/rotation/pivot", std::nullopt},
+    {"background/rotation/pivot/x", std::nullopt},
+    {"background/rotation/pivot/y", std::nullopt},
     {"scrollbar", std::nullopt}
   };
   mutable std::vector<std::string> _background_attributes;
@@ -106,7 +103,7 @@ struct PyLeleStyle {
     static PyMethodDef _methods[];
     static PyObject *toPyDict(
       const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
-      const std::vector<std::string> &white_list = {});
+      const std::vector<std::string> &&white_list = {});
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here

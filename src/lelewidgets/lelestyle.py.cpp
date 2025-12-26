@@ -139,6 +139,9 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
     if (std::holds_alternative<int>(style.value())) {
         value = PyLong_FromLong(std::get<int>(style.value()));
     }
+    else if (std::holds_alternative<float>(style.value())) {
+        value = PyFloat_FromDouble(std::get<float>(style.value()));
+    }
     else if (std::holds_alternative<std::string>(style.value())) {
         value = PyUnicode_FromString(std::get<std::string>(style.value()).c_str());
     }
@@ -181,22 +184,13 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
             case LeleStyle::BorderTypeE::None: default: value = PyObject_GetAttrString(py_style->_border, "No"); break;
         }
     }
-    else if (std::holds_alternative<LeleStyle::Rotation>(style.value())) {
-        LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(style.value());
-        PyObject *dict = PyDict_New();
-        PyDict_SetItem(dict, PyUnicode_FromString("angle"), PyUnicode_FromString(std::to_string(val._angle).c_str()));
-        PyDict_SetItem(dict, PyUnicode_FromString("pivot_x"), PyUnicode_FromString(std::to_string(val._pivot_x).c_str()));
-        PyDict_SetItem(dict, PyUnicode_FromString("pivot_y"), PyUnicode_FromString(std::to_string(val._pivot_y).c_str()));
-        value = PyDict_New();
-        PyDict_SetItem(value, PyUnicode_FromString("background/rotate"), dict);
-    }
     return value;
 }
 }//namespace
 
 PyObject *PyLeleStyle::toPyDict(
     const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
-    const std::vector<std::string> &white_list) {
+    const std::vector<std::string> &&white_list) {
 
     struct RAII {
         PyObject *_dict;
@@ -234,15 +228,61 @@ PyObject *PyLeleStyle::toPyDict(
         $._items[py_name] = py_value;
         if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
             Py_XDECREF(py_style);
-            return PyBool_FromLong(false);
+            return Py_None;
         }
     }
     Py_XDECREF(py_style);
     $._items.clear();
     PyObject *dict = $._dict;
     $._dict = nullptr;
+    Py_XINCREF(dict);
     return dict;
 }
+
+namespace {
+std::vector<std::string> pyListToStrings(PyObject *args) {
+    std::vector<std::string> strings;
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args != 1) {
+        return strings;
+    }
+    PyObject *list = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //list
+                &list)) {
+        LOG(FATAL, LVSIM, "Failed to parse args\n");
+        return strings;
+    }
+    if (!Py_IS_TYPE(list, &PyList_Type)) {
+        LOG(WARNING, LVSIM, "Is not list type!\n");
+        Py_XDECREF(list);
+        return strings;
+    }
+    int len = PyList_Size(list);
+    while (len--) {
+        PyObject *obj = PyList_GetItem(list, len);
+        if(!obj) {
+            LOG(WARNING, LVSIM, "Could not parse list item!\n");
+            continue;
+        }
+        if (!Py_IS_TYPE(obj, &PyUnicode_Type)) {
+            LOG(WARNING, LVSIM, "Is not string type!\n");
+            Py_XDECREF(obj);
+            continue;
+        }
+        const char *item = PyUnicode_AsUTF8(obj);
+        if(!item) {
+            int num = PyList_Size(list);
+            LOG(WARNING, LVSIM, "Could not parse list item!\n");
+            Py_XDECREF(obj);
+            continue;
+        }
+        strings.emplace_back(item);
+        Py_XDECREF(obj);
+    }
+    Py_XDECREF(list);
+    return strings;
+}
+}//namespace
 
 PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
@@ -251,21 +291,9 @@ PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "There are no styles!\n");
         return Py_None;
     }
-    std::vector<std::string> white_list;
-    Py_ssize_t num_args = PyTuple_Size(args);
-    if(num_args == 1) {
-        PyObject *list = nullptr;
-        if(!PyArg_ParseTuple(args, "O", //list
-                    &list)) {
-            LOG(FATAL, LVSIM, "Failed to parse args\n");
-            return Py_None;
-        }
-        int len = PyList_Size(list);
-        while (len--) {
-            white_list.emplace_back(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
-        }
-    }
-    return PyLeleStyle::toPyDict(lele_style->getStyle(), white_list);
+    // std::vector<std::string> white_list = pyListToStrings(args);
+    return toPyDict(lele_style->getStyle(), {});//osm todo use this: pyListToStrings(args));
+    // return toPyDict(lele_style->getStyle(), pyListToStrings(args));
 }
 
 PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
@@ -277,68 +305,44 @@ PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "Expected arg of dict type, but none given\n");
         return PyBool_FromLong(false);
     }
-    PyObject *dic = nullptr;
+    PyObject *dict = nullptr;
     if(!PyArg_ParseTuple(args, "O", //dict
-                &dic)) {
+                &dict)) {
         LOG(FATAL, LVSIM, "Failed to parse args\n");
         return PyBool_FromLong(false);
     }
 
     bool needs_update = false;
-    PyObject* keys = PyDict_Keys(dic); 
+    PyObject* keys = PyDict_Keys(dict); 
     Py_ssize_t size = PyList_Size(keys);
     for (Py_ssize_t i = 0; i < size; i++) {
-        PyObject* key = PyList_GetItem(keys, i);
-        PyObject* key_str = PyObject_Str(key);
-        const char* key_c_str = PyUnicode_AsUTF8(key_str);
-        PyObject* value_str = nullptr;
+        struct RAII {
+            PyObject *key = nullptr;
+            PyObject *key_str = nullptr;
+            PyObject *value_str = nullptr;
+            ~RAII() {
+                Py_XDECREF(value_str);
+                Py_XDECREF(key_str);
+                Py_XDECREF(key);
+            }
+        }$;
+        $.key = PyList_GetItem(keys, i);
+        $.key_str = PyObject_Str($.key);
+        const char* key_c_str = PyUnicode_AsUTF8($.key_str);
         if(!key_c_str) {
-            Py_XDECREF(key_str);
-            Py_XDECREF(key);
             LOG(WARNING, LVSIM, "Failed to parse PyList\n");
             continue;
         }
-        if(strcmp(key_c_str, "background/rotate") == 0) {
-            PyObject *dict = nullptr;
-            if(!PyArg_ParseTuple(args, "O", //dict
-                &dict)) {
-                Py_XDECREF(key_str);
-                Py_XDECREF(key);
-                LOG(WARNING, LVSIM, "Failed to parse PyList\n");
-                continue;
-            }
-            std::string str_value("{");
-            PyObject* keys = PyDict_Keys(dict); 
-            Py_ssize_t size = PyList_Size(keys);
-            for (Py_ssize_t i = 0; i < size; i++) {
-                PyObject* key = PyList_GetItem(keys, i);
-                PyObject* key_str = PyObject_Str(key);
-                const char* key_c_str = PyUnicode_AsUTF8(key_str);
-                PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
-                const char* value_c_str = PyUnicode_AsUTF8(value_str);
-                // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dict key: " << key_c_str << ", value: " << value_c_str << "\n";
-                if(i > 0) { str_value += ","; }
-                str_value += "'";
-                str_value += key_c_str;
-                str_value += "':'";
-                str_value += value_c_str;
-                str_value += "'";
-                Py_DECREF(key_str);
-                Py_DECREF(value_str);
-            }
-            str_value += "}";
-            needs_update |= lele_style->setValue(key_c_str, str_value.c_str());
+        $.value_str = PyDict_GetItemString(dict, key_c_str);
+        const char *value_c_str = PyUnicode_AsUTF8($.value_str);
+        if(!value_c_str) {
+            LOG(WARNING, LVSIM, "Failed to parse PyList\n");
+            continue;
         }
-        else {
-            value_str = PyDict_GetItemString(dic, key_c_str);
-            const char* value_c_str = PyUnicode_AsUTF8(value_str);
-            needs_update |= lele_style->setValue(key_c_str, value_c_str);
-        }
+        needs_update |= lele_style->setValue(key_c_str, value_c_str);
         // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
-        Py_XDECREF(value_str);
-        Py_XDECREF(key_str);
-        Py_XDECREF(key);
     }
+    Py_XDECREF(keys);
     if(!needs_update) {
         return PyBool_FromLong(false);
     }
@@ -468,7 +472,7 @@ PyTypeObject PyLeleStyleLayout::_obj_type = {
     PyLeleStyleLayout::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyType_GenericNew,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };
 
 ///////////////////////////////////////////////////////////////////////////
@@ -544,7 +548,7 @@ PyTypeObject PyLeleStyleFlow::_obj_type = {
     PyLeleStyleFlow::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyType_GenericNew,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };
 
 
@@ -613,7 +617,7 @@ PyTypeObject PyLeleStyleScrollbar::_obj_type = {
     PyLeleStyleScrollbar::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyType_GenericNew,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };
 
 
@@ -682,5 +686,5 @@ PyTypeObject PyLeleStyleBorder::_obj_type = {
     PyLeleStyleBorder::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyType_GenericNew,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };

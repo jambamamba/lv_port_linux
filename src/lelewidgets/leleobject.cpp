@@ -81,6 +81,7 @@ bool LeleObject::fromJson(const std::string &json_str) {
       if(key == "style") {
         auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
         LeleStyle *lele_style = dynamic_cast<LeleStyle*> (value.get());
+        lele_style->setLeleParent(this);
         _lele_styles.emplace_back(lele_style);
       }
     }
@@ -118,10 +119,11 @@ void LeleObject::setLvObj(lv_obj_t *obj) {
 }
 
 void LeleObject::setParent(LeleObject *parent) {
-  for(LeleStyle *lele_style : _lele_styles) {
-    lele_style->setLeleParent(parent);
-  }
   _lele_parent = parent;
+}
+
+LeleObject *LeleObject::getParent() const{
+  return _lele_parent;
 }
 
 // const LeleStyles *LeleObject::styles() const {
@@ -380,8 +382,14 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
         LOG(FATAL, LVSIM, "Failed in generating image description");
         return;
     }
-    int offset_x = 0;
-    int offset_y = 0;
+    struct XY {
+      int _x = 0;
+      int _y = 0;
+    };
+    XY offset;
+    XY background_rotation_pivot;
+    float background_rotation_angle;
+    
     const auto &[keys, bg_style] = getBackgroundStyle();
     for(const auto &key: keys) {
       const auto &value = bg_style.at(key);
@@ -401,12 +409,18 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
           return;
         }
       }
-      else if(key == "background/position") {
-        std::tie(offset_x, offset_y) = parseBackgroundPosition(value, obj_width, obj_height);
+      else if(key == "background/position/x") {
+        std::tie(offset._x, offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
       }
-      else if(key == "background/rotate") {
-        LeleStyle::Rotation val = std::get<LeleStyle::Rotation>(value.value());
-        _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), val._pivot_x, val._pivot_y, val._angle);
+      else if(key == "background/rotation/pivot/x") {
+        background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));
+      }      
+      else if(key == "background/rotation/pivot/y") {
+        background_rotation_pivot._y = std::stoi(std::get<std::string>(value.value()));
+      }      
+      else if(key == "background/rotation/angle") {
+        background_rotation_angle = std::get<float>(value.value());
+        _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), background_rotation_pivot._x, background_rotation_pivot._y, background_rotation_angle);
         if(!_bg_img) {
           LOG(FATAL, LVSIM, "Failed in processing background/rotate");
           return;
@@ -415,13 +429,13 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
       else if(key == "background/repeat") {
         std::string val = std::get<std::string>(value.value());
         if(val == "repeat-x"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset_x, offset_y);
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset._x, offset._y);
         }
         else if(val == "repeat-y"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset_x, offset_y);
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset._x, offset._y);
         }
         else if(val == "repeat"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset_x, offset_y);
+          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset._x, offset._y);
         }
         if(!_bg_img) {
           LOG(FATAL, LVSIM, "Failed in background/repeat");

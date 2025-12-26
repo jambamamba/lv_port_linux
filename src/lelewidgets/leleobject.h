@@ -42,6 +42,7 @@ public:
   lv_obj_t *getLvObj() const;
   void setLvObj(lv_obj_t *obj);
   void setParent(LeleObject *parent);
+  LeleObject *getParent() const;
   std::vector<LeleStyle *> getStyles() const;
   std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::string &class_name = "") const;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;

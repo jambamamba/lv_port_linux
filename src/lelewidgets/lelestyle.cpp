@@ -93,24 +93,6 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   }
   return 0;
 }
-std::optional<LeleStyle::Rotation> LeleStyle::parseRotation(const std::string &json_str) {
-  bool processed = false;
-  LeleStyle::Rotation rotation;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "angle") {
-        rotation._angle = std::stof(value);
-        processed = true;
-      }
-      else if(key == "pivot") {
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &rotation._pivot_x}, {"y", &rotation._pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
-        processed = true;
-      }
-    }
-  }
-  return processed ? std::optional<LeleStyle::Rotation>(rotation) : std::nullopt;
-}
 
 std::vector<std::string> LeleStyle::getBackgroundAttributes() const {
   return _background_attributes;
@@ -124,11 +106,22 @@ void LeleStyle::parseBackground(const std::string &value_) {
     if(subkey == "color") {
       _style[bg + "/" + subkey] = parseColorCode(value);
     }
-    else if(subkey == "rotate") {
-      auto rotation = parseRotation(value);
-      if(rotation) {
-        _style[bg + "/" + subkey] = rotation.value();
+    else if(subkey == "rotation/angle") {
+      _style["background/rotation/angle"] = std::stof(value);
+    }
+    else if(subkey == "rotation/pivot") {
+      int pivot_x = 0;
+      int pivot_y = 0;
+      if(LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
+        _style["background/rotation/pivot/x"] = pivot_x;
+        _style["background/rotation/pivot/y"] = pivot_y;
       }
+    }
+    else if(subkey == "rotation/pivot/x") {
+      _style["background/rotation/pivot/x"] = std::stoi(value);
+    }
+    else if(subkey == "rotation/pivot/y") {
+      _style["background/rotation/pivot/y"] = std::stoi(value);
     }
     else if(subkey == "image") {
       _style[bg + "/" + subkey] = value;
@@ -269,8 +262,8 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
       return it->second;
     }
   }
-  if(_lele_parent) {
-    return _lele_parent->getStyle(key, class_name);
+  if(_lele_parent && _lele_parent->getParent()) {
+    return _lele_parent->getParent()->getStyle(key, class_name);
   }
   return std::nullopt;
 }
@@ -481,11 +474,22 @@ bool LeleStyle::setValue(
     else if(key == "background/color") {
         _style["background/color"] = parseColorCode(value);
     }
-    else if(key == "background/rotate") {
-        auto rotation = parseRotation(value);
-        if(rotation) {
-          _style["background/rotate"] = rotation.value();
-        }
+    else if(key == "background/rotation/angle") {
+      _style["background/rotation/angle"] = std::stof(value);
+    }
+    else if(key == "background/rotation/pivot") {
+      int pivot_x = 0;
+      int pivot_y = 0;
+      if(LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
+        _style["background/rotation/pivot/x"] = pivot_x;
+        _style["background/rotation/pivot/y"] = pivot_y;
+      }
+    }
+    else if(key == "background/rotation/pivot/x") {
+      _style["background/rotation/pivot/x"] = std::stoi(value);
+    }
+    else if(key == "background/rotation/pivot/y") {
+      _style["background/rotation/pivot/y"] = std::stoi(value);
     }
     else if(key == "background/image") {
         _style["background/image"] = value;
@@ -512,6 +516,15 @@ void LeleStyle::applyStyle() {
       setStyle(_lele_parent->getLvObj());
   }
 }
+
+void LeleStyle::setLeleParent(const LeleObject *lele_parent) { 
+  _lele_parent = lele_parent; 
+}
+
+const LeleObject *LeleStyle::getLeleParent() const { 
+  return _lele_parent; 
+}
+
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";

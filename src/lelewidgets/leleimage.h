@@ -14,13 +14,9 @@ class LeleImage : public LeleObject  {
   std::string getSrc() const;
 
 
-  struct Offset {
-    int _offset_x = 0;
-    int _offset_y = 0;
-  };
-  struct Scale {
-    int _percent_x = 0;
-    int _percent_y = 0;
+  struct XY {
+    int _x = 0;
+    int _y = 0;
   };
   protected:
   
@@ -29,8 +25,9 @@ class LeleImage : public LeleObject  {
   std::optional<lv_blend_mode_t> _blendmode;
   std::optional<lv_image_align_t> _align;
   std::optional<bool> _antialias;
-  std::optional<LeleStyle::Rotation> _rotation;
-  std::optional<Offset> _offset;
-  std::optional<Scale> _scale;
+  std::optional<float> _rotation_angle;
+  std::optional<XY> _rotation_pivot;
+  std::optional<XY> _offset;
+  std::optional<XY> _scale;
   std::map<std::string, std::optional<AutoFreeSharedPtr<lv_image_dsc_t>>> _images;
 };

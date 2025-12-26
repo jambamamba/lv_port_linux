@@ -13,6 +13,40 @@ print(f"@@@py lele.version(): {lele.version()}")
 def callback(str):
    print(f"@@@py str:'{str}'")
 
+def setAngleMethod2(theta):
+      print(f"@@@py======================================1")
+      obj = lele.getObjectById("/view/with_bg_img")
+      style = obj.getStyle("img")
+      print(f"@@@py style {style}")
+      print(f"@@@py style.className() {style.getClassName()}")
+      print(f"@@@py style.getValue() {style.getValue()}")
+      dic = obj.getStyle()
+      print(f"@@@py style.dic0  {dic}")
+      dic = style.getValue(['background/image', 'background/repeat', 'background/rotation/angle', 'background/rotation/pivot', 'background/rotation/pivot/x', 'background/rotation/pivot/y'])
+      angle = dic['background/rotation/angle']
+      # print(f"@@@py style.dic1 {dic}, angle {angle}")
+      # print(f"@@@py set background/repeat:none")
+      # style.setValue({'background/repeat':'none'})
+      # print(f"@@@py get background/repeat")
+      # dic = style.getValue(['background/repeat'])
+      # print(f"@@@py style.dic2 {dic}")
+      # # style.setValue({'background/rotation/pivot/x':'256'})
+      # # style.setValue({'background/rotation/pivot/y':'271'})
+      # # style.setValue({'background/rotation/angle':str(theta)})
+
+def setAngleMethod1(theta):
+      obj = lele.getObjectById("/view/with_bg_img")
+      style = lele.Style(
+         '{'
+         '"style":{'
+         '   "background":{'
+         '      "rotation/angle":"' + str(theta) + '","rotation/pivot":{"x":"256","y":"271"}'
+         '   }'
+         '  }'
+         '}')
+      obj.addStyle(style)
+
+
 def sliderMoved(event):
    print(f"@@@py SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
    # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
@@ -21,16 +55,8 @@ def sliderMoved(event):
          obj = lele.getObjectById("/views:0/view/label")
          obj.setText(f"Angle: {event.value}°")
          print(f"@@@py change rotation angle by 10 degrees")
-         obj = lele.getObjectById("/view/with_bg_img")
-         style = lele.Style(
-            '{'
-            '"style":{'
-            '   "background":{'
-            '      "rotate":{"angle":"' + str(event.value) + '","pivot":{"x":"256","y":"271"}}'
-            '   }'
-            '  }'
-            '}')
-         obj.addStyle(style)
+         # setAngleMethod1(event.value)
+         setAngleMethod2(event.value)
    pass
 
 def msgboxEvent(event):
@@ -73,23 +99,6 @@ def pushButtonPressed(event):
       print(f"@@@py change text color to white")
       style = lele.Style('{"style":{"fgcolor":"#fff"}}')
       obj.addStyle(style)
-
-      print(f"@@@py======================================1")
-      obj = lele.getObjectById("/view/with_bg_img")
-      style = obj.getStyle("img")
-      print(f"@@@py style {style}")
-      print(f"@@@py style.className() {style.getClassName()}")
-      print(f"@@@py style.getValue() {style.getValue()}")
-      dic = obj.getStyle()
-      print(f"@@@py style.dic  {dic}")
-      dic = style.getValue(['background/image', 'background/repeat', 'background/rotate'])
-      print(f"@@@py style.dic {dic}")
-      print(f"@@@py set background/repeat:none")
-      style.setValue({'background/repeat':'none'})
-      print(f"@@@py get background/repeat")
-      dic = style.getValue(['background/repeat'])
-      print(f"@@@py style.dic {dic}")  
-      style.setValue({'background/rotate':{'angle':'90.0', 'pivot_x':'256', 'pivot_y':'271'}})
 
       print(f"@@@py======================================")
       print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")

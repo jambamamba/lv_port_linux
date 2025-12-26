@@ -179,5 +179,5 @@ PyTypeObject PyLeleEventType::_obj_type = {
     PyLeleEventType::init,                              /* tp_init */
     PyType_GenericAlloc,            /* tp_alloc */
     PyType_GenericNew,                       /* tp_new */
-    PyObject_GC_Del,                /* tp_free */
+    0,//PyObject_GC_Del,                /* tp_free */
 };
