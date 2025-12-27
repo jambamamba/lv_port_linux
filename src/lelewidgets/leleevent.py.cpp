@@ -40,7 +40,8 @@ PyObject *LeleEvent::createPyObject() {
         case LeleEvent::Type::ValueChanged: self->_code = PyObject_GetAttrString(self->_type, "ValueChanged"); break;
         default: self->_code = Py_None;
     }
-    self->_value = _ivalue;
+    self->_ivalue = _ivalue;
+    self->_ivalue2 = _ivalue2;
 
     return (PyObject *)self;
 }

@@ -44,12 +44,27 @@
             "style":{"id":"button0","class_name":"button0","width":"20%","height":"5%","border":"solid-1px-#f00"},
             "text":"Push button0",
             "event":{"type":"clicked","action":"action0","args":{}}
-        },  
+        },
         "button":{
             "id":"slider0",
-            "type":"slider",
+            "type":"slider-range",
             "style":{"id":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
-            "value":"10",
+            "value":"60",
+            "start":"20",
+            "min":"0",
+            "max":"100",
+            "event":{"type":"clicked","action":"action0","args":{}}
+        },
+        "button":{
+            "id":"arc0",
+            "type":"arc",
+            "style":{"id":"arc0","width":"20%","height":"20%","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+            "value":"90",
+            "rotation":"90",
+            "start":"20",
+            "end":"340",
+            "min":"0",
+            "max":"360",
             "event":{"type":"clicked","action":"action0","args":{}}
         }
     }

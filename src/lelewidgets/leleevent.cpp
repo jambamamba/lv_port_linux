@@ -30,7 +30,7 @@ bool LeleEvent::fromJson(const std::string &json_str) {
   return true;
 }
 
-LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalue) 
+LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalue, int ivalue2) 
 : _id(rhs._id)
 , _type(rhs._type)
 , _action(rhs._action)
@@ -38,7 +38,8 @@ LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalu
 , _lv_event(lv_event)
 , _target_obj(rhs._target_obj)
 , _code(lv_event ? lv_event_get_code(const_cast<lv_event_t*>(lv_event)) : 0)
-, _ivalue(ivalue) {
+, _ivalue(ivalue)
+, _ivalue2(ivalue2) {
 }
 
 void LeleEvent::parseArgs(const std::string &json_str) {

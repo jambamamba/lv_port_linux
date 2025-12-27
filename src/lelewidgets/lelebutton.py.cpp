@@ -97,15 +97,6 @@ PyObject *PyLeleButton::click(PyObject *self_, PyObject *arg) {
     return PyBool_FromLong(lele_obj->click());
 }
 
-PyObject *PyLeleButton::getValue(PyObject *self_, PyObject *arg) {
-    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
-    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
-    if (lele_obj) {
-        return PyLong_FromLong(lele_obj->getValue());
-    }
-    return PyBool_FromLong(false);
-}
-
 PyObject *PyLeleButton::setValue(PyObject *self_, PyObject *args) {
     PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
     LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
@@ -118,6 +109,55 @@ PyObject *PyLeleButton::setValue(PyObject *self_, PyObject *args) {
     }
     return Py_None;
 }
+
+PyObject *PyLeleButton::getValue(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getValue());
+    }
+    return PyBool_FromLong(false);
+}
+PyObject *PyLeleButton::getMin(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getMin());
+    }
+    return PyBool_FromLong(false);
+}    
+PyObject *PyLeleButton::getMax(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getMax());
+    }
+    return PyBool_FromLong(false);
+}    
+PyObject *PyLeleButton::getStartValue(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getStartValue());
+    }
+    return PyBool_FromLong(false);
+}    
+PyObject *PyLeleButton::getEndValue(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getEndValue());
+    }
+    return PyBool_FromLong(false);
+}    
+PyObject *PyLeleButton::getRotation(PyObject *self_, PyObject *arg) {
+    PyLeleButton *self = reinterpret_cast<PyLeleButton *>(self_);
+    LeleButtons::LeleButton *lele_obj = dynamic_cast<LeleButtons::LeleButton *>(self->ob_base.ob_base._lele_obj);
+    if (lele_obj) {
+        return PyLong_FromLong(lele_obj->getRotation());
+    }
+    return PyBool_FromLong(false);
+}    
 
 PyMemberDef PyLeleButton::_members[] = {
     PY_LELEBUTTON_MEMBERS()

@@ -74,6 +74,21 @@ bool LeleButtons::LeleButton::fromJson(const std::string &json_str) {
       else if(key == "value") {
         _value = std::stoi(value);
       }
+      else if(key == "start") {
+        _start_value = std::stoi(value);
+      }
+      else if(key == "end") {
+        _end_value = std::stoi(value);
+      }
+      else if(key == "min") {
+        _min = std::stoi(value);
+      }
+      else if(key == "max") {
+        _max = std::stoi(value);
+      }
+      else if(key == "rotation") {
+        _rotation = std::stoi(value);
+      }
       else if(key == "type") {
         if(value == "checkbox") {
           _type = LeleButtons::LeleButton::Type::Checkbox;
@@ -86,6 +101,12 @@ bool LeleButtons::LeleButton::fromJson(const std::string &json_str) {
         }
         else if(value == "slider") {
           _type = LeleButtons::LeleButton::Type::Slider;
+        }
+        else if(value == "slider-range") {
+          _type = LeleButtons::LeleButton::Type::SliderRange;
+        }
+        else if(value == "arc") {
+          _type = LeleButtons::LeleButton::Type::Arc;
         }
         else if(value == "close") {
           _type = LeleButtons::LeleButton::Type::Close;
@@ -134,10 +155,31 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
       break;
     }
+    case LeleButtons::LeleButton::Type::SliderRange:
     case LeleButtons::LeleButton::Type::Slider:{
       _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_slider_create(lele_parent->getLvObj()));
-        lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
+      lv_slider_set_range(_lv_obj, _min, _max);
+      lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
+      if(_type == LeleButtons::LeleButton::Type::SliderRange) {
+        lv_slider_set_mode(_lv_obj, LV_SLIDER_MODE_RANGE);
+        lv_slider_set_start_value(_lv_obj, _start_value, LV_ANIM_OFF);
+      }
+      break;
+    }
+    case LeleButtons::LeleButton::Type::Arc:{
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
+        lv_obj ? lv_obj : lv_arc_create(lele_parent->getLvObj()));
+        auto width = getStyle("width");
+        auto height = getStyle("height");
+        if(width && height) {
+          lv_obj_set_size(_lv_obj, std::get<int>(width.value()), std::get<int>(height.value()));
+        }
+        lv_arc_set_range(_lv_obj, _min, _max);
+        lv_arc_set_rotation(_lv_obj, _rotation);
+        lv_arc_set_bg_angles(_lv_obj, _start_value, _end_value);
+        lv_arc_set_value(_lv_obj, _value);
+        lv_obj_center(_lv_obj);
       break;
     }
     case LeleButtons::LeleButton::Type::Close: {
@@ -195,9 +237,13 @@ bool LeleButtons::LeleButton::click() {
 }
 
 void LeleButtons::LeleButton::setValue(int value) {
-  _value = value; 
-  if(_type = LeleButtons::LeleButton::Type::Slider) {
+  _value = value;
+  if(_type == LeleButtons::LeleButton::Type::Slider ||
+    _type == LeleButtons::LeleButton::Type::SliderRange) {
     lv_slider_set_value(_lv_obj, _value, LV_ANIM_OFF);
+  }
+  else if(_type == LeleButtons::LeleButton::Type::Arc) {
+    lv_arc_set_value(_lv_obj, _value);
   }
 }
 
@@ -221,9 +267,20 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
         }
     }
     else if(code == LV_EVENT_VALUE_CHANGED) {
-        lv_obj_t *slider = lv_event_get_target_obj(lv_event);
-        _value = slider ? lv_slider_get_value(slider) : _value;
-        LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, _value);
+        lv_obj_t *lv_obj = lv_event_get_target_obj(lv_event);
+        if(lv_obj->class_p == &lv_arc_class) {
+          _value = lv_arc_get_value(lv_obj);
+          LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i\n", _class_name.c_str(), _type, _value);
+          return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
+        }
+        else if(lv_obj->class_p == &lv_slider_class) {
+          _value = lv_slider_get_value(lv_obj);
+          if(_type == LeleButtons::LeleButton::Type::SliderRange) {
+            _start_value = lv_slider_get_left_value(lv_obj);
+          }
+          LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i, start_value:%i\n", _class_name.c_str(), _type, _value, _start_value);
+          return LeleObject::eventCallback(LeleEvent(e, lv_event, _value, _start_value));
+        }
         return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
     }
     return LeleObject::eventCallback(std::move(e));

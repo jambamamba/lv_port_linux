@@ -283,12 +283,65 @@ void iterateNodes(
     }
 }
 
+namespace {
+
+struct click_counts {
+    uint32_t num_clicked;
+    uint32_t num_short_clicked;
+    uint32_t num_single_clicked;
+    uint32_t num_double_clicked;
+    uint32_t num_triple_clicked;
+    uint32_t num_long_pressed;
+    uint8_t short_click_streak;
+};
+
+static void click_event_cb(lv_event_t * e)
+{
+    click_counts * counts = (click_counts *)lv_event_get_user_data(e);
+
+    switch(lv_event_get_code(e)) {
+        case LV_EVENT_CLICKED:
+            counts->num_clicked++;
+            break;
+        case LV_EVENT_SHORT_CLICKED:
+            counts->num_short_clicked++;
+            break;
+        case LV_EVENT_SINGLE_CLICKED:
+            counts->num_single_clicked++;
+            break;
+        case LV_EVENT_DOUBLE_CLICKED:
+            counts->num_double_clicked++;
+            break;
+        case LV_EVENT_TRIPLE_CLICKED:
+            counts->num_triple_clicked++;
+            break;
+        case LV_EVENT_LONG_PRESSED:
+            counts->num_long_pressed++;
+            break;
+        default:
+            break;
+    }
+
+    lv_indev_t * indev = (lv_indev_t *)lv_event_get_param(e);
+    counts->short_click_streak = lv_indev_get_short_click_streak(indev);
+}
+
+}//namespace
 std::vector<std::pair<std::string, Node>> fromConfig(
     LeleObject *parent,
     const std::string &config) {
 
     if(!parent->getLvObj()) {
+        static click_counts counts;
         parent->setLvObj(lv_screen_active());
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SHORT_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SINGLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_DOUBLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
+
+
     }
     const cJSON* json = jsonFromConfig(config);
     if(!json) {

@@ -21,7 +21,9 @@ class LeleButtons : public LeleObject {
       Radio,
       Switch,
       Close,
-      Slider
+      Slider,
+      SliderRange,
+      Arc
     };
     LeleButton(const std::string &json_str = "");
     virtual bool fromJson(const std::string &json_str) override;
@@ -29,18 +31,33 @@ class LeleButtons : public LeleObject {
     virtual PyObject *createPyObject() override;
     virtual bool initPyObject(PyLeleObject *py_obj) override;
     virtual bool eventCallback(LeleEvent &&e) override;
+    bool click();
     bool isCheckable() const { return _checkable; }
     bool getChecked() const { return _checked; }
     void setChecked(bool checked);
-    bool click();
-    Type getType() const { return _type; }
+    int getMin() const { return _min; }
+    // void setMin(int value) { _min = value; }
+    int getMax() const { return _max; }
+    // void setMax(int value) { _max = value; }
     int getValue() const { return _value; }
     void setValue(int value);
+    int getStartValue() const { return _start_value; }
+    // void setStartValue(int value) { _start_value = value; }
+    int getEndValue() const { return _end_value; }
+    // void setEndValue(int value) { _end_value = value; }
+    int getRotation() const { return _rotation; }
+    // void setRotation(int value) { _rotation = value; }
+    Type getType() const { return _type; }
     protected:
     bool _checkable = false;
     bool _checked = false;
     Type _type = Type::Push;
+    int _min = 0;
+    int _max = 100;
     int _value = 0;
+    int _start_value = 0;//slider,arc
+    int _end_value = 320;//arc
+    int _rotation = 90;//arc
     std::vector<LeleEvent*> _events;
   };
   LeleButtons(const std::string &json_str = "");
@@ -66,8 +83,13 @@ struct PyLeleButton {
     static PyObject *setChecked(PyObject *, PyObject *);
     static PyObject *getType(PyObject *, PyObject *);
     static PyObject *click(PyObject *, PyObject *);
-    static PyObject *getValue(PyObject *, PyObject *);
     static PyObject *setValue(PyObject *, PyObject *);
+    static PyObject *getValue(PyObject *, PyObject *);
+    static PyObject *getMin(PyObject *, PyObject *);
+    static PyObject *getMax(PyObject *, PyObject *);
+    static PyObject *getStartValue(PyObject *, PyObject *);
+    static PyObject *getEndValue(PyObject *, PyObject *);
+    static PyObject *getRotation(PyObject *, PyObject *);
 };
 
 #define PY_LELEBUTTON_MEMBERS() \
@@ -81,8 +103,13 @@ struct PyLeleButton {
   {"setChecked", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Make the button checked"},\
   {"getType", (PyCFunction)PyLeleButton::getType, METH_NOARGS, "Get the type of button: Push,Checkbox,Radio,Switch,Close,Slider"},\
   {"click", (PyCFunction)PyLeleButton::click, METH_NOARGS, "Click the button"},\
-  {"getValue", (PyCFunction)PyLeleButton::getChecked, METH_NOARGS, "Get the value of the slider"},\
-  {"setValue", (PyCFunction)PyLeleButton::setChecked, METH_VARARGS, "Set the value of the slider"},\
+  {"setValue", (PyCFunction)PyLeleButton::setValue, METH_VARARGS, "Set the value of the slider"},\
+  {"getValue", (PyCFunction)PyLeleButton::getValue, METH_NOARGS, "Get the value of the slider"},\
+  {"getMin", (PyCFunction)PyLeleButton::getMin, METH_NOARGS, "Get the min value of the slider or arc"},\
+  {"getMax", (PyCFunction)PyLeleButton::getMax, METH_NOARGS, "Get the max value of the slider or arc"},\
+  {"getStartValue", (PyCFunction)PyLeleButton::getStartValue, METH_NOARGS, "Get the start value of the slider or arc"},\
+  {"getEndValue", (PyCFunction)PyLeleButton::getEndValue, METH_NOARGS, "Get the end value of the arc"},\
+  {"getRotation", (PyCFunction)PyLeleButton::getRotation, METH_NOARGS, "Get the rotation value of the arc"},\
 
 ///////////////////////////////////////////////////
 struct PyLeleButtonType {

@@ -47,6 +47,17 @@ def setAngleMethod1(theta):
       obj.addStyle(style)
 
 
+def arcMoved(event):
+   print(f"@@@py ARC MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
+   if event.code == lele.Event().Type.ValueChanged:
+         print(f"@@@py arc {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
+         obj = lele.getObjectById("/views:0/view/label")
+         obj.setText(f"Angle: {event.value}°")
+         print(f"@@@py change rotation angle by 10 degrees")
+         setAngleMethod2(event.value)
+   pass
+
 def sliderMoved(event):
    print(f"@@@py SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
    # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
@@ -55,8 +66,7 @@ def sliderMoved(event):
          obj = lele.getObjectById("/views:0/view/label")
          obj.setText(f"Angle: {event.value}°")
          print(f"@@@py change rotation angle by 10 degrees")
-         # setAngleMethod1(event.value)
-         setAngleMethod2(event.value)
+         setAngleMethod1(event.value)
    pass
 
 def msgboxEvent(event):
@@ -127,6 +137,7 @@ try:
    print(f"@@@py loadConfig result:{res}")
 
    lele.addEventHandler("slider0", lambda event: sliderMoved(event))
+   lele.addEventHandler("arc0", lambda event: arcMoved(event))
    lele.addEventHandler("push_button0", lambda event: pushButtonPressed(event))
 
    btn = lele.Button()
