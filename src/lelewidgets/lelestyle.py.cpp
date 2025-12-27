@@ -135,7 +135,7 @@ PyObject *PyLeleStyle::getClassName(PyObject *self_, PyObject *arg) {
 namespace {
 PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle::StyleValue> &style) {
 
-    PyObject *value = Py_None;
+    PyObject *value = nullptr;
     if (std::holds_alternative<int>(style.value())) {
         value = PyLong_FromLong(std::get<int>(style.value()));
     }
@@ -193,8 +193,12 @@ PyObject *PyLeleStyle::toPyDict(
     const std::vector<std::string> &&white_list) {
 
     struct RAII {
-        PyObject *_dict;
+        PyObject *_dict = nullptr;
         std::map<PyObject*, PyObject*> _items;
+        void reset() {
+            _dict = nullptr;
+            _items.clear();
+        }
         ~RAII() {            
             for(const auto &[name, value] : _items) {
                 Py_XDECREF(name);
@@ -215,27 +219,36 @@ PyObject *PyLeleStyle::toPyDict(
         if(!value) {
             continue;
         }
-        if(!white_list.empty() && 
-            std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
-            continue;
-        }
+        // if(!white_list.empty() && 
+        //     std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
+        //     continue;
+        // }        
         PyObject *py_name = PyUnicode_FromString(name.c_str());
-        PyObject *py_value = toPyObject(py_style, value);
-        if(!py_name || !py_value) {
+        if(!py_name) {
             Py_XDECREF(py_style);
-            return Py_None;
+            // return Py_None;
+            break;
+        }
+        PyObject *py_value = toPyObject(py_style, value);
+        if(!py_value) {
+            Py_XDECREF(py_name);
+            Py_XDECREF(py_style);
+            // return Py_None;
+            break;
+        }
+        if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
+            Py_XDECREF(py_name);
+            Py_XDECREF(py_value);
+            Py_XDECREF(py_style);
+            // return Py_None;
+            break;
         }
         $._items[py_name] = py_value;
-        if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
-            Py_XDECREF(py_style);
-            return Py_None;
-        }
     }
     Py_XDECREF(py_style);
-    $._items.clear();
     PyObject *dict = $._dict;
-    $._dict = nullptr;
     Py_XINCREF(dict);
+    $.reset();
     return dict;
 }
 
@@ -252,11 +265,16 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
         LOG(FATAL, LVSIM, "Failed to parse args\n");
         return strings;
     }
-    if (!Py_IS_TYPE(list, &PyList_Type)) {
+    if (!PyList_Check(list)) {
         LOG(WARNING, LVSIM, "Is not list type!\n");
         Py_XDECREF(list);
         return strings;
     }
+    // if (!Py_IS_TYPE(list, &PyList_Type)) {
+    //     LOG(WARNING, LVSIM, "Is not list type!\n");
+    //     Py_XDECREF(list);
+    //     return strings;
+    // }
     int len = PyList_Size(list);
     while (len--) {
         PyObject *obj = PyList_GetItem(list, len);
@@ -264,7 +282,8 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
             LOG(WARNING, LVSIM, "Could not parse list item!\n");
             continue;
         }
-        if (!Py_IS_TYPE(obj, &PyUnicode_Type)) {
+        if(!PyUnicode_Check(obj)) {
+        // if (!Py_IS_TYPE(obj, &PyUnicode_Type)) {
             LOG(WARNING, LVSIM, "Is not string type!\n");
             Py_XDECREF(obj);
             continue;
@@ -276,8 +295,7 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
             Py_XDECREF(obj);
             continue;
         }
-        strings.emplace_back(item);
-        Py_XDECREF(obj);
+        strings.push_back(item);
     }
     Py_XDECREF(list);
     return strings;
@@ -291,9 +309,10 @@ PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "There are no styles!\n");
         return Py_None;
     }
-    // std::vector<std::string> white_list = pyListToStrings(args);
-    return toPyDict(lele_style->getStyle(), {});//osm todo use this: pyListToStrings(args));
-    // return toPyDict(lele_style->getStyle(), pyListToStrings(args));
+    // std::vector<std::string> &&white_list = std::move(pyListToStrings(args));
+    // const auto style = lele_style->getStyle();
+    // return toPyDict(std::move(style), std::move(white_list));
+    return toPyDict(lele_style->getStyle(), pyListToStrings(args));
 }
 
 PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
@@ -316,25 +335,16 @@ PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
     PyObject* keys = PyDict_Keys(dict); 
     Py_ssize_t size = PyList_Size(keys);
     for (Py_ssize_t i = 0; i < size; i++) {
-        struct RAII {
-            PyObject *key = nullptr;
-            PyObject *key_str = nullptr;
-            PyObject *value_str = nullptr;
-            ~RAII() {
-                Py_XDECREF(value_str);
-                Py_XDECREF(key_str);
-                Py_XDECREF(key);
-            }
-        }$;
-        $.key = PyList_GetItem(keys, i);
-        $.key_str = PyObject_Str($.key);
-        const char* key_c_str = PyUnicode_AsUTF8($.key_str);
+
+        PyObject *key = PyList_GetItem(keys, i);
+        PyObject *key_str = PyObject_Str(key);
+        const char* key_c_str = PyUnicode_AsUTF8(key_str);
         if(!key_c_str) {
             LOG(WARNING, LVSIM, "Failed to parse PyList\n");
             continue;
         }
-        $.value_str = PyDict_GetItemString(dict, key_c_str);
-        const char *value_c_str = PyUnicode_AsUTF8($.value_str);
+        PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
+        const char *value_c_str = PyUnicode_AsUTF8(value_str);
         if(!value_c_str) {
             LOG(WARNING, LVSIM, "Failed to parse PyList\n");
             continue;
@@ -342,7 +352,6 @@ PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
         needs_update |= lele_style->setValue(key_c_str, value_c_str);
         // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
     }
-    Py_XDECREF(keys);
     if(!needs_update) {
         return PyBool_FromLong(false);
     }

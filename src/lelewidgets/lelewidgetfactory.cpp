@@ -290,18 +290,23 @@ std::vector<std::pair<std::string, Node>> fromConfig(
     if(!parent->getLvObj()) {
         parent->setLvObj(lv_screen_active());
     }
-    return leleObjectsFromJson(
-        parent,
-        cJSON_Print(
-            jsonFromConfig(config)));
+    const cJSON* json = jsonFromConfig(config);
+    if(!json) {
+        LOG(WARNING, LVSIM, "Failed to parse config");
+        return std::vector<std::pair<std::string, Node>>();
+    }
+    return leleObjectsFromJson(parent, cJSON_Print(json));
 }
 
 std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
     const std::string &config) {
 
-    return leleStylesFromJson(
-        cJSON_Print(
-            jsonFromConfig(config)));
+    const cJSON* json = jsonFromConfig(config);
+    if(!json) {
+        LOG(WARNING, LVSIM, "Failed to parse config");
+        return std::vector<std::unique_ptr<LeleStyle>>();
+    }
+    return leleStylesFromJson(cJSON_Print(json));
 }
 
 

@@ -94,6 +94,29 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   return 0;
 }
 
+std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str) {
+  bool processed = false;
+  std::map<std::string, float> res;
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+    if (std::holds_alternative<std::string>(token)) {
+      const std::string &value = std::get<std::string>(token);
+      if(key == "angle") {
+        res[key] = std::stof(value);
+        processed = true;
+      }
+      else if(key == "pivot") {
+        int pivot_x;
+        int pivot_y;
+        LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
+        res["pivot/x"] = pivot_x;
+        res["pivot/y"] = pivot_y;
+        processed = true;
+      }
+    }
+  }
+  return processed ? res: std::map<std::string, float>();
+}
+
 std::vector<std::string> LeleStyle::getBackgroundAttributes() const {
   return _background_attributes;
 }
@@ -106,22 +129,17 @@ void LeleStyle::parseBackground(const std::string &value_) {
     if(subkey == "color") {
       _style[bg + "/" + subkey] = parseColorCode(value);
     }
-    else if(subkey == "rotation/angle") {
-      _style["background/rotation/angle"] = std::stof(value);
-    }
-    else if(subkey == "rotation/pivot") {
-      int pivot_x = 0;
-      int pivot_y = 0;
-      if(LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
-        _style["background/rotation/pivot/x"] = pivot_x;
-        _style["background/rotation/pivot/y"] = pivot_y;
+    else if(subkey == "rotation") {
+      auto rotation = parseRotation(value);
+      if(!rotation.empty()) {
+        _style["background/rotation/pivot/x"] = static_cast<int>(rotation["pivot/x"]);
+        _style["background/rotation/pivot/y"] = static_cast<int>(rotation["pivot/y"]);
+        _style["background/rotation/angle"] = rotation["angle"];
+        _background_attributes.push_back("rotation/pivot/x");
+        _background_attributes.push_back("rotation/pivot/y");
+        _background_attributes.push_back("rotation/angle");
+        return;
       }
-    }
-    else if(subkey == "rotation/pivot/x") {
-      _style["background/rotation/pivot/x"] = std::stoi(value);
-    }
-    else if(subkey == "rotation/pivot/y") {
-      _style["background/rotation/pivot/y"] = std::stoi(value);
     }
     else if(subkey == "image") {
       _style[bg + "/" + subkey] = value;
@@ -471,9 +489,6 @@ bool LeleStyle::setValue(
     else if(key == "background") {
       parseBackground(value);
     }
-    else if(key == "background/color") {
-        _style["background/color"] = parseColorCode(value);
-    }
     else if(key == "background/rotation/angle") {
       _style["background/rotation/angle"] = std::stof(value);
     }
@@ -490,6 +505,9 @@ bool LeleStyle::setValue(
     }
     else if(key == "background/rotation/pivot/y") {
       _style["background/rotation/pivot/y"] = std::stoi(value);
+    }
+    else if(key == "background/color") {
+        _style["background/color"] = parseColorCode(value);
     }
     else if(key == "background/image") {
         _style["background/image"] = value;

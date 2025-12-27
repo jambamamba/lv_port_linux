@@ -41,6 +41,7 @@ public:
   void parseBackground(const std::string &value);
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
+  static std::map<std::string, float> parseRotation(const std::string &json_str);
   static std::string trim(const std::string& str);
   static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);

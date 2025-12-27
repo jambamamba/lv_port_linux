@@ -17,22 +17,22 @@ def setAngleMethod2(theta):
       print(f"@@@py======================================1")
       obj = lele.getObjectById("/view/with_bg_img")
       style = obj.getStyle("img")
-      print(f"@@@py style {style}")
-      print(f"@@@py style.className() {style.getClassName()}")
-      print(f"@@@py style.getValue() {style.getValue()}")
+      # print(f"@@@py style {style}")
+      # print(f"@@@py style.className() {style.getClassName()}")
+      # print(f"@@@py style.getValue() {style.getValue()}")
       dic = obj.getStyle()
       print(f"@@@py style.dic0  {dic}")
-      dic = style.getValue(['background/image', 'background/repeat', 'background/rotation/angle', 'background/rotation/pivot', 'background/rotation/pivot/x', 'background/rotation/pivot/y'])
+      dic = style.getValue(["background/image", "background/repeat", "background/rotation/angle", "background/rotation/pivot", "background/rotation/pivot/x", "background/rotation/pivot/y"])
       angle = dic['background/rotation/angle']
-      # print(f"@@@py style.dic1 {dic}, angle {angle}")
-      # print(f"@@@py set background/repeat:none")
-      # style.setValue({'background/repeat':'none'})
+      print(f"@@@py style.dic1 {dic}, angle {angle}")
+      # print(f"@@@py set background/repeat ")
+      # style.setValue({'background/repeat':'no'})
       # print(f"@@@py get background/repeat")
       # dic = style.getValue(['background/repeat'])
-      # print(f"@@@py style.dic2 {dic}")
-      # # style.setValue({'background/rotation/pivot/x':'256'})
-      # # style.setValue({'background/rotation/pivot/y':'271'})
-      # # style.setValue({'background/rotation/angle':str(theta)})
+      print(f"@ @@py style.dic2 {dic}")
+      # style.setValue({'background/rotation/pivot/x':'256'})
+      # style.setValue({'background/rotation/pivot/y':'271'})
+      style.setValue({'background/rotation/angle':str(theta)})
 
 def setAngleMethod1(theta):
       obj = lele.getObjectById("/view/with_bg_img")
@@ -40,7 +40,7 @@ def setAngleMethod1(theta):
          '{'
          '"style":{'
          '   "background":{'
-         '      "rotation/angle":"' + str(theta) + '","rotation/pivot":{"x":"256","y":"271"}'
+         '      "rotation":{"angle":"'+ str(theta) + '","pivot":{"x":"256","y":"271"}}'
          '   }'
          '  }'
          '}')

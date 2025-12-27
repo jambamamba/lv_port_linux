@@ -413,10 +413,12 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
         std::tie(offset._x, offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
       }
       else if(key == "background/rotation/pivot/x") {
-        background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));
+        // background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));
+        background_rotation_pivot._x = std::get<int>(value.value());
       }      
       else if(key == "background/rotation/pivot/y") {
-        background_rotation_pivot._y = std::stoi(std::get<std::string>(value.value()));
+        // background_rotation_pivot._y = std::stoi(std::get<std::string>(value.value()));
+        background_rotation_pivot._y = std::get<int>(value.value());
       }      
       else if(key == "background/rotation/angle") {
         background_rotation_angle = std::get<float>(value.value());
