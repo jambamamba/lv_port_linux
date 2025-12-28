@@ -361,8 +361,11 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 }
 
 void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
-    lv_obj_t *lv_img = lv_image_create(_lv_obj);
-    if(!lv_img) {
+    if(_lv_bg_img) {
+      lv_obj_del(_lv_bg_img);
+    }
+    _lv_bg_img = lv_image_create(_lv_obj);
+    if(!_lv_bg_img) {
         LOG(FATAL, LVSIM, "Failed in lv_image_create");
         return;
     }
@@ -427,6 +430,10 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
           LOG(FATAL, LVSIM, "Failed in processing background/rotate");
           return;
         }
+        // std::string filename("rotated.");
+        // filename += std::to_string(background_rotation_angle);
+        // filename += ".png";
+        // LeleImageConverter::saveGdImage(filename.c_str(), _bg_img.value().get());
       }
       else if(key == "background/repeat") {
         std::string val = std::get<std::string>(value.value());
@@ -454,7 +461,7 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
       return;
     }
     // LOG(DEBUG, LVSIM, "obj_width:%i, obj_height:%i\n", obj_width, obj_height);
-    lv_image_set_src(lv_img, _bg_img.value().get());
+    lv_image_set_src(_lv_bg_img, _bg_img.value().get());
 }
 
 std::tuple<int,int> LeleObject::parseBackgroundPosition(

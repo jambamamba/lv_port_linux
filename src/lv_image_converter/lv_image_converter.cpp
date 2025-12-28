@@ -48,6 +48,10 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
 
+    if(src_img->header.w < 1 || src_img->header.h < 1 || new_width < 1 || new_height < 1) {
+        return std::nullopt;
+    }
+
     if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
         new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
@@ -271,5 +275,15 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
         ++idx;
     }
     c_img_filestream << "};\n";
+}
+
+void saveGdImage(const std::string &filename, const lv_image_dsc_t *src_img) {
+    ImgHelper::saveGdImage(
+        filename.c_str(), 
+        src_img->header.w, 
+        src_img->header.h, 
+        src_img->header.stride, 
+        src_img->header.stride/src_img->header.w, 
+        src_img->data);
 }
 }//namespace LeleImageConverter

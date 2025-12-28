@@ -281,7 +281,10 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
           LOG(DEBUG, LVSIM, "%s: value changed. button type:%i, value:%i, start_value:%i\n", _class_name.c_str(), _type, _value, _start_value);
           return LeleObject::eventCallback(LeleEvent(e, lv_event, _value, _start_value));
         }
+        else {
+          LOG(WARNING, LVSIM, "No handler for value changed event!");
+        }
         return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
     }
-    return LeleObject::eventCallback(std::move(e));
+    return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
 }

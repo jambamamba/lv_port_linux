@@ -80,6 +80,7 @@ protected:
   std::string _id;
   bool _enabled = true;
   lv_obj_t *_lv_obj = nullptr;
+  lv_obj_t *_lv_bg_img = nullptr;
   LeleObject *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;

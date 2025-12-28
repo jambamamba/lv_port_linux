@@ -26,4 +26,5 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(const lv_image_dsc_t *s
     TileRepeat repeat = TileRepeat::RepeatXY, int dx = 0, int dy = 0);
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(const lv_image_dsc_t *src_img, int x, int y, int cropped_width, int cropped_height);
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> rotateImg(const lv_image_dsc_t *src_img, int pivot_x, int pivot_y, float angle);
+void saveGdImage(const std::string &filename, const lv_image_dsc_t *src_img);
 }//namespace LeleImageConverter

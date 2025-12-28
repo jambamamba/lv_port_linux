@@ -219,10 +219,10 @@ PyObject *PyLeleStyle::toPyDict(
         if(!value) {
             continue;
         }
-        // if(!white_list.empty() && 
-        //     std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
-        //     continue;
-        // }        
+        if(!white_list.empty() && 
+            std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
+            continue;
+        }        
         PyObject *py_name = PyUnicode_FromString(name.c_str());
         if(!py_name) {
             Py_XDECREF(py_style);
