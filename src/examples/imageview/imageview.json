@@ -124,10 +124,10 @@
                 "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"90%","fgcolor":"#fff"}
             },
             "button":{
-                "id":"push_button0",
+                "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","class_name":"button0","width":"20%","height":"90%","border":"solid-1px-#f00"},
-                "text":"Push button0",
+                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"90%","border":"solid-1px-#f00"},
+                "text":"Run Test",
                 "event":{"type":"clicked","action":"action0","args":{}}
             }
         }

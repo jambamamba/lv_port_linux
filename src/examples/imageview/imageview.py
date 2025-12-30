@@ -1,5 +1,7 @@
 import sys
 print(sys.path)
+import time
+# from threading import Timer
 import traceback
 import lele
 
@@ -112,7 +114,11 @@ def msgboxEvent(event):
    print(f"@@@py msgboxEvent, button clicked: {event.object.getButtonClicked().id}, button text: {event.object.getButtonClicked().getText()}")
    return True
 
-def pushButtonPressed(event):
+_tests_are_running = False
+_scale_delta = 1
+_rotate_delta = 1
+
+def runTest(event):
    # print(f"@@@py event: {event}")
    # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
    # print(user_attributes)
@@ -141,23 +147,63 @@ def pushButtonPressed(event):
       # print(user_attributes)
       # print(f"@@@py event.object.getText(): {event.object.getText()}")
       # print(f"@@@py event.object: {event.object.id}")
-      obj = lele.getObjectById("rotation-label")
+      # obj = lele.getObjectById("rotation-label")
       # print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
-      obj.setText("Cocoa bean!")
+      # obj.setText("Cocoa bean!")
 
-      print(f"@@@py change text color to white")
-      style = lele.Style('{"style":{"fgcolor":"#fff"}}')
-      obj.addStyle(style)
+      # print(f"@@@py change text color to white")
+      # style = lele.Style('{"style":{"fgcolor":"#fff"}}')
+      # obj.addStyle(style)
 
-      print(f"@@@py======================================")
-      print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
-      root = lele.getObjectById("/views:0/view")
-      msgbox = root.addChild("../messagebox/messagebox.json")
-      msgbox.addEventHandler(lambda event: msgboxEvent(event))
+      # print(f"@@@py======================================")
+      # print(f"@@@py type(lele.MessageBox) {type(lele.MessageBox)}")
+      # root = lele.getObjectById("/views:0/view")
+      # msgbox = root.addChild("../messagebox/messagebox.json")
+      # msgbox.addEventHandler(lambda event: msgboxEvent(event))
 
       # msgbox = lele.MessageBox(root, "/repos/lv_port_linux/src/examples/messagebox/messagebox.json")
       #osm todo: test above msgbox can do handle events
       #osm: now we have above 2 ways of loading an object from its config!
+
+      # obj = lele.getObjectById("scale")
+      # for i in range(100):
+      #    time.sleep(0.01) 
+      #    obj.setValue(i)
+      global _tests_are_running
+      _tests_are_running = True
+      lele.getObjectById("repeat-none").click()
+      pass
+
+def runTestLoop():
+   global _tests_are_running
+   global _scale_delta
+   global _rotate_delta
+   if _tests_are_running:
+      obj = lele.getObjectById("scale")
+      scale = obj.getValue()
+      if scale == 200:
+         _scale_delta = -1
+      elif scale == 1:
+         _scale_delta = 1
+         _tests_are_running = False
+         return
+      obj.setValue(scale + _scale_delta)
+      obj = lele.getObjectById("rotate")
+      angle = obj.getValue()
+      if angle == 360 :
+         _rotate_delta = -1
+      elif angle == 0:
+         _rotate_delta = 1
+      obj.setValue(angle + _rotate_delta)
+      if scale > 0 and scale <= 50:
+         lele.getObjectById("repeat-none").click()
+      elif scale > 50 and scale <= 100:
+         lele.getObjectById("repeat-x").click()
+      elif scale > 100 and scale <= 150:
+         lele.getObjectById("repeat-y").click()
+      elif scale > 150 and scale <= 200:
+         lele.getObjectById("repeat").click()
+      time.sleep(0.005) 
    pass
 
 try:
@@ -183,7 +229,7 @@ try:
    lele.addEventHandler("repeat-x", lambda event: tileImage(event))
    lele.addEventHandler("repeat-y", lambda event: tileImage(event))
    lele.addEventHandler("repeat-none", lambda event: tileImage(event))
-   lele.addEventHandler("push_button0", lambda event: pushButtonPressed(event))
+   lele.addEventHandler("run_test", lambda event: runTest(event))
 
    btn = lele.Button()
    print(f"@@@py btn: {btn}, attr: {[attr for attr in dir(btn.Type) if not attr.startswith('__')]}")
@@ -192,10 +238,10 @@ try:
    obj = lele.getObjectById("rotation-label")
    if obj:
       user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
-   obj = lele.getObjectById("push_button0")
+   obj = lele.getObjectById("run_test")
    if obj:
       user_attributes = [attr for attr in dir(obj.Type) if not attr.startswith('__')]
-      print(f"@@@py push_button0.Type {obj.Type}, user_attributes: {user_attributes}")
+      print(f"@@@py run_test.Type {obj.Type}, user_attributes: {user_attributes}")
       # for attr in obj.Type:
       #    print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
 
@@ -244,6 +290,7 @@ try:
    print(f"@@@py style.Border: {style.Border}, user_attributes: {user_attributes}.")
 
    while lele.handleEvents():
+      runTestLoop()
       pass
 except:
    print(traceback.format_exc())

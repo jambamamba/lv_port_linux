@@ -196,7 +196,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
         lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
       lv_obj_t *label = lv_label_create(_lv_obj);
       lv_label_set_text(label, _text.c_str());
-      setObjAlignStyle(label);
+      // lv_obj_set_layout(_lv_obj, LV_LAYOUT_NONE);
+      // lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+      setObjAlignStyle(label);//osm todo: not working, cannot center text
       break;
     }
   }
@@ -245,6 +247,15 @@ void LeleButtons::LeleButton::setValue(int value) {
   else if(_type == LeleButtons::LeleButton::Type::Arc) {
     lv_arc_set_value(_lv_obj, _value);
   }
+
+  lv_event_t event = {
+    .current_target=_lv_obj,
+    .original_target=_lv_obj,
+    .code=LV_EVENT_VALUE_CHANGED,
+    .user_data=this
+  };
+  LeleObject::EventCallback(&event);
+  // lv_result_t lv_obj_send_event(lv_obj_t * obj, lv_event_code_t event_code, void * param)
 }
 
 bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
