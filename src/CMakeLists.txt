@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.10)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON) #-fPIC
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "-stdlib=libstdc++ -std=stdc++20")
+# clang can use libc++ or libstdc++ (that is what gcc uses)
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie") #no-pie is needed to print line number from addr2line
+endif()
+
 set(CXX_MODULE_STD ON)
 set(LELE_VERSION_MAJOR 1)
 set(LELE_VERSION_MINOR 0)

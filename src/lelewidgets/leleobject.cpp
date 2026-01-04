@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <ranges>
+#include <algorithm>
 #include <lvgl/lvgl_private.h>
 #include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
 

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <iostream>
 #include <openssl/sha.h>
+#include <sstream>
 
 #include <utils/img_helper.h>
 
