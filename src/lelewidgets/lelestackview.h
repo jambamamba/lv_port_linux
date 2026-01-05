@@ -4,7 +4,7 @@
 #include "lelewidgetfactory.h"
 #include <stack>
 
-#include <smart_pointer/auto_free_ptr.h>
+#include <utils/auto_free_ptr.h>
 #include <optional>
 
 class LeleViewHeader;
