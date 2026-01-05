@@ -23,6 +23,7 @@ class LeleButtons : public LeleObject {
       Close,
       Slider,
       SliderRange,
+      ColorPicker,
       Arc
     };
     LeleButton(const std::string &json_str = "");

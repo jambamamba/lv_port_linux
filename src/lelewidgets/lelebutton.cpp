@@ -105,6 +105,9 @@ bool LeleButtons::LeleButton::fromJson(const std::string &json_str) {
         else if(value == "slider-range") {
           _type = LeleButtons::LeleButton::Type::SliderRange;
         }
+        else if(value == "color-picker") {
+          _type = LeleButtons::LeleButton::Type::ColorPicker;
+        }
         else if(value == "arc") {
           _type = LeleButtons::LeleButton::Type::Arc;
         }
@@ -179,6 +182,20 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
         lv_arc_set_rotation(_lv_obj, _rotation);
         lv_arc_set_bg_angles(_lv_obj, _start_value, _end_value);
         lv_arc_set_value(_lv_obj, _value);
+        lv_obj_center(_lv_obj);
+      break;
+    }
+    case LeleButtons::LeleButton::Type::ColorPicker:{
+      _lv_obj = LeleObject::createLvObj(lele_parent, 
+        lv_obj ? lv_obj : lv_cpicker_create(lele_parent->getLvObj()));//https://docs.lvgl.io/7.11/widgets/cpicker.html
+        auto width = getStyle("width");
+        auto height = getStyle("height");
+        if(width && height) {
+          lv_obj_set_size(_lv_obj, std::get<int>(width.value()), std::get<int>(height.value()));
+        }
+        // lv_arc_set_range(_lv_obj, _min, _max);
+        // lv_arc_set_value(_lv_obj, _value);//value: 0-100
+        lv_cpicker_set_color(_lv_obj, _value);
         lv_obj_center(_lv_obj);
       break;
     }
