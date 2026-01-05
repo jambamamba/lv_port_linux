@@ -255,6 +255,12 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
     right = left = std::stoi(matches[2].str());
     return std::tuple<int,int,int,int>{top,right,bottom,left};
   }
+  pattern = std::regex("(\\d*)px\\s*");
+  if (std::regex_search(padding_str, matches, pattern) &&
+    matches.size() == 2) {
+    top = right = bottom = left = std::stoi(matches[1].str());
+    return std::tuple<int,int,int,int>{top,right,bottom,left};
+  }
   // std::string text("{"top":"0","right":"0","bottom":"0","left":"0"}");
   auto [top_str,right_str,bottom_str,left_str] = parseTopRightBottomLeft(padding_str.c_str());
   if(!top_str.empty() && top_str != "none"){ top = std::stoi(top_str); }

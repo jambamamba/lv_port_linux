@@ -1,6 +1,6 @@
 {
-    "style":{"id":"button0","class_name":"button0","border":"solid-1px-#0f0","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
-    "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+    "style":{"id":"button0","class_name":"button0","border":"solid-1px-#ccc","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
+    "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
         "style":{"id":"view/global","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","height":"100%","fgcolor":"#fff","corner_radius":"5"},
@@ -8,7 +8,7 @@
             "style":{"layout":"flex","flow":"row","height":"70%"},
             "view":{
                 "id":"/view/with_bg_img",
-                "style":{"id":"img","class_name":"view/global","border":"solid-1px-#0f0","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
+                "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
                         "image":"firefox-logo.png",
                         "xposition":"20",
@@ -35,11 +35,11 @@
             },
             "view":{
                 "id":"controll-panel",
-                "style":{"layout":"flex","flow":"column","width":"20%"},
+                "style":{"layout":"flex","flow":"column","width":"20%","border":"none"},
                 "xbutton":{
                     "id":"slider0",
                     "type":"slider-range",
-                    "style":{"id":"slider0","width":"20%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+                    "style":{"id":"slider0","width":"20%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"60",
                     "start":"20",
                     "min":"0",
@@ -49,7 +49,7 @@
                 "button":{
                     "id":"scale",
                     "type":"slider",
-                    "style":{"id":"scale-style","width":"20%","height":"20","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+                    "style":{"id":"scale-style","padding":"5px","width":"15%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"100",
                     "min":"1",
                     "max":"200",
@@ -100,7 +100,7 @@
                 "button":{
                     "id":"rotate",
                     "type":"arc",
-                    "style":{"id":"rotate","width":"15%","height":"20%","fgcolor":"#fff","bgcolor":"#444","border":"solid-1px-#0f0"},
+                    "style":{"id":"rotate","padding":"5px","width":"15%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"90",
                     "rotation":"90",
                     "start":"20",
@@ -126,7 +126,7 @@
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"90%","border":"solid-1px-#f00"},
+                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"90%"},
                 "text":"Run Test",
                 "event":{"type":"clicked","action":"action0","args":{}}
             }
