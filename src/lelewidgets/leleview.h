@@ -2,7 +2,7 @@
 
 #include "leleobject.h"
 
-#include <smart_pointer/auto_free_ptr.h>
+#include <utils/auto_free_ptr.h>
 
 class LeleView : public LeleObject {
 public:

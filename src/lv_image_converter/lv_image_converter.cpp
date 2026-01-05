@@ -90,6 +90,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> rotateImg(
     int bpp = src_img->header.stride/src_img->header.w;
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(rotated_width * bpp * rotated_height);
     initImageDsc(dst_img.get(), rotated_width, rotated_height, bpp);
+    memset((void*)dst_img->data, 0, dst_img->data_size);
 
     if(!ImgHelper::rotateImageData(
         src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,

@@ -3,7 +3,7 @@
 #include "leleobject.h"
 #include "lelewidgetfactory.h"
 
-#include <smart_pointer/auto_free_ptr.h>
+#include <utils/auto_free_ptr.h>
 #include <optional>
 
 class LeleViewHeader;

@@ -5,7 +5,7 @@
 #include <functional>
 #include <map>
 #include <optional>
-#include <smart_pointer/auto_free_ptr.h>
+#include <utils/auto_free_ptr.h>
 #include <string>
 
 #include <lvgl/src/draw/lv_image_dsc.h>
