@@ -11,6 +11,7 @@
 
 #include <src/misc/lv_types.h>
 #include <src/misc/lv_event_private.h>
+#include <utils/img_helper.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -34,6 +35,12 @@ struct window *getWindow(backend_t *backend){
         bool closed = window->closed;
         bool maximized = window->maximized;
         bool fullscreen = window->fullscreen;
+        if( window->wl_ctx->shm_ctx.lv_draw_buf) {
+            uint8_t * data = window->wl_ctx->shm_ctx.lv_draw_buf->data;
+            uint32_t data_size = window->wl_ctx->shm_ctx.lv_draw_buf->data_size;
+            int xx = 0;
+            xx = 1;
+        }
         return window;
     }
     return nullptr;
@@ -55,6 +62,7 @@ struct window *getWindow(backend_t *backend){
 //             break;
 //         }
 //         default:
+//             LOG(DEBUG, LVSIM, "@@@@@ e->code:%i\n", e->code);
 //             break;
 //     }
 // }
@@ -65,8 +73,8 @@ bool GraphicsBackend::load() {
     driver_backends_register();//connect to wayland server
     settings.window_width = atoi(getenv("LV_SIM_WINDOW_WIDTH") ? : "800");//osm todo get these values from config
     settings.window_height = atoi(getenv("LV_SIM_WINDOW_HEIGHT") ? : "480");
-    settings.fullscreen = false;
-    settings.maximize = false;
+    // settings.fullscreen = true;
+    // settings.maximize = true;
     lv_init();
     char selected_backend[] = "WAYLAND";
     _backend = driver_backends_init_backend(selected_backend);
@@ -75,7 +83,7 @@ bool GraphicsBackend::load() {
         LOG(FATAL, LVSIM, "Failed to initialize display backend\n");
         return false;
     }
-    // struct window *window = getWindow(_backend);
+    struct window *window = getWindow(_backend);
     // lv_indev_add_event_cb(window->lv_indev_keyboard, keyboard_cb, LV_EVENT_KEY, window);
     // lv_indev_add_event_cb(window->lv_indev_pointer, keyboard_cb, LV_EVENT_CLICKED, window);
     return true;
@@ -93,7 +101,30 @@ bool GraphicsBackend::handleEvents() {
         return false;
     }
     lv_point_t point = {};
-    lv_indev_get_point(getWindow(_backend)->lv_indev_pointer, &point);
+    struct window *window = getWindow(_backend);
+    lv_indev_get_point(window->lv_indev_pointer, &point);
     // LOG(DEBUG, LVSIM, "@@@@@ point:%i,%i\n", point.x, point.y);
+
+    // if(window->wl_ctx->shm_ctx.lv_draw_buf) {
+    //     uint8_t *data = window->wl_ctx->shm_ctx.lv_draw_buf->data;
+    //     uint32_t data_size = window->wl_ctx->shm_ctx.lv_draw_buf->data_size;
+    //     lv_image_header_t &header = window->wl_ctx->shm_ctx.lv_draw_buf->header;
+    //     int xx = 0;
+    //     xx = 1;
+
+    //     if(data_size!=192000){
+    //         return true;
+    //     }
+    //     static int i = 0;
+    //     std::stringstream ss;
+    //     ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i++) << ".png";
+    //     ImgHelper::saveGdImage(
+    //             ss.str().c_str(),
+    //             header.w, 
+    //             header.h, 
+    //             header.stride, 
+    //             header.stride/header.w, 
+    //             data);
+    // }
     return true;
 }
