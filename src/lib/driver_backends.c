@@ -144,7 +144,7 @@ void driver_backends_register(void)
     }
 }
 
-int driver_backends_init_backend(char *backend_name)
+backend_t * driver_backends_init_backend(char *backend_name)
 {
     backend_t *b;
     int i;
@@ -153,7 +153,7 @@ int driver_backends_init_backend(char *backend_name)
 
     if (backends[0] == NULL) {
         LV_LOG_ERROR("Please call driver_backends_register first");
-        return -1;
+        return NULL;//-1 //osm
     }
 
     if (backend_name == NULL) {
@@ -167,7 +167,7 @@ int driver_backends_init_backend(char *backend_name)
 
         if (b->type != BACKEND_DISPLAY) {
             LV_LOG_ERROR("The default backend: %s is not a display driver backend", b->name);
-            return -1;
+            return NULL;//-1 //osm
         }
 
         backend_name = backends[0]->name;
@@ -188,7 +188,7 @@ int driver_backends_init_backend(char *backend_name)
 
                 if (dispb->display == NULL) {
                     LV_LOG_ERROR("Failed to init display with %s backend", b->name);
-                    return -1;
+                    return NULL;//-1 //osm
                 }
 
                 sel_display_backend = b;
@@ -206,7 +206,7 @@ int driver_backends_init_backend(char *backend_name)
                     LV_LOG_ERROR(
                         "Failed to init indev backend: %s - display needs to be initialized",
                         b->name);
-                    return -1;
+                    return NULL;//-1 //osm
                 }
 
                 LV_LOG_INFO("Initialized %s indev backend", b->name);
@@ -221,7 +221,7 @@ int driver_backends_init_backend(char *backend_name)
         i++;
     }
 
-    return 0;
+    return sel_display_backend;
 }
 
 int driver_backends_print_supported(void)

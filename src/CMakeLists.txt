@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "-stdlib=libstdc++ -std=stdc++20")
 # clang can use libc++ or libstdc++ (that is what gcc uses)
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie") #no-pie is needed to print line number from addr2line
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie") #no-pie is needed to print line number from addr2line
 endif()
 
 set(CXX_MODULE_STD ON)

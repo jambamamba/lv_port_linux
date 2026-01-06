@@ -53,9 +53,11 @@ void driver_backends_register(void);
  * create an input device
  *
  * @param backend_name the name of the backend to initialize FBDEV,DRM etc
- * @return 0 on success, -1 on error
+ * //osm changed backend_t *, @return 0 on success, -1 on error
  */
-int driver_backends_init_backend(char *backend_name);
+// #include </repos/lv_port_linux/src/lib/backends.h>
+#include <src/lib/backends.h>//osm
+backend_t * driver_backends_init_backend(char *backend_name);
 
 /**
  * @brief Checks if a backend exists and is supported
