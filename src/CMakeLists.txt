@@ -92,12 +92,14 @@ function(buildLvglSim
         lelewidgets/lelebutton.py.cpp
         lelewidgets/leleevent.cpp
         lelewidgets/leleevent.py.cpp
-        lelewidgets/leleimage.cpp
         lelewidgets/lelelabel.cpp
         lelewidgets/lelelabel.py.cpp
+        lelewidgets/lelecolorwheel.cpp
+        lelewidgets/lelecolorwheel.py.cpp
         lelewidgets/lelemessagebox.cpp
         lelewidgets/lelemessagebox.py.cpp
         lelewidgets/lelenullwidget.cpp
+        lelewidgets/leleimage.cpp
         lelewidgets/leleobject.cpp
         lelewidgets/leleobject.py.cpp
         lelewidgets/lelestackview.cpp

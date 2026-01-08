@@ -108,6 +108,9 @@
                     "min":"0",
                     "max":"360",
                     "event":{"type":"clicked","action":"action0","args":{}}
+                },
+                "colorwheel":{
+                    "style":{"id":"colorwheel","width":"15%","height":"20%","fgcolor":"#fff","bgcolor":"#666"}
                 }
             }
         },

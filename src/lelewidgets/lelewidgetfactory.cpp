@@ -12,6 +12,7 @@
 #include "lelestackview.h"
 #include "leletabview.h"
 #include "leletextbox.h"
+#include "lelecolorwheel.h"
 #include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -188,6 +189,9 @@ std::vector<std::pair<std::string, Node>> fromJson(
         }
         else if(lhs == "textbox") {
             token = std::make_unique<LeleTextbox>(rhs);
+        }
+        else if(lhs == "colorwheel") {
+            token = std::make_unique<LeleColorWheel>(rhs);
         }
         else if(lhs == "view") {
             token = std::make_unique<LeleView>(rhs);
