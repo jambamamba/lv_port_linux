@@ -5,7 +5,125 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-#define PI 3.1415926535897932384626433832795f
+namespace {
+
+static constexpr float PI = 3.1415926535897932384626433832795f;
+
+// Structure to hold RGB color values (0-1 range for this example)
+typedef struct RGBColor {
+    int r;
+    int g;
+    int b;
+} RGBColor;
+
+// Function to convert HSV to RGB
+RGBColor HsvToRgb(float H, float S, float V) {
+    float r = 0, g = 0, b = 0;
+    // Normalize H to 0-360, S and V to 0-1 for internal calculation
+    float h = H >= 360 ? 0 : H; // Wrap hue
+    float s = S / 100.0f;
+    float v = V / 100.0f;
+
+    if (s == 0) {
+        r = g = b = v; // Gray
+    } else {
+        int i = static_cast<int>(std::floor(h * 6.0f / 360.0f)); // Sector 0 to 5
+        float f = h * 6.0f / 360.0f - i; // Fractional part of h
+        float p = v * (1.0f - s);
+        float q = v * (1.0f - s * f);
+        float t = v * (1.0f - s * (1.0f - f));
+
+        switch (i % 6) {
+            case 0: r = v, g = t, b = p; break;
+            case 1: r = q, g = v, b = p; break;
+            case 2: r = p, g = v, b = t; break;
+            case 3: r = p, g = q, b = v; break;
+            case 4: r = t, g = p, b = v; break;
+            case 5: r = v, g = p, b = q; break;
+        }
+    }
+
+    RGBColor color;
+    // Scale RGB values to 0-255 and round
+    color.r = static_cast<int>(r * 255.0f);
+    color.g = static_cast<int>(g * 255.0f);
+    color.b = static_cast<int>(b * 255.0f);
+
+    return color;
+}
+
+void makeColorWheel(lv_obj_t* lv_obj, int width, int height) {
+
+    // Define the center coordinates of the canvas
+    int center_x = width / 2;
+    int center_y = height / 2;
+
+    // Define the maximum radius for the color wheel
+    float max_radius = std::min(center_x, center_y) * 0.9f; // Use 90% of the smallest half for padding
+
+    // Loop through all pixels in the canvas
+    for(int y = 0; y < height; ++y){
+      for(int x = 0; x < width; ++x){
+
+        // Calculate the distance from the pixel to the center (using Pythagorean theorem)
+        // dx = delta x, dy = delta y
+        int dx = x - center_x;
+        int dy = y - center_y;
+        float distance = pow(dx * dx + dy * dy, .5f);
+
+        // Check if the pixel is within the main circular area
+        if (distance <= max_radius) {
+
+            // Calculate the angle (hue) using the arctangent function (atan2)
+            // The result is typically in the range [-PI, PI]
+            float angle_radians = atan2(dy, dx);
+
+            // Convert the angle from radians to degrees and adjust to a 0-360 range for HSL/HSV
+            int angle_degrees = (angle_radians * 180. / PI); // Convert to degrees (-180 to 180)
+            float hue = (angle_degrees + 360) % 360;      // Map to 0-360 range
+
+            // Determine saturation: 100% at the edge, 0% at the center
+            // The distance is mapped from [0, max_radius] to [0, 100]
+            float saturation = (distance / max_radius) * 100.;
+
+            // Set brightness to maximum for a full-intensity wheel
+            float brightness = 100.;
+
+            // Convert the calculated HSL/HSV values to an RGB color
+            // This requires a separate conversion function
+            RGBColor rgb = HsvToRgb(hue, saturation, brightness);
+
+            // Set the pixel's color on the canvas
+            // SET Pixel(x, y) TO rgb_color
+            lv_color_t c = lv_color_make(rgb.r, rgb.g, rgb.b);
+            lv_canvas_set_px(lv_obj, x, y, c, 0);
+        }
+        else {
+            // If outside the wheel, set a background color (e.g., white)
+            // SET Pixel(x, y) TO White // Or transparent, depending on implementation
+            lv_color_t c = lv_color_make(0xff, 0xff, 0xff);
+            lv_canvas_set_px(lv_obj, x, y, c, 0);
+        }
+      }
+    }
+}
+
+std::pair<int,int> getWidgetWidthHeight( 
+  std::optional<LeleStyle::StyleValue> &&width_style, 
+  std::optional<LeleStyle::StyleValue> &&height_style) {
+
+  int width = 0;
+  int height = 0;
+  if(width_style && std::holds_alternative<int>(width_style.value())) {
+    width = std::get<int>(width_style.value());
+  }
+  if(height_style && std::holds_alternative<int>(height_style.value())) {
+    height = std::get<int>(height_style.value());
+  }
+  return std::pair<int,int>(width, height);
+}
+
+}//namespace
 
 LeleColorWheel::LeleColorWheel(const std::string &json_str)
   : LeleObject(json_str) {
@@ -22,145 +140,45 @@ bool LeleColorWheel::fromJson(const std::string &json_str) {
       // }
     }
   }
-  auto width_ = getStyle("width");
-  auto height_ = getStyle("height");
-  int width = 0;
-  int height = 0;
-  if(width_ && std::holds_alternative<int>(width_.value())) {
-    width = std::get<int>(width_.value());
-  }
-  if(height_ && std::holds_alternative<int>(height_.value())) {
-    height = std::get<int>(height_.value());
-  }
-  if(width > 0 && height > 0) {
-    makeColorWheel(width, height);
-  }
   return true;
+}
+
+std::pair<int,int> LeleColorWheel::initCanvas() {
+  auto [width, height] = getWidgetWidthHeight(getStyle("width"), getStyle("height"));
+  if(width > 0 && height > 0) {
+    constexpr lv_color_format_t cf = LV_COLOR_FORMAT_RGB888;
+    const int bits_per_pixel = LV_COLOR_FORMAT_GET_BPP(cf);
+    uint32_t stride = lv_draw_buf_width_to_stride(width, cf);
+    const size_t buffer_sz = stride * height;
+    _canvas_buffer = std::make_unique<lv_color_t[]>(buffer_sz);
+    lv_canvas_set_buffer(_lv_obj, _canvas_buffer.get(), width, height, cf);
+    return std::pair<int,int>(width, height);
+  }
+  return std::pair<int,int>(0,0);
 }
 
 lv_obj_t *LeleColorWheel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_canvas_create(lele_parent->getLvObj()));
-
-  return _lv_obj;
-}
-
-namespace {
-// Structure to hold RGB color values (0-1 range for this example)
-struct RgbColor {
-    float r;
-    float g;
-    float b;
-};
-
-// Function to convert HSV to RGB
-RgbColor HsvToRgb(float h, float s, float v) {
-    RgbColor rgb;
-    float f, p, q, t;
-    int i;
-
-    // If saturation is 0, the color is achromatic (grey)
-    if (s == 0.0f) {
-        rgb.r = rgb.g = rgb.b = v;
-        return rgb;
-    }
-
-    // Wrap hue to the range [0, 360] if necessary
-    h = std::fmod(h, 360.0f);
-    if (h < 0.0f) {
-        h += 360.0f;
-    }
-
-    h /= 60.0f;           // sector 0 to 5
-    i = static_cast<int>(std::floor(h)); // largest integer <= h
-    f = h - i;            // fractional part of h
-
-    p = v * (1.0f - s);
-    q = v * (1.0f - s * f);
-    t = v * (1.0f - s * (1.0f - f));
-
-    switch (i) {
-        case 0:
-            rgb.r = v;
-            rgb.g = t;
-            rgb.b = p;
-            break;
-        case 1:
-            rgb.r = q;
-            rgb.g = v;
-            rgb.b = p;
-            break;
-        case 2:
-            rgb.r = p;
-            rgb.g = v;
-            rgb.b = t;
-            break;
-        case 3:
-            rgb.r = p;
-            rgb.g = q;
-            rgb.b = v;
-            break;
-        case 4:
-            rgb.r = t;
-    }
-    return rgb;
+  
+  auto [width, height] = initCanvas();
+  if(width <= 0 || height <= 0) {
+    LL(DEBUG, LVSIM) << "Failed to initialize canvas";
   }
-}
 
-void LeleColorWheel::makeColorWheel(int width, int height) const {
-
-    // Define the center coordinates of the canvas
-    int center_x = width / 2;
-    int center_y = height / 2;
-
-    // Define the maximum radius for the color wheel
-    int max_radius = std::min(center_x, center_y) * 0.9f; // Use 90% of the smallest half for padding
-
-    // Loop through all pixels in the canvas
-    for(int y = 0; y < height; ++y){
-      for(int x = 0; y < width; ++x){
-
-        // Calculate the distance from the pixel to the center (using Pythagorean theorem)
-        // dx = delta x, dy = delta y
-        int dx = x - center_x;
-        int dy = y - center_y;
-        float distance = pow(dx * dx + dy * dy, .5f);
-
-        // Check if the pixel is within the main circular area
-        if (distance <= max_radius) {
-
-            // Calculate the angle (hue) using the arctangent function (atan2)
-            // The result is typically in the range [-PI, PI]
-            float angle_radians = atan2(dy, dx);
-
-            // Convert the angle from radians to degrees and adjust to a 0-360 range for HSL/HSV
-            int angle_degrees = (angle_radians * 180 / PI); // Convert to degrees (-180 to 180)
-            int hue = (angle_degrees + 360) % 360;      // Map to 0-360 range
-
-            // Determine saturation: 100% at the edge, 0% at the center
-            // The distance is mapped from [0, max_radius] to [0, 100]
-            int saturation = (distance / max_radius) * 100;
-
-            // Set brightness to maximum for a full-intensity wheel
-            int brightness = 100;
-
-            // Convert the calculated HSL/HSV values to an RGB color
-            // This requires a separate conversion function
-            RgbColor rgb = HsvToRgb(hue, saturation, brightness);
-
-            // Set the pixel's color on the canvas
-            // SET Pixel(x, y) TO rgb_color
-            lv_color_t c = lv_color_make(rgb.r, rgb.g, rgb.b);
-            lv_canvas_set_px(_lv_obj, x, y, c, 0);
-
-        }
-        else {
-            // If outside the wheel, set a background color (e.g., white)
-            // SET Pixel(x, y) TO White // Or transparent, depending on implementation
-            lv_color_t c = lv_color_make(0xff, 0xff, 0xff);
-            lv_canvas_set_px(_lv_obj, x, y, c, 0);
-        }
-      }
+  for (const auto &[key, token]: _nodes) {
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &value = std::get<std::unique_ptr<LeleObject>>(token);
+      value->createLvObj(this);
     }
+    // else if (std::holds_alternative<std::string>(token)) {
+    //   const std::string &value = std::get<std::string>(token);
+    //   if(key == "group") {
+    //     _group = (value == "true");
+    //   }
+    // }
+  }
+  makeColorWheel(_lv_obj, width, height);
+  return _lv_obj;
 }

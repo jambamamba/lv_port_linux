@@ -11,7 +11,8 @@ class LeleColorWheel : public LeleObject  {
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
 protected:
-  void makeColorWheel(int width, int height) const;
+  std::unique_ptr<lv_color_t[]> _canvas_buffer;
+  std::pair<int,int> initCanvas();
 };
 
 struct PyLeleColorWheel {
