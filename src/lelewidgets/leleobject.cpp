@@ -531,6 +531,7 @@ lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   setStyle(_lv_obj);
   _lv_obj->user_data = this;
+  lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
   return _lv_obj;
 }
 
@@ -550,10 +551,24 @@ std::vector<LeleObject *> LeleObject::getLeleObj(const std::string &obj_name) co
 void LeleObject::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleObject *base = static_cast<LeleObject*>(e->user_data);
-    LOG(DEBUG, LVSIM, "LeleObject::EventCallback LeleObject: %s, \n", base->_class_name.c_str());
     if(base) {
+      LL(DEBUG, LVSIM) << "LeleObject::eventCallback " <<
+        "id:" << base->id() << 
+        ", class_name: " << base->className() <<
+        ", _lele_parent: " << base->getParent()->className() <<
+        ", event_code: " << e->code <<
+        " " << lv_event_code_get_name(e->code);
       base->eventCallback(LeleEvent(e, base));
     }
+    // if(e->current_target) {
+    //   lv_obj_t *obj = static_cast<lv_obj_t *>(e->current_target);
+    //   if(obj && obj->user_data) {
+    //     base = static_cast<LeleObject*>(obj->user_data);
+    //   }
+    // }
+    // if(base) {
+    //   base->eventCallback(LeleEvent(e, base));
+    // }
 }
 
 void LeleObject::hide() {
@@ -568,8 +583,9 @@ void LeleObject::show() {
 }
 
 bool LeleObject::eventCallback(LeleEvent &&e) {
-  LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s\n", 
-    _id.c_str(), _class_name.c_str(), _lele_parent ? _lele_parent->className().c_str() : "");
+  // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s, code:[0x%x]%s,\n", 
+  //   _id.c_str(), _class_name.c_str(), _lele_parent ? _lele_parent->className().c_str() : "", 
+  //   e.getLvEvent()->code, lv_event_code_get_name(e.getLvEvent()->code));
   for(auto *py_callback:_py_callbacks) {
     if(!LeleObject::pyCallback(py_callback, std::move(e))) {
       return false;

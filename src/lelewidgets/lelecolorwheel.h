@@ -13,6 +13,8 @@ class LeleColorWheel : public LeleObject  {
 protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
   std::pair<int,int> initCanvas();
+
+  bool eventCallback(LeleEvent &&e) override;
 };
 
 struct PyLeleColorWheel {

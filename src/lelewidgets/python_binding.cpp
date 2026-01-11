@@ -12,7 +12,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
-    static GraphicsBackend _graphics_backend;
+    GraphicsBackend &_graphics_backend = GraphicsBackend::getInstance();
     static std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;
 
     struct RAII {

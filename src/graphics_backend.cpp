@@ -45,28 +45,24 @@ struct window *getWindow(backend_t *backend){
     }
     return nullptr;
 }
-
-//does not work:
-// void keyboard_cb(lv_event_t * e) {
-//     switch(e->code){
-//         case LV_EVENT_KEY:{
-//             struct window *window = (struct window *) e->user_data;
-//             uint32_t key = lv_indev_get_key(window->lv_indev_keyboard);
-//             LOG(DEBUG, LVSIM, "@@@@@ key:%i\n", key);
-//             break;
-//         }
-//         case LV_EVENT_CLICKED:{
-//             struct window *window = (struct window *) e->user_data;
-//             // uint32_t key = lv_indev_get_key(window->lv_indev_keyboard);
-//             // LOG(DEBUG, LVSIM, "@@@@@ key:%i\n", key);
-//             break;
-//         }
-//         default:
-//             LOG(DEBUG, LVSIM, "@@@@@ e->code:%i\n", e->code);
-//             break;
-//     }
-// }
 }//namespace
+
+GraphicsBackend &GraphicsBackend::getInstance() {
+    static GraphicsBackend backend;
+    return backend;
+}
+lv_point_t GraphicsBackend::getTouchPoint() const {
+
+    lv_point_t point = {};
+    struct window *window = getWindow(_backend);
+    lv_indev_get_point(window->lv_indev_pointer, &point);
+    return point;
+}
+
+backend_t *GraphicsBackend::getBackend() const {
+    return _backend;
+}
+
 // Global simulator settings, defined in lv_linux_backend.c
 extern simulator_settings_t settings;
 bool GraphicsBackend::load() {
@@ -89,7 +85,7 @@ bool GraphicsBackend::load() {
     return true;
 }
 
-bool GraphicsBackend::handleEvents() {
+bool GraphicsBackend::handleEvents() const {
     // LOG(DEBUG, LVSIM, "@@@@@ handleEvents\n");
     if (lv_wayland_timer_handler()) {
         // Wait only if the cycle was completed

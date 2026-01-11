@@ -37,7 +37,7 @@ lv_obj_t *LeleTextbox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   lv_textarea_set_text_selection(_lv_obj, true);
   lv_textarea_set_max_length(_lv_obj, _max_length);
   lv_textarea_set_one_line(_lv_obj, _multiline);
-  lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
+  // lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }

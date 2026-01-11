@@ -51,7 +51,7 @@ int main(int argc, char **argv) {
     }
     std::string input_file = argv[1];
     if(std::filesystem::path(input_file).extension() == ".json") {
-        GraphicsBackend backend;
+        GraphicsBackend &backend = GraphicsBackend::getInstance();
         backend.load();
         static LeleObject _root_widget;
         auto nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
