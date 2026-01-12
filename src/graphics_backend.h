@@ -9,7 +9,8 @@ public:
     bool load();
     bool handleEvents() const;
     backend_t *getBackend() const;
-    lv_point_t getTouchPoint() const;
+    lv_point_t getTouchPoint(lv_obj_t *obj = nullptr) const;
+    void dumpScreenshot() const;
 protected:
     GraphicsBackend() = default;
     backend_t *_backend;

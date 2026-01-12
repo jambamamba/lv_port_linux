@@ -51,16 +51,45 @@ GraphicsBackend &GraphicsBackend::getInstance() {
     static GraphicsBackend backend;
     return backend;
 }
-lv_point_t GraphicsBackend::getTouchPoint() const {
+lv_point_t GraphicsBackend::getTouchPoint(lv_obj_t *obj) const {
 
     lv_point_t point = {};
     struct window *window = getWindow(_backend);
     lv_indev_get_point(window->lv_indev_pointer, &point);
+
+    if(obj) {
+        lv_area_t obj_area;
+        lv_obj_get_coords(obj, &obj_area);
+        lv_point_t obj_pt = {0};
+        obj_pt.x = point.x - obj_area.x1;
+        obj_pt.y = point.y - obj_area.y1;
+        return obj_pt;
+    }
+
     return point;
 }
 
 backend_t *GraphicsBackend::getBackend() const {
     return _backend;
+}
+void GraphicsBackend::dumpScreenshot() const {
+
+    lv_obj_t *screen = lv_scr_act();
+    lv_area_t snapshot_area = {0};
+    lv_draw_buf_t * snapshot = lv_snapshot_take(screen, LV_COLOR_FORMAT_RGB888);
+
+    static int i = 0;
+    std::stringstream ss;
+    ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i) << ".png";
+    ImgHelper::saveGdImage(
+            ss.str().c_str(),
+            snapshot->header.w, 
+            snapshot->header.h, 
+            snapshot->header.stride, 
+            snapshot->header.stride/snapshot->header.w, 
+            snapshot->data);
+    lv_draw_buf_destroy(snapshot);
+    i = (i+1)%100;
 }
 
 // Global simulator settings, defined in lv_linux_backend.c
@@ -86,7 +115,15 @@ bool GraphicsBackend::load() {
 }
 
 bool GraphicsBackend::handleEvents() const {
-    // LOG(DEBUG, LVSIM, "@@@@@ handleEvents\n");
+    // LL(DEBUG, LVSIM) << "@@@@@ handleEvents";
+    // static auto start = std::chrono::high_resolution_clock::now();
+    // auto end = std::chrono::high_resolution_clock::now();
+    // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    // if(duration.count() > 100) {
+    //     LL(DEBUG, LVSIM) << "@@@@@ handleEvents, " << duration.count() << " us since last call";
+    // }
+    // start = end;
+
     if (lv_wayland_timer_handler()) {
         // Wait only if the cycle was completed
         // usleep(LV_DEF_REFR_PERIOD * 1000);//osm: adjust this LV_DEF_REFR_PERIOD for device
@@ -96,31 +133,9 @@ bool GraphicsBackend::handleEvents() const {
         LOG(DEBUG, LVSIM, "Exiting event loop because all windows are closed\n");
         return false;
     }
-    lv_point_t point = {};
-    struct window *window = getWindow(_backend);
-    lv_indev_get_point(window->lv_indev_pointer, &point);
-    // LOG(DEBUG, LVSIM, "@@@@@ point:%i,%i\n", point.x, point.y);
-
-    // if(window->wl_ctx->shm_ctx.lv_draw_buf) {
-    //     uint8_t *data = window->wl_ctx->shm_ctx.lv_draw_buf->data;
-    //     uint32_t data_size = window->wl_ctx->shm_ctx.lv_draw_buf->data_size;
-    //     lv_image_header_t &header = window->wl_ctx->shm_ctx.lv_draw_buf->header;
-    //     int xx = 0;
-    //     xx = 1;
-
-    //     if(data_size!=192000){
-    //         return true;
-    //     }
-    //     static int i = 0;
-    //     std::stringstream ss;
-    //     ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i++) << ".png";
-    //     ImgHelper::saveGdImage(
-    //             ss.str().c_str(),
-    //             header.w, 
-    //             header.h, 
-    //             header.stride, 
-    //             header.stride/header.w, 
-    //             data);
-    // }
+    // lv_point_t point = {};
+    // struct window *window = getWindow(_backend);
+    // lv_indev_get_point(window->lv_indev_pointer, &point);
+    // dumpScreenshot();
     return true;
 }

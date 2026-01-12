@@ -188,15 +188,23 @@ lv_obj_t *LeleColorWheel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 
 bool LeleColorWheel::eventCallback(LeleEvent &&e) {
 
-  LL(DEBUG, LVSIM) << "LeleColorWheel::eventCallback " <<
-    ", event_code: " << e.getLvEvent()->code <<
-    " " << lv_event_code_get_name(e.getLvEvent()->code);
+  // LL(DEBUG, LVSIM) << "LeleColorWheel::eventCallback " <<
+  //   ", event_code: " << e.getLvEvent()->code <<
+  //   " " << lv_event_code_get_name(e.getLvEvent()->code);
 
   switch(e.getLvEvent()->code) {
     case LV_EVENT_CLICKED:
       GraphicsBackend &backend = GraphicsBackend::getInstance();
-      lv_point_t pt = backend.getTouchPoint();
-      //osm todo: determing if pt is in the wheel, get the color at the pt, set the active color to this color
+      lv_point_t pt = backend.getTouchPoint(_lv_obj);
+      lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
+      LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", rgb: " << 
+        std::hex << (int)color.red <<
+        std::hex << (int)color.green <<
+        std::hex << (int)color.blue;
+      //osm todo: 
+      // determing if pt is in the wheel, get the color at the pt, set the active color to this color
+      // set bg color via json
+
       break;
   }
   return true;
