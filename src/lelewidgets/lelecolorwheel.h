@@ -10,6 +10,8 @@ class LeleColorWheel : public LeleObject  {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
+  void setColor(const std::string &text);
+  std::string getColor() const;
 protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
   std::pair<int,int> initCanvas();
@@ -25,6 +27,8 @@ struct PyLeleColorWheel {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
+    static PyObject *getColor(PyObject *, PyObject *);
+    static PyObject *setColor(PyObject *, PyObject *);
 };
 
 #define PY_LELECOLORWHEEL_MEMBERS() \
@@ -32,4 +36,6 @@ struct PyLeleColorWheel {
 
 #define PY_LELECOLORWHEEL_METHODS() \
   PY_LELEOBJECT_METHODS() \
+  {"getColor", (PyCFunction)PyLeleLabel::getColor, METH_NOARGS, "Get the color"},\
+  {"setColor", (PyCFunction)PyLeleLabel::setColor, METH_VARARGS, "Set the color"},
 

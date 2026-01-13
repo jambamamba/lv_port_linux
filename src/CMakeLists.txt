@@ -19,11 +19,11 @@ add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
 set(LV_CONF_INCLUDE_SIMPLE 1)
 set(LV_USE_WAYLAND 1)
 
-function(buildPythonLib OUT_VAR_PYTHON_LIB_OUTPUT)
+function(buildPython OUT_VAR_PYTHON_LIB_OUTPUT)
     message(STATUS "buildPython()")
 
     set(PYTHON_LIB_NAME "Python")
-    set(PYTHON_LIB_MAJOR_MINOR "3.13")
+    set(PYTHON_LIB_MAJOR_MINOR "3.14")
     set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.3")
     set(PYTHON_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}")
     set(PYTHON_LIB_OUTPUT "${PYTHON_LIB_SOURCE_DIR}/libpython${PYTHON_LIB_MAJOR_MINOR}.so")
@@ -286,7 +286,7 @@ if(NOT TARGET utils::utils)
     find_package(utils REQUIRED CONFIG)
 endif()
 
-buildPythonLib(PYTHON_LIB_OUTPUT)
+buildPython(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim(
     ${PYTHON_LIB_OUTPUT}

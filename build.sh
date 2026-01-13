@@ -34,6 +34,8 @@ function buildelf() {
     pushd x86-build
     echo "cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug .." > cmake.sh
     chmod +x cmake.sh
+    export CC=$(which clang-20)
+    export CXX=$(which clang++-20)
     ./cmake.sh
     ninja install
     popd
