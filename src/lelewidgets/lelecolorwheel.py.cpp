@@ -108,7 +108,7 @@ PyMethodDef PyLeleColorWheel::_methods[] = {
 
 PyTypeObject PyLeleColorWheel::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "lele.Label",             /* tp_name */
+    "lele.ColorWheel",             /* tp_name */
     sizeof(PyLeleColorWheel), /* tp_basicsize */
     0,                         /* tp_itemsize */
     (destructor)PyLeleColorWheel::dealloc, /* tp_dealloc */

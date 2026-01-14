@@ -10,7 +10,7 @@
             "${workspaceFolder}/src/examples/imageview/imageview.py"
         ],
         "env":{
-            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/",
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/ ",
             "PYTHONHOME":"${workspaceFolder}/x86-build/bin/Python/"
         }
     }

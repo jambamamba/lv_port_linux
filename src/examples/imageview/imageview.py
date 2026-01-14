@@ -208,7 +208,7 @@ def runTestLoop():
       time.sleep(0.005) 
    pass
 
-try:
+def main():
    res = lele.foo(
          10,
          "hello",
@@ -298,5 +298,8 @@ try:
    while lele.handleEvents():
       runTestLoop()
       pass
+
+try:
+    main()
 except:
    print(traceback.format_exc())
