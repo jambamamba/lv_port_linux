@@ -122,7 +122,7 @@ function(buildLvglSim
         # ${PYTHON_LIB_OUTPUT}
     )
     set(link_dirs
-        ${CMAKE_BINARY_DIR}/src/Python-3.13.3
+        ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}
     )
     set(link_libs
         lvgl_linux 
@@ -139,8 +139,8 @@ function(buildLvglSim
     )
     set(inc_dirs
         ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_BINARY_DIR}/src/Python-3.13.3 #pyconfig.h
-        ${CMAKE_BINARY_DIR}/src/Python-3.13.3/Include
+        ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION} #pyconfig.h
+        ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}/Include
     )
     set(props
         CMAKE_CXX_STANDARD 17
