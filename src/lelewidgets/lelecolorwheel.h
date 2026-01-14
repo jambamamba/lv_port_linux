@@ -10,12 +10,19 @@ class LeleColorWheel : public LeleObject  {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
-  void setColor(const std::string &text);
-  std::string getColor() const;
+  void setColor(int32_t rgb);
+  int32_t getColor() const;
+  void setBgColor(int32_t rgb);
+  int32_t getBgColor() const;
+  void addEventHandler(PyObject *callback);
 protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
-  std::pair<int,int> initCanvas();
+  int32_t _bgcolor = 0;
+  int32_t _rgb = 0;
+  std::vector<PyObject *> _py_callbacks;
 
+  std::pair<int,int> initCanvas();
+  static bool pyCallback(PyObject *py_callback, int32_t rgb);
   bool eventCallback(LeleEvent &&e) override;
 };
 
@@ -29,6 +36,9 @@ struct PyLeleColorWheel {
     // Type-specific fields go here
     static PyObject *getColor(PyObject *, PyObject *);
     static PyObject *setColor(PyObject *, PyObject *);
+    static PyObject *getBgColor(PyObject *, PyObject *);
+    static PyObject *setBgColor(PyObject *, PyObject *);
+    static PyObject *addEventHandler(PyObject *, PyObject *);    
 };
 
 #define PY_LELECOLORWHEEL_MEMBERS() \
@@ -36,6 +46,7 @@ struct PyLeleColorWheel {
 
 #define PY_LELECOLORWHEEL_METHODS() \
   PY_LELEOBJECT_METHODS() \
-  {"getColor", (PyCFunction)PyLeleLabel::getColor, METH_NOARGS, "Get the color"},\
-  {"setColor", (PyCFunction)PyLeleLabel::setColor, METH_VARARGS, "Set the color"},
+  {"getColor", (PyCFunction)PyLeleColorWheel::getColor, METH_NOARGS, "Get the color"},\
+  {"setColor", (PyCFunction)PyLeleColorWheel::setColor, METH_VARARGS, "Set the color"},\
+  {"addEventHandler", (PyCFunction)PyLeleColorWheel::addEventHandler, METH_VARARGS, "Sets the event handler that is triggered when color changes"},\
 

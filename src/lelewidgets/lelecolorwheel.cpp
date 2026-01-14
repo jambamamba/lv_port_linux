@@ -193,7 +193,7 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
   //   " " << lv_event_code_get_name(e.getLvEvent()->code);
 
   switch(e.getLvEvent()->code) {
-    case LV_EVENT_CLICKED:
+    case LV_EVENT_CLICKED:{
       GraphicsBackend &backend = GraphicsBackend::getInstance();
       lv_point_t pt = backend.getTouchPoint(_lv_obj);
       lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
@@ -201,11 +201,63 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
         std::hex << (int)color.red <<
         std::hex << (int)color.green <<
         std::hex << (int)color.blue;
+      _rgb = (color.red << 16) | (color.green << 8) | (color.blue);
+      for(auto *py_callback:_py_callbacks) {
+        if(!LeleColorWheel::pyCallback(py_callback, _rgb)) {
+          return false;
+        }
+      }
       //osm todo: 
-      // determing if pt is in the wheel, get the color at the pt, set the active color to this color
+      // determing if pt is in the wheel, get the color at the pt, send event when the color is set
       // set bg color via json
 
       break;
+    }
+    default:
+      break;
   }
   return true;
+}
+
+void LeleColorWheel::setColor(int32_t rgb){
+  _rgb = rgb;
+}
+
+int32_t LeleColorWheel::getColor() const {
+  return _rgb;
+}
+
+void LeleColorWheel::setBgColor(int32_t rgb){
+  _bgcolor = rgb;
+}
+
+int32_t LeleColorWheel::getBgColor() const {
+  return _bgcolor;
+}
+
+void LeleColorWheel::addEventHandler(PyObject *py_callback) {
+  _py_callbacks.push_back(py_callback);
+}
+
+bool LeleColorWheel::pyCallback(PyObject *py_callback, int32_t rgb) {
+
+    // LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback:'%p'\n", py_callback);
+    bool ret = false;
+
+    PyObject *res = PyObject_CallObject(py_callback, PyLong_FromLong(rgb));
+    if(res) { 
+        if(res == Py_None) {
+            LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback returned nothing\n");
+            ret = true;
+        }
+        else {
+            int iret = PyObject_IsTrue(res);
+            LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback returned iret:%i\n", iret);
+            if(iret == 1) {
+                ret = true;
+            }//else //We got Py_False or Error
+        }
+        Py_DECREF(res); 
+    }
+    return ret;
 }

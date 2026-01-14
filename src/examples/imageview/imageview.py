@@ -110,6 +110,8 @@ def sliderMoved(event):
          setAngleMethod1(event.value)
    pass
 
+def colorChanged(rgb):
+    print(f"@@@py colorChanged: {rgb}")
 def msgboxEvent(event):
    print(f"@@@py msgboxEvent, button clicked: {event.object.getButtonClicked().id}, button text: {event.object.getButtonClicked().getText()}")
    return True
@@ -288,6 +290,10 @@ try:
    print(f"@@@py style.Scrollbar: {style.Scrollbar}, user_attributes: {user_attributes}.")
    user_attributes = [attr for attr in dir(style.Border) if not attr.startswith('__')]
    print(f"@@@py style.Border: {style.Border}, user_attributes: {user_attributes}.")
+
+   colorwheel = lele.getObjectById("colorwheel")
+   colorwheel.addEventHandler(lambda rgb: colorChanged(rgb))
+
 
    while lele.handleEvents():
       runTestLoop()

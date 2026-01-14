@@ -1,5 +1,7 @@
 #include <lelewidgets/lelecolorwheel.h>
 
+LOG_CATEGORY(LVSIM, "LVSIM");
+
 PyObject *LeleColorWheel::createPyObject() {
     PyTypeObject *type = &PyLeleColorWheel::_obj_type;
     PyType_Ready(type);
@@ -27,6 +29,71 @@ int PyLeleColorWheel::init(PyObject *self_, PyObject *args, PyObject *kwds) {
 void PyLeleColorWheel::dealloc(PyObject* self_) {
     PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
     Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
+PyObject *PyLeleColorWheel::getColor(PyObject *self_, PyObject *args){
+    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
+    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyLong_FromLong(lele_obj->getColor());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleColorWheel::setColor(PyObject *self_, PyObject *args){
+    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
+    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        int value = 0;
+        if(!PyArg_ParseTuple(args, "i", &value)) {
+            return Py_None;
+        }
+        if(value) {
+            lele_obj->setColor(value);
+        }
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleColorWheel::getBgColor(PyObject *self_, PyObject *args){
+    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
+    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyLong_FromLong(lele_obj->getBgColor());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleColorWheel::setBgColor(PyObject *self_, PyObject *args){
+    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
+    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        int value = 0;
+        if(!PyArg_ParseTuple(args, "i", &value)) {
+            return Py_None;
+        }
+        if(value) {
+            lele_obj->setBgColor(value);
+        }
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleColorWheel::addEventHandler(PyObject *self_, PyObject *args) {
+    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
+    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    PyObject *py_callback = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //obj
+        &py_callback)) {
+        return PyBool_FromLong(false);
+    }
+    Py_XINCREF(py_callback);
+    LOG(DEBUG, LVSIM, "PyLeleColorWheel::addEventHandler:'%p'\n", py_callback);
+    lele_obj->addEventHandler(py_callback);
+    return PyBool_FromLong(true);
 }
 
 PyMemberDef PyLeleColorWheel::_members[] = {
