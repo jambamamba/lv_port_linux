@@ -198,6 +198,7 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
       lv_point_t pt = backend.getTouchPoint(_lv_obj);
       lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
       LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", rgb: " << 
+        std::setfill('0') << std::setw(2) <<
         std::hex << (int)color.red <<
         std::hex << (int)color.green <<
         std::hex << (int)color.blue;
@@ -235,7 +236,7 @@ int32_t LeleColorWheel::getBgColor() const {
   return _bgcolor;
 }
 
-void LeleColorWheel::addEventHandler(PyObject *py_callback) {
+void LeleColorWheel::onColorChanged(PyObject *py_callback) {
   _py_callbacks.push_back(py_callback);
 }
 
@@ -244,7 +245,8 @@ bool LeleColorWheel::pyCallback(PyObject *py_callback, int32_t rgb) {
     // LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback:'%p'\n", py_callback);
     bool ret = false;
 
-    PyObject *res = PyObject_CallObject(py_callback, PyLong_FromLong(rgb));
+    PyObject *py_int = Py_BuildValue("(i)", rgb);
+    PyObject *res = PyObject_CallObject(py_callback, py_int);
     if(res) { 
         if(res == Py_None) {
             LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback returned nothing\n");

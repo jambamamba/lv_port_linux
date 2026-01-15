@@ -292,7 +292,9 @@ def main():
    print(f"@@@py style.Border: {style.Border}, user_attributes: {user_attributes}.")
 
    colorwheel = lele.getObjectById("colorwheel")
-   colorwheel.addEventHandler(lambda rgb: colorChanged(rgb))
+   rgb = colorwheel.getColor()
+   print(f"@@@py colorwheel.getColor:{hex(rgb)}")
+   colorwheel.onColorChanged(lambda rgb: colorChanged(rgb))
 
 
    while lele.handleEvents():

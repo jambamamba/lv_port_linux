@@ -77,7 +77,7 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   else if(color_str.c_str()[0] == '#') {
     std::string suffix(color_str.c_str() + 1);
     if(std::all_of(suffix.begin(), suffix.end(),
-      [](unsigned char ch){return ch >= '0' && ch <= '0' + 0xff; })) {
+      [](uint32_t ch){return ch >= '0' && ch <= ('0' + 0xff); })) {
           if(suffix.size() == 3) { // #fff => #ffffff
               std::string value;
               for(int i=0; i<3; ++i) {

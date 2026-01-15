@@ -14,7 +14,7 @@ class LeleColorWheel : public LeleObject  {
   int32_t getColor() const;
   void setBgColor(int32_t rgb);
   int32_t getBgColor() const;
-  void addEventHandler(PyObject *callback);
+  void onColorChanged(PyObject *callback);
 protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
   int32_t _bgcolor = 0;
@@ -38,7 +38,7 @@ struct PyLeleColorWheel {
     static PyObject *setColor(PyObject *, PyObject *);
     static PyObject *getBgColor(PyObject *, PyObject *);
     static PyObject *setBgColor(PyObject *, PyObject *);
-    static PyObject *addEventHandler(PyObject *, PyObject *);    
+    static PyObject *onColorChanged(PyObject *, PyObject *);    
 };
 
 #define PY_LELECOLORWHEEL_MEMBERS() \
@@ -48,5 +48,5 @@ struct PyLeleColorWheel {
   PY_LELEOBJECT_METHODS() \
   {"getColor", (PyCFunction)PyLeleColorWheel::getColor, METH_NOARGS, "Get the color"},\
   {"setColor", (PyCFunction)PyLeleColorWheel::setColor, METH_VARARGS, "Set the color"},\
-  {"addEventHandler", (PyCFunction)PyLeleColorWheel::addEventHandler, METH_VARARGS, "Sets the event handler that is triggered when color changes"},\
+  {"onColorChanged", (PyCFunction)PyLeleColorWheel::onColorChanged, METH_VARARGS, "Sets the event handler that is triggered when color changes"},\
 

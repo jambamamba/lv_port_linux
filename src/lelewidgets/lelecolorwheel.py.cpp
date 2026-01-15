@@ -79,7 +79,7 @@ PyObject *PyLeleColorWheel::setBgColor(PyObject *self_, PyObject *args){
     return Py_None;
 }
 
-PyObject *PyLeleColorWheel::addEventHandler(PyObject *self_, PyObject *args) {
+PyObject *PyLeleColorWheel::onColorChanged(PyObject *self_, PyObject *args) {
     PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
     LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
     if(!lele_obj || !args) {
@@ -91,8 +91,8 @@ PyObject *PyLeleColorWheel::addEventHandler(PyObject *self_, PyObject *args) {
         return PyBool_FromLong(false);
     }
     Py_XINCREF(py_callback);
-    LOG(DEBUG, LVSIM, "PyLeleColorWheel::addEventHandler:'%p'\n", py_callback);
-    lele_obj->addEventHandler(py_callback);
+    LOG(DEBUG, LVSIM, "PyLeleColorWheel::onColorChanged:'%p'\n", py_callback);
+    lele_obj->onColorChanged(py_callback);
     return PyBool_FromLong(true);
 }
 
