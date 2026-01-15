@@ -1,5 +1,5 @@
 #!/bin/bash
-set -xe
+set -xeuo pipefail #better for bash debugging
 
 #todo:
 #load bgcolor of tabview from json
@@ -32,7 +32,15 @@ function buildelf() {
     local cwd=$(pwd)
     mkdir -p x86-build
     pushd x86-build
-    echo "cmake -G Ninja -DCMAKE_PREFIX_PATH=${cwd}/cmake -DLV_CONF_INCLUDE_SIMPLE=1 -DLV_USE_WAYLAND=1 -DCMAKE_BUILD_TYPE=Debug .." > cmake.sh
+    echo "#!/bin/bash
+set -xe
+
+cmake -G Ninja\
+ -DCMAKE_PREFIX_PATH=${cwd}/cmake \
+ -DLV_CONF_INCLUDE_SIMPLE=1 \
+ -DLV_USE_WAYLAND=1 \
+ -DCMAKE_BUILD_TYPE=Debug ..
+" > cmake.sh
     chmod +x cmake.sh
     export CC=$(which clang-20)
     export CXX=$(which clang++-20)

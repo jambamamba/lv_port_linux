@@ -280,10 +280,10 @@ PyObject *getEnumModule() {
 
 /////////////////////////////////////////////////////////////////////
 PyMODINIT_FUNC PyInit_lele(void) {
-    if(!_graphics_backend.load()) {
-        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
-        return nullptr;
-    }
+    // if(!_graphics_backend.load()) {
+    //     LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
+    //     return nullptr;
+    // }
 #ifdef MULTI_PHASE_INIT
     PyObject *module = PyModuleDef_Init(&_mymodule);//leads to _mymodule_create
 #else

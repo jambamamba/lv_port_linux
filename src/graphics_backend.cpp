@@ -35,9 +35,9 @@ struct window *getWindow(backend_t *backend){
         bool closed = window->closed;
         bool maximized = window->maximized;
         bool fullscreen = window->fullscreen;
-        if( window->wl_ctx->shm_ctx.lv_draw_buf) {
-            uint8_t * data = window->wl_ctx->shm_ctx.lv_draw_buf->data;
-            uint32_t data_size = window->wl_ctx->shm_ctx.lv_draw_buf->data_size;
+        if( window->lv_draw_buf) { //if( window->wl_ctx->shm_ctx.lv_draw_buf) {
+            uint8_t * data = window->lv_draw_buf->data;
+            uint32_t data_size = window->lv_draw_buf->data_size;
             int xx = 0;
             xx = 1;
         }
@@ -103,14 +103,10 @@ bool GraphicsBackend::load() {
     lv_init();
     char selected_backend[] = "WAYLAND";
     _backend = driver_backends_init_backend(selected_backend);
-    // if (driver_backends_init_backend(selected_backend) == -1) {
     if(!_backend) {
         LOG(FATAL, LVSIM, "Failed to initialize display backend\n");
         return false;
     }
-    struct window *window = getWindow(_backend);
-    // lv_indev_add_event_cb(window->lv_indev_keyboard, keyboard_cb, LV_EVENT_KEY, window);
-    // lv_indev_add_event_cb(window->lv_indev_pointer, keyboard_cb, LV_EVENT_CLICKED, window);
     return true;
 }
 

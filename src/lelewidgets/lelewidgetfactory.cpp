@@ -3,7 +3,9 @@
 #include <filesystem>
 #include <unistd.h>
 
+#include "graphics_backend.h"
 #include "lelebutton.h"
+#include "lelecolorwheel.h"
 #include "leleevent.h"
 #include "leleimage.h"
 #include "lelelabel.h"
@@ -12,7 +14,6 @@
 #include "lelestackview.h"
 #include "leletabview.h"
 #include "leletextbox.h"
-#include "lelecolorwheel.h"
 #include "leleview.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -334,6 +335,11 @@ static void click_event_cb(lv_event_t * e)
 std::vector<std::pair<std::string, Node>> fromConfig(
     LeleObject *parent,
     const std::string &config) {
+
+    if(!GraphicsBackend::getInstance().load()) {
+        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
+        return std::vector<std::pair<std::string, Node>>();
+    }
 
     if(!parent->getLvObj()) {
         static click_counts counts;

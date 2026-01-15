@@ -50,7 +50,7 @@ bool LeleImage::fromJson(const std::string &json_str) {
         else if(value == "left_mid" )       {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_LEFT_MID);}
         else if(value == "right_mid" )      {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_RIGHT_MID);}
         else if(value == "center" )         {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_CENTER);}
-        else if(value == "auto_transform" ) {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_AUTO_TRANSFORM);}
+        else if(value == "auto_transform" ) {_align = std::optional<lv_image_align_t>(_LV_IMAGE_ALIGN_AUTO_TRANSFORM);}
         else if(value == "stretch" )        {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_STRETCH);}//Set X and Y scale to fill the Widget's area
         else if(value == "tile" )           {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_TILE);}//Tile image to fill Widget's area. Offset is applied to shift the tiling
         else if(value == "contain" )        {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_CONTAIN);}//The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area
