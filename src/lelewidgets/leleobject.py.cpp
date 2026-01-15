@@ -52,7 +52,7 @@ bool LeleObject::pyCallback(PyObject *py_callback, PyObject *arg) {
     bool ret = false;
     if(res) { 
         if(res == Py_None) {
-            // LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned nothing\n");
+            LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned nothing\n");
             ret = true;
         }
         else {
