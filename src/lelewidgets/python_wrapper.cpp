@@ -35,7 +35,7 @@ void PythonWrapper::printError() const {
     // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << (PyUnicode_AsUTF8(old_str)) << "\n";
     LOG(WARNING, LVSIM, "%s\n", PyUnicode_AsUTF8(old_str));
     PyErr_Print();
-    Py_DECREF(old_str);
+    Py_XDECREF(old_str);
 }
 
 bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, const std::vector<std::string> &args) {
@@ -52,7 +52,7 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
         {PyErr_Print();}
         // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "This is not a callable function: '" << func << "'\n";
         LOG(WARNING, LVSIM, "This is not a callable function: '%s'\n", func);
-        Py_DECREF(pFunc);
+        Py_XDECREF(pFunc);
         return false;
     }
 
@@ -77,8 +77,8 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
         }
 
         if (!pValue) {
-            Py_DECREF(pFunc);
-            Py_DECREF(pArgs);
+            Py_XDECREF(pFunc);
+            Py_XDECREF(pArgs);
             // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Cannot convert argument" << "\n";
             LOG(WARNING, LVSIM, "Cannot convert argument\n");
             return false;
@@ -89,8 +89,8 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
     }
     PyObject *pValue = PyObject_CallObject(pFunc, pArgs);
     if (!pValue) {
-        Py_DECREF(pFunc);
-        Py_DECREF(pArgs);
+        Py_XDECREF(pFunc);
+        Py_XDECREF(pArgs);
         PyErr_Print();
         // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Call failed" << "\n";
         LOG(WARNING, LVSIM, "Call failed\n");
@@ -99,9 +99,9 @@ bool PythonWrapper::callPythonFunction(PyObject *py_module, const char* func, co
 
     // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Result of call: " << PyLong_AsLong(pValue) << "\n";
     LOG(WARNING, LVSIM, "Result of call: %d\n", PyLong_AsLong(pValue));
-    Py_DECREF(pFunc);
-    Py_DECREF(pArgs);
-    Py_DECREF(pValue);
+    Py_XDECREF(pFunc);
+    Py_XDECREF(pArgs);
+    Py_XDECREF(pValue);
 
     return true;
 }
@@ -144,7 +144,7 @@ PyObject *PythonWrapper::loadModule(const std::string &py_script) const {
  
    PyObject *obj = PyUnicode_FromString(path.stem().c_str());
    PyObject *py_module =  PyImport_Import(obj);
-   Py_DECREF(obj);
+   Py_XDECREF(obj);
 
    if(!py_module) {
     //    std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Failed to load " << py_script.c_str() << "\n";
@@ -162,7 +162,7 @@ void PythonWrapper::unload() {
     if(!_py->_py_module) {
         return;
     }
-    Py_DECREF(_py->_py_module);
+    Py_XDECREF(_py->_py_module);
     Py_FinalizeEx();
     _py->_py_module = nullptr;
 }

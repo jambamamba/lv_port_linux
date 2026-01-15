@@ -19,10 +19,9 @@ protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
   int32_t _bgcolor = 0;
   int32_t _rgb = 0;
-  std::vector<PyObject *> _py_callbacks;
 
   std::pair<int,int> initCanvas();
-  static bool pyCallback(PyObject *py_callback, int32_t rgb);
+  bool pyCallback(PyObject *py_callback, int32_t rgb);
   bool eventCallback(LeleEvent &&e) override;
 };
 

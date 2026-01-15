@@ -111,7 +111,17 @@ def sliderMoved(event):
    pass
 
 def colorChanged(rgb):
-    print(f"@@@py colorChanged: {rgb}")
+   print(f"@@@py colorChanged: {hex(rgb)}")
+   obj = lele.getObjectById("/view/with_bg_img")
+   style = obj.getStyle("img")
+   dic = obj.getStyle()
+   dic = style.getValue("background/color")
+   print(f"@@@py style.dic {dic}")
+   dic = style.setValue({'background/color':str(rgb)})
+   # print(f"@@@py style.dic {dic}")
+   # print(f"@@@py set background/repeat ")
+   # style.setValue({'background/repeat':'no'})
+
 def msgboxEvent(event):
    print(f"@@@py msgboxEvent, button clicked: {event.object.getButtonClicked().id}, button text: {event.object.getButtonClicked().getText()}")
    return True

@@ -43,10 +43,16 @@ bool LeleObject::pyCallback(PyObject *py_callback, LeleEvent &&e) {
         LOG(WARNING, LVSIM, "LeleObject::pyCallback: Py_BuildValue FAILED to create event PyObject\n");
         return ret;
     }
-    PyObject *res = PyObject_CallObject(py_callback, py_event);
+    return pyCallback(py_callback, py_event);
+}
+
+bool LeleObject::pyCallback(PyObject *py_callback, PyObject *arg) {
+
+    PyObject *res = PyObject_CallObject(py_callback, arg);
+    bool ret = false;
     if(res) { 
         if(res == Py_None) {
-            LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned nothing\n");
+            // LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned nothing\n");
             ret = true;
         }
         else {

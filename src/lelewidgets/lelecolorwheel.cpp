@@ -204,7 +204,7 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
         std::hex << (int)color.blue;
       _rgb = (color.red << 16) | (color.green << 8) | (color.blue);
       for(auto *py_callback:_py_callbacks) {
-        if(!LeleColorWheel::pyCallback(py_callback, _rgb)) {
+        if(!pyCallback(py_callback, _rgb)) {
           return false;
         }
       }
@@ -237,29 +237,20 @@ int32_t LeleColorWheel::getBgColor() const {
 }
 
 void LeleColorWheel::onColorChanged(PyObject *py_callback) {
-  _py_callbacks.push_back(py_callback);
+  LeleObject::addEventHandler(py_callback);
+  // Py_XINCREF(py_callback);
 }
 
 bool LeleColorWheel::pyCallback(PyObject *py_callback, int32_t rgb) {
 
     // LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback:'%p'\n", py_callback);
-    bool ret = false;
-
-    PyObject *py_int = Py_BuildValue("(i)", rgb);
-    PyObject *res = PyObject_CallObject(py_callback, py_int);
-    if(res) { 
-        if(res == Py_None) {
-            LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback returned nothing\n");
-            ret = true;
-        }
-        else {
-            int iret = PyObject_IsTrue(res);
-            LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback returned iret:%i\n", iret);
-            if(iret == 1) {
-                ret = true;
-            }//else //We got Py_False or Error
-        }
-        Py_DECREF(res); 
-    }
-    return ret;
+    // PyObject *py_int = Py_BuildValue("(i)", rgb);
+    // if(!py_int) {
+    //   LL(WARNING, LVSIM) << "LeleColorWheel::pyCallback could not build py_int from int rgb!";
+    //   return false;
+    // }
+    PyObject *pArgs = PyTuple_New(1);
+    // Py_INCREF(pArgs);
+    PyTuple_SetItem(pArgs, 0, PyLong_FromLong(rgb));
+    return LeleObject::pyCallback(py_callback, pArgs);
 }

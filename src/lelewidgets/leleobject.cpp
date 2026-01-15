@@ -587,7 +587,7 @@ bool LeleObject::eventCallback(LeleEvent &&e) {
   //   _id.c_str(), _class_name.c_str(), _lele_parent ? _lele_parent->className().c_str() : "", 
   //   e.getLvEvent()->code, lv_event_code_get_name(e.getLvEvent()->code));
   for(auto *py_callback:_py_callbacks) {
-    if(!LeleObject::pyCallback(py_callback, std::move(e))) {
+    if(!pyCallback(py_callback, std::move(e))) {
       return false;
     }
   }

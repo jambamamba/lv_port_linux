@@ -63,7 +63,8 @@ public:
   static void EventCallback(lv_event_t *e);
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
-  static bool pyCallback(PyObject *py_callback, LeleEvent &&e);
+  bool pyCallback(PyObject *py_callback, LeleEvent &&e);
+  bool pyCallback(PyObject *py_callback, PyObject *arg);
 #ifdef METHOD1_CREATING_PYENUM
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
   static PyObject* getPyEnumValue(const std::string &enum_value = "lele.Event.Clicked");

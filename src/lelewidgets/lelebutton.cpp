@@ -315,5 +315,5 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
         }
         return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
     }
-    return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
+    return LeleObject::eventCallback(LeleEvent(e, lv_event));
 }
