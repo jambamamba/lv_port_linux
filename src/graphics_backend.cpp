@@ -94,10 +94,11 @@ void GraphicsBackend::dumpScreenshot() const {
 
 // Global simulator settings, defined in lv_linux_backend.c
 extern simulator_settings_t settings;
-bool GraphicsBackend::load() {
+bool GraphicsBackend::load(int screen_width, int screen_height) {
+
     driver_backends_register();//connect to wayland server
-    settings.window_width = atoi(getenv("LV_SIM_WINDOW_WIDTH") ? : "800");//osm todo get these values from config
-    settings.window_height = atoi(getenv("LV_SIM_WINDOW_HEIGHT") ? : "480");
+    settings.window_width = screen_width;
+    settings.window_height = screen_height;
     // settings.fullscreen = true;
     // settings.maximize = true;
     lv_init();

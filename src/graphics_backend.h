@@ -6,7 +6,7 @@
 class GraphicsBackend {
 public:
     static GraphicsBackend &getInstance();
-    bool load();
+    bool load(int screen_width, int screen_height);
     bool handleEvents() const;
     backend_t *getBackend() const;
     lv_point_t getTouchPoint(lv_obj_t *obj = nullptr) const;

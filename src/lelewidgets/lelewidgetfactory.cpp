@@ -90,6 +90,35 @@ static std::vector<std::pair<std::string, std::string>> tokenize(const std::stri
     return res;
 }
 
+std::pair<int,int> screenWidthHeightFromJson(const cJSON* json) {
+
+    int width = 800;
+    int height = 480;
+    cJSON *screen = cJSON_GetObjectItem(json, "screen");
+    if(screen && cJSON_IsObject(screen)) {
+        cJSON *obj = cJSON_GetObjectItem(screen, "width");
+        if (cJSON_IsNumber(obj)) {
+            width = obj->valueint;
+        }
+        else if (cJSON_IsString(obj)) {
+            char *value_str = obj->valuestring;
+            if(value_str) {
+                width = std::stoi(value_str);
+            }
+        }
+        obj = cJSON_GetObjectItem(screen, "height");
+        if (cJSON_IsNumber(obj)) {
+            height = obj->valueint;
+        }
+        else if (cJSON_IsString(obj)) {
+            char *value_str = obj->valuestring;
+            if(value_str) {
+                height = std::stoi(value_str);
+            }
+        }
+    }
+    return std::pair<int,int>(width, height);
+}
 
 const cJSON* jsonFromConfig(const std::string &config_json) {
 
@@ -336,7 +365,13 @@ std::vector<std::pair<std::string, Node>> fromConfig(
     LeleObject *parent,
     const std::string &config) {
 
-    if(!GraphicsBackend::getInstance().load()) {
+    const cJSON* json = jsonFromConfig(config);
+    if(!json) {
+        LOG(WARNING, LVSIM, "Failed to parse config");
+        return std::vector<std::pair<std::string, Node>>();
+    }
+    auto [width, height] = screenWidthHeightFromJson(json);
+    if(!GraphicsBackend::getInstance().load(width, height)) {
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return std::vector<std::pair<std::string, Node>>();
     }
@@ -352,11 +387,6 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
 
 
-    }
-    const cJSON* json = jsonFromConfig(config);
-    if(!json) {
-        LOG(WARNING, LVSIM, "Failed to parse config");
-        return std::vector<std::pair<std::string, Node>>();
     }
     return leleObjectsFromJson(parent, cJSON_Print(json));
 }

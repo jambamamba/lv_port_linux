@@ -1,4 +1,5 @@
 {
+    "screen":{"width":"1024","height":"768"},
     "style":{"id":"button0","class_name":"button0","border":"solid-1px-#ccc","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
     "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
