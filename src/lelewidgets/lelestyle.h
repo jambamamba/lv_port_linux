@@ -32,6 +32,7 @@ public:
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
   LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
+  LeleStyle(const std::map<std::string, std::optional<StyleValue>> &style_attributes, lv_obj_t *parent = lv_screen_active());
   virtual bool fromJson(const std::string &json_str);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleStyle *py_obj);
@@ -107,6 +108,8 @@ struct PyLeleStyle {
       const std::vector<std::string> &&white_list = {});
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
+    static void dtor(PyObject *self_);
+    static void onfree(PyObject *self_);
     // Type-specific fields go here
     std::vector<std::unique_ptr<LeleStyle>> _lele_styles;
     LeleStyle* _lele_style = nullptr;

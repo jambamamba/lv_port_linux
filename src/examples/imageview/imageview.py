@@ -110,17 +110,33 @@ def sliderMoved(event):
          setAngleMethod1(event.value)
    pass
 
-def colorChanged(rgb):
-   print(f"@@@py colorChanged: {hex(rgb)}")
+def setImgBgColor(rgb):
    obj = lele.getObjectById("/view/with_bg_img")
+   print(f"@@@py setImgBgColor obj: {obj}")
    style = obj.getStyle("img")
-   dic = obj.getStyle()
+   print(f"@@@py setImgBgColor style: {style}")
    dic = style.getValue("background/color")
    print(f"@@@py style.dic {dic}")
    dic = style.setValue({'background/color':str(rgb)})
-   # print(f"@@@py style.dic {dic}")
-   # print(f"@@@py set background/repeat ")
-   # style.setValue({'background/repeat':'no'})
+   print(f"@@@py style.dic {dic}")
+
+   #####osm
+   obj = lele.getObjectById("rotation-label")
+   style = obj.getStyle("views/view0/label")
+   dic = style.getValue("height")
+   print(f"@@@py views/view0/label dic: {dic}")
+   obj = obj.getParent()
+   style = obj.getStyle()
+   print(f"@@@py views/view0/label parent style: {style}")
+   dic = style.getValue("height")
+   print(f"@@@py views/view0/label parent dic: {dic}")
+
+
+
+def colorChanged(rgb):
+   print(f"@@@py colorChanged: {rgb} ({hex(rgb)})")
+   setImgBgColor(rgb)
+   return
 
 def msgboxEvent(event):
    print(f"@@@py msgboxEvent, button clicked: {event.object.getButtonClicked().id}, button text: {event.object.getButtonClicked().getText()}")
@@ -305,7 +321,6 @@ def main():
    rgb = colorwheel.getColor()
    print(f"@@@py colorwheel.getColor:{hex(rgb)}")
    colorwheel.onColorChanged(lambda rgb: colorChanged(rgb))
-
 
    while lele.handleEvents():
       runTestLoop()

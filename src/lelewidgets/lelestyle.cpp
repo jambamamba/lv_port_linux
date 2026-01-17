@@ -11,9 +11,19 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent) 
   : _parent_width(lv_obj_get_width(parent))
   , _parent_height(lv_obj_get_height(parent)) {
+
   fromJson(json_str);
 }
 
+LeleStyle::LeleStyle(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &style_attributes, lv_obj_t *parent)
+  : _parent_width(lv_obj_get_width(parent))
+  , _parent_height(lv_obj_get_height(parent)) {
+
+  for(const auto &[key, value]: style_attributes) {
+    _style[key] = value;
+  }
+}
+  
 bool LeleStyle::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
     if (std::holds_alternative<std::string>(token)) {

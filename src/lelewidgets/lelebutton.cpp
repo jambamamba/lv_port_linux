@@ -221,7 +221,6 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
     }
   }
 
-  // lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
   lv_obj_remove_flag(_lv_obj, LV_OBJ_FLAG_PRESS_LOCK);
 
   if(_checkable) {
@@ -237,7 +236,6 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
   if(view && view->isGroup()) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);//bubble events to the parent if parent is a group
   }
-  // lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
@@ -311,7 +309,7 @@ bool LeleButtons::LeleButton::eventCallback(LeleEvent &&e) {
           return LeleObject::eventCallback(LeleEvent(e, lv_event, _value, _start_value));
         }
         else {
-          LOG(WARNING, LVSIM, "No handler for value changed event!");
+          LL(WARNING, LVSIM) << "No handler for value changed event!";
         }
         return LeleObject::eventCallback(LeleEvent(e, lv_event, _value));
     }

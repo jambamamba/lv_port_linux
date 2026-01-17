@@ -18,32 +18,36 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 namespace {
 struct window *getWindow(backend_t *backend){
     backend_type_t type = backend->type;
-    if(type == BACKEND_DISPLAY) {
-        lv_display_t *display = backend->handle->display->display;
-        struct window * window = (struct window *)lv_display_get_user_data(display);
-        lv_indev_t * lv_indev_pointer = window->lv_indev_pointer;
-        lv_indev_t * lv_indev_pointeraxis = window->lv_indev_pointeraxis;
-        lv_indev_t * lv_indev_touch = window->lv_indev_touch;
-        lv_indev_t * lv_indev_keyboard = window->lv_indev_keyboard;
-        int width = window->width;
-        int height = window->height;
-        bool resize_pending = window->resize_pending;
-        int resize_width = window->resize_width;
-        int resize_height = window->resize_height;
-        bool flush_pending = window->flush_pending;
-        bool shall_close = window->shall_close;
-        bool closed = window->closed;
-        bool maximized = window->maximized;
-        bool fullscreen = window->fullscreen;
-        if( window->lv_draw_buf) { //if( window->wl_ctx->shm_ctx.lv_draw_buf) {
-            uint8_t * data = window->lv_draw_buf->data;
-            uint32_t data_size = window->lv_draw_buf->data_size;
-            int xx = 0;
-            xx = 1;
-        }
-        return window;
+    if(type != BACKEND_DISPLAY) {
+        return nullptr;
     }
-    return nullptr;
+    lv_display_t *display = backend->handle->display->display;
+    // struct window *window = (struct window *)lv_display_get_user_data(display);
+    struct window * window = (struct window *)lv_display_get_driver_data(display);
+    if(!window) {
+        return nullptr;
+    }
+    lv_indev_t * lv_indev_pointer = window->lv_indev_pointer;
+    lv_indev_t * lv_indev_pointeraxis = window->lv_indev_pointeraxis;
+    lv_indev_t * lv_indev_touch = window->lv_indev_touch;
+    lv_indev_t * lv_indev_keyboard = window->lv_indev_keyboard;
+    int width = window->width;
+    int height = window->height;
+    bool resize_pending = window->resize_pending;
+    int resize_width = window->resize_width;
+    int resize_height = window->resize_height;
+    bool flush_pending = window->flush_pending;
+    bool shall_close = window->shall_close;
+    bool closed = window->closed;
+    bool maximized = window->maximized;
+    bool fullscreen = window->fullscreen;
+    if( window->lv_draw_buf) { //if( window->wl_ctx->shm_ctx.lv_draw_buf) {
+        uint8_t * data = window->lv_draw_buf->data;
+        uint32_t data_size = window->lv_draw_buf->data_size;
+        int xx = 0;
+        xx = 1;
+    }
+    return window;
 }
 }//namespace
 

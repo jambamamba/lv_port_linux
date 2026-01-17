@@ -110,6 +110,7 @@ struct PyLeleObject {
     static PyObject *getStyle(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
     static PyObject *removeStyle(PyObject *, PyObject *);
+    static PyObject *getParent(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
@@ -123,4 +124,5 @@ struct PyLeleObject {
   {"getStyle", (PyCFunction)PyLeleObject::getStyle, METH_VARARGS, "Get the style attributes for this object"},\
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
   {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
+  {"getParent", (PyCFunction)PyLeleObject::getParent, METH_NOARGS, "Get the parent object"},\
 

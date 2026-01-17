@@ -121,17 +121,17 @@
             "label":{
                 "id":"rotation-label",
                 "text":"Angle",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"90%","fgcolor":"#fff"}
+                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"4%","fgcolor":"#fff"}
             },
             "label":{
                 "id":"scale-label",
                 "text":"Scale",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"90%","fgcolor":"#fff"}
+                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"4%","fgcolor":"#fff"}
             },
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"90%"},
+                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"4%"},
                 "text":"Run Test",
                 "event":{"type":"clicked","action":"action0","args":{}}
             }

@@ -244,13 +244,12 @@ void LeleColorWheel::onColorChanged(PyObject *py_callback) {
 bool LeleColorWheel::pyCallback(PyObject *py_callback, int32_t rgb) {
 
     // LOG(DEBUG, LVSIM, "LeleColorWheel::pyCallback:'%p'\n", py_callback);
-    // PyObject *py_int = Py_BuildValue("(i)", rgb);
-    // if(!py_int) {
-    //   LL(WARNING, LVSIM) << "LeleColorWheel::pyCallback could not build py_int from int rgb!";
-    //   return false;
-    // }
-    PyObject *pArgs = PyTuple_New(1);
-    // Py_INCREF(pArgs);
-    PyTuple_SetItem(pArgs, 0, PyLong_FromLong(rgb));
-    return LeleObject::pyCallback(py_callback, pArgs);
+
+    PyObject *py_int = Py_BuildValue("(i)", rgb);
+    if(!py_int) {
+      LL(WARNING, LVSIM) << "LeleColorWheel::pyCallback could not build py_int from int rgb!";
+      return false;
+    }
+    Py_INCREF(py_int);
+    return LeleObject::pyCallback(py_callback, py_int);
 }

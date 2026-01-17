@@ -19,17 +19,23 @@ add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
 set(LV_CONF_INCLUDE_SIMPLE 1)
 set(LV_USE_WAYLAND 1)
 
-set(PYTHON_LIB_MAJOR_MINOR "3.14")
-set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.2")
+# set(PYTHON_LIB_NAME "micropython") #https://github.com/micropython/micropython
+# set(PYTHON_LIB_MAJOR_MINOR "1.27")
+# set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.0")
+# set(PYTHON_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tar.gz")
+# set(PYTHON_LIB_URL "https://github.com/micropython/micropython/archive/refs/tags/v${PYTHON_LIB_VERSION}.tar.gz")
+
+set(PYTHON_LIB_NAME "Python")
+set(PYTHON_LIB_MAJOR_MINOR "3.13")
+set(PYTHON_LIB_VERSION "${PYTHON_LIB_MAJOR_MINOR}.3")
+set(PYTHON_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
+set(PYTHON_LIB_URL "https://www.python.org/ftp/python/${PYTHON_LIB_VERSION}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
 
 function(buildPython OUT_VAR_PYTHON_LIB_OUTPUT)
     message(STATUS "buildPython()")
 
-    set(PYTHON_LIB_NAME "Python")
     set(PYTHON_LIB_SOURCE_DIR "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}")
     set(PYTHON_LIB_OUTPUT "${PYTHON_LIB_SOURCE_DIR}/libpython${PYTHON_LIB_MAJOR_MINOR}.so")
-    set(PYTHON_LIB_ARCHIVE "${CMAKE_CURRENT_BINARY_DIR}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
-    set(PYTHON_LIB_URL "https://www.python.org/ftp/python/${PYTHON_LIB_VERSION}/${PYTHON_LIB_NAME}-${PYTHON_LIB_VERSION}.tgz")
 
     add_custom_command(
         OUTPUT ${PYTHON_LIB_OUTPUT}

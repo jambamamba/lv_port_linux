@@ -86,6 +86,18 @@ int PyLeleStyle::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     return 0;
 }
 
+void PyLeleStyle::dtor(PyObject *self_) {
+    // PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
+    // LeleStyle *lele_style = self->_lele_style;
+}
+
+void PyLeleStyle::onfree(PyObject *self_) {
+    // PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
+    // LeleStyle *lele_style = self->_lele_style;
+    // if(self->ob_base.ob_refcnt == 0) {//osm
+    // }
+}
+
 void PyLeleStyle::dealloc(PyObject* self_) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
     Py_XDECREF(self->_id);
@@ -196,8 +208,7 @@ PyObject *PyLeleStyle::toPyDict(
         PyObject *_dict = nullptr;
         std::map<PyObject*, PyObject*> _items;
         void reset() {
-            _dict = nullptr;
-            _items.clear();
+            _dict = nullptr;//this will prevent ref count decrement
         }
         ~RAII() {            
             for(const auto &[name, value] : _items) {
@@ -233,21 +244,18 @@ PyObject *PyLeleStyle::toPyDict(
         if(!py_value) {
             Py_XDECREF(py_name);
             Py_XDECREF(py_style);
-            // return Py_None;
             break;
         }
         if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
             Py_XDECREF(py_name);
             Py_XDECREF(py_value);
             Py_XDECREF(py_style);
-            // return Py_None;
             break;
         }
         $._items[py_name] = py_value;
     }
     Py_XDECREF(py_style);
     PyObject *dict = $._dict;
-    Py_XINCREF(dict);
     $.reset();
     return dict;
 }
@@ -269,7 +277,6 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
         const char *item = PyUnicode_AsUTF8(obj);
         if(item) {
             strings.push_back(item);
-            Py_XDECREF(obj);
             return strings;
         }
     }
@@ -425,6 +432,14 @@ PyTypeObject PyLeleStyle::_obj_type = {
     (initproc)PyLeleStyle::init,      /* tp_init */
     0,                         /* tp_alloc */
     PyType_New,                 /* tp_new */
+    (freefunc)PyLeleStyle::onfree,      //freefunc tp_free,           /* Low-level free-memory routine */
+    0,//inquiry tp_is_gc,           /* For PyObject_IS_GC */
+    0,//    PyObject *tp_bases,     
+    0,//PyObject *tp_mro,           /* method resolution order */
+    0,//PyObject *tp_cache,         /* no longer used */
+    0,//void *tp_subclasses,             /* for static builtin types this is an index */
+    0,//PyObject *tp_weaklist,          /* not used for static builtin types */
+    PyLeleStyle::dtor,              // destructor tp_del,      
 };
 
 ///////////////////////////////////////////////////////////////////////////

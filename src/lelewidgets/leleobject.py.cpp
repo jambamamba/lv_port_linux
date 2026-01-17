@@ -311,6 +311,16 @@ PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
     return self->_class_name;
 }
 
+PyObject *PyLeleObject::getParent(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if (!lele_obj->getParent()) {
+        PyErr_SetString(PyExc_AttributeError, "no parent");
+        return Py_None;
+    }
+    return lele_obj->getParent()->createPyObject();
+}
+
 PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
@@ -336,7 +346,13 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     }
     Py_ssize_t num_args = PyTuple_Size(args);
     if(num_args == 0) {
-        return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes());
+        // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes());
+        // static LeleStyle style(lele_obj->getStyleAttributes(), lele_obj->getParent()->getLvObj());//osm not used anymore
+        const auto &styles = lele_obj->getStyles();
+        if(styles.size() == 0) {
+            return Py_None;
+        }
+        return styles.at(0)->createPyObject();
     }
     if(num_args != 1) {
         return Py_None;

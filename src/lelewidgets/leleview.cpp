@@ -129,7 +129,6 @@ lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
       // }
     }
   }
-  // lv_obj_add_event_cb(_lv_obj, LeleObject::EventCallback, LV_EVENT_CLICKED, this);//also triggered when Enter key is pressed
 
   return _lv_obj;
 }
