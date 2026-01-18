@@ -9,7 +9,7 @@
 class LeleImage : public LeleObject  {
   public:
   LeleImage(const std::string &json_str);
-  virtual bool fromJson(const std::string &json_str) override;
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   std::string getSrc() const;
 

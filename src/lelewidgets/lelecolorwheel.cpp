@@ -149,10 +149,10 @@ std::pair<int,int> getWidgetWidthHeight(
 LeleColorWheel::LeleColorWheel(const std::string &json_str)
   : LeleObject(json_str) {
   _class_name = __func__;
-  fromJson(json_str);
+  fromJson(json_str, this);
 }
 
-bool LeleColorWheel::fromJson(const std::string &json_str) {
+bool LeleColorWheel::fromJson(const std::string &json_str, const LeleObject *parent) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);

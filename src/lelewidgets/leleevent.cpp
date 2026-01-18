@@ -7,10 +7,10 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleEvent::LeleEvent(const std::string &json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
-  fromJson(json_str);
+  fromJson(json_str, nullptr);
 }
-bool LeleEvent::fromJson(const std::string &json_str) {
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+bool LeleEvent::fromJson(const std::string &json_str, const LeleObject *parent) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str, parent)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "id") {
@@ -23,7 +23,7 @@ bool LeleEvent::fromJson(const std::string &json_str) {
         _action = value;
       }
       else if(key == "args") {
-        parseArgs(value);
+        parseArgs(value, parent);
       }
     }
   }
@@ -42,8 +42,8 @@ LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalu
 , _ivalue2(ivalue2) {
 }
 
-void LeleEvent::parseArgs(const std::string &json_str) {
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+void LeleEvent::parseArgs(const std::string &json_str, const LeleObject *parent) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str, parent)) {
       if (std::holds_alternative<std::string>(token)) {
           const std::string &value = std::get<std::string>(token);
           _args[key] = value;

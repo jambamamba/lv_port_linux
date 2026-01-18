@@ -29,27 +29,25 @@ public:
     lv_scrollbar_mode_t,
     LeleStyle::BorderTypeE
   >;
-  // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
-  // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
-  LeleStyle(const std::string &json_str = "", lv_obj_t *parent = lv_screen_active());
-  LeleStyle(const std::map<std::string, std::optional<StyleValue>> &style_attributes, lv_obj_t *parent = lv_screen_active());
-  virtual bool fromJson(const std::string &json_str);
+  LeleStyle(const std::string &json_str = "", const LeleObject *parent = nullptr);
+  LeleStyle(const std::map<std::string, std::optional<StyleValue>> &style_attributes, const LeleObject *parent = nullptr);
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleStyle *py_obj);
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   void setLeleParent(const LeleObject *lele_parent);
   const LeleObject *getLeleParent() const;
-  void parseBackground(const std::string &value);
+  void parseBackground(const std::string &value, const LeleObject *parent);
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
-  static std::map<std::string, float> parseRotation(const std::string &json_str);
+  static std::map<std::string, float> parseRotation(const std::string &json_str, const LeleObject *parent);
   static std::string trim(const std::string& str);
-  static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
+  static std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str, const LeleObject *parent);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
-  static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
+  static std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value, const LeleObject *parent);
   std::string getClassName() const;
   std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
-  bool setValue(const std::string &key, const std::string &value);
+  bool setValue(const std::string &key, const std::string &value, const LeleObject *parent);
   std::vector<std::string> getBackgroundAttributes() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;
   std::string getId() const;

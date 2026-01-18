@@ -7,7 +7,7 @@
 class LeleView : public LeleObject {
 public:
   LeleView(const std::string &json_str);
-  virtual bool fromJson(const std::string &json_str) override;
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   bool isGroup() const { return _group; }
@@ -19,7 +19,7 @@ protected:
 class LeleViewHeader : public LeleObject {
 public:
   LeleViewHeader(const std::string &json_str);
-  virtual bool fromJson(const std::string &json_str) override;
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent) override;
   const std::string &name() const { return _name; }
   const std::string &img() const { return _img; }
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
@@ -31,7 +31,7 @@ protected:
 class LeleViews : public LeleObject {
 public:
   LeleViews(const std::string &json_str);
-  virtual bool fromJson(const std::string &json_str) override;
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   int count() const;
   LeleView* getAt(int idx) const;

@@ -51,7 +51,7 @@ public:
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleObject *py_obj);
-  virtual bool fromJson(const std::string &json_str);
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent);
   virtual void setStyle(lv_obj_t *lv_obj);
   virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
   virtual void addStyle(LeleStyle* lele_style);

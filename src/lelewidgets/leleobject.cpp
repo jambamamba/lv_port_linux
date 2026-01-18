@@ -12,12 +12,12 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImageWithValuesParsedFromJson(
-  const lv_image_dsc_t *src_img, std::string val, int container_width, int container_height) {
+  const lv_image_dsc_t *src_img, std::string val, int container_width, int container_height, const LeleObject * parent) {
 
   int x = -1;
   int y = -1;
   val = LeleWidgetFactory::trim(val);
-  if(LeleWidgetFactory::parsePercentValues(val, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
+  if(LeleWidgetFactory::parsePercentValues(val, parent, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
     return LeleImageConverter::resizeImg(src_img, x, y);
   }
   x = LeleStyle::parsePercentValue(val, container_width);
@@ -67,7 +67,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 
 LeleObject::LeleObject(const std::string &json_str)
   : _class_name(__func__ ) {
-  fromJson(json_str);
+  fromJson(json_str, this);
   // std::cout << "styles:" << _lele_styles << "\n";
 }
 
@@ -75,8 +75,8 @@ LeleObject::~LeleObject() {
     // lv_style_reset(&_style);
 }
 
-bool LeleObject::fromJson(const std::string &json_str) {
-  _nodes = LeleWidgetFactory::fromJson(json_str);
+bool LeleObject::fromJson(const std::string &json_str, const LeleObject *parent) {
+  _nodes = LeleWidgetFactory::fromJson(json_str, parent);
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       if(key == "style") {
@@ -406,7 +406,7 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
           _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
         }
         else if(!val.empty()) {
-          _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
+          _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height, getParent());
         }
         if(!_bg_img) {
           LOG(FATAL, LVSIM, "Failed in processing background/size");
@@ -472,7 +472,7 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   std::string val = std::get<std::string>(value.value());
   if(!val.empty()) {
     val = LeleWidgetFactory::trim(val);
-    if(!LeleWidgetFactory::parsePercentValues(val, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
+    if(!LeleWidgetFactory::parsePercentValues(val, getParent(), {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
       x = LeleStyle::parsePercentValue(val, container_width);
       y = LeleStyle::parsePercentValue(val, container_height);
     }

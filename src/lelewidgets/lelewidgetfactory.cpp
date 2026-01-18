@@ -141,7 +141,7 @@ const cJSON* jsonFromConfig(const std::string &config_json) {
 }
 
 auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
-    auto nodes = LeleWidgetFactory::fromJson(json_str);
+    auto nodes = LeleWidgetFactory::fromJson(json_str, parent);
     for (const auto &[key, node]: nodes) {
         LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
         if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
@@ -158,9 +158,9 @@ auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
     return nodes;
 }
 
-auto leleStylesFromJson(const std::string &json_str) {
+auto leleStylesFromJson(const std::string &json_str, const LeleObject *parent) {
     std::vector<std::unique_ptr<LeleStyle>> styles;
-    auto nodes = LeleWidgetFactory::fromJson(json_str);
+    auto nodes = LeleWidgetFactory::fromJson(json_str, parent);
     for (auto &[key, token]: nodes) {
         if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
             if(key == "style") {
@@ -178,9 +178,9 @@ auto leleStylesFromJson(const std::string &json_str) {
 namespace LeleWidgetFactory {
 
 std::vector<std::pair<std::string, Node>> fromJson(
-    const std::string &json_str) {
+    const std::string &json_str, const LeleObject *parent) {
 
-    std::vector<std::pair<std::string, Node>> res;
+    std::vector<std::pair<std::string, Node>> nodes;
     // const cJSON *json = readJson(json_str.c_str());
     auto tokens = tokenize(json_str);
     for(const auto &[lhs, rhs]: tokens) {
@@ -236,7 +236,7 @@ std::vector<std::pair<std::string, Node>> fromJson(
             token = std::make_unique<LeleMessageBox>(rhs);
         }
         else if(lhs == "style") {
-            token = std::make_unique<LeleStyle>(rhs);
+            token = std::make_unique<LeleStyle>(rhs, parent);
         }
         else if(lhs == "event") {
             token = std::make_unique<LeleEvent>(rhs);
@@ -248,11 +248,11 @@ std::vector<std::pair<std::string, Node>> fromJson(
             token = rhs;
         }
         // LOG(DEBUG, LVSIM, "lhs:%s\n", lhs.c_str());
-        res.emplace_back(
+        nodes.emplace_back(
             std::make_pair<std::string, Node>(
                 std::string(lhs), std::move(token)));
     }
-    return res;
+    return nodes;
 }
 
 std::string trim(const std::string& str) {
@@ -264,7 +264,7 @@ std::string trim(const std::string& str) {
     return str.substr(first, (last - first + 1));
 }
 
-void fromJson(const std::string &json_str, std::function<void (const std::string &key, const std::string &value)> callback) {
+void fromJson(const std::string &json_str, const LeleObject *parent, std::function<void (const std::string &key, const std::string &value)> callback) {
   if(json_str.empty()) {
     return;
   }
@@ -274,7 +274,7 @@ void fromJson(const std::string &json_str, std::function<void (const std::string
   }
   cJSONRAII json(json_str);
   if(cJSON_IsObject(json())) {
-    for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+    for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str, parent)) {
         if (std::holds_alternative<std::string>(token)) {
             const std::string &value = std::get<std::string>(token);
             if(callback) {
@@ -392,20 +392,25 @@ std::vector<std::pair<std::string, Node>> fromConfig(
 }
 
 std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
-    const std::string &config) {
+    const std::string &config, const LeleObject *parent) {
 
     const cJSON* json = jsonFromConfig(config);
     if(!json) {
         LOG(WARNING, LVSIM, "Failed to parse config");
         return std::vector<std::unique_ptr<LeleStyle>>();
     }
-    return leleStylesFromJson(cJSON_Print(json));
+    return leleStylesFromJson(cJSON_Print(json), parent);
 }
 
 
-bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
+bool parsePercentValues(
+    const std::string &json_str, 
+    const LeleObject *parent,
+    std::map<std::string, int*> &&values, 
+    const std::map<std::string, int> &&max_values) {
+
   bool ret = false;
-  LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
+  LeleWidgetFactory::fromJson(json_str, parent, [&values, &max_values, &ret](const std::string &key, const std::string &value){
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]
       if(value.size() > 1 && value.at(value.size() - 1) == '%') {
         int iret = 0;

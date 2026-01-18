@@ -31,14 +31,17 @@ namespace LeleWidgetFactory {
   void iterateNodes(
     std::vector<std::pair<std::string, Node>> &nodes, int depth = 0, std::function<void(LeleObject &lele_object)> on_visit_lele_base_obj = nullptr);
   void fromJson(
-    const std::string &json_str, 
+    const std::string &json_str, const LeleObject *parent, 
     std::function<void (const std::string &key, const std::string &value)> callback);
   std::vector<std::pair<std::string, Node>> fromJson(
-    const std::string &json_str = "");
+    const std::string &json_str, const LeleObject *parent);
   std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
-    const std::string &config);
+    const std::string &config, const LeleObject *parent);
   bool parsePercentValues(
-    const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values = {});
+    const std::string &json_str, 
+    const LeleObject *parent, 
+    std::map<std::string, int*> &&values, 
+    const std::map<std::string, int> &&max_values = {});
   std::string trim(
     const std::string& str);
 }//LeleWidgetFactory

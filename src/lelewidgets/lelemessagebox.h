@@ -8,7 +8,7 @@ class LeleEvent;
 class LeleMessageBox : public LeleLabel  {
 public:
   LeleMessageBox(const std::string &json_str = "");
-  virtual bool fromJson(const std::string &json_str) override;
+  virtual bool fromJson(const std::string &json_str, const LeleObject *parent) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;

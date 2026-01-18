@@ -8,30 +8,36 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent) 
-  : _parent_width(lv_obj_get_width(parent))
-  , _parent_height(lv_obj_get_height(parent)) {
+LeleStyle::LeleStyle(const std::string &json_str, const LeleObject *parent) 
+  : _parent_width(lv_obj_get_width(parent && parent->getLvObj() ? parent->getLvObj() : lv_screen_active()))
+  , _parent_height(lv_obj_get_height(parent && parent->getLvObj() ? parent->getLvObj() : lv_screen_active())) {
 
-  fromJson(json_str);
+  fromJson(json_str, parent);
 }
 
-LeleStyle::LeleStyle(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &style_attributes, lv_obj_t *parent)
-  : _parent_width(lv_obj_get_width(parent))
-  , _parent_height(lv_obj_get_height(parent)) {
+LeleStyle::LeleStyle(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &style_attributes, const LeleObject *parent)
+  : _parent_width(lv_obj_get_width(parent && parent->getLvObj() ? parent->getLvObj() : lv_screen_active()))
+  , _parent_height(lv_obj_get_height(parent && parent->getLvObj() ? parent->getLvObj() : lv_screen_active())) {
 
   for(const auto &[key, value]: style_attributes) {
     _style[key] = value;
   }
 }
   
-bool LeleStyle::fromJson(const std::string &json_str) {
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+bool LeleStyle::fromJson(const std::string &json_str, const LeleObject *parent) {
+
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str, parent)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
-      if(!setValue(key, value)) {
+      if(!setValue(key, value, parent)) {
         return false;
       }
     }
+  }
+  if(_id == "views/view0/label1/style") {
+    auto height = parent->getStyle("height");
+    int x =0 ;
+    x = 1;
   }
   return true;
 }
@@ -104,10 +110,10 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   return 0;
 }
 
-std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str) {
+std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str, const LeleObject *parent) {
   bool processed = false;
   std::map<std::string, float> res;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str, parent)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "angle") {
@@ -117,7 +123,7 @@ std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_st
       else if(key == "pivot") {
         int pivot_x;
         int pivot_y;
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
+        LeleWidgetFactory::parsePercentValues(value, parent, {{"x", &pivot_x}, {"y", &pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
         res["pivot/x"] = pivot_x;
         res["pivot/y"] = pivot_y;
         processed = true;
@@ -131,16 +137,16 @@ std::vector<std::string> LeleStyle::getBackgroundAttributes() const {
   return _background_attributes;
 }
 
-void LeleStyle::parseBackground(const std::string &value_) {
+void LeleStyle::parseBackground(const std::string &value_, const LeleObject *parent) {
 
-  LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
+  LeleWidgetFactory::fromJson(value_, parent, [this, parent](const std::string &subkey_, const std::string &value){
     const std::string bg("background");
     std::string subkey(subkey_);
     if(subkey == "color") {
       _style[bg + "/" + subkey] = parseColorCode(value);
     }
     else if(subkey == "rotation") {
-      auto rotation = parseRotation(value);
+      auto rotation = parseRotation(value, parent);
       if(!rotation.empty()) {
         _style["background/rotation/pivot/x"] = static_cast<int>(rotation["pivot/x"]);
         _style["background/rotation/pivot/y"] = static_cast<int>(rotation["pivot/y"]);
@@ -202,12 +208,12 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
 
-std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopRightBottomLeft(const std::string &value) {
+std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopRightBottomLeft(const std::string &value, const LeleObject *parent) {
   std::string top("none");
   std::string right("none");
   std::string bottom("none");
   std::string left("none");
-  for (const auto &[key, val]: LeleWidgetFactory::fromJson(value)) {
+  for (const auto &[key, val]: LeleWidgetFactory::fromJson(value, parent)) {
     if (std::holds_alternative<std::string>(val)) {
       const std::string &value = std::get<std::string>(val);
       if(value.empty() || value == "none" || value == "tight" || value == "parent" || value == "max") {
@@ -237,7 +243,7 @@ std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopR
   return std::tuple<std::string,std::string,std::string,std::string>{top,right,bottom,left};
 }
 
-std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &padding_str) {
+std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &padding_str, const LeleObject *parent) {
 
   int top = 0;
   int right = 0;
@@ -272,7 +278,7 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
     return std::tuple<int,int,int,int>{top,right,bottom,left};
   }
   // std::string text("{"top":"0","right":"0","bottom":"0","left":"0"}");
-  auto [top_str,right_str,bottom_str,left_str] = parseTopRightBottomLeft(padding_str.c_str());
+  auto [top_str,right_str,bottom_str,left_str] = parseTopRightBottomLeft(padding_str.c_str(), parent);
   if(!top_str.empty() && top_str != "none"){ top = std::stoi(top_str); }
   if(!right_str.empty() && right_str != "none"){ right = std::stoi(right_str); }
   if(!bottom_str.empty() && bottom_str != "none"){ bottom = std::stoi(bottom_str); }
@@ -304,7 +310,8 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
 
 bool LeleStyle::setValue(
     const std::string &key, 
-    const std::string &value) {
+    const std::string &value,
+    const LeleObject *parent) {
 
     if(key == "class_name") {
         _class_name = value;
@@ -338,42 +345,42 @@ bool LeleStyle::setValue(
       _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
     }
     else if(key == "padding") {
-      std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
+      std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "padding/top") {
       int top, right, bottom, left;
-      std::tie(_style["padding/top"], right, bottom, left) = parsePaddingOrMargin(value);
+      std::tie(_style["padding/top"], right, bottom, left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "padding/right") {
       int top, right, bottom, left;
-      std::tie(top, _style["padding/right"], bottom, left) = parsePaddingOrMargin(value);
+      std::tie(top, _style["padding/right"], bottom, left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "padding/bottom") {
       int top, right, bottom, left;
-      std::tie(top, right, _style["padding/bottom"], left) = parsePaddingOrMargin(value);
+      std::tie(top, right, _style["padding/bottom"], left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "padding/left") {
       int top, right, bottom, left;
-      std::tie(top, right, bottom, _style["padding/left"]) = parsePaddingOrMargin(value);
+      std::tie(top, right, bottom, _style["padding/left"]) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "margin") {
-      std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value);
+      std::tie(_style["margin/top"], _style["margin/right"], _style["margin/bottom"], _style["margin/left"]) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "margin/top") {
       int top, right, bottom, left;
-      std::tie(_style["margin/top"], right, bottom, left) = parsePaddingOrMargin(value);
+      std::tie(_style["margin/top"], right, bottom, left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "margin/right") {
       int top, right, bottom, left;
-      std::tie(top, _style["margin/right"], bottom, left) = parsePaddingOrMargin(value);
+      std::tie(top, _style["margin/right"], bottom, left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "margin/bottom") {
       int top, right, bottom, left;
-      std::tie(top, right, _style["margin/bottom"], left) = parsePaddingOrMargin(value);
+      std::tie(top, right, _style["margin/bottom"], left) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "margin/left") {
       int top, right, bottom, left;
-      std::tie(top, right, bottom, _style["margin/left"]) = parsePaddingOrMargin(value);
+      std::tie(top, right, bottom, _style["margin/left"]) = parsePaddingOrMargin(value, parent);
     }
     else if(key == "border") {
       std::tie(_style["border/type"], _style["border/width"], _style["border/color"]) = LeleStyle::parseBorder(value); 
@@ -503,7 +510,7 @@ bool LeleStyle::setValue(
       }
     }
     else if(key == "background") {
-      parseBackground(value);
+      parseBackground(value, parent);
     }
     else if(key == "background/rotation/angle") {
       _style["background/rotation/angle"] = std::stof(value);
@@ -511,7 +518,7 @@ bool LeleStyle::setValue(
     else if(key == "background/rotation/pivot") {
       int pivot_x = 0;
       int pivot_y = 0;
-      if(LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
+      if(LeleWidgetFactory::parsePercentValues(value, parent, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
         _style["background/rotation/pivot/x"] = pivot_x;
         _style["background/rotation/pivot/y"] = pivot_y;
       }

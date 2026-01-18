@@ -6,9 +6,9 @@ LeleImage::LeleImage(const std::string &json_str)
   : LeleObject(json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
-  fromJson(json_str);
+  fromJson(json_str, this);
 }
-bool LeleImage::fromJson(const std::string &json_str) {
+bool LeleImage::fromJson(const std::string &json_str, const LeleObject *parent) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -23,15 +23,15 @@ bool LeleImage::fromJson(const std::string &json_str) {
       }
       else if(key == "rotation/pivot") {
         _rotation_pivot = std::optional<LeleImage::XY>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_rotation_pivot->_x}, {"y", &_rotation_pivot->_y}});
+        LeleWidgetFactory::parsePercentValues(value, parent, {{"x", &_rotation_pivot->_x}, {"y", &_rotation_pivot->_y}});
       }
       else if(key == "offset") {
         _offset = std::optional<LeleImage::XY>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_x}, {"y", &_offset->_y}});
+        LeleWidgetFactory::parsePercentValues(value, parent, {{"x", &_offset->_x}, {"y", &_offset->_y}});
       }
       else if(key == "scale") {
         _scale = std::optional<LeleImage::XY>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_x}, {"y", &_scale->_y}});
+        LeleWidgetFactory::parsePercentValues(value, parent, {{"x", &_scale->_x}, {"y", &_scale->_y}});
       }
       else if(key == "blendmode") {
         if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }

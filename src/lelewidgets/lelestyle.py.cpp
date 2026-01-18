@@ -124,7 +124,7 @@ PyObject *PyLeleStyle::fromConfig(PyObject *self_, PyObject *args) {
             return Py_None;
         }
     }
-    self->_lele_styles = LeleWidgetFactory::stylesFromConfig(config);
+    self->_lele_styles = LeleWidgetFactory::stylesFromConfig(config, nullptr);
     if(self->_lele_styles.size() > 0) {
         self->_lele_style = self->_lele_styles.at(0).get();
     }
@@ -365,7 +365,7 @@ PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {
             LOG(WARNING, LVSIM, "Failed to parse PyList\n");
             continue;
         }
-        needs_update |= lele_style->setValue(key_c_str, value_c_str);
+        needs_update |= lele_style->setValue(key_c_str, value_c_str, nullptr);
         // std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dic key: " << key_c_str << ", value: " << value_c_str << "\n";
     }
     if(!needs_update) {

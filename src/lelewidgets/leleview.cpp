@@ -9,9 +9,9 @@ LeleViews::LeleViews(const std::string &json_str)
   : LeleObject(json_str) {
     _class_name = __func__ ;//
     LOG(DEBUG, LVSIM, "LeleViews json_str:%s\n", json_str.c_str());
-    fromJson(json_str);
+    fromJson(json_str, this);
 }
-bool LeleViews::fromJson(const std::string &json_str) {
+bool LeleViews::fromJson(const std::string &json_str, const LeleObject *parent) {
   return true;
 }
 
@@ -63,9 +63,9 @@ void LeleViews::hide(){
 LeleViewHeader::LeleViewHeader(const std::string &json_str)
   : LeleObject(json_str) {
     _class_name = __func__ ;//
-    fromJson(json_str);
+    fromJson(json_str, this);
 }
-bool LeleViewHeader::fromJson(const std::string &json_str) {
+bool LeleViewHeader::fromJson(const std::string &json_str, const LeleObject *parent) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
@@ -98,9 +98,9 @@ lv_obj_t *LeleViewHeader::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 LeleView::LeleView(const std::string &json_str)
   : LeleObject(json_str) {
     _class_name = __func__ ;//
-    fromJson(json_str);
+    fromJson(json_str, this);
 }
-bool LeleView::fromJson(const std::string &json_str) {
+bool LeleView::fromJson(const std::string &, const LeleObject *parent) {
   return true;
 }
 lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
