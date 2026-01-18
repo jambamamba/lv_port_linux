@@ -11,7 +11,7 @@
                 "id":"/view/with_bg_img",
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
-                        "image":"firefox-logo.png",
+                        "image":"res/pumpkin-man.png",
                         "xposition":"20",
                         "xposition":{"x":"20","y":"20"},
                         "xsize":"contain",

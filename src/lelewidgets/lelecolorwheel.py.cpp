@@ -55,30 +55,6 @@ PyObject *PyLeleColorWheel::setColor(PyObject *self_, PyObject *args){
     return Py_None;
 }
 
-PyObject *PyLeleColorWheel::getBgColor(PyObject *self_, PyObject *args){
-    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
-    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
-    if(lele_obj) {
-        return PyLong_FromLong(lele_obj->getBgColor());
-    }
-    return Py_None;
-}
-
-PyObject *PyLeleColorWheel::setBgColor(PyObject *self_, PyObject *args){
-    PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
-    LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);
-    if(lele_obj && args) {
-        int value = 0;
-        if(!PyArg_ParseTuple(args, "i", &value)) {
-            return Py_None;
-        }
-        if(value) {
-            lele_obj->setBgColor(value);
-        }
-    }
-    return Py_None;
-}
-
 PyObject *PyLeleColorWheel::onColorChanged(PyObject *self_, PyObject *args) {
     PyLeleColorWheel *self = reinterpret_cast<PyLeleColorWheel *>(self_);
     LeleColorWheel *lele_obj = dynamic_cast<LeleColorWheel *>(self->ob_base._lele_obj);

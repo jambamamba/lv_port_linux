@@ -12,13 +12,12 @@ class LeleColorWheel : public LeleObject  {
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   void setColor(int32_t rgb);
   int32_t getColor() const;
-  void setBgColor(int32_t rgb);
-  int32_t getBgColor() const;
   void onColorChanged(PyObject *callback);
 protected:
   std::unique_ptr<lv_color_t[]> _canvas_buffer;
-  int32_t _bgcolor = 0;
   int32_t _rgb = 0;
+  int _width = 0;
+  int _height = 0;
 
   std::pair<int,int> initCanvas();
   bool pyCallback(PyObject *py_callback, int32_t rgb);
@@ -35,8 +34,6 @@ struct PyLeleColorWheel {
     // Type-specific fields go here
     static PyObject *getColor(PyObject *, PyObject *);
     static PyObject *setColor(PyObject *, PyObject *);
-    static PyObject *getBgColor(PyObject *, PyObject *);
-    static PyObject *setBgColor(PyObject *, PyObject *);
     static PyObject *onColorChanged(PyObject *, PyObject *);    
 };
 

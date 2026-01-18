@@ -208,7 +208,7 @@ PyObject *PyLeleObject::pyListOrPyObjectFromStdVector(const std::vector<PyObject
         Py_INCREF(py_objects.at(0));
         return py_objects.at(0);
     }
-    else {//(py_objects.size() > 1) 
+    else {//(py_objects.size() > 1)
         PyObject *list = PyList_New(0);
         for(PyObject *py_object : py_objects){
             PyList_Append(list, py_object);
@@ -348,11 +348,16 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     if(num_args == 0) {
         // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes());
         // static LeleStyle style(lele_obj->getStyleAttributes(), lele_obj->getParent()->getLvObj());//osm not used anymore
-        const auto &styles = lele_obj->getStyles();
-        if(styles.size() == 0) {
-            return Py_None;
+        // const auto &styles = lele_obj->getStyles();
+        // if(styles.size() == 0) {
+        //     return Py_None;
+        // }
+        // return styles.at(0)->createPyObject();
+        std::vector<PyObject *> res;
+        for (LeleStyle *style : lele_obj->getStyles()) {
+            res.emplace_back(style->createPyObject());
         }
-        return styles.at(0)->createPyObject();
+        return pyListOrPyObjectFromStdVector(res);
     }
     if(num_args != 1) {
         return Py_None;
@@ -368,12 +373,13 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "No style id was given\n");
         return Py_None;
     }
-    for(LeleStyle *style : lele_obj->getStyles()) {
+    std::vector<PyObject *> res;
+    for (LeleStyle *style : lele_obj->getStyles()) {
         if(style->getId() == style_id) {
-            return style->createPyObject();
+            res.emplace_back(style->createPyObject());
         }
     }
-    return Py_None;
+    return pyListOrPyObjectFromStdVector(res);
     // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes(style_id));
 }
 

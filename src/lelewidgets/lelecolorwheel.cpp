@@ -53,7 +53,23 @@ RGBColor HsvToRgb(float H, float S, float V) {
     return color;
 }
 
-void makeColorWheel(lv_obj_t* lv_obj, int width, int height) {
+
+inline bool isWithinCircle(int width, int height, int x, int y) {
+
+  int center_x = width / 2;
+  int center_y = height / 2;
+  float max_radius = std::min(center_x, center_y) * 0.9f;
+
+  // Calculate the distance from the pixel to the center (using Pythagorean theorem)
+  // dx = delta x, dy = delta y
+  int dx = x - center_x;
+  int dy = y - center_y;
+  float distance = pow(dx * dx + dy * dy, .5f);
+
+  return (distance <= max_radius);
+}
+
+void makeColorWheel(lv_obj_t* lv_obj, int width, int height, int bgcolor) {
 
     // Define the center coordinates of the canvas
     int center_x = width / 2;
@@ -73,7 +89,8 @@ void makeColorWheel(lv_obj_t* lv_obj, int width, int height) {
         float distance = pow(dx * dx + dy * dy, .5f);
 
         // Check if the pixel is within the main circular area
-        if (distance <= max_radius) {
+        // if (distance <= max_radius) {
+        if(isWithinCircle(width, height, x, y)) {
 
             // Calculate the angle (hue) using the arctangent function (atan2)
             // The result is typically in the range [-PI, PI]
@@ -102,7 +119,10 @@ void makeColorWheel(lv_obj_t* lv_obj, int width, int height) {
         else {
             // If outside the wheel, set a background color (e.g., white)
             // SET Pixel(x, y) TO White // Or transparent, depending on implementation
-            lv_color_t c = lv_color_make(0xff, 0xff, 0xff);
+            lv_color_t c = lv_color_make(
+              (bgcolor >> 16) & 0xff, 
+              (bgcolor >> 8) & 0xff, 
+              (bgcolor >> 0) & 0xff);
             lv_canvas_set_px(lv_obj, x, y, c, 0);
         }
       }
@@ -164,8 +184,8 @@ lv_obj_t *LeleColorWheel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
     lv_canvas_create(lele_parent->getLvObj()));
   lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_CLICKABLE);
   
-  auto [width, height] = initCanvas();
-  if(width <= 0 || height <= 0) {
+  std::tie<int,int>(_width, _height) = initCanvas();
+  if(_width <= 0 || _height <= 0) {
     LL(DEBUG, LVSIM) << "Failed to initialize canvas";
   }
 
@@ -181,7 +201,12 @@ lv_obj_t *LeleColorWheel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
     //   }
     // }
   }
-  makeColorWheel(_lv_obj, width, height);
+  int bgcolor = 0xffffff;
+  auto value = getStyle("bgcolor");
+  if(value) {
+    bgcolor = std::get<int>(value.value());
+  }
+  makeColorWheel(_lv_obj, _width, _height, bgcolor);
   
   return _lv_obj;
 }
@@ -196,6 +221,10 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
     case LV_EVENT_CLICKED:{
       GraphicsBackend &backend = GraphicsBackend::getInstance();
       lv_point_t pt = backend.getTouchPoint(_lv_obj);
+      if(!isWithinCircle(_width, _height, pt.x, pt.y)) {
+        LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", but outside the circle. Ignoring click event";
+        return false;
+      }
       lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
       LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", rgb: " << 
         std::setfill('0') << std::setw(2) <<
@@ -208,10 +237,6 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
           return false;
         }
       }
-      //osm todo: 
-      // determing if pt is in the wheel, get the color at the pt, send event when the color is set
-      // set bg color via json
-
       break;
     }
     default:
@@ -226,14 +251,6 @@ void LeleColorWheel::setColor(int32_t rgb){
 
 int32_t LeleColorWheel::getColor() const {
   return _rgb;
-}
-
-void LeleColorWheel::setBgColor(int32_t rgb){
-  _bgcolor = rgb;
-}
-
-int32_t LeleColorWheel::getBgColor() const {
-  return _bgcolor;
 }
 
 void LeleColorWheel::onColorChanged(PyObject *py_callback) {
