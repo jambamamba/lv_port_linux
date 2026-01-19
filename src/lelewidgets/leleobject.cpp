@@ -17,7 +17,10 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImageWithValuesParsedFrom
   int x = -1;
   int y = -1;
   val = LeleWidgetFactory::trim(val);
-  if(LeleWidgetFactory::parsePercentValues(val, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
+  if(LeleWidgetFactory::parsePercentValues(
+    val, 
+    {{"x", &x}, {"y", &y}}, 
+    {{"x", container_width}, {"y", container_height}})) {
     return LeleImageConverter::resizeImg(src_img, x, y);
   }
   x = LeleStyle::parsePercentValue(val, container_width);
@@ -76,13 +79,12 @@ LeleObject::~LeleObject() {
 }
 
 bool LeleObject::fromJson(const std::string &json_str) {
-  _nodes = LeleWidgetFactory::fromJson(json_str);
+  _nodes = LeleWidgetFactory::fromJson(this, json_str);
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
       if(key == "style") {
         auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
         LeleStyle *lele_style = dynamic_cast<LeleStyle*> (value.get());
-        lele_style->setLeleParent(this);
         _lele_styles.emplace_back(lele_style);
       }
     }
@@ -472,7 +474,10 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   std::string val = std::get<std::string>(value.value());
   if(!val.empty()) {
     val = LeleWidgetFactory::trim(val);
-    if(!LeleWidgetFactory::parsePercentValues(val, {{"x", &x}, {"y", &y}}, {{"x", container_width}, {"y", container_height}})) {
+    if(!LeleWidgetFactory::parsePercentValues(
+      val, 
+      {{"x", &x}, {"y", &y}}, 
+      {{"x", container_width}, {"y", container_height}})) {
       x = LeleStyle::parsePercentValue(val, container_width);
       y = LeleStyle::parsePercentValue(val, container_height);
     }

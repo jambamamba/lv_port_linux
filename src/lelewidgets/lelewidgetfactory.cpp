@@ -180,6 +180,13 @@ namespace LeleWidgetFactory {
 std::vector<std::pair<std::string, Node>> fromJson(
     const std::string &json_str) {
 
+    return fromJson(nullptr, json_str);
+}
+
+std::vector<std::pair<std::string, Node>> fromJson(
+    const LeleObject *lele_obj,
+    const std::string &json_str) {
+
     std::vector<std::pair<std::string, Node>> res;
     // const cJSON *json = readJson(json_str.c_str());
     auto tokens = tokenize(json_str);
@@ -236,7 +243,7 @@ std::vector<std::pair<std::string, Node>> fromJson(
             token = std::make_unique<LeleMessageBox>(rhs);
         }
         else if(lhs == "style") {
-            token = std::make_unique<LeleStyle>(rhs);
+            token = std::make_unique<LeleStyle>(lele_obj, rhs);
         }
         else if(lhs == "event") {
             token = std::make_unique<LeleEvent>(rhs);
@@ -403,7 +410,11 @@ std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(
 }
 
 
-bool parsePercentValues(const std::string &json_str, std::map<std::string, int*> &&values, const std::map<std::string, int> &&max_values) {
+bool parsePercentValues(
+    const std::string &json_str, 
+    std::map<std::string, int*> &&values, 
+    const std::map<std::string, int> &&max_values) {
+        
   bool ret = false;
   LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]

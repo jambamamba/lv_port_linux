@@ -8,24 +8,34 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleStyle::LeleStyle(const std::string &json_str, lv_obj_t *parent) 
-  : _parent_width(lv_obj_get_width(parent))
-  , _parent_height(lv_obj_get_height(parent)) {
+namespace {
+int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
+  if(lele_obj && lele_obj->getParent()) {
+    auto value = lele_obj->getParent()->getStyle(key);
+    if(value && std::holds_alternative<int>(*value)) {
+      return std::get<int>(*value);
+    }
+  }
+  return 0;
+}
+}//namespace
+
+LeleStyle::LeleStyle(const LeleObject *lele_obj, const std::string &json_str) 
+: _lele_obj(lele_obj) {
 
   fromJson(json_str);
 }
 
-LeleStyle::LeleStyle(const std::map<std::string, std::optional<LeleStyle::StyleValue>> &style_attributes, lv_obj_t *parent)
-  : _parent_width(lv_obj_get_width(parent))
-  , _parent_height(lv_obj_get_height(parent)) {
+//   LeleStyle::LeleStyle(LeleObject *lele_obj, const std::map<std::string, std::optional<LeleStyle::StyleValue>> &style_attributes, lv_obj_t *parent)
+//   : _lele_obj(lele_obj) {
 
-  for(const auto &[key, value]: style_attributes) {
-    _style[key] = value;
-  }
-}
+//   for(const auto &[key, value]: style_attributes) {
+//     _style[key] = value;
+//   }
+// }
   
 bool LeleStyle::fromJson(const std::string &json_str) {
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(_lele_obj, json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(!setValue(key, value)) {
@@ -107,7 +117,7 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
 std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str) {
   bool processed = false;
   std::map<std::string, float> res;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(json_str)) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(_lele_obj, json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "angle") {
@@ -117,7 +127,13 @@ std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_st
       else if(key == "pivot") {
         int pivot_x;
         int pivot_y;
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}});//osm todo: need max_x, max_y to parse x y if they are percentages
+        int max_x = getParentDimension("width", _lele_obj);
+        int max_y = getParentDimension("height", _lele_obj);
+        LeleWidgetFactory::parsePercentValues(
+          value, 
+          {{"x", &pivot_x}, {"y", &pivot_y}},
+          {{"x", max_x}, {"y", max_y}}
+        );
         res["pivot/x"] = pivot_x;
         res["pivot/y"] = pivot_y;
         processed = true;
@@ -207,7 +223,7 @@ std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopR
   std::string right("none");
   std::string bottom("none");
   std::string left("none");
-  for (const auto &[key, val]: LeleWidgetFactory::fromJson(value)) {
+  for (const auto &[key, val]: LeleWidgetFactory::fromJson(_lele_obj, value)) {
     if (std::holds_alternative<std::string>(val)) {
       const std::string &value = std::get<std::string>(val);
       if(value.empty() || value == "none" || value == "tight" || value == "parent" || value == "max") {
@@ -296,8 +312,8 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
       return it->second;
     }
   }
-  if(_lele_parent && _lele_parent->getParent()) {
-    return _lele_parent->getParent()->getStyle(key, class_name);
+  if(_lele_obj && _lele_obj->getParent()) {
+    return _lele_obj->getParent()->getStyle(key, class_name);
   }
   return std::nullopt;
 }
@@ -323,19 +339,19 @@ bool LeleStyle::setValue(
       return false;
     }
     else if(key == "x") {
-      _style[key] = parsePercentValue(value, _parent_width);
+      _style[key] = parsePercentValue(value, getParentDimension("width", _lele_obj));
     }
     else if(key == "y") {
-      _style[key] = parsePercentValue(value, _parent_height);
+      _style[key] = parsePercentValue(value, getParentDimension("height", _lele_obj));
     }
     else if(key == "width") {
-      _style[key] = parsePercentValue(value, _parent_width);
+      _style[key] = parsePercentValue(value, getParentDimension("width", _lele_obj));
     }
     else if(key == "height") {
-      _style[key] = parsePercentValue(value, _parent_height);
+      _style[key] = parsePercentValue(value, getParentDimension("height", _lele_obj));
     }
     else if(key == "corner_radius") {
-      _style[key] = parsePercentValue(value, std::max(_parent_height, _parent_width));
+      _style[key] = parsePercentValue(value, std::max(getParentDimension("height", _lele_obj), getParentDimension("width", _lele_obj)));
     }
     else if(key == "padding") {
       std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
@@ -511,7 +527,13 @@ bool LeleStyle::setValue(
     else if(key == "background/rotation/pivot") {
       int pivot_x = 0;
       int pivot_y = 0;
-      if(LeleWidgetFactory::parsePercentValues(value, {{"x", &pivot_x}, {"y", &pivot_y}})) {//osm todo: need max_x, max_y to parse x y if they are percentages
+      int max_x = getParentDimension("width", _lele_obj);
+      int max_y = getParentDimension("height", _lele_obj);
+      if(LeleWidgetFactory::parsePercentValues(
+        value, 
+        {{"x", &pivot_x}, {"y", &pivot_y}},
+        {{"x", max_x}, {"y", max_y}}
+      )) {//osm todo: need max_x, max_y to parse x y if they are percentages
         _style["background/rotation/pivot/x"] = pivot_x;
         _style["background/rotation/pivot/y"] = pivot_y;
       }
@@ -545,25 +567,21 @@ std::string LeleStyle::getId() const {
 }
 
 void LeleStyle::applyStyle() {
-  if(_lele_parent) {
-    (const_cast<LeleObject *>(_lele_parent))->
-      setStyle(_lele_parent->getLvObj());
+  if(_lele_obj) {
+    (const_cast<LeleObject *>(_lele_obj))->
+      setStyle(_lele_obj->getLvObj());
   }
 }
 
-void LeleStyle::setLeleParent(const LeleObject *lele_parent) { 
-  _lele_parent = lele_parent; 
-}
-
-const LeleObject *LeleStyle::getLeleParent() const { 
-  return _lele_parent; 
+const LeleObject *LeleStyle::getLeleObject() const { 
+  return _lele_obj; 
 }
 
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
-    // os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
-    // os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+    // os << "parent:" << (p._lele_obj ? p._lele_obj->id() : "") << ",";
+    // os << "parent class name:" << (p._lele_obj ? p._lele_obj->className() : "") << ",";
     for(const auto [style, value]: p._style) {
       if(value.has_value()) {
         os << style << ":";
@@ -586,8 +604,8 @@ std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
 }
 // std::ostream& operator<<(std::ostream& os, const LeleStyles& p) {
 //     // os << "LeleStyles id: " << p._id << ", ";
-//     // os << "parent:" << (p._lele_parent ? p._lele_parent->id() : "") << ",";
-//     // os << "parent class name:" << (p._lele_parent ? p._lele_parent->className() : "") << ",";
+//     // os << "parent:" << (p._lele_obj ? p._lele_obj->id() : "") << ",";
+//     // os << "parent class name:" << (p._lele_obj ? p._lele_obj->className() : "") << ",";
 //     os << "\nStyles {\n";
 //     for(const LeleStyle *lele_style : p._lele_styles) {
 //       os << "\t" << *lele_style << ",\n";
