@@ -10,7 +10,7 @@ public:
   LeleMessageBox(const LeleObject *parent, const std::string &json_str = "");
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-  virtual PyObject *createPyObject() override;
+  virtual PyObject *createPyObject() const override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   void setTitle(const std::string &text);

@@ -8,7 +8,7 @@ class LeleColorWheel : public LeleObject  {
   LeleColorWheel(const LeleObject *parent, const std::string &json_str = "");
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-  virtual PyObject *createPyObject() override;
+  virtual PyObject *createPyObject() const override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   void setColor(int32_t rgb);
   int32_t getColor() const;

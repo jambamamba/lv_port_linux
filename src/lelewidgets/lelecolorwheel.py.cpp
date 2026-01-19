@@ -2,7 +2,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-PyObject *LeleColorWheel::createPyObject() {
+PyObject *LeleColorWheel::createPyObject() const {
     PyTypeObject *type = &PyLeleColorWheel::_obj_type;
     PyType_Ready(type);
     PyLeleColorWheel *self = (PyLeleColorWheel *)type->tp_alloc(type, 0);
