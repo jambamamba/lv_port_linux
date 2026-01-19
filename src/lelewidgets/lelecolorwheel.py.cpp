@@ -13,7 +13,7 @@ PyObject *LeleColorWheel::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleColorWheel::initPyObject(PyLeleObject *py_obj_) {
+bool LeleColorWheel::initPyObject(PyLeleObject *py_obj_) const {
     PyLeleColorWheel *py_obj = reinterpret_cast<PyLeleColorWheel *>(py_obj_);
     if(!py_obj) {
         return false;

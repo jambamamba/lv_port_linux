@@ -16,7 +16,7 @@ PyObject *LeleButtons::LeleButton::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
+bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) const {
     PyLeleButton *py_obj = reinterpret_cast<PyLeleButton *>(py_obj_);
     if(!py_obj) {
         return false;
@@ -172,7 +172,7 @@ PyMethodDef PyLeleButton::_methods[] = {
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    LeleButtons::LeleButton obj;
+    LeleButtons::LeleButton obj(nullptr, "");//osm, need parent
     return obj.createPyObject();
 }
 

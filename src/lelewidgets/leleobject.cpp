@@ -68,8 +68,9 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 
 }//namespace
 
-LeleObject::LeleObject(const std::string &json_str)
-  : _class_name(__func__ ) {
+LeleObject::LeleObject(const LeleObject *parent, const std::string &json_str)
+  : _lele_parent(parent), 
+  _class_name(__func__ ) {
   fromJson(json_str);
   // std::cout << "styles:" << _lele_styles << "\n";
 }
@@ -125,7 +126,7 @@ void LeleObject::setParent(LeleObject *parent) {
   _lele_parent = parent;
 }
 
-LeleObject *LeleObject::getParent() const{
+const LeleObject *LeleObject::getParent() const{
   return _lele_parent;
 }
 

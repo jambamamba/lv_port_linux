@@ -11,7 +11,7 @@ PyObject *LeleLabel::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleLabel::initPyObject(PyLeleObject *py_obj_) {
+bool LeleLabel::initPyObject(PyLeleObject *py_obj_) const {
     PyLeleLabel *py_obj = reinterpret_cast<PyLeleLabel *>(py_obj_);
     if(!py_obj) {
         return false;

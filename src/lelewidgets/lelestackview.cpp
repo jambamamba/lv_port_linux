@@ -11,8 +11,8 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleStackView::LeleStackView(const std::string &json_str)
-  : LeleObject(json_str) {
+LeleStackView::LeleStackView(const LeleObject *parent, const std::string &json_str)
+  : LeleObject(parent, json_str) {
   _class_name = __func__ ;//
   fromJson(json_str);
   // std::cout << "StackView: styles: " << _lele_styles << "\n";

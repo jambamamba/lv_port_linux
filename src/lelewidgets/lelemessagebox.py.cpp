@@ -13,7 +13,7 @@ PyObject *LeleMessageBox::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) {
+bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) const {
     PyLeleMessageBox *py_obj = reinterpret_cast<PyLeleMessageBox *>(py_obj_);
     if(!py_obj) {
         return false;

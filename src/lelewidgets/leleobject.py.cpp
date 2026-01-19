@@ -2,7 +2,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-PyObject *LeleObject::createPyObject() {
+PyObject *LeleObject::createPyObject() const {
     PyTypeObject *type = &PyLeleObject::_obj_type;
     PyType_Ready(type);
     PyLeleObject *self = (PyLeleObject *)type->tp_alloc(type, 0);
@@ -13,7 +13,7 @@ PyObject *LeleObject::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleObject::initPyObject(PyLeleObject *py_obj) {
+bool LeleObject::initPyObject(PyLeleObject *py_obj) const {
     if(!py_obj) {
         return false;
     }
@@ -425,7 +425,7 @@ PyMethodDef PyLeleObject::_methods[] = {
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    LeleObject obj;
+    LeleObject obj(nullptr, "");//osm, need parent
     return obj.createPyObject();
 }
 

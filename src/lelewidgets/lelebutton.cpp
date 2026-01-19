@@ -5,8 +5,8 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleButtons::LeleButtons(const std::string &json_str)
-  : LeleObject(json_str) {
+LeleButtons::LeleButtons(const LeleObject *parent, const std::string &json_str)
+  : LeleObject(parent, json_str) {
   _class_name = __func__ ;//
   fromJson(json_str);
 }
@@ -58,8 +58,8 @@ LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
     return nullptr;
 }
 
-LeleButtons::LeleButton::LeleButton(const std::string &json_str)
-  : LeleLabel(json_str) {
+LeleButtons::LeleButton::LeleButton(const LeleObject *parent, const std::string &json_str)
+  : LeleLabel(parent, json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   fromJson(json_str);
@@ -232,7 +232,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
   }
   setChecked(_checked);
 
-  LeleView *view = dynamic_cast<LeleView*>(_lele_parent);
+  const LeleView *view = dynamic_cast<const LeleView*>(_lele_parent);
   if(view && view->isGroup()) {
     lv_obj_add_flag(_lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);//bubble events to the parent if parent is a group
   }

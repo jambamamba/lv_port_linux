@@ -5,7 +5,7 @@
 struct PyLeleColorWheel;
 class LeleColorWheel : public LeleObject  {
   public:
-  LeleColorWheel(const std::string &json_str = "");
+  LeleColorWheel(const LeleObject *parent, const std::string &json_str = "");
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;

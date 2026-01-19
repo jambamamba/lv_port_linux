@@ -30,7 +30,7 @@ struct PyLeleObject;
 typedef struct _object PyObject;
 class LeleObject {
 public:
-  LeleObject(const std::string &json_str = "");
+  LeleObject(const LeleObject *parent, const std::string &json_str = "");
   virtual ~LeleObject();
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
@@ -42,14 +42,14 @@ public:
   lv_obj_t *getLvObj() const;
   void setLvObj(lv_obj_t *obj);
   void setParent(LeleObject *parent);
-  LeleObject *getParent() const;
+  const LeleObject *getParent() const;
   std::vector<LeleStyle *> getStyles() const;
   std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::string &class_name = "") const;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;
   std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle(const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
-  virtual PyObject *createPyObject();
+  virtual PyObject *createPyObject() const;
   virtual bool initPyObject(PyLeleObject *py_obj);
   virtual bool fromJson(const std::string &json_str);
   virtual void setStyle(lv_obj_t *lv_obj);
@@ -82,7 +82,7 @@ protected:
   bool _enabled = true;
   lv_obj_t *_lv_obj = nullptr;
   lv_obj_t *_lv_bg_img = nullptr;
-  LeleObject *_lele_parent = nullptr;
+  const LeleObject *_lele_parent = nullptr;
   lv_style_t _style = {0};
   std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _bg_img;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> _nodes;

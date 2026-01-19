@@ -16,7 +16,7 @@ PyObject *LeleStyle::createPyObject() {
     return (PyObject *)self;
 }
 
-bool LeleStyle::initPyObject(PyLeleStyle *py_obj) {
+bool LeleStyle::initPyObject(PyLeleStyle *py_obj) const {
     if(!py_obj) {
         return false;
     }
