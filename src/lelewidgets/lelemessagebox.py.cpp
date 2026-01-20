@@ -2,7 +2,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-PyObject *LeleMessageBox::createPyObject() const {
+PyObject *LeleMessageBox::createPyObject() {
     PyTypeObject *type = &PyLeleMessageBox::_obj_type;
     PyType_Ready(type);
     PyLeleMessageBox *self = (PyLeleMessageBox *)type->tp_alloc(type, 0);
@@ -13,7 +13,7 @@ PyObject *LeleMessageBox::createPyObject() const {
     return (PyObject *)self;
 }
 
-bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) const {
+bool LeleMessageBox::initPyObject(PyLeleObject *py_obj_) {
     PyLeleMessageBox *py_obj = reinterpret_cast<PyLeleMessageBox *>(py_obj_);
     if(!py_obj) {
         return false;

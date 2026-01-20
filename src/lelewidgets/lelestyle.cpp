@@ -12,15 +12,40 @@ namespace {
 int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
   if(lele_obj && lele_obj->getParent()) {
     auto value = lele_obj->getParent()->getStyle(key);
-    if(value && std::holds_alternative<int>(*value)) {
-      return std::get<int>(*value);
+    if(value){
+      if(std::holds_alternative<int>(value.value())) {
+        int val = std::get<int>(value.value());
+        return std::get<int>(value.value());
+      }
+      else {
+        int x = 0;
+        x = 0;
+      }
+    }
+    else {
+      int x = 0;
+      x = 0;
+    }
+  }
+  else if(lele_obj) {
+    if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
+    else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
+    else if(key == "corner_radius") { 
+      return std::max(
+        lv_obj_get_width(lv_screen_active()), 
+        lv_obj_get_height(lv_screen_active())
+      ); 
+    }
+    else {
+      int x = 0;
+      x = 0;
     }
   }
   return 0;
 }
 }//namespace
 
-LeleStyle::LeleStyle(const LeleObject *lele_obj, const std::string &json_str) 
+LeleStyle::LeleStyle(LeleObject *lele_obj, const std::string &json_str) 
 : _lele_obj(lele_obj) {
 
   fromJson(json_str);
@@ -218,12 +243,12 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
 
-std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopRightBottomLeft(const std::string &value) {
+std::tuple<std::string,std::string,std::string,std::string> LeleStyle::parseTopRightBottomLeft(const std::string &json) {
   std::string top("none");
   std::string right("none");
   std::string bottom("none");
   std::string left("none");
-  for (const auto &[key, val]: LeleWidgetFactory::fromJson(_lele_obj, value)) {
+  for (const auto &[key, val]: LeleWidgetFactory::fromJson(_lele_obj, json)) {
     if (std::holds_alternative<std::string>(val)) {
       const std::string &value = std::get<std::string>(val);
       if(value.empty() || value == "none" || value == "tight" || value == "parent" || value == "max") {
@@ -339,19 +364,19 @@ bool LeleStyle::setValue(
       return false;
     }
     else if(key == "x") {
-      _style[key] = parsePercentValue(value, getParentDimension("width", _lele_obj));
+      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
     }
     else if(key == "y") {
-      _style[key] = parsePercentValue(value, getParentDimension("height", _lele_obj));
+      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
     }
     else if(key == "width") {
-      _style[key] = parsePercentValue(value, getParentDimension("width", _lele_obj));
+      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
     }
     else if(key == "height") {
-      _style[key] = parsePercentValue(value, getParentDimension("height", _lele_obj));
+      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
     }
     else if(key == "corner_radius") {
-      _style[key] = parsePercentValue(value, std::max(getParentDimension("height", _lele_obj), getParentDimension("width", _lele_obj)));
+      _style[key] = parsePercentValue(value, std::max(getParentDimension(key, _lele_obj), getParentDimension(key, _lele_obj)));
     }
     else if(key == "padding") {
       std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);

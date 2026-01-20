@@ -1,6 +1,6 @@
 #include <lelewidgets/lelelabel.h>
 
-PyObject *LeleLabel::createPyObject() const {
+PyObject *LeleLabel::createPyObject() {
     PyTypeObject *type = &PyLeleLabel::_obj_type;
     PyType_Ready(type);
     PyLeleLabel *self = (PyLeleLabel *)type->tp_alloc(type, 0);
@@ -11,7 +11,7 @@ PyObject *LeleLabel::createPyObject() const {
     return (PyObject *)self;
 }
 
-bool LeleLabel::initPyObject(PyLeleObject *py_obj_) const {
+bool LeleLabel::initPyObject(PyLeleObject *py_obj_) {
     PyLeleLabel *py_obj = reinterpret_cast<PyLeleLabel *>(py_obj_);
     if(!py_obj) {
         return false;

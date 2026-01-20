@@ -5,7 +5,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 ////////////////////////////////////////////////////////////////////////
-LeleViews::LeleViews(const LeleObject *parent, const std::string &json_str)
+LeleViews::LeleViews(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
     _class_name = __func__ ;//
     LOG(DEBUG, LVSIM, "LeleViews json_str:%s\n", json_str.c_str());
@@ -60,7 +60,7 @@ void LeleViews::hide(){
   }
 }
 ////////////////////////////////////////////////////////////////////////
-LeleViewHeader::LeleViewHeader(const LeleObject *parent, const std::string &json_str)
+LeleViewHeader::LeleViewHeader(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
     _class_name = __func__ ;//
     fromJson(json_str);
@@ -95,7 +95,7 @@ lv_obj_t *LeleViewHeader::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 ////////////////////////////////////////////////////////////////////////
 
 
-LeleView::LeleView(const LeleObject *parent, const std::string &json_str)
+LeleView::LeleView(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
     _class_name = __func__ ;//
     fromJson(json_str);

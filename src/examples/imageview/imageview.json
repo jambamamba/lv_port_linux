@@ -4,8 +4,9 @@
     "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
-        "style":{"id":"view/global","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","height":"100%","fgcolor":"#fff","corner_radius":"5"},
+        "style":{"id":"view/global","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"5"},
         "view":{
+            "id":"/views:0/view/view",
             "style":{"layout":"flex","flow":"row","height":"70%"},
             "view":{
                 "id":"/view/with_bg_img",
@@ -36,7 +37,7 @@
             },
             "view":{
                 "id":"controll-panel",
-                "style":{"layout":"flex","flow":"column","width":"20%","border":"none"},
+                "style":{"layout":"flex","flow":"column","width":"18%","border":"solid-1px-#ccc"},
                 "xbutton":{
                     "id":"slider0",
                     "type":"slider-range",
@@ -50,14 +51,14 @@
                 "button":{
                     "id":"scale",
                     "type":"slider",
-                    "style":{"id":"scale-style","padding":"5px","width":"15%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
+                    "style":{"id":"scale-style","padding":"10px","width":"100%","height":"5%","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"100",
                     "min":"1",
                     "max":"200",
                     "xevent":{"type":"clicked","action":"action0","args":{}}
                 },
                 "view":{
-                    "style":{"flow":"column","border":"none","width":"50%","height":"25%","corner_radius":"0x7FFF"},
+                    "style":{"flow":"column","border":"none","width":"100%","height":"25%","corner_radius":"0x7FFF"},
                     "group":"true",
                     "buttons":[
                         {
@@ -100,12 +101,12 @@
                 },
                 "colorwheel":{
                     "id":"colorwheel",
-                    "style":{"id":"colorwheel","width":"15%","height":"20%","fgcolor":"#fff","bgcolor":"#666"}
+                    "style":{"id":"colorwheel","width":"100%","height":"25%","fgcolor":"#fff","bgcolor":"#666"}
                 },
                 "button":{
                     "id":"rotate",
                     "type":"arc",
-                    "style":{"id":"rotate","padding":"5px","width":"15%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
+                    "style":{"id":"rotate","padding":"5px","width":"100%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"90",
                     "rotation":"90",
                     "start":"20",
@@ -117,21 +118,21 @@
             }
         },
         "view":{
-            "style":{"layout":"flex","flow":"row","height":"5%"},
+            "style":{"layout":"flex","flow":"row","height":"5%","border":"solid-1px-#ccc"},
             "label":{
                 "id":"rotation-label",
                 "text":"Angle",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"4%","fgcolor":"#fff"}
+                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"95%","fgcolor":"#fff"}
             },
             "label":{
                 "id":"scale-label",
                 "text":"Scale",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"4%","fgcolor":"#fff"}
+                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"95%","fgcolor":"#fff"}
             },
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"4%"},
+                "style":{"id":"button0","align":"center","class_name":"button0","width":"20%","height":"95%"},
                 "text":"Run Test",
                 "event":{"type":"clicked","action":"action0","args":{}}
             }

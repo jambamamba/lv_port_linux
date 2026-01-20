@@ -68,7 +68,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
 
 }//namespace
 
-LeleObject::LeleObject(const LeleObject *parent, const std::string &json_str)
+LeleObject::LeleObject(LeleObject *parent, const std::string &json_str)
   : _lele_parent(parent), 
   _class_name(__func__ ) {
   fromJson(json_str);
@@ -80,16 +80,13 @@ LeleObject::~LeleObject() {
 }
 
 bool LeleObject::fromJson(const std::string &json_str) {
-  _nodes = LeleWidgetFactory::fromJson(this, json_str);
+
+  auto json_tokens = LeleWidgetFactory::tokenizeJson(json_str);
+  _lele_styles = LeleWidgetFactory::stylesFromJson(this, json_tokens);
+
+  _nodes = LeleWidgetFactory::fromJson(this, json_tokens);
   for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::unique_ptr<LeleStyle>>(token)) {
-      if(key == "style") {
-        auto &value = std::get<std::unique_ptr<LeleStyle>>(token);
-        LeleStyle *lele_style = dynamic_cast<LeleStyle*> (value.get());
-        _lele_styles.emplace_back(lele_style);
-      }
-    }
-    else if (std::holds_alternative<std::string>(token)) {
+    if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "id") {
         _id = value;
@@ -126,7 +123,7 @@ void LeleObject::setParent(LeleObject *parent) {
   _lele_parent = parent;
 }
 
-const LeleObject *LeleObject::getParent() const{
+LeleObject *LeleObject::getParent() const{
   return _lele_parent;
 }
 
@@ -177,7 +174,7 @@ static void new_theme_init_and_set(void)
 std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyleAttributes(const std::string &style_id) const {
 
   std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;
-  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+  for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     if(!style_id.empty() && style_id != lele_style->getId()) {
       continue;
     }
@@ -195,12 +192,12 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
   return ret;
 }
 
-std::vector<LeleStyle *> LeleObject::getStyles() const {
+const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
 
-  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+  for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
     if(value) {
       return value;
@@ -213,7 +210,7 @@ std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleSty
 
   std::vector<std::string> bg_keys;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> bg_style;
-  for(auto *lele_style : std::ranges::views::reverse(_lele_styles)) {
+  for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     for(const std::string &key : lele_style->getBackgroundAttributes()) {
       std::string bg_key("background/" + key);
       auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClassName() : class_name);
@@ -610,8 +607,8 @@ std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     os << "_id:" << p._id << ",";
     os << "_class_name:" << p._class_name << ",";
     os << "\nStyles {\n";
-    for(LeleStyle *lele_style : p._lele_styles) {
-      os << lele_style;
+    for(const auto &lele_style : p._lele_styles) {
+      os << lele_style.get();
     }
     return os;
 }

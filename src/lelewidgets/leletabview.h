@@ -11,7 +11,7 @@ class LeleTabView : public LeleObject {
 public:
   class TabHeader : public LeleObject {
   public:
-    TabHeader(const LeleObject *parent, const LeleObject *parent, const std::string &json_str);
+    TabHeader(LeleObject *parent, const std::string &json_str);
     virtual bool fromJson(const std::string &json_str) override;
     const std::string &name() const { return _name; }
     const std::string &img() const { return _img; }
@@ -23,7 +23,7 @@ public:
   };
   class TabContent : public LeleObject {
   public:
-    TabContent(const LeleObject *parent, const std::string &json_str);
+    TabContent(LeleObject *parent, const std::string &json_str);
     virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   protected:
@@ -31,7 +31,7 @@ public:
   };
   class Tab : public LeleObject {
   public:
-    Tab(const LeleObject *parent, const std::string &json_str = "");
+    Tab(LeleObject *parent, const std::string &json_str = "");
     virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     TabHeader *getTabHeader() const;
@@ -42,7 +42,7 @@ public:
   };
   class Tabs : public LeleObject {
   public:
-    Tabs(const LeleObject *parent, const std::string &json_str);
+    Tabs(LeleObject *parent, const std::string &json_str);
     virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
     int count() const;
@@ -50,7 +50,7 @@ public:
     std::vector<LeleTabView::Tab*> getChildren() const;
   protected:
   };
-  LeleTabView(const std::string &json_str);
+  LeleTabView(LeleObject *parent, const std::string &json_str);
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
 

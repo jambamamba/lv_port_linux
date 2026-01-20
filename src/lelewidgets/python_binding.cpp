@@ -199,8 +199,8 @@ namespace {
         }
 
         LOG(DEBUG, LVSIM, "Loading config: '%s'\n", input_file.c_str());
-        static LeleObject _root_widget;
-        _nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
+        static LeleObject _root(nullptr);
+        _nodes = LeleWidgetFactory::fromConfig(&_root, input_file);
         if(_nodes.size() == 0) {
             LOG(WARNING, LVSIM, "Failed to load config: '%s'\n", input_file.c_str());
             return PyBool_FromLong(false);

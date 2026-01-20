@@ -4,7 +4,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleMessageBox::LeleMessageBox(const LeleObject *parent, const std::string &json_str)
+LeleMessageBox::LeleMessageBox(LeleObject *parent, const std::string &json_str)
   : LeleLabel(parent, json_str) {
 
   _class_name = __func__ ;//typeid(this).name();

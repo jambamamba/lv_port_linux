@@ -5,7 +5,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 
-PyObject *LeleButtons::LeleButton::createPyObject() const {
+PyObject *LeleButtons::LeleButton::createPyObject() {
     PyTypeObject *type = &PyLeleButton::_obj_type;
     PyType_Ready(type);
     PyLeleButton *self = (PyLeleButton *)type->tp_alloc(type, 0);
@@ -16,7 +16,7 @@ PyObject *LeleButtons::LeleButton::createPyObject() const {
     return (PyObject *)self;
 }
 
-bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) const {
+bool LeleButtons::LeleButton::initPyObject(PyLeleObject *py_obj_) {
     PyLeleButton *py_obj = reinterpret_cast<PyLeleButton *>(py_obj_);
     if(!py_obj) {
         return false;

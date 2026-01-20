@@ -2,7 +2,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-PyObject *LeleObject::createPyObject() const {
+PyObject *LeleObject::createPyObject() {
     PyTypeObject *type = &PyLeleObject::_obj_type;
     PyType_Ready(type);
     PyLeleObject *self = (PyLeleObject *)type->tp_alloc(type, 0);
@@ -13,7 +13,7 @@ PyObject *LeleObject::createPyObject() const {
     return (PyObject *)self;
 }
 
-bool LeleObject::initPyObject(PyLeleObject *py_obj) const {
+bool LeleObject::initPyObject(PyLeleObject *py_obj) {
     if(!py_obj) {
         return false;
     }
@@ -354,7 +354,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         // }
         // return styles.at(0)->createPyObject();
         std::vector<PyObject *> res;
-        for (LeleStyle *style : lele_obj->getStyles()) {
+        for (const auto &style : lele_obj->getStyles()) {
             res.emplace_back(style->createPyObject());
         }
         return pyListOrPyObjectFromStdVector(res);
@@ -374,7 +374,7 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         return Py_None;
     }
     std::vector<PyObject *> res;
-    for (LeleStyle *style : lele_obj->getStyles()) {
+    for (const auto &style : lele_obj->getStyles()) {
         if(style->getId() == style_id) {
             res.emplace_back(style->createPyObject());
         }

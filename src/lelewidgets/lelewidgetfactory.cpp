@@ -40,56 +40,6 @@ struct cJSONRAII {
     const std::string &_json_str;
 };
 
-static std::vector<std::pair<std::string, std::string>> tokenize(const std::string &json_str) {
-    std::vector<std::pair<std::string, std::string>> res;
-    if(json_str.empty()) {
-        return res;
-    }
-    cJSONRAII json(json_str);
-    cJSON *item = nullptr;
-    int idx = 0;
-    cJSON_ArrayForEach(item, json()) {
-        std::string item_num = std::string("@") + std::to_string(idx);
-        // LOG(DEBUG, LVSIM, "Process item: %s:%s\n", item_num.c_str(), item->string);
-        std::string key = !item->string ? 
-            item_num : 
-            item->string;
-        if(cJSON_IsString(item)) {
-            res.emplace_back(std::pair<std::string, std::string>
-                {key, cJSON_GetStringValue(item)}
-            );
-        }
-        else if(cJSON_IsNumber(item) || cJSON_IsTrue(item) || cJSON_IsFalse(item) ||
-            cJSON_IsBool(item) || cJSON_IsNull(item)){
-            res.emplace_back(std::pair<std::string, std::string>
-                {key, std::to_string(cJSON_GetNumberValue(item))}
-            );
-        }
-        else if(cJSON_IsObject(item) || cJSON_IsArray(item)) {
-            if(item->string) {
-                res.emplace_back(std::pair<std::string, std::string>
-                    {key, cJSON_Print(item)}
-                );
-            }
-            else {
-                std::vector<std::pair<std::string, std::string>> subtokens = tokenize(cJSON_Print(item));
-                res.insert( res.end(), subtokens.begin(), subtokens.end() );
-                // for(const auto &pair: subtokens) {
-                //     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", pair.first.c_str(), pair.second.c_str());
-                // }
-            }
-        }
-        else {
-            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key.c_str());
-        }
-        ++idx;
-    }
-    // for(const auto &pair: res) {
-    //     LOG(DEBUG, LVSIM, "Processed token %s:%s\n", pair.first.c_str(), pair.second.c_str());
-    // }
-    return res;
-}
-
 std::pair<int,int> screenWidthHeightFromJson(const cJSON* json) {
 
     int width = 800;
@@ -177,79 +127,149 @@ auto leleStylesFromJson(const std::string &json_str) {
 
 namespace LeleWidgetFactory {
 
-std::vector<std::pair<std::string, Node>> fromJson(
-    const std::string &json_str) {
+std::vector<std::pair<std::string, std::string>> tokenizeJson(const std::string &json_str) {
+    std::vector<std::pair<std::string, std::string>> res;
+    if(json_str.empty()) {
+        return res;
+    }
+    cJSONRAII json(json_str);
+    cJSON *item = nullptr;
+    int idx = 0;
+    cJSON_ArrayForEach(item, json()) {
+        std::string item_num = std::string("@") + std::to_string(idx);
+        // LOG(DEBUG, LVSIM, "Process item: %s:%s\n", item_num.c_str(), item->string);
+        std::string key = !item->string ? 
+            item_num : 
+            item->string;
+        if(cJSON_IsString(item)) {
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, cJSON_GetStringValue(item)}
+            );
+        }
+        else if(cJSON_IsNumber(item) || cJSON_IsTrue(item) || cJSON_IsFalse(item) ||
+            cJSON_IsBool(item) || cJSON_IsNull(item)){
+            res.emplace_back(std::pair<std::string, std::string>
+                {key, std::to_string(cJSON_GetNumberValue(item))}
+            );
+        }
+        else if(cJSON_IsObject(item) || cJSON_IsArray(item)) {
+            if(item->string) {
+                res.emplace_back(std::pair<std::string, std::string>
+                    {key, cJSON_Print(item)}
+                );
+            }
+            else {
+                std::vector<std::pair<std::string, std::string>> subtokens = tokenizeJson(cJSON_Print(item));
+                res.insert( res.end(), subtokens.begin(), subtokens.end() );
+                // for(const auto &pair: subtokens) {
+                //     LOG(DEBUG, LVSIM, "@@@ %s:%s\n", pair.first.c_str(), pair.second.c_str());
+                // }
+            }
+        }
+        else {
+            LOG(WARNING, LVSIM, "Unknown and unhandled item: %s\n", key.c_str());
+        }
+        ++idx;
+    }
+    // for(const auto &pair: res) {
+    //     LOG(DEBUG, LVSIM, "Processed token %s:%s\n", pair.first.c_str(), pair.second.c_str());
+    // }
+    return res;
+}
 
-    return fromJson(nullptr, json_str);
+std::vector<std::unique_ptr<LeleStyle>> stylesFromJson(
+    LeleObject *lele_obj,
+    const std::vector<std::pair<std::string, std::string>> &json_tokens) {
+
+    std::vector<std::unique_ptr<LeleStyle>> res;
+    for(const auto &[lhs, rhs]: json_tokens) {
+        if(lhs != "style") {
+            continue;
+        }
+        res.emplace_back(
+            std::make_unique<LeleStyle>(lele_obj, rhs));
+    }
+    return res;
 }
 
 std::vector<std::pair<std::string, Node>> fromJson(
-    const LeleObject *lele_obj,
     const std::string &json_str) {
+
+    return fromJson(nullptr, tokenizeJson(json_str));
+}
+
+std::vector<std::pair<std::string, Node>> fromJson(
+    LeleObject *lele_obj,
+    const std::string &json_str) {
+
+    return fromJson(lele_obj, tokenizeJson(json_str));
+}
+
+std::vector<std::pair<std::string, Node>> fromJson(
+    LeleObject *lele_obj,
+    const std::vector<std::pair<std::string, std::string>> &json_tokens) {
+    // const std::string &json_str) {
 
     std::vector<std::pair<std::string, Node>> res;
     // const cJSON *json = readJson(json_str.c_str());
-    auto tokens = tokenize(json_str);
-    for(const auto &[lhs, rhs]: tokens) {
+    // auto tokens = tokenize(json_str);
+    for(const auto &[lhs, rhs]: json_tokens) {
         Node token;
         if(lhs == "tabview") {
-            token = std::make_unique<LeleTabView>(rhs);
+            token = std::make_unique<LeleTabView>(lele_obj, rhs);
         }
         else if(lhs == "tabs") {
-            token = std::make_unique<LeleTabView::Tabs>(rhs);
+            token = std::make_unique<LeleTabView::Tabs>(lele_obj, rhs);
         }
         else if(lhs == "tab") {
-            token = std::make_unique<LeleTabView::Tab>(rhs);
+            token = std::make_unique<LeleTabView::Tab>(lele_obj, rhs);
         }
         else if(lhs == "tab_header") {
-            token = std::make_unique<LeleTabView::TabHeader>(rhs);
+            token = std::make_unique<LeleTabView::TabHeader>(lele_obj, rhs);
         }
         else if(lhs == "tab_content") {
-            token = std::make_unique<LeleTabView::TabContent>(rhs);
+            token = std::make_unique<LeleTabView::TabContent>(lele_obj, rhs);
         }
         //
         else if(lhs == "stackview") {
-            token = std::make_unique<LeleStackView>(rhs);
+            token = std::make_unique<LeleStackView>(lele_obj, rhs);
         }
         else if(lhs == "views") {
-            token = std::make_unique<LeleViews>(rhs);
+            token = std::make_unique<LeleViews>(lele_obj, rhs);
         }
         else if(lhs == "view") {
-            token = std::make_unique<LeleView>(rhs);
+            token = std::make_unique<LeleView>(lele_obj, rhs);
         }
         else if(lhs == "view_header") {
-            token = std::make_unique<LeleViewHeader>(rhs);
+            token = std::make_unique<LeleViewHeader>(lele_obj, rhs);
         }
         //
         else if(lhs == "label") {
-            token = std::make_unique<LeleLabel>(rhs);
+            token = std::make_unique<LeleLabel>(lele_obj, rhs);
         }
         else if(lhs == "textbox") {
-            token = std::make_unique<LeleTextbox>(rhs);
+            token = std::make_unique<LeleTextbox>(lele_obj, rhs);
         }
         else if(lhs == "colorwheel") {
-            token = std::make_unique<LeleColorWheel>(rhs);
+            token = std::make_unique<LeleColorWheel>(lele_obj, rhs);
         }
         else if(lhs == "view") {
-            token = std::make_unique<LeleView>(rhs);
+            token = std::make_unique<LeleView>(lele_obj, rhs);
         }
         else if(lhs == "buttons") {
-            token = std::make_unique<LeleButtons>(rhs);
+            token = std::make_unique<LeleButtons>(lele_obj, rhs);
         }
         else if(lhs == "button") {
-            token = std::make_unique<LeleButtons::LeleButton>(rhs);
+            token = std::make_unique<LeleButtons::LeleButton>(lele_obj, rhs);
         }
         else if(lhs == "messagebox") {
-            token = std::make_unique<LeleMessageBox>(rhs);
-        }
-        else if(lhs == "style") {
-            token = std::make_unique<LeleStyle>(lele_obj, rhs);
+            token = std::make_unique<LeleMessageBox>(lele_obj, rhs);
         }
         else if(lhs == "event") {
             token = std::make_unique<LeleEvent>(rhs);
         }
-        else if(lhs == "img" && tokenize(rhs).size() > 0) {
-            token = std::make_unique<LeleImage>(rhs);
+        else if(lhs == "img" && tokenizeJson(rhs).size() > 0) {
+            token = std::make_unique<LeleImage>(lele_obj, rhs);
         }
         else {
             token = rhs;
@@ -416,7 +436,7 @@ bool parsePercentValues(
     const std::map<std::string, int> &&max_values) {
         
   bool ret = false;
-  LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value){
+  LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value) {
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]
       if(value.size() > 1 && value.at(value.size() - 1) == '%') {
         int iret = 0;

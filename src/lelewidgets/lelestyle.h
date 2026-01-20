@@ -31,7 +31,7 @@ public:
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);
   // LeleStyle(int parent_width = 0, int parent_height = 0, const std::string &x = "", const std::string &y = "", const std::string &width = "", const std::string &height = "");
-  LeleStyle(const LeleObject *lele_obj = nullptr, const std::string &json_str = "");
+  LeleStyle(LeleObject *lele_obj = nullptr, const std::string &json_str = "");
   // LeleStyle(LeleObject *lele_obj = nullptr, const std::map<std::string, std::optional<StyleValue>> &style_attributes, lv_obj_t *parent = lv_screen_active());
   virtual bool fromJson(const std::string &json_str);
   virtual PyObject *createPyObject();
@@ -55,7 +55,7 @@ protected:
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
 
-  const LeleObject *_lele_obj = nullptr;
+  LeleObject *_lele_obj = nullptr;
   std::string _class_name;
   std::string _id;
   std::map<std::string, std::optional<StyleValue>> _style = {

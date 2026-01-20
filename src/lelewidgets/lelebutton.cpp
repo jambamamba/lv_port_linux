@@ -5,7 +5,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-LeleButtons::LeleButtons(const LeleObject *parent, const std::string &json_str)
+LeleButtons::LeleButtons(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
   _class_name = __func__ ;//
   fromJson(json_str);
@@ -58,7 +58,7 @@ LeleButtons::LeleButton* LeleButtons::getAt(int index) const {
     return nullptr;
 }
 
-LeleButtons::LeleButton::LeleButton(const LeleObject *parent, const std::string &json_str)
+LeleButtons::LeleButton::LeleButton(LeleObject *parent, const std::string &json_str)
   : LeleLabel(parent, json_str) {
 
   _class_name = __func__ ;//typeid(this).name();

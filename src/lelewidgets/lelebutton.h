@@ -5,7 +5,7 @@
 struct PyLeleButton;
 class LeleGroup : public LeleObject {
   public:
-  LeleGroup(const LeleObject *parent, const std::string &json_str = "");
+  LeleGroup(LeleObject *parent, const std::string &json_str = "");
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual bool eventCallback(LeleEvent &&e) override;
   protected:
@@ -26,11 +26,11 @@ class LeleButtons : public LeleObject {
       ColorPicker,
       Arc
     };
-    LeleButton(const LeleObject *parent, const std::string &json_str = "");
+    LeleButton(LeleObject *parent, const std::string &json_str = "");
     virtual bool fromJson(const std::string &json_str) override;
     virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
-    virtual PyObject *createPyObject() const override;
-    virtual bool initPyObject(PyLeleObject *py_obj) const override;
+    virtual PyObject *createPyObject() override;
+    virtual bool initPyObject(PyLeleObject *py_obj) override;
     virtual bool eventCallback(LeleEvent &&e) override;
     bool click();
     bool isCheckable() const { return _checkable; }
@@ -55,13 +55,13 @@ class LeleButtons : public LeleObject {
     Type _type = Type::Push;
     int _min = 0;
     int _max = 100;
-    int _value = 0;
+    mutable int _value = 0;
     int _start_value = 0;//slider,arc
     int _end_value = 320;//arc
     int _rotation = 90;//arc
     std::vector<LeleEvent*> _events;
   };
-  LeleButtons(const LeleObject *parent, const std::string &json_str = "");
+  LeleButtons(LeleObject *parent, const std::string &json_str = "");
   virtual bool fromJson(const std::string &json_str) override;
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   int count() const;

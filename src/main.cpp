@@ -51,8 +51,8 @@ int main(int argc, char **argv) {
     }
     std::string input_file = argv[1];
     if(std::filesystem::path(input_file).extension() == ".json") {
-        static LeleObject _root_widget;
-        auto nodes = LeleWidgetFactory::fromConfig(&_root_widget, input_file);
+        static LeleObject _root(nullptr);
+        auto nodes = LeleWidgetFactory::fromConfig(&_root, input_file);
         while(GraphicsBackend::getInstance().handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
