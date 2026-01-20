@@ -48,6 +48,11 @@
                     "max":"100",
                     "event":{"type":"clicked","action":"action0","args":{}}
                 },
+                "label":{
+                    "id":"scale-label",
+                    "text":"Scale",
+                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"100%","height":"5%","fgcolor":"#fff"}
+                },               
                 "button":{
                     "id":"scale",
                     "type":"slider",
@@ -114,21 +119,16 @@
                     "min":"0",
                     "max":"360",
                     "event":{"type":"clicked","action":"action0","args":{}}
+                },
+                "label":{
+                    "id":"rotation-label",
+                    "text":"Angle",
+                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"100%","height":"95%","fgcolor":"#fff"}
                 }
             }
         },
         "view":{
             "style":{"layout":"flex","flow":"row","height":"5%","border":"solid-1px-#ccc"},
-            "label":{
-                "id":"rotation-label",
-                "text":"Angle",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"95%","fgcolor":"#fff"}
-            },
-            "label":{
-                "id":"scale-label",
-                "text":"Scale",
-                "style":{"id":"views/view0/label","x":"0","y":"0","width":"20%","height":"95%","fgcolor":"#fff"}
-            },
             "button":{
                 "id":"run_test",
                 "type":"push",
