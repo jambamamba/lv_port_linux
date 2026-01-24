@@ -5,6 +5,7 @@
 #include <json_utils/json_utils.h>
 #include <lv_image_converter/lv_image_converter.h>
 #include <lvgl/lvgl_private.h>
+#include <functional>
 #include <optional>
 #include <typeinfo>
 
@@ -48,6 +49,8 @@ public:
   std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;
   std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle(const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
+  static bool visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback);
+  static std::pair<int,int> getTextSize(lv_obj_t *lv_obj, const char *text);
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleObject *py_obj);

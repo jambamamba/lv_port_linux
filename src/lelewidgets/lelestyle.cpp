@@ -353,16 +353,17 @@ bool LeleStyle::setValue(
     else if(key == "id") {
         _id = value;
     }
-    else if(
-      key != "padding" && 
-      key != "margin" && 
-      key != "border" && 
-      key != "background" && 
-      _style.find(key) == _style.end()){
+    // else if(
+    //   _style.find(key) == _style.end() && 
+    //   key != "padding" && 
+    //   key != "margin" && 
+    //   key != "border" && 
+    //   key != "background"
+    //   ){
 
-      LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
-      return false;
-    }
+    //   LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+    //   return false;
+    // }
     else if(key == "x") {
       _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
     }
@@ -583,6 +584,10 @@ bool LeleStyle::setValue(
     }
     else if(key == "background/repeat") {
         _style["background/repeat"] = value;
+    }
+    else {
+      LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+      return false;
     }
     return true;
 }

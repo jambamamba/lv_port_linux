@@ -206,6 +206,30 @@ std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key
   return std::optional<LeleStyle::StyleValue>();
 }
 
+namespace {
+void setTextAlign(lv_obj_t *lv_obj, lv_text_align_t align_type) {
+
+  const lv_obj_class_t *child_class = lv_obj_get_class(lv_obj);
+  if(strcmp((char*)child_class->name, "label")==0) {
+    lv_obj_set_style_text_align(lv_obj, align_type, 0);
+  }
+}
+
+}//namespace
+
+bool LeleObject::visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback) {
+  for(int idx = 0; idx < lv_obj_get_child_count(lv_obj); ++idx) {
+      lv_obj_t *child_obj = lv_obj_get_child(lv_obj, idx);
+      if(!callback(child_obj)) {
+        return false;
+      }
+      if(!visitLvChildren(child_obj, callback)) {
+        return false;
+      }
+  }
+  return true;
+}
+
 std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> LeleObject::getBackgroundStyle(const std::string &class_name) const {
 
   std::vector<std::string> bg_keys;
@@ -328,16 +352,16 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
       lv_obj_set_style_flex_grow(lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
     }
   }
-
   value = getStyle("align");
   if(value) {
+    lv_align_t align = static_cast<lv_align_t>(std::get<int>(value.value()));
     lv_obj_align(lv_obj, 
       static_cast<lv_align_t>(std::get<int>(value.value())), 0, 0);
   }
   value = getStyle("text_align");
   if(value) {
-    lv_obj_set_style_text_align(lv_obj, 
-      static_cast<lv_text_align_t>(std::get<int>(value.value())), 0);
+    lv_text_align_t align_type = static_cast<lv_text_align_t>(std::get<int>(value.value()));
+    lv_obj_set_style_text_align(lv_obj, align_type, 0);
   }
 
   value = getStyle("background/color");
@@ -512,6 +536,17 @@ void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
   }
 }
 
+std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
+
+    const lv_font_t *font = lv_obj_get_style_text_font(lv_obj, LV_PART_MAIN);
+    lv_point_t text_size;
+    int32_t letter_space = 0;
+    int32_t line_space = 0;
+    int32_t max_width = lv_obj_get_width(lv_screen_active());
+    lv_text_get_size(&text_size, text, font, letter_space, line_space, max_width, LV_TEXT_FLAG_NONE);
+    return std::pair<int,int>(text_size.x, text_size.y);
+}
+
 void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
 
   auto value = getStyle("text_align");
@@ -519,6 +554,7 @@ void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
     lv_obj_set_style_text_align(lv_obj, 
       static_cast<lv_text_align_t>(
         std::get<int>(value.value())),
+      // LV_PART_ANY);
       LV_PART_MAIN);
   }
 }

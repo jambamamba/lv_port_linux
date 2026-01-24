@@ -58,41 +58,7 @@ protected:
   LeleObject *_lele_obj = nullptr;
   std::string _class_name;
   std::string _id;
-  std::map<std::string, std::optional<StyleValue>> _style = {
-    {"x", std::nullopt},
-    {"y", std::nullopt},
-    {"width", std::nullopt},
-    {"height", std::nullopt},
-    {"corner_radius", std::nullopt},
-    {"padding/top", std::nullopt},
-    {"padding/right", std::nullopt},
-    {"padding/bottom", std::nullopt},
-    {"padding/left", std::nullopt},
-    {"margin/top", std::nullopt},
-    {"margin/right", std::nullopt},
-    {"margin/bottom", std::nullopt},
-    {"margin/left", std::nullopt},
-    {"border/type", std::nullopt},
-    {"border/width", std::nullopt},
-    {"border/color", std::nullopt},
-    {"layout", std::nullopt},
-    {"flow", std::nullopt},
-    {"grow", std::nullopt},
-    {"fgcolor", std::nullopt},
-    {"bgcolor", std::nullopt},
-    {"checked_color", std::nullopt},
-    {"align", std::nullopt},
-    {"background/image", std::nullopt},
-    {"background/position", std::nullopt},
-    {"background/size", std::nullopt},
-    {"background/repeat", std::nullopt},
-    {"background/color", std::nullopt},
-    {"background/rotation/angle", std::nullopt},
-    {"background/rotation/pivot", std::nullopt},
-    {"background/rotation/pivot/x", std::nullopt},
-    {"background/rotation/pivot/y", std::nullopt},
-    {"scrollbar", std::nullopt}
-  };
+  std::map<std::string, std::optional<StyleValue>> _style = {};
   mutable std::vector<std::string> _background_attributes;
   int _parent_width = 0;
   int _parent_height = 0;
