@@ -64,7 +64,7 @@ bool LeleImage::fromJson(const std::string &json_str) {
   }  
   return true;
 }
-lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
+lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj_) {
 
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_image_create(lele_parent->getLvObj()));
@@ -75,7 +75,7 @@ lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
       img = LeleImageConverter::generateImgDsc(_src.c_str());
     }
     else {
-      std::string img_path(std::filesystem::current_path().string() + "/res/" + _src);
+      std::string img_path(std::filesystem::current_path().string() + "/" + _src);
       if(!std::filesystem::exists(img_path)) {
         LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
       }
@@ -89,47 +89,48 @@ lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
     return _lv_obj;
   }
 
-  lv_image_set_src(_lv_obj, img.value().get());
+  lv_obj_t *lv_obj = _lv_bg_img ? lv_image_create(_lv_bg_img) : _lv_obj;
+  lv_image_set_src(lv_obj, img.value().get());
   _images[_src] = img;
 
-  int width = lv_obj_get_width(_lv_obj);
-  int height = lv_obj_get_height(_lv_obj);
-  LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj _lv_obj w:%i, h:%i\n", width, height);
-  lv_image_t *lv_image = reinterpret_cast<lv_image_t *>(_lv_obj);
+  int width = lv_obj_get_width(lv_obj);
+  int height = lv_obj_get_height(lv_obj);
+  LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_obj w:%i, h:%i\n", width, height);
+  lv_image_t *lv_image = reinterpret_cast<lv_image_t *>(lv_obj);
   LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_image w:%i, h:%i, sx:%i, sy:%i\n", lv_image->w, lv_image->h, lv_image->scale_x, lv_image->scale_y);
   lv_image_dsc_t *lv_image_dsc = img.value().get();
   LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_image_dsc w:%i, h:%i\n", lv_image_dsc->header.w, lv_image_dsc->header.h);
 
   if(_blendmode) {
-    lv_image_set_blend_mode(_lv_obj, _blendmode.value());
+    lv_image_set_blend_mode(lv_obj, _blendmode.value());
   }
   if(_antialias) {
-    lv_image_set_antialias(_lv_obj, _antialias.value());
+    lv_image_set_antialias(lv_obj, _antialias.value());
   }
   if(_rotation_pivot) {
-    lv_image_set_pivot(_lv_obj, _rotation_pivot->_x, _rotation_pivot->_y);
+    lv_image_set_pivot(lv_obj, _rotation_pivot->_x, _rotation_pivot->_y);
   }
   if(_rotation_angle) {
-    lv_image_set_rotation(_lv_obj, _rotation_angle.value());
+    lv_image_set_rotation(lv_obj, _rotation_angle.value());
   }
   if(_offset) {
-    lv_image_set_offset_x(_lv_obj, _offset->_x);
-    lv_image_set_offset_y(_lv_obj, _offset->_y);
+    lv_image_set_offset_x(lv_obj, _offset->_x);
+    lv_image_set_offset_y(lv_obj, _offset->_y);
   }
   if(_scale) {
     if(_scale->_x == _scale->_y) {
-      lv_image_set_scale(_lv_obj, LV_SCALE_NONE * _scale->_x / 100);
+      lv_image_set_scale(lv_obj, LV_SCALE_NONE * _scale->_x / 100);
     }
     else {
-      lv_image_set_scale_x(_lv_obj, LV_SCALE_NONE * _scale->_x / 100);
-      lv_image_set_scale_y(_lv_obj, LV_SCALE_NONE * _scale->_y / 100);
+      lv_image_set_scale_x(lv_obj, LV_SCALE_NONE * _scale->_x / 100);
+      lv_image_set_scale_y(lv_obj, LV_SCALE_NONE * _scale->_y / 100);
     }
   }
   if(_align) {
-    lv_image_set_inner_align(_lv_obj, _align.value());
+    lv_image_set_inner_align(lv_obj, _align.value());
   }
 
-  return _lv_obj;
+  return lv_obj;
 }
 
 std::string LeleImage::getSrc() const { 

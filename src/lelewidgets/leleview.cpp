@@ -116,7 +116,7 @@ lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
         _group = (value == "true");
       }
       // else if(key == "img") {
-      //   std::string img_path(std::filesystem::current_path().string() + "/res/" + value);
+      //   std::string img_path(std::filesystem::current_path().string() + "/" + value);
       //   if(!std::filesystem::exists(img_path)) {
       //     LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
       //   }

@@ -175,7 +175,7 @@ lv_obj_t *LeleStackView::setStackViewImg(lv_obj_t *tabview_header, const std::st
     lv_obj_t *logo = lv_image_create(tabview_header);
     lv_obj_add_flag(logo, LV_OBJ_FLAG_IGNORE_LAYOUT);
     // lv_image_set_src(logo, _lv_img_dsc_map.at(img));
-    std::string img_path(std::filesystem::current_path().string() + "/res/" + img);
+    std::string img_path(std::filesystem::current_path().string() + "/" + img);
     if(!std::filesystem::exists(img_path)) {
       LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
     }

@@ -8,8 +8,14 @@
         "view":{
             "id":"/views:0/view/view",
             "style":{"layout":"flex","flow":"row","height":"70%"},
-            "view":{
+            "img":{
                 "id":"/view/with_bg_img",
+                "src":"res/goose.png",
+                "antialias":"true",
+                "xrotation":{"angle":"90","pivot":{"x":"0","y":"0"}},
+                "xoffset":{"x":"20","y":"30"},
+                "scale":"20%",
+                "xalign":"tile",
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
                         "image":"res/pumpkin-man.png",
@@ -24,16 +30,6 @@
                         "color":"#0f0"
                     }
                 }
-            },
-            "ximg":{
-                "style":{"id":"img","border":"solid-1px-#ff0000","x":"0","y":"0","width":"50%","height":"50%"},
-                "src":"logo.png",
-                "xsrc":"firefox-logo.png",
-                "antialias":"true",
-                "xrotation":{"angle":"90","pivot":{"x":"0","y":"0"}},
-                "xoffset":{"x":"20","y":"30"},
-                "scale":"20%",
-                "xalign":"tile"
             },
             "view":{
                 "id":"controll-panel",

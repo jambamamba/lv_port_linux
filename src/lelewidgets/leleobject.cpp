@@ -386,10 +386,9 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 }
 
 void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
-    if(_lv_bg_img) {
-      lv_obj_del(_lv_bg_img);
+    if(!_lv_bg_img) {
+      _lv_bg_img = lv_image_create(_lv_obj);
     }
-    _lv_bg_img = lv_image_create(_lv_obj);
     if(!_lv_bg_img) {
         LOG(FATAL, LVSIM, "Failed in lv_image_create");
         return;
