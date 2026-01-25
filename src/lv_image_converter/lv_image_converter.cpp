@@ -72,7 +72,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(
         return std::nullopt;
     }
 
-    return dst_img;        
+    return dst_img;
 }
 
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> rotateImg(

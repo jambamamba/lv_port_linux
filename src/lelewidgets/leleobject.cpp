@@ -484,6 +484,40 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
       LOG(FATAL, LVSIM, "Failed in cropping image");
       return;
     }
+    auto color_value = getStyle("background/color");
+    if(color_value) {
+      lv_color_t bg = lv_color_hex(std::get<int>(color_value.value()));
+
+      int stride = _bg_img.value()->header.stride;
+      int width = _bg_img.value()->header.w;
+      int height = _bg_img.value()->header.h;
+      int bpp = stride / width;
+      uint8_t *src_data = (uint8_t *)_bg_img.value()->data;
+      for(int row = 0; row < height; ++row) {
+          for(int col = 0; col < width; ++col) {
+              int &src_pixel = *reinterpret_cast< int*>(
+                  &src_data[row * stride + col * bpp]);
+              uint8_t *pixel = (uint8_t *)(&src_pixel);
+              uint8_t &b = pixel[0];
+              uint8_t &g = pixel[1];
+              uint8_t &r = pixel[2];
+              uint8_t &a = pixel[3];
+              float alpha = a/255.;
+              if(r == 0 && g == 0 && b == 0) {
+                r = bg.red;
+                g = bg.green;
+                b = bg.blue;
+                a = 0xff;
+              }
+              // else { //osm todo: alpha blending is messed up
+              //   r = (r * alpha + bg.red * (1 - alpha));
+              //   g = (g * alpha + bg.green * (1 - alpha));
+              //   b = (g * alpha + bg.blue * (1 - alpha));
+              // }
+          }
+      }
+    }
+
     // LOG(DEBUG, LVSIM, "obj_width:%i, obj_height:%i\n", obj_width, obj_height);
     lv_image_set_src(_lv_bg_img, _bg_img.value().get());
 }

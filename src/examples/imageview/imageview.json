@@ -18,7 +18,8 @@
                 "xalign":"tile",
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
-                        "image":"res/pumpkin-man.png",
+                        "ximage":"res/pumpkin-man.png",
+                        "image":"res/rgba.png",
                         "xposition":"20",
                         "xposition":{"x":"20","y":"20"},
                         "xsize":"contain",
