@@ -31,6 +31,7 @@ bool LeleImage::fromJson(const std::string &json_str) {
       }
       else if(key == "scale") {
         _scale = std::optional<LeleImage::XY>();
+        // LeleStyle::parsePercentValue(value, );//osm todo: use LeleStyle with container width/height to scale image
         LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_x}, {"y", &_scale->_y}});
       }
       else if(key == "blendmode") {
@@ -93,9 +94,6 @@ lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj_) {
   lv_image_set_src(lv_obj, img.value().get());
   _images[_src] = img;
 
-  int width = lv_obj_get_width(lv_obj);
-  int height = lv_obj_get_height(lv_obj);
-  LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_obj w:%i, h:%i\n", width, height);
   lv_image_t *lv_image = reinterpret_cast<lv_image_t *>(lv_obj);
   LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_image w:%i, h:%i, sx:%i, sy:%i\n", lv_image->w, lv_image->h, lv_image->scale_x, lv_image->scale_y);
   lv_image_dsc_t *lv_image_dsc = img.value().get();

@@ -366,21 +366,11 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 
   value = getStyle("background/color");
   if(value) {
-    if(!_bg_color) {
-      _bg_color = LeleImageConverter::generateImgDsc(obj_width, obj_height, 3);
-    }
-    if(!_bg_color) {
-      LL(FATAL, LVSIM) << "Failed to generate image for background color";
-    }
-    LeleImageConverter::fillImgDsc(_bg_color->get(), 
-      std::get<int>(value.value())
-    );
-    _lv_bg_color = lv_image_create(lv_obj);
-    lv_image_set_src(_lv_bg_color, _bg_color.value().get());
+    fillBackgroundColor(lv_obj, std::get<int>(value.value()), obj_width, obj_height);
   }
   value = getStyle("background/image");
   if(value) {
-    drawBackgroundImage(lv_obj, value, obj_width, obj_height);
+    drawBackgroundImage(lv_obj, std::get<std::string>(value.value()), obj_width, obj_height);
   }
   value = getStyle("scrollbar");
   if(value) {
@@ -395,9 +385,21 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_obj_add_style(lv_obj, &_style, LV_PART_MAIN);
 }
 
-void LeleObject::drawBackgroundImage(lv_obj_t *lv_obj, std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
+void LeleObject::fillBackgroundColor(lv_obj_t *lv_obj, int color, int obj_width, int obj_height) {
 
-    std::string src = std::get<std::string>(value.value());
+  _bg_color = LeleImageConverter::generateImgDsc(obj_width, obj_height, 3);
+  if(!_bg_color) {
+    LL(FATAL, LVSIM) << "Failed to generate image for background color";
+  }
+  LeleImageConverter::fillImgDsc(_bg_color->get(), color);
+  if(!_lv_bg_color) {
+    _lv_bg_color = lv_image_create(lv_obj);
+  }
+  lv_image_set_src(_lv_bg_color, _bg_color.value().get());
+}
+
+void LeleObject::drawBackgroundImage(lv_obj_t *lv_obj, const std::string &src, int obj_width, int obj_height) {
+
     if(src.at(0) == '/') {
       _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
     }

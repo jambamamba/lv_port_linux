@@ -14,7 +14,7 @@
                 "antialias":"true",
                 "xrotation":{"angle":"90","pivot":{"x":"0","y":"0"}},
                 "xoffset":{"x":"20","y":"30"},
-                "scale":"20%",
+                "xscale":"20%",
                 "xalign":"tile",
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
@@ -125,12 +125,24 @@
             }
         },
         "view":{
-            "style":{"layout":"flex","flow":"row","height":"5%","border":"solid-1px-#ccc"},
+            "style":{"layout":"flex","flow":"row","height":"15%","border":"solid-1px-#ccc"},
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","align":"center","text_align":"center","class_name":"button0","width":"20%","height":"95%","border":"solid-1px-#f00"},
-                "text":"Run Test",
+                "style":{"id":"button0","align":"center","text_align":"center","class_name":"button0",
+                    "width":"20%","height":"95%",
+                    "border":"solid-1px-#f00"},
+                "xtext":"Run Test",
+                "label":{
+                    "id":"label:/run_test",
+                    "text":"Run Test",
+                    "style":{"id":"style:/button/run_test/label","x":"0","y":"0","width":"100%","height":"100%"}
+                },
+                "img":{
+                    "id":"img:/run_test",
+                    "src":"res/goose.png",
+                    "scale":"1%"
+                },
                 "event":{"type":"clicked","action":"action0","args":{}}
             }
         }

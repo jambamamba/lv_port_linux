@@ -76,7 +76,8 @@ public:
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
 #endif
 protected:
-  void drawBackgroundImage(lv_obj_t *lv_obj, std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height);
+  void fillBackgroundColor(lv_obj_t *lv_obj, int color, int obj_width, int obj_height);
+  void drawBackgroundImage(lv_obj_t *lv_obj, const std::string &src, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
     const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const;
 
