@@ -366,11 +366,21 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 
   value = getStyle("background/color");
   if(value) {
-    lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+    if(!_bg_color) {
+      _bg_color = LeleImageConverter::generateImgDsc(obj_width, obj_height, 3);
+    }
+    if(!_bg_color) {
+      LL(FATAL, LVSIM) << "Failed to generate image for background color";
+    }
+    LeleImageConverter::fillImgDsc(_bg_color->get(), 
+      std::get<int>(value.value())
+    );
+    _lv_bg_color = lv_image_create(lv_obj);
+    lv_image_set_src(_lv_bg_color, _bg_color.value().get());
   }
   value = getStyle("background/image");
   if(value) {
-    drawBackgroundImage(value, obj_width, obj_height);
+    drawBackgroundImage(lv_obj, value, obj_width, obj_height);
   }
   value = getStyle("scrollbar");
   if(value) {
@@ -385,14 +395,8 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_obj_add_style(lv_obj, &_style, LV_PART_MAIN);
 }
 
-void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
-    if(!_lv_bg_img) {
-      _lv_bg_img = lv_image_create(_lv_obj);
-    }
-    if(!_lv_bg_img) {
-        LOG(FATAL, LVSIM, "Failed in lv_image_create");
-        return;
-    }
+void LeleObject::drawBackgroundImage(lv_obj_t *lv_obj, std::optional<LeleStyle::StyleValue> value, int obj_width, int obj_height) {
+
     std::string src = std::get<std::string>(value.value());
     if(src.at(0) == '/') {
       _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
@@ -484,41 +488,15 @@ void LeleObject::drawBackgroundImage(std::optional<LeleStyle::StyleValue> value,
       LOG(FATAL, LVSIM, "Failed in cropping image");
       return;
     }
-    auto color_value = getStyle("background/color");
-    if(color_value) {
-      lv_color_t bg = lv_color_hex(std::get<int>(color_value.value()));
-
-      int stride = _bg_img.value()->header.stride;
-      int width = _bg_img.value()->header.w;
-      int height = _bg_img.value()->header.h;
-      int bpp = stride / width;
-      uint8_t *src_data = (uint8_t *)_bg_img.value()->data;
-      for(int row = 0; row < height; ++row) {
-          for(int col = 0; col < width; ++col) {
-              int &src_pixel = *reinterpret_cast< int*>(
-                  &src_data[row * stride + col * bpp]);
-              uint8_t *pixel = (uint8_t *)(&src_pixel);
-              uint8_t &b = pixel[0];
-              uint8_t &g = pixel[1];
-              uint8_t &r = pixel[2];
-              uint8_t &a = pixel[3];
-              float alpha = a/255.;
-              if(r == 0 && g == 0 && b == 0) {
-                r = bg.red;
-                g = bg.green;
-                b = bg.blue;
-                a = 0xff;
-              }
-              // else { //osm todo: alpha blending is messed up
-              //   r = (r * alpha + bg.red * (1 - alpha));
-              //   g = (g * alpha + bg.green * (1 - alpha));
-              //   b = (g * alpha + bg.blue * (1 - alpha));
-              // }
-          }
-      }
-    }
 
     // LOG(DEBUG, LVSIM, "obj_width:%i, obj_height:%i\n", obj_width, obj_height);
+    if(!_lv_bg_img) {
+      _lv_bg_img = lv_image_create(_lv_bg_color ? _lv_bg_color : _lv_obj);
+    }
+    if(!_lv_bg_img) {
+        LOG(FATAL, LVSIM, "Failed in lv_image_create");
+        return;
+    }
     lv_image_set_src(_lv_bg_img, _bg_img.value().get());
 }
 

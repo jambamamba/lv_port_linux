@@ -585,8 +585,12 @@ bool LeleStyle::setValue(
     else if(key == "background/repeat") {
         _style["background/repeat"] = value;
     }
+    else if(key.at(0) == '#' || key.at(0) == '@') {
+      LL(WARNING, LVSIM) << "Ignoreing key " << key << " for styles";
+      return false;
+    }
     else {
-      LOG(FATAL, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
+      LL(FATAL, LVSIM) << "No such key " << key << " exists for styles";
       return false;
     }
     return true;

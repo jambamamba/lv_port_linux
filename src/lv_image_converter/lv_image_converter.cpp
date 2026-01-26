@@ -161,6 +161,52 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     return img_dsc;
 }
 
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(int width, int height, int bpp) {
+
+    int stride = bpp * width;
+    auto img_dsc = AutoFreeSharedPtr<lv_image_dsc_t>::create(stride * height);
+    initImageDsc(img_dsc.get(), width, height, bpp);
+    
+    size_t bytes_copied = 0;
+    lv_image_dsc_t *p = img_dsc.get();
+    uint8_t *img_data = (uint8_t *)&p[1];
+    p->data = img_data;
+
+    return img_dsc;
+}
+
+void fillImgDsc(lv_image_dsc_t *img_dsc, uint32_t color) {
+
+    uint8_t b = color & 0xff;
+    uint8_t g = (color >> 8) & 0xff;
+    uint8_t r = (color >> 16) & 0xff;
+    uint8_t a = (color >> 24) & 0xff;
+    uint8_t *img_data = (uint8_t *)&img_dsc[1];
+
+    for(int y = 0; y < img_dsc->header.h; ++y) {
+        for(int x = 0; x < img_dsc->header.stride; ) {
+            switch(img_dsc->header.cf){
+                case LV_COLOR_FORMAT_ARGB8888: {
+                    img_data[y * img_dsc->header.stride + x + 0] = b;
+                    img_data[y * img_dsc->header.stride + x + 1] = g;
+                    img_data[y * img_dsc->header.stride + x + 2] = r;
+                    img_data[y * img_dsc->header.stride + x + 3] = a;
+                    x += 4;
+                    break;
+                }
+                case LV_COLOR_FORMAT_RGB888: {
+                    img_data[y * img_dsc->header.stride + x + 0] = b;
+                    img_data[y * img_dsc->header.stride + x + 1] = g;
+                    img_data[y * img_dsc->header.stride + x + 2] = r;
+                    x += 3;
+                    break;
+                }
+                default: return;
+            }
+        }
+    }
+}
+
 std::optional<std::pair<std::string, std::string>> generateCImgFile(std::ofstream &c_img_filestream, const std::string &img_file_path) {
 
     std::filesystem::path img_path(img_file_path);
