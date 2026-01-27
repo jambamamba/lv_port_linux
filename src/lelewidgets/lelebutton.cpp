@@ -212,16 +212,17 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
     default: {
       _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
-      lv_obj_t *label = lv_label_create(_lv_obj);
-      lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-      lv_label_set_text(label, _text.c_str());
-      lv_obj_update_layout(_lv_obj);
-      lv_obj_set_width(label, lv_obj_get_width(_lv_obj)); 
-      lv_obj_set_height(label, lv_obj_get_height(_lv_obj));
+      // lv_obj_t *label = lv_label_create(_lv_obj);
+      // lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
+      // lv_label_set_text(label, _text.c_str());
+      // lv_obj_update_layout(_lv_obj);
+      // lv_obj_set_width(label, lv_obj_get_width(_lv_obj)); 
+      // lv_obj_set_height(label, lv_obj_get_height(_lv_obj));
 
-      auto [width, height] = LeleObject::getTextSize(label, _text.c_str());
-      lv_obj_set_height(label, height);
-      lv_obj_update_layout(label);
+      // auto [width, height] = LeleObject::getTextSize(label, _text.c_str());
+      // lv_obj_set_height(label, height);
+      // lv_obj_update_layout(label);
+
       // LL(WARNING, LVSIM) << "@@@@ TEXT SIZE: " <<  width << "x" << height;
       // width = lv_obj_get_width(label); 
       // height = lv_obj_get_height(label);
@@ -230,9 +231,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
       // height = lv_obj_get_height(_lv_obj);
       // LL(WARNING, LVSIM) << "@@@@ BUTTON SIZE: " << width << "x" << height;
 
-      setTextAlignStyle(label);
-      setObjAlignStyle(label);
-      lv_obj_set_layout(_lv_obj, LV_LAYOUT_NONE);
+      // setTextAlignStyle(label);
+      // setObjAlignStyle(label);
+      // lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);//LV_LAYOUT_NONE);
 
       break;
     }

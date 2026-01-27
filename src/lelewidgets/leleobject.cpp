@@ -538,16 +538,16 @@ void LeleObject::removeStyle(const std::string &style_id) {
   //osm todo
 }
 
-void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
-  auto value = getStyle("align");
-  if(value) {
-    lv_obj_align(lv_obj, 
-      static_cast<lv_align_t>(
-        std::get<int>(value.value())),
-      0, 0);
-    //make sure to do lv_obj_set_layout(parent, LV_LAYOUT_NONE); otherwise this function might not work
-  }
-}
+// void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
+//   auto value = getStyle("align");
+//   if(value) {
+//     lv_obj_align(lv_obj, 
+//       static_cast<lv_align_t>(
+//         std::get<int>(value.value())),
+//       0, 0);
+//     //make sure to do lv_obj_set_layout(parent, LV_LAYOUT_NONE); otherwise this function might not work
+//   }
+// }
 
 std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
 
@@ -560,17 +560,17 @@ std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
     return std::pair<int,int>(text_size.x, text_size.y);
 }
 
-void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
+// void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
 
-  auto value = getStyle("text_align");
-  if(value) {
-    lv_obj_set_style_text_align(lv_obj, 
-      static_cast<lv_text_align_t>(
-        std::get<int>(value.value())),
-      // LV_PART_ANY);
-      LV_PART_MAIN);
-  }
-}
+//   auto value = getStyle("text_align");
+//   if(value) {
+//     lv_obj_set_style_text_align(lv_obj, 
+//       static_cast<lv_text_align_t>(
+//         std::get<int>(value.value())),
+//       // LV_PART_ANY);
+//       LV_PART_MAIN);
+//   }
+// }
 
 lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 

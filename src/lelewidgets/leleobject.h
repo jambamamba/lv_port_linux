@@ -59,8 +59,8 @@ public:
   virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
   virtual void addStyle(LeleStyle* lele_style);
   virtual void removeStyle(const std::string &style_id);
-  virtual void setObjAlignStyle(lv_obj_t *lv_obj);
-  virtual void setTextAlignStyle(lv_obj_t *lv_obj);
+  // virtual void setObjAlignStyle(lv_obj_t *lv_obj);
+  // virtual void setTextAlignStyle(lv_obj_t *lv_obj);
   virtual void show();
   virtual void hide();
   static void EventCallback(lv_event_t *e);

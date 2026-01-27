@@ -129,19 +129,36 @@
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","align":"center","text_align":"center","class_name":"button0",
+                "style":{"id":"button0","class_name":"button0",
+                    "layout":"flex","flow":"row",
+                    "align":"center",
                     "width":"20%","height":"95%",
-                    "border":"solid-1px-#f00"},
-                "xtext":"Run Test",
-                "label":{
-                    "id":"label:/run_test",
-                    "text":"Run Test",
-                    "style":{"id":"style:/button/run_test/label","x":"0","y":"0","width":"100%","height":"100%"}
+                    "border":"solid-1px-#f00"
                 },
                 "img":{
                     "id":"img:/run_test",
-                    "src":"res/goose.png",
-                    "scale":"1%"
+                    "src":"res/play-button.png",
+                    "border":"solid-2px-#00f",
+                    "#scale":"90%",
+                    "scale":{"x":"50%","y":"50%"},
+                    "style":{"id":"style:/button/run_test/img",
+                        "x":"0","y":"0",
+                        "width":"48%","height":"100%",
+                        "border":"none",
+                        "#border":"solid-2px-#00f"}
+                },
+                "label":{
+                    "id":"label:/run_test",
+                    "text":"Run Test",
+                    "style":{"id":"style:/button/run_test/label",
+                        "text_align":"left",
+                        "align":"center",
+                        "x":"0","y":"100",
+                        "layout":"none",
+                        "width":"50%","height":"100%",
+                        "border":"none",
+                        "#border":"solid-2px-#0f0"
+                    }
                 },
                 "event":{"type":"clicked","action":"action0","args":{}}
             }

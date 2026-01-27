@@ -2,6 +2,39 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
+namespace {
+int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
+  if(lele_obj && lele_obj->getParent()) {
+    auto value = lele_obj->getParent()->getStyle(key);
+    if(value){
+      if(std::holds_alternative<int>(value.value())) {
+        int val = std::get<int>(value.value());
+        return std::get<int>(value.value());
+      }
+      else {
+        LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
+      }
+    }
+    else {
+      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
+    }
+  }
+  else if(lele_obj) {
+    if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
+    else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
+    else if(key == "corner_radius") { 
+      return std::max(
+        lv_obj_get_width(lv_screen_active()), 
+        lv_obj_get_height(lv_screen_active())
+      ); 
+    }
+    else {
+      LL(WARNING, LVSIM) << "style key:" << key << " not handled";
+    }
+  }
+  return 0;
+}
+}//namespace
 LeleImage::LeleImage(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
 
@@ -30,9 +63,24 @@ bool LeleImage::fromJson(const std::string &json_str) {
         LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_x}, {"y", &_offset->_y}});
       }
       else if(key == "scale") {
-        _scale = std::optional<LeleImage::XY>();
-        // LeleStyle::parsePercentValue(value, );//osm todo: use LeleStyle with container width/height to scale image
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_scale->_x}, {"y", &_scale->_y}});
+        std::string val = LeleWidgetFactory::trim(value);
+        // int x = LeleStyle::parsePercentValue(val, max_x);
+        int rev_offset = 0;
+        if(val.at(value.size()-1) == '%'){
+          rev_offset = 1;
+        }
+        _scale = LeleImage::XY();
+        if(std::all_of(val.begin(), val.end() - rev_offset,
+          [this](unsigned char ch){ return std::isdigit(ch); })) {
+          _scale->_x = _scale->_y = std::stoi(val, 0, 10);
+        }
+        else {
+          int max_x_percent = 100;
+          int max_y_percent = 100;
+          LeleWidgetFactory::parsePercentValues(value,
+            {{"x", &_scale->_x}, {"y", &_scale->_y}},
+            {{"x", max_x_percent}, {"y", max_y_percent}});
+        }
       }
       else if(key == "blendmode") {
         if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }

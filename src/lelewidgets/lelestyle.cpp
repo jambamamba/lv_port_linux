@@ -18,13 +18,11 @@ int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
         return std::get<int>(value.value());
       }
       else {
-        int x = 0;
-        x = 0;
+        LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
       }
     }
     else {
-      int x = 0;
-      x = 0;
+      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
     }
   }
   else if(lele_obj) {
@@ -37,8 +35,7 @@ int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
       ); 
     }
     else {
-      int x = 0;
-      x = 0;
+      LL(WARNING, LVSIM) << "style key:" << key << " not handled";
     }
   }
   return 0;
@@ -88,8 +85,12 @@ int LeleStyle::parsePercentValue(const std::string &x, int parent_x) {
         if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
           i = std::stoi(x, 0, 16);
         }
-        else {
+        else if(std::all_of(x.begin(), x.end(),
+          [&i](unsigned char ch){ return std::isdigit(ch); })) {
           i = std::stoi(x, 0, 10);
+        }
+        else {
+          LL(WARNING, LVSIM) << "input is not a number: " << x;
         }
         return i;
     }
@@ -610,7 +611,6 @@ void LeleStyle::applyStyle() {
 const LeleObject *LeleStyle::getLeleObject() const { 
   return _lele_obj; 
 }
-
 
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
