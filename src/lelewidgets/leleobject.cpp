@@ -333,7 +333,16 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     lv_obj_set_style_layout(lv_obj, 
       std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
       LV_STYLE_STATE_CMP_SAME);
-    lv_obj_set_flex_align(lv_obj, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);//osm todo: read from json
+    // lv_obj_set_flex_align(lv_obj, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);//osm todo: read from json
+                // "flex":{
+                //     "flow":"row|column|row_wrap|column_wrap|row_reverse|column_reverse|row_wrap_reverse|column_wrap_reverse",
+                //     "justify-content":"start|center|space-between|space-around|space-evenly",
+                //     "align-items":"start|end|center|stretch",
+                //     "align-content":"start|center|space-between|space-around",
+                //     "grow":"1"
+                // },
+
+
   }
   value = getStyle("flow");
   if(value) {
