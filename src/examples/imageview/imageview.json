@@ -125,7 +125,17 @@
             }
         },
         "view":{
-            "style":{"layout":"flex","flow":"row","height":"15%","border":"solid-1px-#ccc"},
+            "style":{
+                "layout":"flex","flow":"row",
+                "#flex":{
+                    "flow":"row|column|row_wrap|column_wrap|row_reverse|column_reverse|row_wrap_reverse|column_wrap_reverse",
+                    "justify-content":"start|center|space-between|space-around|space-evenly",
+                    "align-items":"start|end|center|stretch",
+                    "align-content":"start|center|space-between|space-around",
+                    "grow":"1"
+                },
+                "height":"15%","border":"solid-1px-#ccc"
+            },
             "button":{
                 "id":"run_test",
                 "type":"push",
@@ -144,8 +154,9 @@
                     "style":{"id":"style:/button/run_test/img",
                         "x":"0","y":"0",
                         "width":"48%","height":"100%",
-                        "border":"none",
-                        "#border":"solid-2px-#00f"}
+                        "border":"solid-2px-#00f",
+                        "#border":"none"
+                    }
                 },
                 "label":{
                     "id":"label:/run_test",
@@ -153,11 +164,10 @@
                     "style":{"id":"style:/button/run_test/label",
                         "text_align":"left",
                         "align":"center",
-                        "x":"0","y":"100",
-                        "layout":"none",
-                        "width":"50%","height":"100%",
-                        "border":"none",
-                        "#border":"solid-2px-#0f0"
+                        "x":"0","y":"23",
+                        "width":"50%","height":"40%",
+                        "border":"solid-2px-#0f0",
+                        "#border":"none"
                     }
                 },
                 "event":{"type":"clicked","action":"action0","args":{}}

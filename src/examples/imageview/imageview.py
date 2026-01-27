@@ -198,8 +198,16 @@ def runTest(event):
       #    time.sleep(0.01) 
       #    obj.setValue(i)
       global _tests_are_running
-      _tests_are_running = True
-      lele.getObjectById("repeat-none").click()
+      _tests_are_running ^= True
+      #osm todo: change image to stop button, and change label also
+      obj = lele.getObjectById("img:/run_test")
+      user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
+      print(f"@@@py obj: {obj}, user_attributes: {user_attributes}.")
+      obj = lele.getObjectById("label:/run_test")
+      user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
+      print(f"@@@py obj: {obj}, user_attributes: {user_attributes}.")
+      print(f"@@@#@@@")
+      # lele.getObjectById("repeat-none").click()
       pass
 
 def runTestLoop():

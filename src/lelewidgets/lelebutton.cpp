@@ -231,7 +231,7 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
       // height = lv_obj_get_height(_lv_obj);
       // LL(WARNING, LVSIM) << "@@@@ BUTTON SIZE: " << width << "x" << height;
 
-      // setTextAlignStyle(label);
+      // setTextAlign(label);
       // setObjAlignStyle(label);
       // lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);//LV_LAYOUT_NONE);
 

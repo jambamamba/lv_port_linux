@@ -206,17 +206,6 @@ std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key
   return std::optional<LeleStyle::StyleValue>();
 }
 
-namespace {
-void setTextAlign(lv_obj_t *lv_obj, lv_text_align_t align_type) {
-
-  const lv_obj_class_t *child_class = lv_obj_get_class(lv_obj);
-  if(strcmp((char*)child_class->name, "label")==0) {
-    lv_obj_set_style_text_align(lv_obj, align_type, 0);
-  }
-}
-
-}//namespace
-
 bool LeleObject::visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback) {
   for(int idx = 0; idx < lv_obj_get_child_count(lv_obj); ++idx) {
       lv_obj_t *child_obj = lv_obj_get_child(lv_obj, idx);
@@ -250,13 +239,17 @@ std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleSty
 void LeleObject::setStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
 
+  int obj_x = 0;
   auto value = getStyle("x");
   if(value) {
-    lv_obj_set_x(lv_obj, std::get<int>(value.value()));
+    obj_x = std::get<int>(value.value());
+    lv_obj_set_x(lv_obj, obj_x);
   }
+  int obj_y = 0;
   value = getStyle("y");
   if(value) {
-    lv_obj_set_y(lv_obj, std::get<int>(value.value()));
+    obj_y = std::get<int>(value.value());
+    lv_obj_set_y(lv_obj, obj_y);
   }
   int obj_width = -1;
   value = getStyle("width");
@@ -340,6 +333,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     lv_obj_set_style_layout(lv_obj, 
       std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
       LV_STYLE_STATE_CMP_SAME);
+    lv_obj_set_flex_align(lv_obj, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);//osm todo: read from json
   }
   value = getStyle("flow");
   if(value) {
@@ -355,8 +349,8 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   value = getStyle("align");
   if(value) {
     lv_align_t align = static_cast<lv_align_t>(std::get<int>(value.value()));
-    lv_obj_align(lv_obj, 
-      static_cast<lv_align_t>(std::get<int>(value.value())), 0, 0);
+    lv_obj_align(lv_obj,
+      static_cast<lv_align_t>(std::get<int>(value.value())), obj_x, obj_y);
   }
   value = getStyle("text_align");
   if(value) {
@@ -538,17 +532,6 @@ void LeleObject::removeStyle(const std::string &style_id) {
   //osm todo
 }
 
-// void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
-//   auto value = getStyle("align");
-//   if(value) {
-//     lv_obj_align(lv_obj, 
-//       static_cast<lv_align_t>(
-//         std::get<int>(value.value())),
-//       0, 0);
-//     //make sure to do lv_obj_set_layout(parent, LV_LAYOUT_NONE); otherwise this function might not work
-//   }
-// }
-
 std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
 
     const lv_font_t *font = lv_obj_get_style_text_font(lv_obj, LV_PART_MAIN);
@@ -560,7 +543,19 @@ std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
     return std::pair<int,int>(text_size.x, text_size.y);
 }
 
-// void LeleObject::setTextAlignStyle(lv_obj_t *lv_obj) {
+
+// void LeleObject::setObjAlignStyle(lv_obj_t *lv_obj) {
+//   auto value = getStyle("align");
+//   if(value) {
+//     lv_obj_align(lv_obj, 
+//       static_cast<lv_align_t>(
+//         std::get<int>(value.value())),
+//       0, 0);
+//     //make sure to do lv_obj_set_layout(parent, LV_LAYOUT_NONE); otherwise this function might not work
+//   }
+// }
+
+// void LeleObject::setTextAlign(lv_obj_t *lv_obj) {
 
 //   auto value = getStyle("text_align");
 //   if(value) {
@@ -571,6 +566,15 @@ std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
 //       LV_PART_MAIN);
 //   }
 // }
+
+// void setTextAlign(lv_obj_t *lv_obj, lv_text_align_t align_type) {
+
+//   const lv_obj_class_t *child_class = lv_obj_get_class(lv_obj);
+//   if(strcmp((char*)child_class->name, "label")==0) {
+//     lv_obj_set_style_text_align(lv_obj, align_type, 0);
+//   }
+// }
+
 
 lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
