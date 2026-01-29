@@ -80,6 +80,7 @@ protected:
   void drawBackgroundImage(lv_obj_t *lv_obj, const std::string &src, int obj_width, int obj_height);
   std::tuple<int,int> parseBackgroundPosition(
     const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const;
+  void setFlexStyle();
 
   std::string _class_name = "N/A";
   std::string _id;

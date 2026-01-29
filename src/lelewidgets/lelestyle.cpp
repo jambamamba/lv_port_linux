@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <ranges>
 #include <regex>
 
 #include "lelestyle.h"
@@ -169,17 +170,17 @@ std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_st
   return processed ? res: std::map<std::string, float>();
 }
 
-std::vector<std::string> LeleStyle::getBackgroundAttributes() const {
+std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() const {
   return _background_attributes;
 }
 
 void LeleStyle::parseBackground(const std::string &value_) {
 
   LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
-    const std::string bg("background");
+    const std::string key("background");
     std::string subkey(subkey_);
     if(subkey == "color") {
-      _style[bg + "/" + subkey] = parseColorCode(value);
+      _style[key + "/" + subkey] = parseColorCode(value);
     }
     else if(subkey == "rotation") {
       auto rotation = parseRotation(value);
@@ -194,21 +195,122 @@ void LeleStyle::parseBackground(const std::string &value_) {
       }
     }
     else if(subkey == "image") {
-      _style[bg + "/" + subkey] = value;
+      _style[key + "/" + subkey] = value;
     }
     else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-      _style[bg + "/" + subkey] = value;
+      _style[key + "/" + subkey] = value;
     }
     else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
-      _style[bg + "/" + subkey] = value;
+      _style[key + "/" + subkey] = value;
     }
     else if(subkey == "repeat") {
-      _style[bg + "/" + subkey] = value;
+      std::vector<std::string> _flex_possible_values = {"repeat-x","repeat-y","repeat","none"};
+      if(_flex_possible_values.end() == std::find(_flex_possible_values.begin(), _flex_possible_values.end(), value)) {
+        auto joined_view = _flex_possible_values | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
+        LL(WARNING, LVSIM) << key << "/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
+        return;
+      }
+      _style[key + "/" + subkey] = value;
     }
     else {
+      LL(WARNING, LVSIM) << key << "/" << subkey << " is not a valid attribute";        
       return;
     }
     _background_attributes.push_back(subkey);
+  });
+}
+
+std::map<std::string, std::vector<std::string>> LeleStyle::_flex_possible_values = {
+  {"flow", {"row","column","row-wrap","column-wrap","row-reverse","column-reverse","row-wrap-reverse","column-wrap-reverse"}},
+  {"justify-content", {"start","center","space-between","space-around","space-evenly"}},
+  {"align-items", {"start","end","center"}},
+  {"align-content", {"start","center","space-between","space-around"}}
+};
+std::map<std::string, std::map<std::string,int>> LeleStyle::_flex_possible_ivalues = {
+  {"flow",{
+      {"row",LV_FLEX_FLOW_ROW},
+      {"column",LV_FLEX_FLOW_COLUMN},
+      {"row-wrap",LV_FLEX_FLOW_ROW_WRAP},
+      {"column-wrap",LV_FLEX_FLOW_COLUMN_WRAP},
+      {"row-reverse",LV_FLEX_FLOW_ROW_REVERSE},
+      {"column-reverse",LV_FLEX_FLOW_COLUMN_REVERSE},
+      {"row-wrap-reverse",LV_FLEX_FLOW_ROW_WRAP_REVERSE},
+      {"column-wrap-reverse",LV_FLEX_FLOW_COLUMN_WRAP_REVERSE}
+    }
+  },
+  {"justify-content",{
+      {"start",LV_FLEX_ALIGN_START},
+      {"center",LV_FLEX_ALIGN_CENTER},
+      {"space-between",LV_FLEX_ALIGN_SPACE_BETWEEN},
+      {"space-around",LV_FLEX_ALIGN_SPACE_AROUND},
+      {"space-evenly",LV_FLEX_ALIGN_SPACE_EVENLY}
+    }
+  },
+  {"align-items", {
+      {"start",LV_FLEX_ALIGN_START},
+      {"end",LV_FLEX_ALIGN_END},
+      {"center",LV_FLEX_ALIGN_CENTER}
+    }
+  },
+  {"align-content", {
+      {"start",LV_FLEX_ALIGN_START},
+      {"center",LV_FLEX_ALIGN_CENTER},
+      {"space-between",LV_FLEX_ALIGN_SPACE_BETWEEN},
+      {"space-around",LV_FLEX_ALIGN_SPACE_AROUND}
+    }
+  }
+};
+
+void LeleStyle::parseFlex(const std::string &value_) {
+
+  LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
+    const std::string key("flex");
+    std::string subkey(subkey_);
+    if(subkey == "flow") {
+      if(_flex_possible_values[subkey].end() == std::find(_flex_possible_values[subkey].begin(), _flex_possible_values[subkey].end(), value)) {
+        auto joined_view = _flex_possible_values[subkey] | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
+        LL(WARNING, LVSIM) << "flex/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
+        return;
+      }
+      _style[key + "/" + subkey] = value;
+    }
+    else if(subkey == "justify-content") {
+      if(_flex_possible_values[subkey].end() == std::find(_flex_possible_values[subkey].begin(), _flex_possible_values[subkey].end(), value)) {
+        auto joined_view = _flex_possible_values[subkey] | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
+        LL(WARNING, LVSIM) << key << "/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
+        return;
+      }
+      _style[key + "/" + subkey] = value;
+    }
+    else if(subkey == "align-items") {
+      if(_flex_possible_values[subkey].end() == std::find(_flex_possible_values[subkey].begin(), _flex_possible_values[subkey].end(), value)) {
+        auto joined_view = _flex_possible_values[subkey] | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
+        LL(WARNING, LVSIM) << key << "/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
+        return;
+      }
+      _style[key + "/" + subkey] = value;
+    }
+    else if(subkey == "align-content") {
+      if(_flex_possible_values[subkey].end() == std::find(_flex_possible_values[subkey].begin(), _flex_possible_values[subkey].end(), value)) {
+        auto joined_view = _flex_possible_values[subkey] | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
+        LL(WARNING, LVSIM) << key << "/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
+        return;
+      }
+      _style[key + "/" + subkey] = value;
+    }
+    else if(subkey == "grow") {
+      if(std::all_of(value.begin(), value.end(),
+        [this,&key,&subkey](unsigned char ch){ return std::isdigit(ch); })) {
+        _style[key + "/" + subkey] = std::stoi(value, 0, 10);
+      }
+      else {
+        LL(WARNING, LVSIM) << key << "/" << subkey << " is not a digit";        
+      }
+    }
+    else {
+      LL(WARNING, LVSIM) << key << "/" << subkey << " is not a valid attribute";        
+      return;
+    }
   });
 }
 
@@ -217,19 +319,21 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
   LeleStyle::BorderTypeE border_type = LeleStyle::BorderTypeE::None;
   int border_width = 0;
   int border_color = 0;
-  if(border_type_width_color.empty()) {
+  if(border_type_width_color.empty() ||
+    border_type_width_color == "none") {
     return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
   }
-  std::regex pattern("(solid|none)-(\\d*)px-(#[a-f0-9]{1,6})");
+  std::regex pattern("(solid|dashed|dotted)-(\\d*)(px)?-(#[a-f0-9]{1,6}|\\d{1,10})$");
   std::smatch matches;
-  // std::string text("none-0px-#fcfcfc");
-  // std::string text("solid-9px-#fcfcfc");
-  if (std::regex_search(border_type_width_color, matches, pattern) &&
-    matches.size() == 4) {
-    if(matches[1] == "none") {
-      border_type = None;
-    }
-    else if(matches[1] == "solid") {
+  //examples:
+        // "solid-1px-#fff"
+        // "solid-1px-#abcdef" // max 6 hex digit
+        // "dashed-1px-0123456789"//[0-4294967296] max 10 digit 10 base number
+        // "dotted-2-9999"
+  if (std::regex_search(border_type_width_color, matches, pattern)
+    && matches.size() == 5
+  ) {
+    if(matches[1] == "solid") {
       border_type = Solid;
     }
     else if(matches[1] == "dashed") {
@@ -239,7 +343,7 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
       border_type = Dotted;
     }
     border_width = std::stoi(matches[2].str());
-    border_color = parseColorCode(matches[3]);
+    border_color = parseColorCode(matches[4]);
   }
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
@@ -348,6 +452,7 @@ bool LeleStyle::setValue(
     const std::string &key, 
     const std::string &value) {
 
+
     if(key == "class_name") {
         _class_name = value;
     }
@@ -433,49 +538,6 @@ bool LeleStyle::setValue(
       std::string type; int width,  color;
       std::tie(type, width, _style["border/color"]) = LeleStyle::parseBorder(value); 
     }
-    else if(key == "layout") {
-      if(strncmp(value.c_str(), "flex", 4)==0) {
-        _style[key] = LV_LAYOUT_FLEX;
-      }
-      else if(strncmp(value.c_str(), "grid", 4)==0) {
-        _style[key] = LV_LAYOUT_GRID;
-      }
-      else {//if(strncmp(value.c_str(), "none", 4)==0) {
-        _style[key] = LV_LAYOUT_NONE;
-      }
-    }
-    else if(key == "flow") {
-      if(strncmp(value.c_str(), "row", 3)==0) {
-        _style[key] = LV_FLEX_FLOW_ROW;
-      }
-      else if(strncmp(value.c_str(), "row_wrap", 8)==0) {
-        _style[key] = LV_FLEX_FLOW_ROW_WRAP;
-      }
-      else if(strncmp(value.c_str(), "row_reverse", 11)==0){
-        _style[key] = LV_FLEX_FLOW_ROW_REVERSE;
-      }
-      else if(strncmp(value.c_str(), "row_wrap_reverse", 16)==0){
-        _style[key] = LV_FLEX_FLOW_ROW_WRAP_REVERSE;
-      }
-      else if(strncmp(value.c_str(), "column", 6)==0) {
-        _style[key] = LV_FLEX_FLOW_COLUMN;//lv_obj_set_flex_flow(cont1, LV_FLEX_FLOW_COLUMN);
-      }
-      else if(strncmp(value.c_str(), "column_wrap", 11)==0){
-        _style[key] = LV_FLEX_FLOW_COLUMN_WRAP;
-      }
-      else if(strncmp(value.c_str(), "column_reverse", 14)==0){
-        _style[key] = LV_FLEX_FLOW_COLUMN_REVERSE;
-      }
-      else if(strncmp(value.c_str(), "column_wrap_reverse", 19)==0){
-        _style[key] = LV_FLEX_FLOW_COLUMN_WRAP_REVERSE;
-      }
-      else {
-        _style[key] = std::nullopt;
-      }
-    }
-    else if(key == "grow") {
-      _style[key] = std::stoi(value);
-    }
     else if(key == "scrollbar") {
       if(strncmp(value.c_str(), "off", 3)==0 || strncmp(value.c_str(), "none", 4)==0 || strncmp(value.c_str(), "false", 4)==0) {
         _style[key] = LV_SCROLLBAR_MODE_OFF;
@@ -531,7 +593,7 @@ bool LeleStyle::setValue(
         _style[key] = LV_ALIGN_DEFAULT;
       }
     }
-    else if(key == "text_align") {
+    else if(key == "text-align") {
       if(strncmp(value.c_str(), "center", 6)==0){
         _style[key] = LV_TEXT_ALIGN_CENTER;
       }
@@ -544,6 +606,9 @@ bool LeleStyle::setValue(
       else {
         _style[key] = LV_TEXT_ALIGN_AUTO;
       }
+    }
+    else if(key == "flex") {
+      parseFlex(value);
     }
     else if(key == "background") {
       parseBackground(value);

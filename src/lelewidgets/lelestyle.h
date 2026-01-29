@@ -39,6 +39,7 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const LeleStyle& p);
   const LeleObject *getLeleObject() const;
   static std::string trim(const std::string& str);
+  void parseFlex(const std::string &value);
   void parseBackground(const std::string &value);
   static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
@@ -46,10 +47,12 @@ public:
   std::string getClassName() const;
   std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
   bool setValue(const std::string &key, const std::string &value);
-  std::vector<std::string> getBackgroundAttributes() const;
+  std::vector<std::string> getBackgroundAttributesAsOrderedInJson() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;
   std::string getId() const;
   void applyStyle();
+  static std::map<std::string, std::vector<std::string>> _flex_possible_values;
+  static std::map<std::string, std::map<std::string,int>> _flex_possible_ivalues;
 protected:
   std::map<std::string, float> parseRotation(const std::string &json_str);
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);

@@ -2,12 +2,9 @@ cmake_minimum_required(VERSION 3.10)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-stdlib=libstdc++ -std=stdc++20")
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_FLAGS "-stdlib=libstdc++ -std=stdc++23")
 # clang can use libc++ or libstdc++ (that is what gcc uses)
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -no-pie") #no-pie is needed to print line number from addr2line
-endif()
 
 set(CXX_MODULE_STD ON)
 set(LELE_VERSION_MAJOR 1)
@@ -149,7 +146,7 @@ function(buildLvglSim
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}/Include
     )
     set(props
-        CMAKE_CXX_STANDARD 17
+        CMAKE_CXX_STANDARD 23
         CMAKE_CXX_STANDARD_REQUIRED ON
         CMAKE_CXX_EXTENSIONS OFF # Optional: ensures strict C++17 compliance, no GNU extensions
     )
@@ -310,6 +307,12 @@ generateSetupPyFile(
     "${LVGL_LINK_LIBS}"
     "${LVGL_INC_DIRS}"
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+target_link_options(lele_ui PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
+target_link_options(lvglsim PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
+endif()
+
 # buildLeleCpython() #commented out becasue it is slow. This lets us run py file using python
 buildTests()
 runTests()

@@ -4,10 +4,11 @@
     "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
-        "style":{"id":"view/global","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"5"},
+        "style":{"id":"view/global","padding":"none","margin":"none","flex":{"flow":"column"},
+            "width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"5"},
         "view":{
             "id":"/views:0/view/view",
-            "style":{"layout":"flex","flow":"row","height":"70%"},
+            "style":{"flex":{"flow":"row"},"height":"70%"},
             "img":{
                 "id":"/view/with_bg_img",
                 "src":"res/goose.png",
@@ -34,7 +35,7 @@
             },
             "view":{
                 "id":"controll-panel",
-                "style":{"layout":"flex","flow":"column","width":"18%","border":"solid-1px-#ccc"},
+                "style":{"flex":{"flow":"column"},"width":"18%","border":"solid-1px-#ccc"},
                 "xbutton":{
                     "id":"slider0",
                     "type":"slider-range",
@@ -60,7 +61,7 @@
                     "xevent":{"type":"clicked","action":"action0","args":{}}
                 },
                 "view":{
-                    "style":{"flow":"column","border":"none","width":"100%","height":"25%","corner_radius":"0x7FFF"},
+                    "style":{"flex":{"flow":"column"},"border":"none","width":"100%","height":"25%","corner_radius":"0x7FFF"},
                     "group":"true",
                     "buttons":[
                         {
@@ -126,41 +127,45 @@
         },
         "view":{
             "style":{
-                "layout":"flex","flow":"row",
-                "height":"15%","border":"solid-1px-#ccc"
+                "flex":{"flow":"row"},
+                "height":"8%",
+                "#border":"solid-1px-#ccc",
+                "border":"none"
             },
             "button":{
                 "id":"run_test",
                 "type":"push",
                 "style":{"id":"button0","class_name":"button0",
-                    "layout":"flex","flow":"row",
+                    "flex":{"flow":"row","justify-content":"center","align-items":"center"},
                     "align":"center",
                     "width":"20%","height":"95%",
-                    "border":"solid-1px-#f00"
+                    "border":"solid-2px-#0f0",
+                    "#border":"none"                   
                 },
                 "img":{
                     "id":"img:/run_test",
                     "src":"res/play-button.png",
-                    "border":"solid-2px-#00f",
+                    "#border":"solid-2px-#00f",
+                    "border":"none",
                     "#scale":"90%",
                     "scale":{"x":"50%","y":"50%"},
                     "style":{"id":"style:/button/run_test/img",
                         "x":"0","y":"0",
                         "width":"48%","height":"100%",
-                        "border":"solid-2px-#00f",
-                        "#border":"none"
+                        "border":"none",
+                        "#border":"solid-2px-#00f"
                     }
                 },
                 "label":{
                     "id":"label:/run_test",
                     "text":"Run Test",
                     "style":{"id":"style:/button/run_test/label",
-                        "text_align":"left",
+                        "text-align":"left",
                         "align":"center",
                         "x":"0","y":"23",
                         "width":"50%","height":"40%",
-                        "border":"solid-2px-#0f0",
-                        "#border":"none"
+                        "border":"none",
+                        "#border":"solid-2px-#0f0"
                     }
                 },
                 "event":{"type":"clicked","action":"action0","args":{}}

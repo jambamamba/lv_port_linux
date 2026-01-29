@@ -224,7 +224,7 @@ std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleSty
   std::vector<std::string> bg_keys;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> bg_style;
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    for(const std::string &key : lele_style->getBackgroundAttributes()) {
+    for(const std::string &key : lele_style->getBackgroundAttributesAsOrderedInJson()) {
       std::string bg_key("background/" + key);
       auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClassName() : class_name);
       if(value && bg_style.find(bg_key) == bg_style.end()) {
@@ -304,7 +304,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   }
 
   value = getStyle("border/type");
-  if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::None) {
+  if(!value || std::get<LeleStyle::BorderTypeE>(value.value()) == LeleStyle::BorderTypeE::None) {
     lv_style_set_border_width(&_style, 0);
   }
   else {
@@ -327,45 +327,18 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     int bgcolor = std::get<int>(value.value());
     lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
-
-  value = getStyle("layout");
-  if(value) {
-    lv_obj_set_style_layout(lv_obj, 
-      std::get<lv_layout_t>(value.value()), //LV_LAYOUT_FLEX or LV_LAYOUT_GRID or LV_LAYOUT_NONE
-      LV_STYLE_STATE_CMP_SAME);
-    // lv_obj_set_flex_align(lv_obj, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);//osm todo: read from json
-                // "flex":{
-                //     "flow":"row|column|row_wrap|column_wrap|row_reverse|column_reverse|row_wrap_reverse|column_wrap_reverse",
-                //     "justify-content":"start|center|space-between|space-around|space-evenly",
-                //     "align-items":"start|end|center|stretch",
-                //     "align-content":"start|center|space-between|space-around",
-                //     "grow":"1"
-                // },
-
-
-  }
-  value = getStyle("flow");
-  if(value) {
-    lv_obj_set_style_flex_flow(lv_obj, 
-      std::get<lv_flex_flow_t>(value.value()), //LV_FLEX_FLOW_ROW or LV_FLEX_FLOW_COLUMN or ...
-      LV_STYLE_STATE_CMP_SAME);
-
-    value = getStyle("grow");
-    if(value) {
-      lv_obj_set_style_flex_grow(lv_obj, std::get<int>(value.value()), LV_STYLE_STATE_CMP_SAME);
-    }
-  }
   value = getStyle("align");
   if(value) {
     lv_align_t align = static_cast<lv_align_t>(std::get<int>(value.value()));
     lv_obj_align(lv_obj,
       static_cast<lv_align_t>(std::get<int>(value.value())), obj_x, obj_y);
   }
-  value = getStyle("text_align");
+  value = getStyle("text-align");
   if(value) {
     lv_text_align_t align_type = static_cast<lv_text_align_t>(std::get<int>(value.value()));
     lv_obj_set_style_text_align(lv_obj, align_type, 0);
   }
+  setFlexStyle();
 
   value = getStyle("background/color");
   if(value) {
@@ -523,6 +496,54 @@ std::tuple<int,int> LeleObject::parseBackgroundPosition(
   return std::tuple<int,int>(x, y);
 }
 
+namespace {
+std::optional<int> parseFlexValue(const std::optional<LeleStyle::StyleValue> &value, const std::string &key) {
+
+  if(!value) {
+    return std::nullopt;
+  }
+  std::string desired = std::get<std::string>(value.value());
+  for(const std::string &allowed : LeleStyle::_flex_possible_values[key]) {
+    if(desired == allowed) {
+          int value_ = LeleStyle::_flex_possible_ivalues[key][desired];
+          return value_;
+    }
+  }
+  return std::nullopt;
+}
+}//namespace
+
+void LeleObject::setFlexStyle() {
+  int flow = LeleStyle::_flex_possible_ivalues["flow"]["row"];//default
+  auto value = parseFlexValue(getStyle("flex/flow"), "flow");
+  if(!value) {
+    return;
+  }
+  flow = value.value();
+  int justify_content = LeleStyle::_flex_possible_ivalues["justify-content"]["start"];//default
+  value = parseFlexValue(getStyle("flex/justify-content"), "justify-content");
+  if(value) {
+    justify_content = value.value();
+  }
+  int align_items = LeleStyle::_flex_possible_ivalues["align-items"]["start"];//default
+  value = parseFlexValue(getStyle("flex/align-items"), "align-items");
+  if(value) {
+    align_items = value.value();
+  }
+  int align_content = LeleStyle::_flex_possible_ivalues["align-content"]["start"];//default
+  value = parseFlexValue(getStyle("flex/align-content"), "align-content");
+  if(value) {
+    align_content = value.value();
+  }
+  lv_obj_set_flex_flow(_lv_obj,
+    static_cast<lv_flex_flow_t>(flow));
+  lv_obj_set_flex_align(_lv_obj, 
+    static_cast<lv_flex_align_t>(justify_content), 
+    static_cast<lv_flex_align_t>(align_items), 
+    static_cast<lv_flex_align_t>(align_content)
+  );
+}
+
 void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
   if(lele_styles.size()){
     for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
@@ -566,7 +587,7 @@ std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
 
 // void LeleObject::setTextAlign(lv_obj_t *lv_obj) {
 
-//   auto value = getStyle("text_align");
+//   auto value = getStyle("text-align");
 //   if(value) {
 //     lv_obj_set_style_text_align(lv_obj, 
 //       static_cast<lv_text_align_t>(
