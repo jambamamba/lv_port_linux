@@ -145,16 +145,17 @@
                 "img":{
                     "id":"img:/run_test",
                     "src":"res/play-button.png",
-                    "#border":"solid-2px-#00f",
                     "border":"none",
-                    "#scale":"90%",
+                    "#border":"solid-2px-#00f",
                     "scale":{"x":"50%","y":"50%"},
                     "style":{"id":"style:/button/run_test/img",
                         "x":"0","y":"0",
                         "width":"48%","height":"100%",
-                        "border":"none",
-                        "#border":"solid-2px-#00f"
-                    }
+                        "border":"solid-2px-#00f",
+                        "#border":"none"
+                    },
+                    "antialias":"true",
+                    "#rotation":{"angle":"90","pivot":{"x":"0","y":"0"}}
                 },
                 "label":{
                     "id":"label:/run_test",

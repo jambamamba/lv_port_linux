@@ -51,12 +51,12 @@ bool LeleImage::fromJson(const std::string &json_str) {
       else if(key == "name") {
         _name = value;
       }
-      else if(key == "rotation/angle") {
-        _rotation_angle = std::optional<float>(std::stof(value));
-      }
-      else if(key == "rotation/pivot") {
-        _rotation_pivot = std::optional<LeleImage::XY>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_rotation_pivot->_x}, {"y", &_rotation_pivot->_y}});
+      else if(key == "rotation") {
+        auto rotation = LeleStyle::parseRotation(value, this);
+        if(!rotation.empty()) {
+          _rotation_pivot = LeleImage::XY(static_cast<int>(rotation["pivot/x"]), static_cast<int>(rotation["pivot/y"]));
+          _rotation_angle = rotation["angle"];
+        }
       }
       else if(key == "offset") {
         _offset = std::optional<LeleImage::XY>();

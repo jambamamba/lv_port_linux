@@ -53,8 +53,8 @@ public:
   void applyStyle();
   static std::map<std::string, std::vector<std::string>> _flex_possible_values;
   static std::map<std::string, std::map<std::string,int>> _flex_possible_ivalues;
+  static std::map<std::string, float> parseRotation(const std::string &json_str, LeleObject *lele_obj);
 protected:
-  std::map<std::string, float> parseRotation(const std::string &json_str);
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
 

@@ -141,10 +141,10 @@ int LeleStyle::parseColorCode(const std::string &color_str) {
   return 0;
 }
 
-std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str) {
+std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str, LeleObject *lele_obj) {
   bool processed = false;
   std::map<std::string, float> res;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(_lele_obj, json_str)) {
+  for (const auto &[key, token]: LeleWidgetFactory::fromJson(lele_obj, json_str)) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
       if(key == "angle") {
@@ -154,8 +154,8 @@ std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_st
       else if(key == "pivot") {
         int pivot_x;
         int pivot_y;
-        int max_x = getParentDimension("width", _lele_obj);
-        int max_y = getParentDimension("height", _lele_obj);
+        int max_x = getParentDimension("width", lele_obj);
+        int max_y = getParentDimension("height", lele_obj);
         LeleWidgetFactory::parsePercentValues(
           value, 
           {{"x", &pivot_x}, {"y", &pivot_y}},
@@ -183,7 +183,7 @@ void LeleStyle::parseBackground(const std::string &value_) {
       _style[key + "/" + subkey] = parseColorCode(value);
     }
     else if(subkey == "rotation") {
-      auto rotation = parseRotation(value);
+      auto rotation = LeleStyle::parseRotation(value, _lele_obj);
       if(!rotation.empty()) {
         _style["background/rotation/pivot/x"] = static_cast<int>(rotation["pivot/x"]);
         _style["background/rotation/pivot/y"] = static_cast<int>(rotation["pivot/y"]);
