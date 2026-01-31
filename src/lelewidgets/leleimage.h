@@ -15,6 +15,12 @@ class LeleImage : public LeleObject  {
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   std::string getSrc() const;
   void setSrc(const std::string& src);
+  std::string getSize() const;
+  void setSize(const std::string& src);
+  std::string getPosition() const;
+  void setPosition(const std::string& src);
+  std::string getRotation() const;
+  void setRotation(const std::string& src);
 
   protected:
   void drawImage();
@@ -35,6 +41,12 @@ struct PyLeleImage {
     // Type-specific fields go here
     static PyObject *getSrc(PyObject *, PyObject *);
     static PyObject *setSrc(PyObject *, PyObject *);
+    static PyObject *getSize(PyObject *, PyObject *);
+    static PyObject *setSize(PyObject *, PyObject *);
+    static PyObject *getPosition(PyObject *, PyObject *);
+    static PyObject *setPosition(PyObject *, PyObject *);
+    static PyObject *getRotation(PyObject *, PyObject *);
+    static PyObject *setRotation(PyObject *, PyObject *);
 };
 
 #define PY_LELEIMAGE_MEMBERS() \

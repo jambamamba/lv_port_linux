@@ -69,3 +69,22 @@ void LeleImage::setSrc(const std::string& src) {
   _img_style["img/src"] = src;
   drawImage();
 }
+
+std::string LeleImage::getSize() const {
+  return "";//osm todo
+}
+void LeleImage::setSize(const std::string& src) {
+  //osm todo
+}
+std::string LeleImage::getPosition() const {
+  return "";//osm todo
+}
+void LeleImage::setPosition(const std::string& src) {
+  //osm todo
+}
+std::string LeleImage::getRotation() const {
+  return "";//osm todo
+}
+void LeleImage::setRotation(const std::string& src) {
+  //osm todo
+}
