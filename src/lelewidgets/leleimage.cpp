@@ -1,184 +1,71 @@
 #include "leleimage.h"
 
+#include <image_builder/image_builder.h>
+
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-namespace {
-int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
-  if(lele_obj && lele_obj->getParent()) {
-    auto value = lele_obj->getParent()->getStyle(key);
-    if(value){
-      if(std::holds_alternative<int>(value.value())) {
-        int val = std::get<int>(value.value());
-        return std::get<int>(value.value());
-      }
-      else {
-        LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
-      }
-    }
-    else {
-      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
-    }
-  }
-  else if(lele_obj) {
-    if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
-    else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
-    else if(key == "corner_radius") { 
-      return std::max(
-        lv_obj_get_width(lv_screen_active()), 
-        lv_obj_get_height(lv_screen_active())
-      ); 
-    }
-    else {
-      LL(WARNING, LVSIM) << "style key:" << key << " not handled";
-    }
-  }
-  return 0;
-}
-}//namespace
 LeleImage::LeleImage(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
 
   _class_name = __func__ ;//typeid(this).name();
   fromJson(json_str);
 }
+
+namespace {
+const std::string prefix("img");
+}
+
 bool LeleImage::fromJson(const std::string &json_str) {
-  for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "src") {
-        _src = value;
-      }
-      else if(key == "name") {
-        _name = value;
-      }
-      else if(key == "rotation") {
-        auto rotation = LeleStyle::parseRotation(value, this);
-        if(!rotation.empty()) {
-          _rotation_pivot = LeleImage::XY(static_cast<int>(rotation["pivot/x"]), static_cast<int>(rotation["pivot/y"]));
-          _rotation_angle = rotation["angle"];
-        }
-      }
-      else if(key == "offset") {
-        _offset = std::optional<LeleImage::XY>();
-        LeleWidgetFactory::parsePercentValues(value, {{"x", &_offset->_x}, {"y", &_offset->_y}});
-      }
-      else if(key == "scale") {
-        std::string val = LeleWidgetFactory::trim(value);
-        // int x = LeleStyle::parsePercentValue(val, max_x);
-        int rev_offset = 0;
-        if(val.at(value.size()-1) == '%'){
-          rev_offset = 1;
-        }
-        _scale = LeleImage::XY();
-        if(std::all_of(val.begin(), val.end() - rev_offset,
-          [this](unsigned char ch){ return std::isdigit(ch); })) {
-          _scale->_x = _scale->_y = std::stoi(val, 0, 10);
-        }
-        else {
-          int max_x_percent = 100;
-          int max_y_percent = 100;
-          LeleWidgetFactory::parsePercentValues(value,
-            {{"x", &_scale->_x}, {"y", &_scale->_y}},
-            {{"x", max_x_percent}, {"y", max_y_percent}});
-        }
-      }
-      else if(key == "blendmode") {
-        if(value == "additive")         { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_ADDITIVE); }
-        else if(value == "subtractive") { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_SUBTRACTIVE); }
-        else if(value == "multiply")    { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_MULTIPLY); }
-        else if(value == "difference")  { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_DIFFERENCE); }
-        else                            { _blendmode = std::optional<lv_blend_mode_t>(LV_BLEND_MODE_NORMAL); }
-      }
-      else if(key == "align") {
-        if(value == "top_left" )            {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_TOP_LEFT);}
-        else if(value == "top_mid" )        {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_TOP_MID);}
-        else if(value == "top_right" )      {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_TOP_RIGHT);}
-        else if(value == "bottom_left" )    {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_BOTTOM_LEFT);}
-        else if(value == "bottom_mid" )     {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_BOTTOM_MID);}
-        else if(value == "bottom_right")    {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_BOTTOM_RIGHT);}
-        else if(value == "left_mid" )       {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_LEFT_MID);}
-        else if(value == "right_mid" )      {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_RIGHT_MID);}
-        else if(value == "center" )         {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_CENTER);}
-        else if(value == "auto_transform" ) {_align = std::optional<lv_image_align_t>(_LV_IMAGE_ALIGN_AUTO_TRANSFORM);}
-        else if(value == "stretch" )        {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_STRETCH);}//Set X and Y scale to fill the Widget's area
-        else if(value == "tile" )           {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_TILE);}//Tile image to fill Widget's area. Offset is applied to shift the tiling
-        else if(value == "contain" )        {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_CONTAIN);}//The image keeps its aspect ratio, but is resized to the maximum size that fits within the Widget's area
-        else if(value == "cover" )          {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_COVER);}//The image keeps its aspect ratio and fills the Widget's area
-        else                                {_align = std::optional<lv_image_align_t>(LV_IMAGE_ALIGN_DEFAULT);}
-      }
-      else if(key == "antialias") {
-        _antialias = (value == "false") ? false:true;
-      }
-    }
-  }  
+  std::tie(_img_style, _attributes_as_ordered_in_json) = ImageBuilder::parseBackground("img", json_str, this);
+  for(auto &item: _attributes_as_ordered_in_json) {
+    item = prefix + "/" + item;
+  }
   return true;
 }
+
 lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj_) {
 
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_image_create(lele_parent->getLvObj()));
+  
+  _lv_img = lv_image_create(
+      _lv_bg_img ? _lv_bg_img : 
+        _lv_bg_color ? _lv_bg_color : 
+          _lv_obj);
 
-  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> img;
-  if(!_src.empty()) {
-    if(_src.at(0) == '/') {
-      img = LeleImageConverter::generateImgDsc(_src.c_str());
-    }
-    else {
-      std::string img_path(std::filesystem::current_path().string() + "/" + _src);
-      if(!std::filesystem::exists(img_path)) {
-        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
-      }
-      img = LeleImageConverter::generateImgDsc(img_path.c_str());
-    }
-  }
-  if(!img) {
-    if(!_src.empty()) {
-      LOG(WARNING, LVSIM, "LeleImage::createLvObj FAILED to load image: '%s'\n", _src.c_str()); 
-    }
-    return _lv_obj;
-  }
+  drawImage();
+  return _lv_obj;
+}
 
-  lv_obj_t *lv_obj = _lv_bg_img ? lv_image_create(_lv_bg_img) : _lv_obj;
-  lv_image_set_src(lv_obj, img.value().get());
-  _images[_src] = img;
+void LeleImage::drawImage() {
+  auto width = getStyle("width");
+  auto height = getStyle("height");
 
-  lv_image_t *lv_image = reinterpret_cast<lv_image_t *>(lv_obj);
-  LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_image w:%i, h:%i, sx:%i, sy:%i\n", lv_image->w, lv_image->h, lv_image->scale_x, lv_image->scale_y);
-  lv_image_dsc_t *lv_image_dsc = img.value().get();
-  LOG(DEBUG, LVSIM, "@@@ LeleImage::createLvObj lv_image_dsc w:%i, h:%i\n", lv_image_dsc->header.w, lv_image_dsc->header.h);
-
-  if(_blendmode) {
-    lv_image_set_blend_mode(lv_obj, _blendmode.value());
+  _img_dsc = ImageBuilder::drawBackgroundImage(
+    prefix,
+    std::get<std::string>(_img_style["img/src"].value()),
+    _attributes_as_ordered_in_json,
+    _img_style,
+    std::get<int>(width.value()),
+    std::get<int>(height.value()));
+  if(_img_dsc) {
+    lv_image_set_src(_lv_img, _img_dsc.value().get());
   }
-  if(_antialias) {
-    lv_image_set_antialias(lv_obj, _antialias.value());
-  }
-  if(_rotation_pivot) {
-    lv_image_set_pivot(lv_obj, _rotation_pivot->_x, _rotation_pivot->_y);
-  }
-  if(_rotation_angle) {
-    lv_image_set_rotation(lv_obj, _rotation_angle.value());
-  }
-  if(_offset) {
-    lv_image_set_offset_x(lv_obj, _offset->_x);
-    lv_image_set_offset_y(lv_obj, _offset->_y);
-  }
-  if(_scale) {
-    if(_scale->_x == _scale->_y) {
-      lv_image_set_scale(lv_obj, LV_SCALE_NONE * _scale->_x / 100);
-    }
-    else {
-      lv_image_set_scale_x(lv_obj, LV_SCALE_NONE * _scale->_x / 100);
-      lv_image_set_scale_y(lv_obj, LV_SCALE_NONE * _scale->_y / 100);
-    }
-  }
-  if(_align) {
-    lv_image_set_inner_align(lv_obj, _align.value());
-  }
-
-  return lv_obj;
 }
 
 std::string LeleImage::getSrc() const { 
-  return _src; 
+  auto src = _img_style.find("img/src");
+  if(src == _img_style.end()) {
+    return "";
+  }
+  if(!src->second) {
+    return "";
+  }
+  std::string img_src = std::get<std::string>(src->second.value());
+  return img_src;
+}
+
+void LeleImage::setSrc(const std::string& src) {
+  _img_style["img/src"] = src;
+  drawImage();
 }

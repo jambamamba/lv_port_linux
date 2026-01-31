@@ -2,46 +2,13 @@
 #include <algorithm>
 #include <ranges>
 #include <regex>
+#include <image_builder/image_builder.h>
 
 #include "lelestyle.h"
 #include "lelewidgetfactory.h"
 #include "leleobject.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
-
-namespace {
-int getParentDimension(const std::string &key, const LeleObject *lele_obj) {
-  if(lele_obj && lele_obj->getParent()) {
-    auto value = lele_obj->getParent()->getStyle(key);
-    if(value){
-      if(std::holds_alternative<int>(value.value())) {
-        int val = std::get<int>(value.value());
-        return std::get<int>(value.value());
-      }
-      else {
-        LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
-      }
-    }
-    else {
-      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
-    }
-  }
-  else if(lele_obj) {
-    if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
-    else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
-    else if(key == "corner_radius") { 
-      return std::max(
-        lv_obj_get_width(lv_screen_active()), 
-        lv_obj_get_height(lv_screen_active())
-      ); 
-    }
-    else {
-      LL(WARNING, LVSIM) << "style key:" << key << " not handled";
-    }
-  }
-  return 0;
-}
-}//namespace
 
 LeleStyle::LeleStyle(LeleObject *lele_obj, const std::string &json_str) 
 : _lele_obj(lele_obj) {
@@ -98,126 +65,8 @@ int LeleStyle::parsePercentValue(const std::string &x, int parent_x) {
     return 0;
 }
 
-int LeleStyle::parseColorCode(const std::string &color_str) {
-  if(color_str.empty()) {
-    return 0;
-  }
-  else if(strcmp(color_str.c_str(), "red") == 0) {
-    return 0xff0000;
-  }
-  else if(strcmp(color_str.c_str(), "green") == 0) {
-    return 0x00ff00;
-  }
-  else if(strcmp(color_str.c_str(), "blue") == 0) {
-    return 0x0000ff;
-  }
-  else if(strcmp(color_str.c_str(), "white") == 0) {
-    return 0xffffff;
-  }
-  else if(strcmp(color_str.c_str(), "black") == 0) {
-    return 0x000000;
-  }
-  else if(std::all_of(color_str.begin(), color_str.end(),
-    [](unsigned char ch){ return std::isdigit(ch); })) {
-    return std::stoi(color_str.c_str(), nullptr, 10);
-  }
-  else if(color_str.c_str()[0] == '#') {
-    std::string suffix(color_str.c_str() + 1);
-    if(std::all_of(suffix.begin(), suffix.end(),
-      [](uint32_t ch){return ch >= '0' && ch <= ('0' + 0xff); })) {
-          if(suffix.size() == 3) { // #fff => #ffffff
-              std::string value;
-              for(int i=0; i<3; ++i) {
-                  value+=suffix.at(i);
-                  value+=suffix.at(i);
-              }
-              return std::stoi(value.c_str(), nullptr, 16);
-          }
-          else {
-            return std::stoi(suffix.c_str(), nullptr, 16);
-          }
-    }
-  }
-  return 0;
-}
-
-std::map<std::string, float> LeleStyle::parseRotation(const std::string &json_str, LeleObject *lele_obj) {
-  bool processed = false;
-  std::map<std::string, float> res;
-  for (const auto &[key, token]: LeleWidgetFactory::fromJson(lele_obj, json_str)) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "angle") {
-        res[key] = std::stof(value);
-        processed = true;
-      }
-      else if(key == "pivot") {
-        int pivot_x;
-        int pivot_y;
-        int max_x = getParentDimension("width", lele_obj);
-        int max_y = getParentDimension("height", lele_obj);
-        LeleWidgetFactory::parsePercentValues(
-          value, 
-          {{"x", &pivot_x}, {"y", &pivot_y}},
-          {{"x", max_x}, {"y", max_y}}
-        );
-        res["pivot/x"] = pivot_x;
-        res["pivot/y"] = pivot_y;
-        processed = true;
-      }
-    }
-  }
-  return processed ? res: std::map<std::string, float>();
-}
-
 std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() const {
-  return _background_attributes;
-}
-
-void LeleStyle::parseBackground(const std::string &value_) {
-
-  LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
-    const std::string key("background");
-    std::string subkey(subkey_);
-    if(subkey == "color") {
-      _style[key + "/" + subkey] = parseColorCode(value);
-    }
-    else if(subkey == "rotation") {
-      auto rotation = LeleStyle::parseRotation(value, _lele_obj);
-      if(!rotation.empty()) {
-        _style["background/rotation/pivot/x"] = static_cast<int>(rotation["pivot/x"]);
-        _style["background/rotation/pivot/y"] = static_cast<int>(rotation["pivot/y"]);
-        _style["background/rotation/angle"] = rotation["angle"];
-        _background_attributes.push_back("rotation/pivot/x");
-        _background_attributes.push_back("rotation/pivot/y");
-        _background_attributes.push_back("rotation/angle");
-        return;
-      }
-    }
-    else if(subkey == "image") {
-      _style[key + "/" + subkey] = value;
-    }
-    else if(subkey == "position") { //"10%", "10px", "10% 10%", "10px 10px"
-      _style[key + "/" + subkey] = value;
-    }
-    else if(subkey == "size") {//"10%", "10% 10%", "cover", "contain"
-      _style[key + "/" + subkey] = value;
-    }
-    else if(subkey == "repeat") {
-      std::vector<std::string> _flex_possible_values = {"repeat-x","repeat-y","repeat","none"};
-      if(_flex_possible_values.end() == std::find(_flex_possible_values.begin(), _flex_possible_values.end(), value)) {
-        auto joined_view = _flex_possible_values | std::views::join_with('|');//std::ranges::to<std::string>(joined_view);
-        LL(WARNING, LVSIM) << key << "/" << subkey << "'" << value << "' is not valid. Acceptable values are: " << std::ranges::to<std::string>(joined_view);
-        return;
-      }
-      _style[key + "/" + subkey] = value;
-    }
-    else {
-      LL(WARNING, LVSIM) << key << "/" << subkey << " is not a valid attribute";        
-      return;
-    }
-    _background_attributes.push_back(subkey);
-  });
+  return _background_attributes_as_ordered_in_json;
 }
 
 std::map<std::string, std::vector<std::string>> LeleStyle::_flex_possible_values = {
@@ -343,7 +192,7 @@ std::tuple<LeleStyle::BorderTypeE,int,int> LeleStyle::parseBorder(const std::str
       border_type = Dotted;
     }
     border_width = std::stoi(matches[2].str());
-    border_color = parseColorCode(matches[4]);
+    border_color = ImageBuilder::parseColorCode(matches[4]);
   }
   return std::tuple<LeleStyle::BorderTypeE,int,int>{border_type, border_width, border_color};
 }
@@ -471,19 +320,19 @@ bool LeleStyle::setValue(
     //   return false;
     // }
     else if(key == "x") {
-      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
+      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
     }
     else if(key == "y") {
-      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
+      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
     }
     else if(key == "width") {
-      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
+      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
     }
     else if(key == "height") {
-      _style[key] = parsePercentValue(value, getParentDimension(key, _lele_obj));
+      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
     }
     else if(key == "corner_radius") {
-      _style[key] = parsePercentValue(value, std::max(getParentDimension(key, _lele_obj), getParentDimension(key, _lele_obj)));
+      _style[key] = parsePercentValue(value, std::max(ImageBuilder::getParentDimension(key, _lele_obj), ImageBuilder::getParentDimension(key, _lele_obj)));
     }
     else if(key == "padding") {
       std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);
@@ -553,13 +402,13 @@ bool LeleStyle::setValue(
       }
     }
     else if(key == "fgcolor") {
-      _style[key] = LeleStyle::parseColorCode(value);
+      _style[key] = ImageBuilder::parseColorCode(value);
     }
     else if(key == "bgcolor") {
-      _style[key] = LeleStyle::parseColorCode(value);
+      _style[key] = ImageBuilder::parseColorCode(value);
     }
     else if(key == "checked_color") {
-      _style[key] = LeleStyle::parseColorCode(value);
+      _style[key] = ImageBuilder::parseColorCode(value);
     }
     else if(key == "align") {
       if(strncmp(value.c_str(), "center", strlen("center"))==0){
@@ -611,7 +460,9 @@ bool LeleStyle::setValue(
       parseFlex(value);
     }
     else if(key == "background") {
-      parseBackground(value);
+      auto [style, attributes] = ImageBuilder::parseBackground(key, value, _lele_obj);
+      _style.merge(style);
+      _background_attributes_as_ordered_in_json = attributes;
     }
     else if(key == "background/rotation/angle") {
       _style["background/rotation/angle"] = std::stof(value);
@@ -619,8 +470,8 @@ bool LeleStyle::setValue(
     else if(key == "background/rotation/pivot") {
       int pivot_x = 0;
       int pivot_y = 0;
-      int max_x = getParentDimension("width", _lele_obj);
-      int max_y = getParentDimension("height", _lele_obj);
+      int max_x = ImageBuilder::getParentDimension("width", _lele_obj);
+      int max_y = ImageBuilder::getParentDimension("height", _lele_obj);
       if(LeleWidgetFactory::parsePercentValues(
         value, 
         {{"x", &pivot_x}, {"y", &pivot_y}},
@@ -637,7 +488,7 @@ bool LeleStyle::setValue(
       _style["background/rotation/pivot/y"] = std::stoi(value);
     }
     else if(key == "background/color") {
-        _style["background/color"] = parseColorCode(value);
+        _style["background/color"] = ImageBuilder::parseColorCode(value);
     }
     else if(key == "background/image") {
         _style["background/image"] = value;

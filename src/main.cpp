@@ -36,7 +36,7 @@
 
 #include "src/graphics_backend.h"
 #include "src/lelewidgets/leleobject.h"
-#include "src/lelewidgets/python_wrapper.h"
+#include "src/python/python_wrapper.h"
 
 
 LOG_CATEGORY(LVSIM, "LVSIM");

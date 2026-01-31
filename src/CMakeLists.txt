@@ -104,6 +104,7 @@ function(buildLvglSim
         lelewidgets/lelemessagebox.py.cpp
         lelewidgets/lelenullwidget.cpp
         lelewidgets/leleimage.cpp
+        lelewidgets/leleimage.py.cpp
         lelewidgets/leleobject.cpp
         lelewidgets/leleobject.py.cpp
         lelewidgets/lelestackview.cpp
@@ -113,11 +114,12 @@ function(buildLvglSim
         lelewidgets/leletextbox.cpp
         lelewidgets/leleview.cpp
         lelewidgets/lelewidgetfactory.cpp
-        lelewidgets/python_binding.cpp
     )
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")
     set(sources
         graphics_backend.cpp
+        python/python_binding.cpp
+        image_builder/image_builder.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 
@@ -177,7 +179,7 @@ function(buildLvglSim
     target_include_directories(lele_ui PRIVATE ${inc_dirs})
     add_dependencies(lele_ui lv_image_convert python)
 
-    add_executable(lvglsim main.cpp lelewidgets/python_wrapper.cpp)
+    add_executable(lvglsim main.cpp python/python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
     target_link_directories(lvglsim PRIVATE ${link_dirs})
     target_link_libraries(lvglsim PRIVATE ${link_libs} lele_ui)

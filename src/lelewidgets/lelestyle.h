@@ -40,8 +40,6 @@ public:
   const LeleObject *getLeleObject() const;
   static std::string trim(const std::string& str);
   void parseFlex(const std::string &value);
-  void parseBackground(const std::string &value);
-  static int parseColorCode(const std::string &color_str);
   static int parsePercentValue(const std::string &x, int parent_x);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
   std::string getClassName() const;
@@ -53,7 +51,6 @@ public:
   void applyStyle();
   static std::map<std::string, std::vector<std::string>> _flex_possible_values;
   static std::map<std::string, std::map<std::string,int>> _flex_possible_ivalues;
-  static std::map<std::string, float> parseRotation(const std::string &json_str, LeleObject *lele_obj);
 protected:
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
@@ -62,7 +59,7 @@ protected:
   std::string _class_name;
   std::string _id;
   std::map<std::string, std::optional<StyleValue>> _style = {};
-  mutable std::vector<std::string> _background_attributes;
+  mutable std::vector<std::string> _background_attributes_as_ordered_in_json;
   int _parent_width = 0;
   int _parent_height = 0;
 };

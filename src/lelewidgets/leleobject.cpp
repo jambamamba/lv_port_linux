@@ -2,71 +2,14 @@
 #include <iostream>
 #include <ranges>
 #include <algorithm>
+#include <image_builder/image_builder.h>
 #include <lvgl/lvgl_private.h>
-#include </repos/lv_port_linux/lvgl/src/core/lv_obj_tree.h>
+#include <lvgl/src/core/lv_obj_tree.h>
+#include <python/python_wrapper.h>
 
 #include "leleobject.h"
-#include "python_wrapper.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
-
-namespace {
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImageWithValuesParsedFromJson(
-  const lv_image_dsc_t *src_img, std::string val, int container_width, int container_height) {
-
-  int x = -1;
-  int y = -1;
-  val = LeleWidgetFactory::trim(val);
-  if(LeleWidgetFactory::parsePercentValues(
-    val, 
-    {{"x", &x}, {"y", &y}}, 
-    {{"x", container_width}, {"y", container_height}})) {
-    return LeleImageConverter::resizeImg(src_img, x, y);
-  }
-  x = LeleStyle::parsePercentValue(val, container_width);
-  y = LeleStyle::parsePercentValue(val, container_height);
-  return LeleImageConverter::resizeImg(src_img, x, y);
-}
-
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeContentToFillContainerPotentiallyCroppingContent(
-  const lv_image_dsc_t *src_img, int container_width, int container_height) {
-  int img_width = src_img->header.w;
-  int img_height = src_img->header.h;
-  int dx = std::abs(container_width - img_width);
-  int dy = std::abs(container_height - img_height);
-  int new_width = -1;
-  int new_height = -1;
-  if(dx < dy) {
-    new_width = container_width;
-    new_height = img_height * container_width / img_width;
-  }
-  else {
-    new_height = container_height;
-    new_width = img_width * container_height / img_height;
-  }
-  return LeleImageConverter::resizeImg(src_img, new_width, new_height);
-}
-
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotentiallyLeavingEmptySpace(
-  const lv_image_dsc_t *src_img, int container_width, int container_height) {
-  int img_width = src_img->header.w;
-  int img_height = src_img->header.h;
-  int dx = std::abs(container_width - img_width);
-  int dy = std::abs(container_height - img_height);
-  int new_width = -1;
-  int new_height = -1;
-  if(dx < dy) {
-    new_height = container_height;
-    new_width = img_width * container_height / img_height;
-  }
-  else {
-    new_width = container_width;
-    new_height = img_height * container_width / img_width;
-  }
-  return LeleImageConverter::resizeImg(src_img, new_width, new_height);
-}
-
-}//namespace
 
 LeleObject::LeleObject(LeleObject *parent, const std::string &json_str)
   : _lele_parent(parent), 
@@ -219,7 +162,8 @@ bool LeleObject::visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *
   return true;
 }
 
-std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> LeleObject::getBackgroundStyle(const std::string &class_name) const {
+std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> 
+LeleObject::getBackgroundStyle(const std::string &class_name) const {
 
   std::vector<std::string> bg_keys;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> bg_style;
@@ -342,11 +286,34 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
 
   value = getStyle("background/color");
   if(value) {
-    fillBackgroundColor(lv_obj, std::get<int>(value.value()), obj_width, obj_height);
+    _bg_color = ImageBuilder::fillBackgroundColor(std::get<int>(value.value()), obj_width, obj_height);
+    if(!_lv_bg_color) {
+      _lv_bg_color = lv_image_create(lv_obj);
+    }
+    if(!_lv_bg_color) {
+        LOG(FATAL, LVSIM, "Failed in lv_image_create");
+        return;
+    }
+    lv_image_set_src(_lv_bg_color, _bg_color.value().get());
   }
   value = getStyle("background/image");
   if(value) {
-    drawBackgroundImage(lv_obj, std::get<std::string>(value.value()), obj_width, obj_height);
+    auto [style_keys, style_map] = getBackgroundStyle();
+    _bg_img = ImageBuilder::drawBackgroundImage(
+      "background",
+      std::get<std::string>(value.value()), 
+      style_keys,
+      style_map,
+      obj_width,
+      obj_height);
+    if(!_lv_bg_img) {
+      _lv_bg_img = lv_image_create(_lv_bg_color ? _lv_bg_color : _lv_obj);
+    }
+    if(!_lv_bg_img) {
+        LOG(FATAL, LVSIM, "Failed in lv_image_create");
+        return;
+    }
+    lv_image_set_src(_lv_bg_img, _bg_img.value().get());
   }
   value = getStyle("scrollbar");
   if(value) {
@@ -359,141 +326,6 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   // lv_style_t * btn_style = lv_theme_get_style(my_theme, LV_PART_MAIN); // Get the button style from your custom theme
   // lv_style_set_bg_color(btn_style, lv_color_hex(0x0000FF), LV_STATE_DEFAULT); // Customize the button style
   lv_obj_add_style(lv_obj, &_style, LV_PART_MAIN);
-}
-
-void LeleObject::fillBackgroundColor(lv_obj_t *lv_obj, int color, int obj_width, int obj_height) {
-
-  _bg_color = LeleImageConverter::generateImgDsc(obj_width, obj_height, 3);
-  if(!_bg_color) {
-    LL(FATAL, LVSIM) << "Failed to generate image for background color";
-  }
-  LeleImageConverter::fillImgDsc(_bg_color->get(), color);
-  if(!_lv_bg_color) {
-    _lv_bg_color = lv_image_create(lv_obj);
-  }
-  lv_image_set_src(_lv_bg_color, _bg_color.value().get());
-}
-
-void LeleObject::drawBackgroundImage(lv_obj_t *lv_obj, const std::string &src, int obj_width, int obj_height) {
-
-    if(src.at(0) == '/') {
-      _bg_img = LeleImageConverter::generateImgDsc(src.c_str());
-    }
-    else {
-      std::string img_path(std::filesystem::current_path().string() + "/" + src);
-      if(!std::filesystem::exists(img_path)) {
-        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
-      }
-      LOG(DEBUG, LVSIM, "Loading image: %s\n", img_path.c_str());
-      _bg_img = LeleImageConverter::generateImgDsc(img_path.c_str());
-    }
-    if(!_bg_img) {
-        LOG(FATAL, LVSIM, "Failed in generating image description");
-        return;
-    }
-    struct XY {
-      int _x = 0;
-      int _y = 0;
-    };
-    XY offset;
-    XY background_rotation_pivot;
-    float background_rotation_angle;
-    
-    const auto &[keys, bg_style] = getBackgroundStyle();
-    for(const auto &key: keys) {
-      const auto &value = bg_style.at(key);
-      if(key == "background/size") {
-        std::string val = std::get<std::string>(value.value());
-        if(val == "cover") {
-          _bg_img = resizeContentToFillContainerPotentiallyCroppingContent(_bg_img.value().get(), obj_width, obj_height);
-        }
-        else if(val == "contain") {
-          _bg_img = resizeToShowEntireContentPotentiallyLeavingEmptySpace(_bg_img.value().get(), obj_width, obj_height);
-        }
-        else if(!val.empty()) {
-          _bg_img = resizeImageWithValuesParsedFromJson(_bg_img.value().get(), val, obj_width, obj_height);
-        }
-        if(!_bg_img) {
-          LOG(FATAL, LVSIM, "Failed in processing background/size");
-          return;
-        }
-      }
-      else if(key == "background/position/x") {
-        std::tie(offset._x, offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
-      }
-      else if(key == "background/rotation/pivot/x") {
-        // background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));
-        background_rotation_pivot._x = std::get<int>(value.value());
-      }      
-      else if(key == "background/rotation/pivot/y") {
-        // background_rotation_pivot._y = std::stoi(std::get<std::string>(value.value()));
-        background_rotation_pivot._y = std::get<int>(value.value());
-      }      
-      else if(key == "background/rotation/angle") {
-        background_rotation_angle = std::get<float>(value.value());
-        _bg_img = LeleImageConverter::rotateImg(_bg_img.value().get(), background_rotation_pivot._x, background_rotation_pivot._y, background_rotation_angle);
-        if(!_bg_img) {
-          LOG(FATAL, LVSIM, "Failed in processing background/rotate");
-          return;
-        }
-        // std::string filename("rotated.");
-        // filename += std::to_string(background_rotation_angle);
-        // filename += ".png";
-        // LeleImageConverter::saveGdImage(filename.c_str(), _bg_img.value().get());
-      }
-      else if(key == "background/repeat") {
-        std::string val = std::get<std::string>(value.value());
-        if(val == "repeat-x"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset._x, offset._y);
-        }
-        else if(val == "repeat-y"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset._x, offset._y);
-        }
-        else if(val == "repeat"){
-          _bg_img = LeleImageConverter::tileImg(_bg_img.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset._x, offset._y);
-        }
-        if(!_bg_img) {
-          LOG(FATAL, LVSIM, "Failed in background/repeat");
-          return;
-        }
-      }
-    }
-    if(_bg_img.value().get()->header.w > obj_width || 
-        _bg_img.value().get()->header.h > obj_height) {
-        _bg_img = LeleImageConverter::cropImg(_bg_img.value().get(), 0, 0, obj_width, obj_height);
-    }
-    if(!_bg_img) {
-      LOG(FATAL, LVSIM, "Failed in cropping image");
-      return;
-    }
-
-    // LOG(DEBUG, LVSIM, "obj_width:%i, obj_height:%i\n", obj_width, obj_height);
-    if(!_lv_bg_img) {
-      _lv_bg_img = lv_image_create(_lv_bg_color ? _lv_bg_color : _lv_obj);
-    }
-    if(!_lv_bg_img) {
-        LOG(FATAL, LVSIM, "Failed in lv_image_create");
-        return;
-    }
-    lv_image_set_src(_lv_bg_img, _bg_img.value().get());
-}
-
-std::tuple<int,int> LeleObject::parseBackgroundPosition(
-  const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) const {
-  int x = 0;
-  int y = 0;
-  std::string val = std::get<std::string>(value.value());
-  if(!val.empty()) {
-    val = LeleWidgetFactory::trim(val);
-    if(!LeleWidgetFactory::parsePercentValues(
-      val, 
-      {{"x", &x}, {"y", &y}}, 
-      {{"x", container_width}, {"y", container_height}})) {
-      x = LeleStyle::parsePercentValue(val, container_width);
-      y = LeleStyle::parsePercentValue(val, container_height);
-    }
-  }
-  return std::tuple<int,int>(x, y);
 }
 
 namespace {

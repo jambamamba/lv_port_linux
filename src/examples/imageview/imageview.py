@@ -204,9 +204,17 @@ def runTest(event):
       user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
       print(f"@@@py obj: {obj}, user_attributes: {user_attributes}.")
       obj = lele.getObjectById("label:/run_test")
+      img = lele.getObjectById("img:/run_test")
+      if _tests_are_running:
+          obj.setText("Stop")
+          img_src = img.getSrc()
+          print(f"@@@py img_src: {img_src}.")
+          img.setSrc("res/pause-button.png")
+      else:
+          obj.setText("Run Test")
+          img.setSrc("res/play-button.png")
       user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
       print(f"@@@py obj: {obj}, user_attributes: {user_attributes}.")
-      print(f"@@@#@@@")
       # lele.getObjectById("repeat-none").click()
       pass
 
@@ -216,13 +224,11 @@ def runTestLoop():
    global _rotate_delta
    if _tests_are_running:
       obj = lele.getObjectById("scale")
-      scale = obj.getValue()
-      if scale == 200:
+      scale = obj.getValue() % 200
+      if scale >= 200-1:
          _scale_delta = -1
       elif scale == 1:
          _scale_delta = 1
-         _tests_are_running = False
-         return
       obj.setValue(scale + _scale_delta)
       obj = lele.getObjectById("rotate")
       angle = obj.getValue()

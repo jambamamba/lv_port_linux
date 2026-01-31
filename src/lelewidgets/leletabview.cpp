@@ -1,5 +1,7 @@
 #include "leletabview.h"
 
+#include <image_builder/image_builder.h>
+
 #include "lelelabel.h"
 #include "leletextbox.h"
 #include "lelestyle.h"
@@ -171,7 +173,7 @@ bool LeleTabView::fromJson(const std::string &json_str) {
         _img = value;
       }
       else if(key == "active_tab_bgcolor") {
-        _active_tab_bgcolor = LeleStyle::parseColorCode(value);
+        _active_tab_bgcolor = ImageBuilder::parseColorCode(value);
       }
       else if(key == "active_tab_bottom_border") {
         std::tie(_active_tab_bottom_border_type,_active_tab_bottom_border_width,_active_tab_bottom_border_color) = 

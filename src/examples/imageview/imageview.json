@@ -12,11 +12,13 @@
             "img":{
                 "id":"/view/with_bg_img",
                 "src":"res/goose.png",
-                "antialias":"true",
-                "xrotation":{"angle":"90","pivot":{"x":"0","y":"0"}},
-                "xoffset":{"x":"20","y":"30"},
-                "xscale":"20%",
-                "xalign":"tile",
+                "xposition":"20",
+                "xposition":{"x":"120","y":"120"},
+                "xsize":"contain",
+                "xsize":"cover",
+                "xsize":{"x":"20%","y":"20%"},
+                "xsize":"100",
+                "xrotation":{"angle":"30","pivot":{"x":"0","y":"0"}},
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
                         "ximage":"res/pumpkin-man.png",
@@ -25,8 +27,8 @@
                         "xposition":{"x":"20","y":"20"},
                         "xsize":"contain",
                         "xsize":"cover",
-                        "size":"100",
                         "xsize":{"x":"20%","y":"20%"},
+                        "size":"100",
                         "rotation":{"angle":"0","pivot":{"x":"100","y":"100"}},
                         "repeat":"repeat",
                         "color":"#0f0"
@@ -145,17 +147,15 @@
                 "img":{
                     "id":"img:/run_test",
                     "src":"res/play-button.png",
+                    "size":{"x":"50%","y":"80%"},
                     "border":"none",
                     "#border":"solid-2px-#00f",
-                    "scale":{"x":"50%","y":"50%"},
                     "style":{"id":"style:/button/run_test/img",
                         "x":"0","y":"0",
                         "width":"48%","height":"100%",
                         "border":"solid-2px-#00f",
                         "#border":"none"
-                    },
-                    "antialias":"true",
-                    "#rotation":{"angle":"90","pivot":{"x":"0","y":"0"}}
+                    }
                 },
                 "label":{
                     "id":"label:/run_test",
