@@ -4,6 +4,7 @@
 
 #include <map>
 #include <optional>
+#include <image_builder/image_builder.h>
 #include <lv_image_converter/lv_image_converter.h>
 
 class LeleImage : public LeleObject  {
@@ -15,18 +16,18 @@ class LeleImage : public LeleObject  {
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   std::string getSrc() const;
   void setSrc(const std::string& src);
-  std::string getSize() const;
-  void setSize(const std::string& src);
-  std::string getPosition() const;
-  void setPosition(const std::string& src);
-  std::string getRotation() const;
-  void setRotation(const std::string& src);
+  std::tuple<int,int> getSize() const;
+  void setSize(int width, int height);
+  std::tuple<int,int> getPosition() const;
+  void setPosition(int width, int height);
+  std::tuple<float, int,int> getRotation() const;
+  void setRotation(float angle, int pivot_x, int pivot_y);
 
   protected:
   void drawImage();
   
   lv_obj_t *_lv_img = nullptr;
-  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
+  ImageBuilder::Res _img;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> _img_style;
   std::vector<std::string> _attributes_as_ordered_in_json;
 };
@@ -55,5 +56,11 @@ struct PyLeleImage {
 #define PY_LELEIMAGE_METHODS() \
   PY_LELEOBJECT_METHODS() \
   {"getSrc", (PyCFunction)PyLeleImage::getSrc, METH_NOARGS, "Get the image source"},\
-  {"setSrc", (PyCFunction)PyLeleImage::setSrc, METH_VARARGS, "Set the image source"},
+  {"setSrc", (PyCFunction)PyLeleImage::setSrc, METH_VARARGS, "Set the image source"},\
+  {"getSize", (PyCFunction)PyLeleImage::getSize, METH_NOARGS, "Get the image size as tuple x,y"},\
+  {"setSize", (PyCFunction)PyLeleImage::setSize, METH_VARARGS, "Set the image size with tuple x,y"},\
+  {"getPosition", (PyCFunction)PyLeleImage::getPosition, METH_NOARGS, "Get the image position"},\
+  {"setPosition", (PyCFunction)PyLeleImage::setPosition, METH_VARARGS, "Set the image position"},\
+  {"getRotation", (PyCFunction)PyLeleImage::getRotation, METH_NOARGS, "Get the image rotation"},\
+  {"setRotation", (PyCFunction)PyLeleImage::setRotation, METH_VARARGS, "Set the image rotation"},\
 

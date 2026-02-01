@@ -204,6 +204,17 @@ def runTest(event):
       user_attributes = [attr for attr in dir(obj) if not attr.startswith('__')]
       print(f"@@@py obj: {obj}, user_attributes: {user_attributes}.")
       obj = lele.getObjectById("label:/run_test")
+      img = lele.getObjectById("/view/with_bg_img")
+      width,height = img.getSize()
+      print(f"@@@py width,height: {width},{height}")
+      img.setSize(width + 100, height + 100)
+      x, y = img.getPosition()
+      print(f"@@@py x,y: {x},{y}")
+      img.setPosition(x + 100, y + 100)
+      angle, pivot_x, pivot_y = img.getRotation()
+      print(f"@@@py angle,x,y: {angle},{pivot_x},{pivot_y}")
+      img.setRotation(angle + 10, pivot_x, pivot_y)
+
       img = lele.getObjectById("img:/run_test")
       if _tests_are_running:
           obj.setText("Stop")

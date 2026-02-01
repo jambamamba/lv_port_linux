@@ -57,7 +57,11 @@ PyObject *PyLeleImage::getSize(PyObject *self_, PyObject *arg) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj) {
-        return PyUnicode_FromString(lele_obj->getSize().c_str());
+        auto [x, y] = lele_obj->getSize();
+        PyObject *xy = PyTuple_New(2);
+        PyTuple_SetItem(xy, 0, PyLong_FromLong(x));
+        PyTuple_SetItem(xy, 1, PyLong_FromLong(y));
+        return xy;
     }
     return Py_None;
 }
@@ -65,21 +69,24 @@ PyObject *PyLeleImage::setSize(PyObject *self_, PyObject *args) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj && args) {
-        char *str = nullptr;
-        if(!PyArg_ParseTuple(args, "s", &str)) {
-            return Py_None;
+        int x = 0;
+        int y = 0;
+        if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
+            return Py_False;
         }
-        if(str) {
-            lele_obj->setSize(str);
-        }
+        lele_obj->setSize(x, y);
     }
-    return Py_None;
+    return Py_True;
 }
 PyObject *PyLeleImage::getPosition(PyObject *self_, PyObject *arg) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj) {
-        return PyUnicode_FromString(lele_obj->getPosition().c_str());
+        auto [x, y] = lele_obj->getPosition();
+        PyObject *xy = PyTuple_New(2);
+        PyTuple_SetItem(xy, 0, PyLong_FromLong(x));
+        PyTuple_SetItem(xy, 1, PyLong_FromLong(y));
+        return xy;
     }
     return Py_None;
 }
@@ -87,21 +94,25 @@ PyObject *PyLeleImage::setPosition(PyObject *self_, PyObject *args) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj && args) {
-        char *str = nullptr;
-        if(!PyArg_ParseTuple(args, "s", &str)) {
-            return Py_None;
+        int x = 0;
+        int y = 0;
+        if(!PyArg_ParseTuple(args, "ii", &x, &y)) {
+            return Py_False;
         }
-        if(str) {
-            lele_obj->setPosition(str);
-        }
+        lele_obj->setPosition(x, y);
     }
-    return Py_None;
+    return Py_True;
 }
 PyObject *PyLeleImage::getRotation(PyObject *self_, PyObject *arg) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj) {
-        return PyUnicode_FromString(lele_obj->getRotation().c_str());
+        auto [angle, pivot_x, pivot_y] = lele_obj->getRotation();
+        PyObject *ret = PyTuple_New(3);
+        PyTuple_SetItem(ret, 0, PyLong_FromLong(angle));
+        PyTuple_SetItem(ret, 1, PyLong_FromLong(pivot_x));
+        PyTuple_SetItem(ret, 2, PyLong_FromLong(pivot_y));
+        return ret;
     }
     return Py_None;
 }
@@ -109,17 +120,16 @@ PyObject *PyLeleImage::setRotation(PyObject *self_, PyObject *args) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
     if(lele_obj && args) {
-        char *str = nullptr;
-        if(!PyArg_ParseTuple(args, "s", &str)) {
+        float angle = 0;
+        int x = 0;
+        int y = 0;
+        if(!PyArg_ParseTuple(args, "fii", &angle, &x, &y)) {
             return Py_None;
         }
-        if(str) {
-            lele_obj->setRotation(str);
-        }
+        lele_obj->setRotation(angle, x, y);
     }
     return Py_None;
 }
-
 
 PyMemberDef PyLeleImage::_members[] = {
     PY_LELEIMAGE_MEMBERS()

@@ -13,7 +13,7 @@
                 "id":"/view/with_bg_img",
                 "src":"res/goose.png",
                 "xposition":"20",
-                "xposition":{"x":"120","y":"120"},
+                "position":{"x":"120","y":"120"},
                 "xsize":"contain",
                 "xsize":"cover",
                 "xsize":{"x":"20%","y":"20%"},

@@ -266,7 +266,7 @@ ImageBuilder::fillBackgroundColor(int color, int obj_width, int obj_height) {
 }
 
 
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> 
+ImageBuilder::Res
 ImageBuilder::drawBackgroundImage(
   const std::string &prefix,
   const std::string &src, 
@@ -275,9 +275,9 @@ ImageBuilder::drawBackgroundImage(
   int obj_width, 
   int obj_height) {
 
-  std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> img_dsc;
+    Res res;
     if(src.at(0) == '/') {
-      img_dsc = LeleImageConverter::generateImgDsc(src.c_str());
+      res._img_dsc = LeleImageConverter::generateImgDsc(src.c_str());
     }
     else {
       std::string img_path(std::filesystem::current_path().string() + "/" + src);
@@ -285,55 +285,47 @@ ImageBuilder::drawBackgroundImage(
         LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
       }
       LOG(DEBUG, LVSIM, "Loading image: %s\n", img_path.c_str());
-      img_dsc = LeleImageConverter::generateImgDsc(img_path.c_str());
+      res._img_dsc = LeleImageConverter::generateImgDsc(img_path.c_str());
     }
-    if(!img_dsc) {
+    if(!res._img_dsc) {
         LOG(FATAL, LVSIM, "Failed in generating image description");
-        return img_dsc;
+        return res;
     }
-    struct XY {
-      int _x = 0;
-      int _y = 0;
-    };
-    XY offset;
-    XY background_rotation_pivot;
-    float background_rotation_angle;
-    
     for(const auto &key: style_keys) {
       const auto &value = style_map.at(key);
       if(key == (prefix + "/size")) {
         std::string val = std::get<std::string>(value.value());
         if(val == "cover") {
-          img_dsc = resizeContentToFillContainerPotentiallyCroppingContent(img_dsc.value().get(), obj_width, obj_height);
+          res._img_dsc = resizeContentToFillContainerPotentiallyCroppingContent(res._img_dsc.value().get(), obj_width, obj_height);
         }
         else if(val == "contain") {
-          img_dsc = resizeToShowEntireContentPotentiallyLeavingEmptySpace(img_dsc.value().get(), obj_width, obj_height);
+          res._img_dsc = resizeToShowEntireContentPotentiallyLeavingEmptySpace(res._img_dsc.value().get(), obj_width, obj_height);
         }
         else if(!val.empty()) {
-          img_dsc = resizeImageWithValuesParsedFromJson(img_dsc.value().get(), val, obj_width, obj_height);
+          res._img_dsc = resizeImageWithValuesParsedFromJson(res._img_dsc.value().get(), val, obj_width, obj_height);
         }
-        if(!img_dsc) {
+        if(!res._img_dsc) {
           LL(FATAL, LVSIM) << "Failed in processing " << prefix << "/size";
-          return img_dsc;
+          return res;
         }
       }
-      else if(key == (prefix + "/position/x")) {
-        std::tie(offset._x, offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
+      else if(key == (prefix + "/position")) {
+        std::tie(res._offset._x, res._offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
       }
       else if(key == (prefix + "/rotation/pivot/x")) {
         // background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));
-        background_rotation_pivot._x = std::get<int>(value.value());
+        res._rotation_pivot._x = std::get<int>(value.value());
       }      
       else if(key == (prefix + "/rotation/pivot/y")) {
         // background_rotation_pivot._y = std::stoi(std::get<std::string>(value.value()));
-        background_rotation_pivot._y = std::get<int>(value.value());
-      }      
+        res._rotation_pivot._y = std::get<int>(value.value());
+      }
       else if(key == (prefix + "/rotation/angle")) {
-        background_rotation_angle = std::get<float>(value.value());
-        img_dsc = LeleImageConverter::rotateImg(img_dsc.value().get(), background_rotation_pivot._x, background_rotation_pivot._y, background_rotation_angle);
-        if(!img_dsc) {
+        res._rotation_angle = std::get<float>(value.value());
+        res._img_dsc = LeleImageConverter::rotateImg(res._img_dsc.value().get(), res._rotation_pivot._x, res._rotation_pivot._y, res._rotation_angle);
+        if(!res._img_dsc) {
           LL(FATAL, LVSIM) << "Failed in processing " << prefix << "/rotate";
-          return img_dsc;
+          return res;
         }
         // std::string filename("rotated.");
         // filename += std::to_string(background_rotation_angle);
@@ -343,27 +335,27 @@ ImageBuilder::drawBackgroundImage(
       else if(key == (prefix + "/repeat")) {
         std::string val = std::get<std::string>(value.value());
         if(val == "repeat-x"){
-          img_dsc = LeleImageConverter::tileImg(img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, offset._x, offset._y);
+          res._img_dsc = LeleImageConverter::tileImg(res._img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatX, res._offset._x, res._offset._y);
         }
         else if(val == "repeat-y"){
-          img_dsc = LeleImageConverter::tileImg(img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, offset._x, offset._y);
+          res._img_dsc = LeleImageConverter::tileImg(res._img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatY, res._offset._x, res._offset._y);
         }
         else if(val == "repeat"){
-          img_dsc = LeleImageConverter::tileImg(img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, offset._x, offset._y);
+          res._img_dsc = LeleImageConverter::tileImg(res._img_dsc.value().get(), obj_width, obj_height, LeleImageConverter::TileRepeat::RepeatXY, res._offset._x, res._offset._y);
         }
-        if(!img_dsc) {
+        if(!res._img_dsc) {
           LL(FATAL, LVSIM) << "Failed in " << prefix << "/repeat";
-          return img_dsc;
+          return res;
         }
       }
     }
-    if(img_dsc.value().get()->header.w > obj_width || 
-        img_dsc.value().get()->header.h > obj_height) {
-        img_dsc = LeleImageConverter::cropImg(img_dsc.value().get(), 0, 0, obj_width, obj_height);
+    if(res._img_dsc.value().get()->header.w > obj_width || 
+        res._img_dsc.value().get()->header.h > obj_height) {
+        res._img_dsc = LeleImageConverter::cropImg(res._img_dsc.value().get(), 0, 0, obj_width, obj_height);
     }
-    if(!img_dsc) {
+    if(!res._img_dsc) {
       LL(FATAL, LVSIM) << "Failed in cropping image";
-      return img_dsc;
+      return res;
     }
-    return img_dsc;
+    return res;
 }

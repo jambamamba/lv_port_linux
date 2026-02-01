@@ -299,7 +299,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   value = getStyle("background/image");
   if(value) {
     auto [style_keys, style_map] = getBackgroundStyle();
-    _bg_img = ImageBuilder::drawBackgroundImage(
+    auto res = ImageBuilder::drawBackgroundImage(
       "background",
       std::get<std::string>(value.value()), 
       style_keys,
@@ -313,6 +313,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
         LOG(FATAL, LVSIM, "Failed in lv_image_create");
         return;
     }
+    _bg_img = std::move(res._img_dsc);
     lv_image_set_src(_lv_bg_img, _bg_img.value().get());
   }
   value = getStyle("scrollbar");

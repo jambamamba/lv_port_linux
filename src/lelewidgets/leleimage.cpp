@@ -1,7 +1,5 @@
 #include "leleimage.h"
 
-#include <image_builder/image_builder.h>
-
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleImage::LeleImage(LeleObject *parent, const std::string &json_str)
@@ -41,24 +39,22 @@ void LeleImage::drawImage() {
   auto width = getStyle("width");
   auto height = getStyle("height");
 
-  _img_dsc = ImageBuilder::drawBackgroundImage(
+  _img = ImageBuilder::drawBackgroundImage(
     prefix,
     std::get<std::string>(_img_style["img/src"].value()),
     _attributes_as_ordered_in_json,
     _img_style,
     std::get<int>(width.value()),
     std::get<int>(height.value()));
-  if(_img_dsc) {
-    lv_image_set_src(_lv_img, _img_dsc.value().get());
+  if(_img._img_dsc) {
+    lv_image_set_src(_lv_img, _img._img_dsc.value().get());
   }
+  lv_obj_set_pos(_lv_img, _img._offset._x, _img._offset._y);
 }
 
 std::string LeleImage::getSrc() const { 
   auto src = _img_style.find("img/src");
-  if(src == _img_style.end()) {
-    return "";
-  }
-  if(!src->second) {
+  if(src == _img_style.end() || !src->second) {
     return "";
   }
   std::string img_src = std::get<std::string>(src->second.value());
@@ -66,25 +62,90 @@ std::string LeleImage::getSrc() const {
 }
 
 void LeleImage::setSrc(const std::string& src) {
+  bool found = std::any_of(_attributes_as_ordered_in_json.begin(), _attributes_as_ordered_in_json.end(), [](const std::string& s) {
+      return "img/src" == s;
+  });
+  if(!found) {
+    _attributes_as_ordered_in_json.push_back("img/src");
+  }
+
   _img_style["img/src"] = src;
   drawImage();
 }
 
-std::string LeleImage::getSize() const {
-  return "";//osm todo
+std::tuple<int,int> LeleImage::getSize() const {
+  if(!_img._img_dsc){
+    return {0,0};
+  }
+  int width = _img._img_dsc.value()->header.w;
+  int height = _img._img_dsc.value()->header.h;
+  return {width, height};
 }
-void LeleImage::setSize(const std::string& src) {
-  //osm todo
+void LeleImage::setSize(int width, int height) {
+  if(!_img._img_dsc){
+    LL(WARNING, LVSIM) << "No image therefore cannot set width and height";
+    return;
+  }
+  _img._img_dsc = LeleImageConverter::resizeImg(_img._img_dsc.value().get(), width, height);
+  if(!_img._img_dsc) {
+    LL(WARNING, LVSIM) << "Failed to resize image to width: " << width << ", hieght: " << height;
+    return;
+  }
+  lv_image_set_src(_lv_img, _img._img_dsc.value().get());
 }
-std::string LeleImage::getPosition() const {
-  return "";//osm todo
+std::tuple<int,int> LeleImage::getPosition() const {
+  return {_img._offset._x, _img._offset._y};
 }
-void LeleImage::setPosition(const std::string& src) {
-  //osm todo
+void LeleImage::setPosition(int x, int y) {
+  _img._offset._x = x;
+  _img._offset._y = y;
+  lv_obj_set_pos(_lv_img, _img._offset._x, _img._offset._y);
 }
-std::string LeleImage::getRotation() const {
-  return "";//osm todo
+std::tuple<float, int,int> LeleImage::getRotation() const {
+  auto angle = _img_style.find("img/rotation/angle");
+  if(angle == _img_style.end() || !angle->second) {
+    return {0.,0,0};
+  }
+
+  auto pivot_x = _img_style.find("img/rotation/pivot/x");
+  if(pivot_x == _img_style.end() || !pivot_x->second) {
+    return {0.,0,0};
+  }
+
+  auto pivot_y = _img_style.find("img/rotation/pivot/y");
+  if(pivot_y == _img_style.end() || !pivot_y->second) {
+    return {0.,0,0};
+  }
+
+  return {
+    std::get<float>(angle->second.value()),
+    std::get<int>(pivot_x->second.value()),
+    std::get<int>(pivot_y->second.value()),
+  };
 }
-void LeleImage::setRotation(const std::string& src) {
-  //osm todo
+void LeleImage::setRotation(float angle, int pivot_x, int pivot_y) {
+  bool found = std::any_of(_attributes_as_ordered_in_json.begin(), _attributes_as_ordered_in_json.end(), [](const std::string& s) {
+      return "img/rotation/angle" == s;
+  });
+  if(!found) {
+    _attributes_as_ordered_in_json.push_back("img/rotation/angle");
+  }
+
+  found = std::any_of(_attributes_as_ordered_in_json.begin(), _attributes_as_ordered_in_json.end(), [](const std::string& s) {
+      return "img/rotation/pivot/x" == s;
+  });
+  if(!found) {
+    _attributes_as_ordered_in_json.push_back("img/rotation/pivot/x");
+  }
+  found = std::any_of(_attributes_as_ordered_in_json.begin(), _attributes_as_ordered_in_json.end(), [](const std::string& s) {
+      return "img/rotation/pivot/y" == s;
+  });
+  if(!found) {
+    _attributes_as_ordered_in_json.push_back("img/rotation/pivot/y");
+  }
+
+  _img_style["img/rotation/angle"] = angle;
+  _img_style["img/rotation/pivot/x"] = pivot_x;
+  _img_style["img/rotation/pivot/y"] = pivot_y;
+  drawImage();
 }
