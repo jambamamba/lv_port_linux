@@ -5,6 +5,17 @@
         "label":{
             "id":"/hello-world/label",
             "text":"Hello World",
+            "text_arabic":"مرحبا العالم",
+            "text_spanish":"Hola Mundo",
+            "text_french":"Bonjour le monde",
+            "text_italian":"Ciao mondo",
+            "text_portuguese":"Olá mundo",
+            "text_russian":"Привет, мир",
+            "text_ukrainian":"привіт світ",
+            "text_chinese_simplified":"你好世界",
+            "text_chinese_traditional":"你好世界",
+            "text_japanese":"こんにちは世界",
+            "text_urdu":"ہیلو دنیا",
             "style":{
                 "id":"/hello-world/style",
                 "x":"40%","y":"40%",

@@ -51,6 +51,7 @@ public:
   void applyStyle();
   static std::map<std::string, std::vector<std::string>> _flex_possible_values;
   static std::map<std::string, std::map<std::string,int>> _flex_possible_ivalues;
+  static const lv_font_t *getFont(const std::string &family="montserrat", int size=16);
 protected:
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
   std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);

@@ -456,6 +456,15 @@ bool LeleStyle::setValue(
         _style[key] = LV_TEXT_ALIGN_AUTO;
       }
     }
+    else if(key == "font-family") {
+      _style[key] = value;
+    }
+    else if(key == "font-size") {
+      if(std::isdigit(value.at(0))) {
+        int font_size = std::stoi(value);
+        _style[key] = font_size;
+      }
+    }
     else if(key == "flex") {
       parseFlex(value);
     }
@@ -502,9 +511,9 @@ bool LeleStyle::setValue(
     else if(key == "background/repeat") {
         _style["background/repeat"] = value;
     }
-    else if(key.at(0) == '#' || key.at(0) == '@') {
+    else if(key.at(0) == '#') {
       LL(WARNING, LVSIM) << "Ignoreing key " << key << " for styles";
-      return false;
+      return true;
     }
     else {
       LL(FATAL, LVSIM) << "No such key " << key << " exists for styles";
@@ -528,6 +537,79 @@ const LeleObject *LeleStyle::getLeleObject() const {
   return _lele_obj; 
 }
 
+const lv_font_t *LeleStyle::getFont(const std::string &family, int size) {
+  if(family == "montserrat") {
+    if(size <= 12) {
+      return &lv_font_montserrat_12;
+    }
+    else if(size <= 14) {
+      return &lv_font_montserrat_14;
+    }
+    else if(size <= 16) {
+      return &lv_font_montserrat_16;
+    }
+    else if(size <= 18) {
+      return &lv_font_montserrat_18;
+    }
+    else if(size <= 20) {
+      return &lv_font_montserrat_20;
+    }
+    else if(size <= 22) {
+      return &lv_font_montserrat_22;
+    }
+    else if(size <= 24) {
+      return &lv_font_montserrat_24;
+    }
+    else if(size <= 26) {
+      return &lv_font_montserrat_26;
+    }
+    else if(size <= 28) {
+      return &lv_font_montserrat_28;
+    }
+    else if(size <= 30) {
+      return &lv_font_montserrat_30;
+    }
+    else if(size <= 32) {
+      return &lv_font_montserrat_32;
+    }
+    else if(size <= 34) {
+      return &lv_font_montserrat_34;
+    }
+    else if(size <= 36) {
+      return &lv_font_montserrat_36;
+    }
+    else if(size <= 38) {
+      return &lv_font_montserrat_38;
+    }
+    else if(size <= 40) {
+      return &lv_font_montserrat_40;
+    }
+    else if(size <= 42) {
+      return &lv_font_montserrat_42;
+    }
+    else if(size <= 44) {
+      return &lv_font_montserrat_44;
+    }
+    else if(size <= 46) {
+      return &lv_font_montserrat_46;
+    }
+    else if(size <= 48) {
+      return &lv_font_montserrat_48;
+    }
+  }
+  else if(family == "unscii") {
+    if(size <= 8) {
+      return &lv_font_unscii_8;
+    }
+  }
+  else if(family == "dejavu") {
+    if(size <= 16) {
+      return &lv_font_dejavu_16_persian_hebrew;
+    }
+  }
+  LL(WARNING, LVSIM) << "Failed to find font '" << family << "' of size " << size << ". Defaulting to default";
+  return &lv_font_montserrat_16; //default
+}
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
     // os << "parent:" << (p._lele_obj ? p._lele_obj->id() : "") << ",";

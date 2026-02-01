@@ -21,8 +21,8 @@
                 "xrotation":{"angle":"30","pivot":{"x":"0","y":"0"}},
                 "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
                     "background":{
-                        "ximage":"res/pumpkin-man.png",
-                        "image":"res/rgba.png",
+                        "image":"res/pumpkin-man.png",
+                        "#image":"res/rgba.png",
                         "xposition":"20",
                         "xposition":{"x":"20","y":"20"},
                         "xsize":"contain",
@@ -141,7 +141,7 @@
                     "flex":{"flow":"row","justify-content":"center","align-items":"center"},
                     "align":"center",
                     "width":"20%","height":"95%",
-                    "border":"solid-2px-#0f0",
+                    "border":"solid-2px-#ccc",
                     "#border":"none"                   
                 },
                 "img":{
@@ -153,18 +153,22 @@
                     "style":{"id":"style:/button/run_test/img",
                         "x":"0","y":"0",
                         "width":"48%","height":"100%",
-                        "border":"solid-2px-#00f",
-                        "#border":"none"
+                        "#border":"solid-2px-#00f",
+                        "border":"none"
                     }
                 },
                 "label":{
                     "id":"label:/run_test",
-                    "text":"Run Test",
+                    "#text":"Run Test",
+                    "text":"تشغيل الاختبار",
                     "style":{"id":"style:/button/run_test/label",
                         "text-align":"left",
                         "align":"center",
                         "x":"0","y":"23",
                         "width":"50%","height":"40%",
+                        "#font-family":"montserrat",
+                        "font-family":"dejavu",
+                        "font-size":"16px",
                         "border":"none",
                         "#border":"solid-2px-#0f0"
                     }
