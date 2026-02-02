@@ -218,33 +218,44 @@ bool LeleColorWheel::eventCallback(LeleEvent &&e) {
   //   " " << lv_event_code_get_name(e.getLvEvent()->code);
 
   switch(e.getLvEvent()->code) {
-    case LV_EVENT_CLICKED:{
-      GraphicsBackend &backend = GraphicsBackend::getInstance();
-      lv_point_t pt = backend.getTouchPoint(_lv_obj);
-      if(!isWithinCircle(_width, _height, pt.x, pt.y)) {
-        LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", but outside the circle. Ignoring click event";
-        return false;
-      }
-      lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
-      LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", rgb: " << 
-        std::setfill('0') << std::setw(2) <<
-        std::hex << (int)color.red <<
-        std::hex << (int)color.green <<
-        std::hex << (int)color.blue;
-      _rgb = (color.red << 16) | (color.green << 8) | (color.blue);
-      for(auto *py_callback:_py_callbacks) {
-        if(!pyCallback(py_callback, _rgb)) {
-          return false;
-        }
-      }
+    case LV_EVENT_CLICKED:
+    case LV_EVENT_LONG_PRESSED:
+    case LV_EVENT_LONG_PRESSED_REPEAT:
+    case LV_EVENT_SCROLL:
+    {
+      updateColor();
       break;
     }
-    default:
+    default: {
+      // GraphicsBackend &backend = GraphicsBackend::getInstance();
+      // lv_point_t pt = backend.getTouchPoint(_lv_obj);
+      // LL(DEBUG, LVSIM) << "UNHANDLED Event e.getLvEvent()->code: " << e.getLvEvent()->code << ", x,y:" << pt.x << "," << pt.y;
       break;
+    }
   }
   return true;
 }
 
+void LeleColorWheel::updateColor() {
+    GraphicsBackend &backend = GraphicsBackend::getInstance();
+    lv_point_t pt = backend.getTouchPoint(_lv_obj);
+    if(!isWithinCircle(_width, _height, pt.x, pt.y)) {
+      LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", but outside the circle. Ignoring click event";
+      return;
+    }
+    lv_color32_t color = lv_canvas_get_px(_lv_obj, pt.x, pt.y); 
+    LL(DEBUG, LVSIM) << "LeleColorWheel::LV_EVENT_CLICKED x,y:" << pt.x << "," << pt.y << ", rgb: " << 
+      std::setfill('0') << std::setw(2) <<
+      std::hex << (int)color.red <<
+      std::hex << (int)color.green <<
+      std::hex << (int)color.blue;
+    _rgb = (color.red << 16) | (color.green << 8) | (color.blue);
+    for(auto *py_callback:_py_callbacks) {
+      if(!pyCallback(py_callback, _rgb)) {
+        return;
+      }
+    }
+}
 void LeleColorWheel::setColor(int32_t rgb){
   _rgb = rgb;
 }

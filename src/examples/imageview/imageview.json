@@ -19,7 +19,7 @@
                 "xsize":{"x":"20%","y":"20%"},
                 "xsize":"100",
                 "xrotation":{"angle":"30","pivot":{"x":"0","y":"0"}},
-                "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"80%","height":"100%","scrollbar":"off",
+                "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"78%","height":"100%","scrollbar":"off",
                     "background":{
                         "image":"res/pumpkin-man.png",
                         "#image":"res/rgba.png",
@@ -37,7 +37,7 @@
             },
             "view":{
                 "id":"controll-panel",
-                "style":{"flex":{"flow":"column"},"width":"18%","border":"solid-1px-#ccc"},
+                "style":{"flex":{"flow":"column"},"width":"20%","border":"solid-1px-#ccc","scrollbar":"off"},
                 "xbutton":{
                     "id":"slider0",
                     "type":"slider-range",
@@ -63,7 +63,7 @@
                     "xevent":{"type":"clicked","action":"action0","args":{}}
                 },
                 "view":{
-                    "style":{"flex":{"flow":"column"},"border":"none","width":"100%","height":"25%","corner_radius":"0x7FFF"},
+                    "style":{"flex":{"flow":"column"},"border":"none","width":"95%","height":"25%","corner_radius":"0x7FFF"},
                     "group":"true",
                     "buttons":[
                         {
@@ -106,12 +106,12 @@
                 },
                 "colorwheel":{
                     "id":"colorwheel",
-                    "style":{"id":"colorwheel","width":"100%","height":"25%","fgcolor":"#fff","bgcolor":"#666"}
+                    "style":{"id":"colorwheel","width":"95%","height":"25%","fgcolor":"#fff","bgcolor":"#666"}
                 },
                 "button":{
                     "id":"rotate",
                     "type":"arc",
-                    "style":{"id":"rotate","padding":"5px","width":"100%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
+                    "style":{"id":"rotate","padding":"5px","width":"95%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"90",
                     "rotation":"90",
                     "start":"20",
@@ -123,7 +123,7 @@
                 "label":{
                     "id":"rotation-label",
                     "text":"Angle",
-                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"100%","height":"95%","fgcolor":"#fff"}
+                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"95%","height":"95%","fgcolor":"#fff"}
                 }
             }
         },

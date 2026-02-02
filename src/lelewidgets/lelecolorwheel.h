@@ -10,6 +10,7 @@ class LeleColorWheel : public LeleObject  {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
+  void updateColor();
   void setColor(int32_t rgb);
   int32_t getColor() const;
   void onColorChanged(PyObject *callback);

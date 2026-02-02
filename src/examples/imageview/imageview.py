@@ -89,7 +89,7 @@ def tileImage(event):
    pass
 
 def rotateImage(event):
-   print(f"@@@py ARC MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
+   print(f"@@@py rotateImage @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
    # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
    if event.code == lele.Event().Type.ValueChanged:
          print(f"@@@py arc {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
