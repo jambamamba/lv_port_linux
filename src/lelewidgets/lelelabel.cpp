@@ -1,5 +1,7 @@
 #include "lelelabel.h"
 
+#include <tr/tr.h>
+
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleLabel::LeleLabel(LeleObject *parent, const std::string &json_str)
@@ -25,13 +27,13 @@ lv_obj_t *LeleLabel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_label_create(lele_parent->getLvObj()));
 
-  lv_label_set_text(_lv_obj, _text.c_str());
+  lv_label_set_text(_lv_obj, tr(_text).c_str());
   return _lv_obj;
 }
 
 void LeleLabel::setText(const std::string &text) {
   _text = text;
-  lv_label_set_text(_lv_obj, _text.c_str());
+  lv_label_set_text(_lv_obj, tr(_text).c_str());
 }
 
 std::string LeleLabel::getText() const { 

@@ -12,6 +12,7 @@ set(LELE_VERSION_MINOR 0)
 
 add_compile_definitions(LELE_VERSION_MAJOR=${LELE_VERSION_MAJOR})
 add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
+add_compile_definitions(LELE_DATA_DIR="/tmp/lele/data")
 
 set(LV_CONF_INCLUDE_SIMPLE 1)
 set(LV_USE_WAYLAND 1)
@@ -120,6 +121,7 @@ function(buildLvglSim
         graphics_backend.cpp
         python/python_binding.cpp
         image_builder/image_builder.cpp
+        tr/tr.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 
