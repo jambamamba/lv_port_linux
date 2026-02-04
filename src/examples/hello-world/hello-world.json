@@ -1,10 +1,12 @@
 {
     "view":{
         "id":"/hello-world",
-        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0"},
+        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0",
+            "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"}
+        },
         "label":{
             "id":"/hello-world/label",
-            "text":"Hello World",
+            "text":"Hello World!",
             "text_arabic":"مرحبا العالم",
             "text_spanish":"Hola Mundo",
             "text_french":"Bonjour le monde",
@@ -17,11 +19,27 @@
             "text_japanese":"こんにちは世界",
             "text_urdu":"ہیلو دنیا",
             "style":{
-                "id":"/hello-world/style",
-                "x":"40%","y":"40%",
-                "width":"15%","height":"10%",
-                "osm-todo-margin":"100",
-                "osm-todo-padding":"100",
+                "id":"style:/hello-world/style",
+                "width":"40%",
+                "height":"10%",
+                "padding":"1px",
+                "text-align":"center",
+                "border":"solid-1px-#555",
+                "corner_radius":"10",
+                "font-family":"montserrat",
+                "font-size":"40px"
+            }
+        },
+        "label":{
+            "id":"/hello-world/version",
+            "text":"",
+            "style":{
+                "id":"style:/hello-world/version",
+                "width":"20%",
+                "height":"5%",
+                "padding":"1px",
+                "text-align":"center",
+                "corner_radius":"5",
                 "border":"solid-1px-#555"
             }
         }

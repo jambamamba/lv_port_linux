@@ -212,6 +212,9 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
   if(value) {
     lv_style_set_radius(&_style, std::get<int>(value.value()));
   }
+  else {
+    lv_style_set_radius(&_style, 0);
+  }
 
   value = getStyle("padding/top");
   if(value) {

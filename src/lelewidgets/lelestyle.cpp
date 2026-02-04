@@ -37,7 +37,7 @@ bool LeleStyle::fromJson(const std::string &json_str) {
 }
 
 int LeleStyle::parsePercentValue(const std::string &x, int parent_x) {
-    if(x.size() > 0 && x.c_str()[x.size() - 1] == '%' && parent_x > 0) {
+    if(x.size() > 0 && x.at(x.size() - 1) == '%' && parent_x > 0) {
         int i = 0;
         if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
           i = std::stoi(x, 0, 16);
@@ -608,7 +608,7 @@ const lv_font_t *LeleStyle::getFont(const std::string &family, int size) {
     }
   }
   LL(WARNING, LVSIM) << "Failed to find font '" << family << "' of size " << size << ". Defaulting to default";
-  return &lv_font_montserrat_16; //default
+  return &lv_font_dejavu_16_persian_hebrew; //default
 }
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";

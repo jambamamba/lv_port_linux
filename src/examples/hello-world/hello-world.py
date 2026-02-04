@@ -4,10 +4,12 @@ import lele
 
 res = lele.loadConfig("hello-world.json")
 if res:
-   label = lele.getObjectById("/hello-world/label")
-   text = label.getText()
+   label_hello_world = lele.getObjectById("/hello-world/label")
+   print(f"label text: {label_hello_world}")
+
+   label_version = lele.getObjectById("/hello-world/version")
    version = f"{lele.version()['Major']}.{lele.version()['Minor']}"
-   label.setText(f"{text}\n\nLele Version: {version}")
+   label_version.setText(f"Lele-UI Version: {version}")
 
 while lele.handleEvents():
    pass
