@@ -1,4 +1,5 @@
 {
+    "screen":{"width":"1024","height":"768"},
     "view":{
         "id":"/hello-world",
         "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0",

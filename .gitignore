@@ -64,4 +64,5 @@ lv_image_converter/libpng
 qtcreator.jpg
 qt.png
 src/examples/*/__pycache__/
-src/py
+src/res/fonts/.lvf
+src/res/fonts/.ttf

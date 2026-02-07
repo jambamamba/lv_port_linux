@@ -16,10 +16,13 @@
 extern char **environ; // Access to environment variables
 
 //g++ src/font/font.cpp && ./a.out /usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf
+//g++ -g -O0 font.cpp &&  ./a.out -i /usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf -s 8 -s 10 -s 12 -s 14 -s 16 -s 18 -b 1 -b 2 -b 3 -b 4 -b 8 -o /tmp
+
+// Ubuntu-BI.ttf
 
 namespace {
 
-char *default_font = "/usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf";
+const char *default_font = "/usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf";
 
 std::vector<std::string> split_string(const std::string& str_, char delimiter) {
     std::string str(str_); // Create a local copy of the string
@@ -45,9 +48,13 @@ std::vector<std::string> getGlyphRanges(const std::string& output) {
     std::vector<std::string> lines = split_string(output, ' ');
     for(auto& line : lines) {
         auto nums = split_string(line, '-');
+
         int idx = 0;
         std::string range;
         for(auto& num : nums) {
+            if(num.size()==0){
+                continue;
+            }
             if(idx > 0) {
                 // printf("-");
                 range += '-';
@@ -56,8 +63,10 @@ std::vector<std::string> getGlyphRanges(const std::string& output) {
             range += "0x" + num;
             ++idx;
         }
-        ranges.push_back(range);
-        // printf("%s\n", range.c_str());
+        if(range.size()) {
+            ranges.push_back(range);
+            // printf("range: %s\n", range.c_str());
+        }
     }
     return ranges;
 }
@@ -68,12 +77,23 @@ std::string dump_child_stdout(int fd) {
     while ((bytesRead = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
         buffer[bytesRead] = '\0'; // Null-terminate the buffer
         // printf("%s", buffer); // Print the output from the child process
-        output += std::string(buffer);
+        for(int i = 0; i < bytesRead; ++i) {
+            if(buffer[i] == '\n') {
+                output.push_back(' ');
+                continue;
+            }
+            if(buffer[i] == '\'') {
+                continue;
+            }
+            output.push_back(buffer[i]);
+        }
+        // output += std::string(buffer);
     }
     if (bytesRead == -1) {
         perror("read");
     }
     close(fd); // Close the read end of the pipe after reading
+    // printf("### output: %s\n", output.c_str());
     return output;
 }
 
@@ -142,21 +162,26 @@ std::string fcquery(const std::string &font_file = default_font) {
 std::vector<char*> makeLvFontConvArgs(
     const std::string &font_file, 
     const std::string &out_dir, 
-    const std::vector<std::string>& ranges,
-    const std::string &font_size = "16", 
-    const std::string &bpp = "3"
+    const std::vector<std::string> &ranges,
+    const std::vector<std::string> &font_size, 
+    const std::vector<std::string> &bpp
 ) {
-
     std::string cmd("/usr/local/bin/lv_font_conv");
     static std::vector<std::string> args = {};
     args = {
         "lv_font_conv",
         "--font", font_file,
-        "--size", font_size,
         "--format", "bin",
-        "--bpp", bpp,
         "--no-compress"
     };
+    for(const auto& bpp_ : bpp) {
+        args.push_back("--bpp");
+        args.push_back(bpp_);
+    }
+    for(const auto& fs : font_size) {
+        args.push_back("--size");
+        args.push_back(fs);
+    }
     for(const auto& range : ranges) {
         args.push_back("--range");
         args.push_back(range);
@@ -166,7 +191,7 @@ std::vector<char*> makeLvFontConvArgs(
     if(!std::filesystem::exists(out_path)) {
         std::filesystem::create_directories(out_path);
     }
-    std::string output_file = out_dir + "/" + std::filesystem::path(font_file).filename().string() + ".fnt";
+    std::string output_file = out_dir + "/" + std::filesystem::path(font_file).filename().string() + ".lvf";
     args.push_back(output_file);
 
     std::vector<char*> argv_ptrs;
@@ -178,17 +203,20 @@ std::vector<char*> makeLvFontConvArgs(
 }
 std::optional<std::string> createLvFont(
     const std::vector<std::string>& ranges, 
-    const std::string &font_size = "16", 
-    const std::string &bpp = "3",
+    const std::vector<std::string>&font_size, 
+    const std::vector<std::string>&bpp,
     const std::string &out_dir = "/tmp", 
     const std::string &font_file = default_font) {
 
-// /usr/local/bin/lv_font_conv --font /usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf --size 16 --range 0x20-0xFFFF --format bin --bpp 3 --no-compress -o /tmp/output.fnt
+// /usr/local/bin/lv_font_conv --font /usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf --size 16 --range 0x20-0xFFFF --format bin --bpp 3 --no-compress -o /tmp/output.lvf
+// --bpp {1,2,3,4,8}
+
+    // printf("[%s:%i] createLvFont\n", __FILE__, __LINE__);
 
     std::string cmd("/usr/local/bin/lv_font_conv");
     auto args = makeLvFontConvArgs(font_file, out_dir, ranges, font_size, bpp);
     // for(const auto &arg : args) {
-    //     printf("%s\n", arg);
+    //     printf("[%s:%i] %s\n", __FILE__, __LINE__, arg);
     // }
     std::string output_file = args[args.size() - 2]; // The output file is the second last argument
 
@@ -217,22 +245,23 @@ std::optional<std::string> createLvFont(
     return output_file;
 }
 auto mainArgs(int argc, char *argv[]) {
-    std::string font_file = default_font, font_size = "16", bpp = "3", output_dir = std::filesystem::current_path();
+    std::string output_dir = std::filesystem::current_path();
+    std::vector<std::string> font_file;// = {default_font};
+    std::vector<std::string> bpp = {"1","2","3","4","8"};
+    std::vector<std::string> font_size = {"8","10","12","14","16","18","20","22","24","26","28","30"};
     int opt;
     while ((opt = getopt(argc, argv, "i:s:b:o:h")) != -1) {
         switch(opt) {
             case 'i'://input font file
-                font_file = optarg;
+                font_file.push_back(optarg);
                 break;
             case 's'://font size
-                font_size = optarg;
+                font_size.push_back(optarg);
                 break;
             case 'b'://bpp
-                // printf("Option -b selected\n");
-                bpp = optarg;
+                bpp.push_back(optarg);
                 break;
             case 'o'://output directory
-                // printf("Option -o selected\n");
                 output_dir = optarg;
                 break;
             case 'h':
@@ -241,24 +270,26 @@ auto mainArgs(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
-    printf("Font file: %s\n", font_file.c_str());
-    printf("Font size: %s\n", font_size.c_str());
-    printf("BPP: %s\n", bpp.c_str());
-    printf("Output directory: %s\n", output_dir.c_str());
-    return std::tuple<std::string, std::string, std::string, std::string>{font_file, font_size, bpp, output_dir};
+    if (font_file.size() == 0) {
+        fprintf(stderr, "Usage: %s -i <font-file> -s <font-size> -b <bpp> -o <output-dir>\n", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+    return std::tuple<std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::string>{font_file, font_size, bpp, output_dir};
 }
 }//namespace
 
 int main(int argc, char *argv[]) {
-    auto [font_file, font_size, bpp, output_dir] = mainArgs(argc, argv);
-    auto ranges = getGlyphRanges(fcquery(font_file));
-    auto output_file = createLvFont(
-        ranges, font_size, bpp, output_dir, font_file
-    );
-    if(output_file.has_value()) {
-        printf("Generated font file: %s\n", output_file.value().c_str());
-    } else {
-        fprintf(stderr, "Failed to generate font file\n");
+    auto [font_files, font_size, bpp, output_dir] = mainArgs(argc, argv);
+    for(const auto &font_file: font_files) {
+        auto ranges = getGlyphRanges(fcquery(font_file));
+        auto output_file = createLvFont(
+            ranges, font_size, bpp, output_dir, font_file
+        );
+        if(output_file.has_value()) {
+            printf("Generated font file: %s\n", output_file.value().c_str());
+        } else {
+            fprintf(stderr, "Failed to generate font file\n");
+        }
     }
     return 0;
 }
