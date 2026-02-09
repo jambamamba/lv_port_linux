@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <optional>
+#include <mutex>
 #include <spawn.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,6 +13,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdlib.h>
+#include <thread>
 
 extern char **environ; // Access to environment variables
 
@@ -52,7 +54,7 @@ std::vector<std::string> getGlyphRanges(const std::string& output) {
         int idx = 0;
         std::string range;
         for(auto& num : nums) {
-            if(num.size()==0){
+            if(num.size()==0 || num.at(0) == '\n'){
                 continue;
             }
             if(idx > 0) {
@@ -64,8 +66,11 @@ std::vector<std::string> getGlyphRanges(const std::string& output) {
             ++idx;
         }
         if(range.size()) {
+            // range.erase(std::remove(range.begin(), range.end(), '\n'), range.end());
+            // range.erase(std::remove(range.begin(), range.end(), '\r'), range.end());
+            // range.erase(std::remove(range.begin(), range.end(), ' '), range.end());
             ranges.push_back(range);
-            // printf("range: %s\n", range.c_str());
+            // printf("range:%s\n", range.c_str());
         }
     }
     return ranges;
@@ -79,14 +84,16 @@ std::string dump_child_stdout(int fd) {
         // printf("%s", buffer); // Print the output from the child process
         for(int i = 0; i < bytesRead; ++i) {
             if(buffer[i] == '\n') {
-                output.push_back(' ');
-                continue;
+                // output.push_back(' ');
+                // continue;
+                break;
             }
             if(buffer[i] == '\'') {
                 continue;
             }
             output.push_back(buffer[i]);
         }
+        output.push_back(0);
         // output += std::string(buffer);
     }
     if (bytesRead == -1) {
@@ -98,14 +105,18 @@ std::string dump_child_stdout(int fd) {
 }
 
 std::vector<char*> makeFcQueryArgs(const std::string &font_file) {
-    static std::vector<std::string> args = {};
+    std::vector<std::string> args = {};
     args = {
         "fc-query",
         "--format='%{charset}\n'",
         font_file
     };
+    static std::vector<std::vector<std::string>> fc_query_args;
+    static std::mutex mtx;
+    std::scoped_lock lock(mtx);
+    fc_query_args.push_back(args);
     std::vector<char*> argv_ptrs;
-    for (auto& s : args) {
+    for (auto& s : fc_query_args.at(fc_query_args.size()-1)) {
         argv_ptrs.push_back(&s[0]);
     }
     argv_ptrs.push_back(nullptr);
@@ -163,25 +174,19 @@ std::vector<char*> makeLvFontConvArgs(
     const std::string &font_file, 
     const std::string &out_dir, 
     const std::vector<std::string> &ranges,
-    const std::vector<std::string> &font_size, 
-    const std::vector<std::string> &bpp
+    const std::string &font_size, 
+    const std::string &bpp
 ) {
     std::string cmd("/usr/local/bin/lv_font_conv");
-    static std::vector<std::string> args = {};
+    std::vector<std::string> args = {};
     args = {
         "lv_font_conv",
         "--font", font_file,
         "--format", "bin",
-        "--no-compress"
+        "--no-compress",
+        "--bpp", bpp,
+        "--size", font_size
     };
-    for(const auto& bpp_ : bpp) {
-        args.push_back("--bpp");
-        args.push_back(bpp_);
-    }
-    for(const auto& fs : font_size) {
-        args.push_back("--size");
-        args.push_back(fs);
-    }
     for(const auto& range : ranges) {
         args.push_back("--range");
         args.push_back(range);
@@ -191,20 +196,43 @@ std::vector<char*> makeLvFontConvArgs(
     if(!std::filesystem::exists(out_path)) {
         std::filesystem::create_directories(out_path);
     }
-    std::string output_file = out_dir + "/" + std::filesystem::path(font_file).filename().string() + ".lvf";
+    std::string output_file = out_dir + "/" + std::filesystem::path(font_file).stem().string() + "." + font_size + "pt.lvf";
     args.push_back(output_file);
 
+    static std::vector<std::vector<std::string>> lv_font_conv_args;
+    static std::mutex mtx;
+    std::scoped_lock lock(mtx);
+    lv_font_conv_args.push_back(args);
     std::vector<char*> argv_ptrs;
-    for (auto& s : args) {
+    for (auto& s : lv_font_conv_args.at(lv_font_conv_args.size()-1)) {
         argv_ptrs.push_back(&s[0]);
     }
     argv_ptrs.push_back(nullptr);
     return argv_ptrs;
 }
+
+static std::string outFileExists(const std::vector<char*> args) {
+    bool arg_is_out_file = false;
+    for(const char *arg : args) {
+        if(strcmp(arg, "-o")==0) {
+            arg_is_out_file = true;
+            continue;
+        }
+        if(arg_is_out_file && arg) {
+            std::string out_file(arg);
+            if(std::filesystem::exists(out_file)) {
+                return out_file;
+            }
+            break;
+        }
+    }
+    return "";
+}
+
 std::optional<std::string> createLvFont(
     const std::vector<std::string>& ranges, 
-    const std::vector<std::string>&font_size, 
-    const std::vector<std::string>&bpp,
+    const std::string &font_size, 
+    const std::string &bpp,
     const std::string &out_dir = "/tmp", 
     const std::string &font_file = default_font) {
 
@@ -215,9 +243,12 @@ std::optional<std::string> createLvFont(
 
     std::string cmd("/usr/local/bin/lv_font_conv");
     auto args = makeLvFontConvArgs(font_file, out_dir, ranges, font_size, bpp);
-    // for(const auto &arg : args) {
-    //     printf("[%s:%i] %s\n", __FILE__, __LINE__, arg);
-    // }
+
+    std::string out_file = outFileExists(args);
+    if(out_file.size()) {
+        return std::string("SKIPPED ") + out_file;
+    }
+
     std::string output_file = args[args.size() - 2]; // The output file is the second last argument
 
     posix_spawn_file_actions_t action;
@@ -245,24 +276,26 @@ std::optional<std::string> createLvFont(
     return output_file;
 }
 auto mainArgs(int argc, char *argv[]) {
-    std::string output_dir = std::filesystem::current_path();
-    std::vector<std::string> font_file;// = {default_font};
-    std::vector<std::string> bpp = {"1","2","3","4","8"};
-    std::vector<std::string> font_size = {"8","10","12","14","16","18","20","22","24","26","28","30"};
+    std::string current_dir = std::filesystem::current_path();
+    std::vector<std::string> font_files;//  = default_font;
+    std::vector<std::string> default_bpps = {"8"};//{"1","2","3","4","8"};
+    std::vector<std::string> bpps;
+    std::vector<std::string> default_font_sizes = {"8","10","12","14","16","18","20","22","24","26","28","30","32","34","36","38","40"};
+    std::vector<std::string> font_sizes;
     int opt;
     while ((opt = getopt(argc, argv, "i:s:b:o:h")) != -1) {
         switch(opt) {
             case 'i'://input font file
-                font_file.push_back(optarg);
+                font_files.push_back(optarg);
                 break;
             case 's'://font size
-                font_size.push_back(optarg);
+                font_sizes.push_back(optarg);
                 break;
             case 'b'://bpp
-                bpp.push_back(optarg);
+                bpps.push_back(optarg);
                 break;
             case 'o'://output directory
-                output_dir = optarg;
+                current_dir = optarg;
                 break;
             case 'h':
             default:
@@ -270,25 +303,70 @@ auto mainArgs(int argc, char *argv[]) {
                 exit(EXIT_FAILURE);
         }
     }
-    if (font_file.size() == 0) {
+    if (font_files.size() == 0) {
         fprintf(stderr, "Usage: %s -i <font-file> -s <font-size> -b <bpp> -o <output-dir>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
-    return std::tuple<std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::string>{font_file, font_size, bpp, output_dir};
+    if ( bpps.size() == 0 ) {
+        bpps = default_bpps;
+    }
+    if ( font_sizes.size() == 0 ) {
+        font_sizes = default_font_sizes;
+    }
+
+    std::vector<std::string> all_files;
+    for(auto it = font_files.begin(); it != font_files.end(); ) {
+        if (!std::filesystem::is_directory(*it)) {
+            ++it;
+        }
+        else {
+            for (const auto& entry : std::filesystem::directory_iterator(*it)) {
+                // Check if the entry is a regular file and not a directory
+                if (std::filesystem::is_regular_file(entry.status())) {
+                    all_files.push_back(entry.path());
+                }
+            }
+            it = font_files.erase(it);
+        }
+    }
+    font_files.insert(font_files.end(), all_files.begin(), all_files.end());
+    return std::tuple<std::vector<std::string>, std::vector<std::string>, std::vector<std::string>, std::string>
+        {font_files, font_sizes, bpps, current_dir};
 }
 }//namespace
 
 int main(int argc, char *argv[]) {
-    auto [font_files, font_size, bpp, output_dir] = mainArgs(argc, argv);
-    for(const auto &font_file: font_files) {
+    const auto [font_files, font_sizes, bpps, current_dir] = mainArgs(argc, argv);
+    for(std::string font_file: font_files) {
         auto ranges = getGlyphRanges(fcquery(font_file));
-        auto output_file = createLvFont(
-            ranges, font_size, bpp, output_dir, font_file
-        );
-        if(output_file.has_value()) {
-            printf("Generated font file: %s\n", output_file.value().c_str());
-        } else {
-            fprintf(stderr, "Failed to generate font file\n");
+        for(std::string bpp: bpps) {
+            std::vector<std::thread> threads;
+            for(std::string font_size: font_sizes) {
+                threads.push_back(std::thread([ranges, font_size, bpp, current_dir, font_file]{
+
+                    auto output_file = createLvFont(
+                        ranges, font_size, bpp, current_dir, font_file
+                    );
+                    if(output_file.has_value()) {
+                        printf("Generated font file: %s\n", output_file.value().c_str());
+                    } else {
+                        fprintf(stderr, "Failed to generate font file:'%s', font_size:'%s', bpp:'%s', ranges:\n",
+                            font_file.c_str(),
+                            font_size.c_str(),
+                            bpp.c_str()
+                        );
+                        for(const auto &range: ranges) {
+                            fprintf(stderr, "%s ", range.c_str());
+                        }
+                        fprintf(stderr, "\n");
+                    }
+                }));
+            }
+            for(auto &thread:threads) {
+                if(thread.joinable()) {
+                    thread.join();
+                }
+            }
         }
     }
     return 0;

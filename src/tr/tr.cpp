@@ -280,7 +280,8 @@ std::string tr(const std::string &txt) {
         return it->second;
     }
     std::stringstream ss;
-    ss << LELE_DATA_DIR << "/tr/" << _current_lang << "/" << hash;
+    std::string current_dir = std::filesystem::current_path();
+    ss << current_dir << "/tr/" << _current_lang << "/" << hash;
     std::ifstream file_in(ss.str(), std::ios_base::in | std::ios_base::binary);
     if (file_in.is_open()) {
         std::string content = std::string(std::istreambuf_iterator<char>(file_in), std::istreambuf_iterator<char>());
@@ -290,7 +291,7 @@ std::string tr(const std::string &txt) {
     LL(WARNING, LVSIM) << "Error opening file: " << ss.str();
     ss.str("");
     ss.clear();
-    ss << LELE_DATA_DIR << "/tr/" << _current_lang << "/" << "missing";
+    ss << current_dir << "/tr/" << _current_lang << "/" << "missing";
     std::filesystem::path nested_path = ss.str();
     if(!std::filesystem::exists(nested_path)) {
         if(!std::filesystem::create_directories(nested_path)){

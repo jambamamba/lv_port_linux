@@ -537,7 +537,14 @@ const LeleObject *LeleStyle::getLeleObject() const {
   return _lele_obj; 
 }
 
-const lv_font_t *LeleStyle::getFont(const std::string &family, int size) {
+const lv_font_t *LeleStyle::getFont(const std::string &family_, int size) {
+  std::string family(family_);
+  for (unsigned char* c = (unsigned char*)family.data(); *c; ++c) {
+        *c = std::tolower(*c);
+  }
+  // std::transform(family_.begin(), family_.end(), family.begin(),
+  //   [](unsigned char c){ return std::tolower(c); });
+    
   if(family == "montserrat") {
     if(size <= 12) {
       return &lv_font_montserrat_12;
@@ -606,6 +613,46 @@ const lv_font_t *LeleStyle::getFont(const std::string &family, int size) {
     if(size <= 16) {
       return &lv_font_dejavu_16_persian_hebrew;
     }
+  }
+  else if(family == "ubuntu-bi") {
+    std::string current_dir = std::filesystem::current_path().string() + "/fonts";
+    std::vector<std::string> all_files;
+    for (const auto& entry : std::filesystem::directory_iterator(current_dir)) {
+        // std::string ext = entry.path().extension().string();
+        if (std::filesystem::is_regular_file(entry.status()) &&
+            entry.path().extension().string() == ".lvf") {
+              all_files.push_back(entry.path().string());
+
+            // std::string font_file = entry.path().string();
+            // for (unsigned char* c = (unsigned char*)font_file.data(); *c; ++c) {
+            //       *c = std::tolower(*c);
+            // }
+            // std::transform(entry.path().string().begin(), entry.path().string().end(), font_file.begin(),
+            //   [](unsigned char c){ return std::tolower(c); });
+            // all_files.push_back(font_file);
+        }
+    }
+    std::stringstream ss;
+    ss << family << "." << size << "pt.lvf"; //Ubuntu-BI.16pt.lvf
+    std::string requested_font_file = ss.str();
+    for(const auto &font_file_path : all_files) {
+      
+      std::string font_file = std::filesystem::path(font_file_path).filename().string();
+      std::string font_file_lower_case = font_file;
+
+      for (unsigned char* c = (unsigned char*)font_file_lower_case.data(); *c; ++c) {
+            *c = std::tolower(*c);
+      }
+      // std::transform(font_file_path.begin(), font_file_path.end(), font_file_lower_case.begin(),
+      //     [](unsigned char c){ return std::tolower(c); });
+
+      if(font_file_lower_case == requested_font_file) {
+        static lv_font_t *font_1_bin = lv_binfont_create(font_file_path.c_str());
+        return font_1_bin;
+      }
+    }
+    // lv_binfont_destroy(font_1_bin);
+    // return font_1_bin;
   }
   LL(WARNING, LVSIM) << "Failed to find font '" << family << "' of size " << size << ". Defaulting to default";
   return &lv_font_dejavu_16_persian_hebrew; //default

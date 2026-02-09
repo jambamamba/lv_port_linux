@@ -12,7 +12,6 @@ set(LELE_VERSION_MINOR 0)
 
 add_compile_definitions(LELE_VERSION_MAJOR=${LELE_VERSION_MAJOR})
 add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
-add_compile_definitions(LELE_DATA_DIR="/tmp/lele/data")
 
 set(LV_CONF_INCLUDE_SIMPLE 1)
 set(LV_USE_WAYLAND 1)
