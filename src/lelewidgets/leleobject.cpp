@@ -298,7 +298,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     font_family = std::get<std::string>(value.value());
   }
   // lv_obj_set_style_text_font(lv_obj, LeleStyle::getFont(font_family, font_size), LV_PART_MAIN);
-  lv_style_set_text_font(&_style, LeleStyle::getFont(font_family, font_size));
+  lv_style_set_text_font(&_style, _lele_font.getFont(font_family, font_size));
   // lv_style_set_text_font(&_style, &lv_font_dejavu_16_persian_hebrew);
 
   value = getStyle("background/color");

@@ -120,6 +120,7 @@ function(buildLvglSim
         graphics_backend.cpp
         python/python_binding.cpp
         image_builder/image_builder.cpp
+        font/lelefont.cpp
         tr/tr.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
@@ -311,10 +312,10 @@ generateSetupPyFile(
     "${LVGL_INC_DIRS}"
 )
 
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-target_link_options(lele_ui PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
-target_link_options(lvglsim PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
-endif()
+# if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+# target_link_options(lele_ui PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
+# target_link_options(lvglsim PRIVATE -no-pie) #no-pie is needed to print line number from addr2line
+# endif()
 
 # buildLeleCpython() #commented out becasue it is slow. This lets us run py file using python
 buildTests()

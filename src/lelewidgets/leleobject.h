@@ -7,6 +7,7 @@
 #include <lvgl/lvgl_private.h>
 #include <functional>
 #include <optional>
+#include <src/font/lelefont.h>
 #include <typeinfo>
 
 //need to include all the types in   using Node = std::variant<
@@ -92,6 +93,7 @@ protected:
   // LeleStyles _lele_styles;
   std::vector<std::unique_ptr<LeleStyle>>_lele_styles;
   std::vector<PyObject*> _py_callbacks;
+  static inline LeleFont _lele_font = LeleFont();
 };
 
 struct PyLeleObject {
