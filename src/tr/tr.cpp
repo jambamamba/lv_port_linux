@@ -199,14 +199,16 @@ const std::unordered_map<std::string, std::string> _language_map = {
     {"zu", "Zulu"}
 };
 
-std::string _default_lang("en");
-std::string _current_lang("es");
+std::string _default_language("en");
+std::string _current_language("es");
 
 bool setLanguage(const std::string &input, std::string &toset) {
     for(const auto &[lang_code, lang_name] : _language_map) {
-        std::string rhs;
-        std::transform(lang_name.begin(), lang_name.end(), rhs.begin(),
-            [](unsigned char c){ return std::tolower(c); });
+        std::string rhs(lang_code);
+
+        for(char *c = (char*) rhs.c_str(); *c; c++) {
+            *c = std::tolower(*c);
+        }
 
         if(input == rhs) {
             toset = lang_code;
@@ -241,19 +243,19 @@ std::vector<std::string> availableLanguages() {
 }
 
 std::string getCurrentLanguage() {
-    return _language_map.at(_current_lang);
+    return _language_map.at(_current_language);
 }
 
 std::string getDefaultLanguage() {
-    return _language_map.at(_default_lang);
+    return _language_map.at(_default_language);
 }
 
 bool setCurrentLanguage(const std::string &language) {
-    std::string input;
-    std::transform(language.begin(), language.end(), input.begin(),
-        [](unsigned char c){ return std::tolower(c); });
+    for(char *c = (char*) language.c_str(); *c; c++) {
+        *c = std::tolower(*c);
+    }
 
-    if(setLanguage(input, _current_lang)){
+    if(setLanguage(language, _current_language)){
         _translation_map.clear();
         return true;
     }
@@ -261,17 +263,16 @@ bool setCurrentLanguage(const std::string &language) {
 }
 
 bool setDefaultLanguage(const std::string &language) {
-    std::string input;
-    std::transform(language.begin(), language.end(), input.begin(),
-        [](unsigned char c){ return std::tolower(c); });
-
-    return setLanguage(input, _default_lang);
+    for(char *c = (char*) language.c_str(); *c; c++) {
+        *c = std::tolower(*c);
+    }
+    return setLanguage(language, _default_language);
 }
 
 }//Translation
 
 std::string tr(const std::string &txt) {
-    if(_current_lang == _default_lang) {
+    if(_current_language == _default_language) {
         return txt;
     }
     std::string hash = sha256(txt);
@@ -281,7 +282,7 @@ std::string tr(const std::string &txt) {
     }
     std::stringstream ss;
     std::string current_dir = std::filesystem::current_path();
-    ss << current_dir << "/tr/" << _current_lang << "/" << hash;
+    ss << current_dir << "/tr/" << _current_language << "/" << hash;
     std::ifstream file_in(ss.str(), std::ios_base::in | std::ios_base::binary);
     if (file_in.is_open()) {
         std::string content = std::string(std::istreambuf_iterator<char>(file_in), std::istreambuf_iterator<char>());
@@ -291,7 +292,7 @@ std::string tr(const std::string &txt) {
     LL(WARNING, LVSIM) << "Error opening file: " << ss.str();
     ss.str("");
     ss.clear();
-    ss << current_dir << "/tr/" << _current_lang << "/" << "missing";
+    ss << current_dir << "/tr/" << _current_language << "/" << "missing";
     std::filesystem::path nested_path = ss.str();
     if(!std::filesystem::exists(nested_path)) {
         if(!std::filesystem::create_directories(nested_path)){

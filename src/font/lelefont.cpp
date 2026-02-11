@@ -6,6 +6,33 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
+namespace {
+
+void updateFontDb(std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> &_font_db) {
+
+  std::string current_dir = std::filesystem::current_path().string() + "/fonts";
+  for (const auto& entry : std::filesystem::directory_iterator(current_dir)) {
+      const std::string LVF_EXT = ".lvf";
+      if (std::filesystem::is_regular_file(entry.status()) &&
+          entry.path().extension().string() == LVF_EXT) {
+            std::regex rgx("(.*)\\.([0-9]*)pt\\.lvf");
+            std::smatch matches;
+            std::string file_name(std::filesystem::path(entry.path().string()).filename().string());
+            std::regex_search(file_name, matches, rgx);
+            if(matches.size() > 2) {
+              std::string font_name = matches[1].str();
+              int pt_size = std::stoi(matches[2].str());
+
+              for (unsigned char* c = (unsigned char*)font_name.data(); *c; ++c) {
+                    *c = std::tolower(*c);
+              }
+              _font_db[font_name].insert({pt_size, LeleFont::Font(entry.path().string())});
+            }
+      }
+  }
+}
+}//namespace
+
 LeleFont::Font::Font(const std::string &lvf_file)
 : _lvf_file(lvf_file) {}
 
@@ -93,27 +120,10 @@ const lv_font_t *LeleFont::getFont(const std::string &family_, int size) {
     }
   }
   else {
-    std::string current_dir = std::filesystem::current_path().string() + "/fonts";
-    for (const auto& entry : std::filesystem::directory_iterator(current_dir)) {
-        const std::string LVF_EXT = ".lvf";
-        if (std::filesystem::is_regular_file(entry.status()) &&
-            entry.path().extension().string() == LVF_EXT) {
-              std::regex rgx("(.*)\\.([0-9]*)pt\\.lvf");
-              std::smatch matches;
-              std::string file_name(std::filesystem::path(entry.path().string()).filename().string());
-              std::regex_search(file_name, matches, rgx);
-              if(matches.size() > 2) {
-                std::string font_name = matches[1].str();
-                int pt_size = std::stoi(matches[2].str());
-
-                for (unsigned char* c = (unsigned char*)font_name.data(); *c; ++c) {
-                      *c = std::tolower(*c);
-                }
-                _font_db[font_name].insert({pt_size, Font(entry.path().string())});
-              }
-        }
-    }
     const auto &it_family = _font_db.find(family);
+    if(it_family == _font_db.end()) {
+      updateFontDb(_font_db);
+    }
     if(it_family != _font_db.end()) {
       const auto &it_pt = it_family->second.find(size);
       if(it_pt != it_family->second.end()) {

@@ -2,6 +2,7 @@
 
 #include <filesystem>
 #include <unistd.h>
+#include <tr/tr.h>
 
 #include "graphics_backend.h"
 #include "lelebutton.h"
@@ -39,6 +40,24 @@ struct cJSONRAII {
     cJSON *_json;
     const std::string &_json_str;
 };
+
+std::pair<std::string,std::string> languageFromJson(const cJSON* json) {
+
+    std::string default_language("en");
+    std::string current_language("en");
+    cJSON *language = cJSON_GetObjectItem(json, "language");
+    if(language && cJSON_IsObject(language)) {
+        cJSON *obj = cJSON_GetObjectItem(language, "default");
+        if (cJSON_IsString(obj)) {
+            default_language = obj->valuestring;
+        }
+        obj = cJSON_GetObjectItem(language, "current");
+        if (cJSON_IsString(obj)) {
+            current_language = obj->valuestring;
+        }
+    }
+    return std::pair<std::string,std::string>(default_language, current_language);
+}
 
 std::pair<int,int> screenWidthHeightFromJson(const cJSON* json) {
 
@@ -402,6 +421,9 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return std::vector<std::pair<std::string, Node>>();
     }
+    auto [default_language, current_language] = languageFromJson(json);
+    Translation::setDefaultLanguage(default_language);
+    Translation::setCurrentLanguage(current_language);
 
     if(!parent->getLvObj()) {
         static click_counts counts;

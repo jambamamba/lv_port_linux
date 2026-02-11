@@ -1,7 +1,7 @@
 #pragma once
 
 #include <lvgl/lvgl.h>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 class LeleFont {
@@ -14,5 +14,5 @@ public:
   };
   const lv_font_t *getFont(const std::string &family="montserrat", int size=16);
 protected:
-  std::map<std::string, std::map<int, Font>> _font_db;
+  std::unordered_map<std::string, std::unordered_map<int, Font>> _font_db;
 };
