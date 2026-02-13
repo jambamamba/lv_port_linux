@@ -137,6 +137,7 @@ function(buildLvglSim
         python/python_binding.cpp
         image_builder/image_builder.cpp
         font/lelefont.cpp
+        font/lelefont.py.cpp
         tr/tr.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 

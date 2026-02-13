@@ -42,6 +42,9 @@ LeleFont::Font::~Font() {
   }
 }
 
+std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> LeleFont::getFontDb() const {
+  return _font_db;
+}
 const lv_font_t *LeleFont::getFont(const std::string &family_, int size) {
   std::string family(family_);
   for (unsigned char* c = (unsigned char*)family.data(); *c; ++c) {
