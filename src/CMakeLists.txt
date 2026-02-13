@@ -48,6 +48,22 @@ function(buildPython OUT_VAR_PYTHON_LIB_OUTPUT)
     set(${OUT_VAR_PYTHON_LIB_OUTPUT} "${PYTHON_LIB_OUTPUT}" PARENT_SCOPE)
 endfunction()
 
+function(buildFonts OUT_VAR_FONTS_OUTPUT)
+    message(STATUS "buildFonts()")
+
+    set(FONTS_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/res/fonts")
+    add_custom_command(
+        OUTPUT ${FONTS_OUTPUT}
+        COMMAND ${CMAKE_COMMAND} -B ${CMAKE_BINARY_DIR}/fonts -S ${CMAKE_CURRENT_SOURCE_DIR}/font -DCMAKE_BUILD_TYPE=Release
+        COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/fonts
+        #COMMAND ${CMAKE_BINARY_DIR}/fonts/ttf_to_lvf -i ${CMAKE_CURRENT_SOURCE_DIR}/res/fonts/.ttf/noto -o ${CMAKE_CURRENT_SOURCE_DIR}/res/fonts/.lvf/noto
+        COMMENT "Building ${FONTS_OUTPUT}"
+        VERBATIM
+    )
+    add_custom_target(ttf_to_lvf DEPENDS ${FONTS_OUTPUT})
+    set(${OUT_VAR_FONTS_OUTPUT} "${FONTS_OUTPUT}" PARENT_SCOPE)
+endfunction()
+
 function(buildLvImageConverter OUT_VAR_LV_IMG_DSC_SRC)
     message(STATUS "buildLvImageConverter()")
 
@@ -179,7 +195,7 @@ function(buildLvglSim
     target_link_directories(lele_ui PRIVATE ${link_dirs})
     target_link_libraries(lele_ui PRIVATE ${link_libs})
     target_include_directories(lele_ui PRIVATE ${inc_dirs})
-    add_dependencies(lele_ui lv_image_convert python)
+    add_dependencies(lele_ui lv_image_convert python ttf_to_lvf)
 
     add_executable(lvglsim main.cpp python/python_wrapper.cpp)
     set_target_properties(lvglsim PROPERTIES ${props})
@@ -294,6 +310,7 @@ if(NOT TARGET utils::utils)
     find_package(utils REQUIRED CONFIG)
 endif()
 
+buildFonts(FONTS_OUTPUT)
 buildPython(PYTHON_LIB_OUTPUT)
 buildLvImageConverter(LV_IMG_DSC_SRC)
 buildLvglSim(

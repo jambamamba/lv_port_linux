@@ -30,8 +30,11 @@
                 "border":"solid-1px-#555",
                 "corner_radius":"10",
                 "#font-family":"montserrat",
-                "font-family":"Ubuntu-BI",
-                "font-size":"40pt"
+                "#font-family":"dejavu",
+                "font-family":"Ubuntu-B",
+                "#font-family":"NotoSansArabic-Bold",
+                "font-size":"40pt",
+                "#font-size":"16pt"
             }
         },
         "label":{
@@ -45,7 +48,8 @@
                 "text-align":"center",
                 "corner_radius":"5",
                 "border":"solid-1px-#555",
-                "font-family":"Ubuntu-BI",
+                "font-family":"Ubuntu-B",
+                "#font-family":"NotoSansArabic-Bold",
                 "font-size":"16pt"
             }
         }

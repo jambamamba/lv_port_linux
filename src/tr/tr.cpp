@@ -272,7 +272,7 @@ bool setDefaultLanguage(const std::string &language) {
 }//Translation
 
 std::string tr(const std::string &txt) {
-    if(_current_language == _default_language) {
+    if(_current_language == _default_language || txt.size() == 0) {
         return txt;
     }
     std::string hash = sha256(txt);
@@ -292,7 +292,7 @@ std::string tr(const std::string &txt) {
     LL(WARNING, LVSIM) << "Error opening file: " << ss.str();
     ss.str("");
     ss.clear();
-    ss << current_dir << "/tr/" << _current_language << "/" << "missing";
+    ss << current_dir << "/tr/" << _current_language << "/" << ".missing";
     std::filesystem::path nested_path = ss.str();
     if(!std::filesystem::exists(nested_path)) {
         if(!std::filesystem::create_directories(nested_path)){

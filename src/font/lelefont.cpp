@@ -120,15 +120,22 @@ const lv_font_t *LeleFont::getFont(const std::string &family_, int size) {
     }
   }
   else {
-    const auto &it_family = _font_db.find(family);
-    if(it_family == _font_db.end()) {
-      updateFontDb(_font_db);
+    //run command: fc-list :family| grep -i ubuntu # to see paths of font files
+    //Sans vs. Serif: 
+    // Use Noto Sans for digital screens and UI (neutral, modern), 
+    // Use Noto Serif for printed materials or longer reading (better readability).
+    {
+      const auto &it_family = _font_db.find(family);
+      if(it_family == _font_db.end()) {
+        updateFontDb(_font_db);
+      }
     }
+    const auto &it_family = _font_db.find(family);
     if(it_family != _font_db.end()) {
       const auto &it_pt = it_family->second.find(size);
       if(it_pt != it_family->second.end()) {
         Font &font = it_pt->second;
-        if(font._lv_font) { 
+        if(font._lv_font) {
           return font._lv_font;
         }
         font._lv_font = lv_binfont_create(font._lvf_file.c_str());

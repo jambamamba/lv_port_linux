@@ -513,7 +513,7 @@ bool LeleStyle::setValue(
         _style["background/repeat"] = value;
     }
     else if(key.at(0) == '#') {
-      LL(WARNING, LVSIM) << "Ignoreing key " << key << " for styles";
+      LL(WARNING, LVSIM) << "Ignoring key " << key << " for styles";
       return true;
     }
     else {
