@@ -1,9 +1,31 @@
 #include "lelefont.h"
 
 
+PyObject *LeleFont::createPyObject() {
+    
+    // LOG(DEBUG, LVSIM, "createPyObject\n");
+    PyTypeObject *type = &PyLeleFont::_obj_type;
+    PyType_Ready(type);
+    PyLeleFont *self = (PyLeleFont *)type->tp_alloc(type, 0);
+    if (!self) {
+        return Py_None;
+    }
+    self->_lele_font = nullptr;
+    return (PyObject *)self;
+}
+
+int PyLeleFont::init(PyObject *self_, PyObject *args, PyObject *kwds) {
+    PyLeleFont *self = reinterpret_cast<PyLeleFont *>(self_);
+    return 0;
+}
+
+void PyLeleFont::dealloc(PyObject* self) {
+    Py_TYPE(self)->tp_free((PyObject*)self);
+}
+
 PyObject *PyLeleFont::getFontDb(PyObject *self_, PyObject *args) {
     PyLeleFont *self = reinterpret_cast<PyLeleFont *>(self_);
-    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    LeleFont *lele_font = dynamic_cast<LeleFont *>(self->_lele_font);
     if(self) {
         // self-getFontDb();//osm todo
     }
@@ -23,7 +45,7 @@ PyMethodDef PyLeleFont::_methods[] = {
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    LeleObject obj(nullptr, "");//osm, need parent
+    LeleFont obj;
     return obj.createPyObject();
 }
 
