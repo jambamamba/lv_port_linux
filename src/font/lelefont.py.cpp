@@ -1,5 +1,5 @@
 #include "lelefont.h"
-
+#include "leleobject.h"
 
 PyObject *LeleFont::createPyObject() {
     
@@ -10,7 +10,7 @@ PyObject *LeleFont::createPyObject() {
     if (!self) {
         return Py_None;
     }
-    self->_lele_font = nullptr;//osm todo
+    self->_lele_font = LeleObject::getLeleFont();
     return (PyObject *)self;
 }
 

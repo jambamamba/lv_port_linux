@@ -76,6 +76,7 @@ public:
 #ifdef METHOD2_CREATING_PYENUM
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
 #endif
+  static const LeleFont *getLeleFont();
 protected:
   void setFlexStyle();
 

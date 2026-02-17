@@ -535,6 +535,9 @@ bool LeleObject::eventCallback(LeleEvent &&e) {
 void LeleObject::addEventHandler(PyObject *py_callback) {
   _py_callbacks.push_back(py_callback);
 }
+const LeleFont *LeleObject::getLeleFont() {
+  return &_lele_font;
+}
 std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     // os << "LeleStyles id: " << p._id << ", ";
     os << "_id:" << p._id << ",";

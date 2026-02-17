@@ -29,7 +29,7 @@ struct PyLeleFont {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    LeleFont *_lele_font = nullptr;
+    const LeleFont *_lele_font = nullptr;
     static PyObject *getFontDb(PyObject *self_, PyObject *args);
 };
 
