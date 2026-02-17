@@ -139,6 +139,7 @@ function(buildLvglSim
         font/lelefont.cpp
         font/lelefont.py.cpp
         tr/tr.cpp
+        tr/tr.py.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 

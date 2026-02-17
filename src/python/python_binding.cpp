@@ -1,13 +1,14 @@
+#include <debug_logger/debug_logger.h>
 #include <filesystem>
 #include <iostream>
-#include <debug_logger/debug_logger.h>
+#include <lelewidgets/lelebutton.h>
+#include <lelewidgets/leleevent.h>
+#include <lelewidgets/lelemessagebox.h>
+#include <lelewidgets/leleobject.h>
+#include <tr/tr.h>
 
 #include "python_wrapper.h"
 #include "graphics_backend.h"
-#include "lelewidgets/leleobject.h"
-#include "lelewidgets/leleevent.h"
-#include "lelewidgets/lelebutton.h"
-#include "lelewidgets/lelemessagebox.h"
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -300,6 +301,7 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyModule_AddType(module, &PyLeleButton::_obj_type);
     PyModule_AddType(module, &PyLeleButtonType::_obj_type);
     PyModule_AddType(module, &PyLeleFont::_obj_type);
+    PyModule_AddType(module, &PyLeleTranslation::_obj_type);
     // PyModule_AddObject(module, "FooBar", 
     //     LeleObject::createPyEnum("FooBar", {
     //             {"FOO",1},

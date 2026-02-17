@@ -422,8 +422,8 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         return std::vector<std::pair<std::string, Node>>();
     }
     auto [default_language, current_language] = languageFromJson(json);
-    Translation::setDefaultLanguage(default_language);
-    Translation::setCurrentLanguage(current_language);
+    LeleTranslation::getLeleTranslation().setDefaultLanguage(default_language);
+    LeleTranslation::getLeleTranslation().setCurrentLanguage(current_language);
 
     if(!parent->getLvObj()) {
         static click_counts counts;
@@ -434,8 +434,6 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_DOUBLE_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
-
-
     }
     return leleObjectsFromJson(parent, cJSON_Print(json));
 }

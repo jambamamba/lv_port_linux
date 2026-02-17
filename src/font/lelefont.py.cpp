@@ -25,11 +25,11 @@ void PyLeleFont::dealloc(PyObject* self) {
 
 ////////////////////
 namespace {
-PyObject *toPyDict(std::unordered_map<std::string, PyObject*> &style_name_value_map) {
+PyObject *toPyDict(std::unordered_map<std::string, PyObject*> &font_families) {
 
     struct RAII {
         PyObject *_dict = nullptr;
-        std::map<PyObject*, PyObject*> _items;
+        std::unordered_map<PyObject*, PyObject*> _items;
         void reset() {
             _dict = nullptr;//this will prevent ref count decrement
         }
@@ -46,7 +46,7 @@ PyObject *toPyDict(std::unordered_map<std::string, PyObject*> &style_name_value_
     if(!$._dict) {
         return Py_None;
     }
-    for(const auto &[family, font] : style_name_value_map) {
+    for(const auto &[family, font] : font_families) {
 
         PyObject *py_name = PyUnicode_FromString(family.c_str());
         if(!py_name) {
@@ -70,11 +70,11 @@ PyObject *toPyDict(std::unordered_map<std::string, PyObject*> &style_name_value_
     return dict;
 }
 
-PyObject *toPyDict(const std::unordered_map<int, LeleFont::Font> &style_name_value_map) {
+PyObject *toPyDict(const std::unordered_map<int, LeleFont::Font> &font_sizes) {
 
     struct RAII {
         PyObject *_dict = nullptr;
-        std::map<PyObject*, PyObject*> _items;
+        std::unordered_map<PyObject*, PyObject*> _items;
         void reset() {
             _dict = nullptr;//this will prevent ref count decrement
         }
@@ -91,7 +91,7 @@ PyObject *toPyDict(const std::unordered_map<int, LeleFont::Font> &style_name_val
     if(!$._dict) {
         return Py_None;
     }
-    for(const auto &[font_size, font] : style_name_value_map) {
+    for(const auto &[font_size, font] : font_sizes) {
 
         PyObject *py_name = PyLong_FromLong(font_size);
         if(!py_name) {

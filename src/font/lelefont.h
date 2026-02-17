@@ -27,7 +27,6 @@ struct PyLeleFont {
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
     static PyMethodDef _methods[];
-    static PyObject *createPyObject();
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here

@@ -1,57 +1,17 @@
-{
-    "version":"1.0",
-    "screen":{"width":"1024","height":"768"},
-    "language":{"current":"es","default":"en"},
-    "view":{
-        "id":"/hello-world",
-        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0",
-            "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"}
-        },
-        "label":{
-            "id":"/hello-world/label",
-            "text":"Hello World!",
-            "text_arabic":"مرحبا العالم",
-            "text_spanish":"Hola Mundo",
-            "text_french":"Bonjour le monde",
-            "text_italian":"Ciao mondo",
-            "text_portuguese":"Olá mundo",
-            "text_russian":"Привет, мир",
-            "text_ukrainian":"привіт світ",
-            "text_chinese_simplified":"你好世界",
-            "text_chinese_traditional":"你好世界",
-            "text_japanese":"こんにちは世界",
-            "text_urdu":"ہیلو دنیا",
-            "style":{
-                "id":"style:/hello-world/style",
-                "width":"40%",
-                "height":"10%",
-                "padding":"1px",
-                "text-align":"center",
-                "border":"solid-1px-#555",
-                "corner_radius":"10",
-                "#font-family":"montserrat",
-                "#font-family":"dejavu",
-                "font-family":"Ubuntu-B",
-                "#font-family":"NotoSansArabic-Bold",
-                "font-size":"40pt",
-                "#font-size":"16pt"
-            }
-        },
-        "label":{
-            "id":"/hello-world/version",
-            "text":"",
-            "style":{
-                "id":"style:/hello-world/version",
-                "width":"20%",
-                "height":"5%",
-                "padding":"1px",
-                "text-align":"center",
-                "corner_radius":"5",
-                "border":"solid-1px-#555",
-                "font-family":"Ubuntu-B",
-                "#font-family":"NotoSansArabic-Bold",
-                "font-size":"16pt"
-            }
-        }
-    }
-}
+import os
+import sys
+import lele
+
+res = lele.loadConfig("hello-world.json")
+if not res:
+   sys.exit(1)
+
+label_hello_world = lele.getObjectById("/hello-world/label")
+print(f"label text: {label_hello_world}")
+
+label_version = lele.getObjectById("/hello-world/version")
+version = f"{lele.version()['Major']}.{lele.version()['Minor']}"
+label_version.setText(f"Lele-UI Version: {version}")
+
+while lele.handleEvents():
+   pass

@@ -260,13 +260,6 @@ def runTestLoop():
    pass
 
 def main():
-   res = lele.foo(
-         10,
-         "hello",
-         ["/home", "/tmp"], 
-         {"flags":"bar", "sue": "sal"},
-         lambda percent: callback(percent))
-   print(f"@@@py foo result:{res}")
 
    # res = lele.loadConfig("/repos/lv_port_linux/src/examples/imageview/imageview.json")
    res = lele.loadConfig("imageview.json")

@@ -1,0 +1,55 @@
+{
+    "version":"1.0",
+    "screen":{"width":"1024","height":"768"},
+    "language":{"current":"es","default":"en"},
+    "view":{
+        "id":"/hello-world-international",
+        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0",
+            "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"},
+            "#font-family":"montserrat",
+            "#font-family":"dejavu",
+            "#font-family":"NotoSansArabic-Bold",
+            "font-family":"Ubuntu-B"
+        },
+        "label":{
+            "id":"/hello-world-international/label",
+            "text":"Hello World!",
+            "text_arabic":"مرحبا العالم",
+            "text_spanish":"Hola Mundo",
+            "text_french":"Bonjour le monde",
+            "text_italian":"Ciao mondo",
+            "text_portuguese":"Olá mundo",
+            "text_russian":"Привет, мир",
+            "text_ukrainian":"привіт світ",
+            "text_chinese_simplified":"你好世界",
+            "text_chinese_traditional":"你好世界",
+            "text_japanese":"こんにちは世界",
+            "text_urdu":"ہیلو دنیا",
+            "style":{
+                "id":"style:/hello-world-international/style",
+                "width":"40%",
+                "height":"10%",
+                "padding":"1px",
+                "text-align":"center",
+                "border":"solid-1px-#555",
+                "corner_radius":"10",
+                "font-size":"40pt",
+                "#font-size":"16pt"
+            }
+        },
+        "label":{
+            "id":"/hello-world-international/version",
+            "text":"",
+            "style":{
+                "id":"style:/hello-world-international/version",
+                "width":"20%",
+                "height":"5%",
+                "padding":"1px",
+                "text-align":"center",
+                "corner_radius":"5",
+                "border":"solid-1px-#555",
+                "font-size":"16pt"
+            }
+        }
+    }
+}

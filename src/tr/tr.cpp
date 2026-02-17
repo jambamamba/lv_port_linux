@@ -218,7 +218,6 @@ bool setLanguage(const std::string &input, std::string &toset) {
     return false;
 }
 
-
 std::string sha256(const std::string inputStr) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     // SHA256 function calculates the hash of the data
@@ -233,24 +232,29 @@ std::string sha256(const std::string inputStr) {
 std::unordered_map<std::string, std::string> _translation_map = {};
 }//namespace
 
-namespace Translation {
-std::vector<std::string> availableLanguages() {
-    std::vector<std::string> languages;
-    for(const auto &[lang_code, lang_name] : _language_map) {
-        languages.emplace_back(lang_name);
-    }
-    return languages;
+LeleTranslation &LeleTranslation::getLeleTranslation() {
+  static LeleTranslation _lele_translation;
+  return _lele_translation;
 }
 
-std::string getCurrentLanguage() {
+const std::unordered_map<std::string, std::string> &LeleTranslation::getAvailableLanguages() {
+    return _language_map;
+    // std::vector<std::string> languages;
+    // for(const auto &[lang_code, lang_name] : _language_map) {
+    //     languages.emplace_back(lang_name);
+    // }
+    // return languages;
+}
+
+std::string LeleTranslation::getCurrentLanguage() {
     return _language_map.at(_current_language);
 }
 
-std::string getDefaultLanguage() {
+std::string LeleTranslation::getDefaultLanguage() {
     return _language_map.at(_default_language);
 }
 
-bool setCurrentLanguage(const std::string &language) {
+bool LeleTranslation::setCurrentLanguage(const std::string &language) {
     for(char *c = (char*) language.c_str(); *c; c++) {
         *c = std::tolower(*c);
     }
@@ -262,15 +266,14 @@ bool setCurrentLanguage(const std::string &language) {
     return false;
 }
 
-bool setDefaultLanguage(const std::string &language) {
+bool LeleTranslation::setDefaultLanguage(const std::string &language) {
     for(char *c = (char*) language.c_str(); *c; c++) {
         *c = std::tolower(*c);
     }
     return setLanguage(language, _default_language);
 }
 
-}//Translation
-
+//global function:
 std::string tr(const std::string &txt) {
     if(_current_language == _default_language || txt.size() == 0) {
         return txt;
