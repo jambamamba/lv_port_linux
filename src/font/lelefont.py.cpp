@@ -1,5 +1,5 @@
 #include "lelefont.h"
-#include "leleobject.h"
+#include "lelewidgets/leleobject.h"
 
 PyObject *LeleFont::createPyObject() {
     
@@ -25,9 +25,9 @@ void PyLeleFont::dealloc(PyObject* self) {
 
 PyObject *PyLeleFont::getFontDb(PyObject *self_, PyObject *args) {
     PyLeleFont *self = reinterpret_cast<PyLeleFont *>(self_);
-    LeleFont *lele_font = dynamic_cast<LeleFont *>(self->_lele_font);
-    if(self) {
-        // self-getFontDb();//osm todo
+    const LeleFont *lele_font = dynamic_cast<const LeleFont *>(self->_lele_font);
+    if(lele_font) {
+        lele_font->getFontDb();//osm todo, convert ret obj to py obj
     }
     return Py_None;
 }
