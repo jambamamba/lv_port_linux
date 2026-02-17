@@ -16,6 +16,8 @@ class LeleImage : public LeleObject  {
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   std::string getSrc() const;
   void setSrc(const std::string& src);
+  std::vector<uint8_t> getBuffer() const;
+  void setBuffer(const std::vector<uint8_t>& buffer);
   std::tuple<int,int> getSize() const;
   void setSize(int width, int height);
   std::tuple<int,int> getPosition() const;
@@ -42,6 +44,8 @@ struct PyLeleImage {
     // Type-specific fields go here
     static PyObject *getSrc(PyObject *, PyObject *);
     static PyObject *setSrc(PyObject *, PyObject *);
+    static PyObject *getBuffer(PyObject *, PyObject *);
+    static PyObject *setBuffer(PyObject *, PyObject *);
     static PyObject *getSize(PyObject *, PyObject *);
     static PyObject *setSize(PyObject *, PyObject *);
     static PyObject *getPosition(PyObject *, PyObject *);
@@ -57,6 +61,8 @@ struct PyLeleImage {
   PY_LELEOBJECT_METHODS() \
   {"getSrc", (PyCFunction)PyLeleImage::getSrc, METH_NOARGS, "Get the image source"},\
   {"setSrc", (PyCFunction)PyLeleImage::setSrc, METH_VARARGS, "Set the image source"},\
+  {"getBuffer", (PyCFunction)PyLeleImage::getBuffer, METH_NOARGS, "Get the image buffer"},\
+  {"setBuffer", (PyCFunction)PyLeleImage::setBuffer, METH_VARARGS, "Set the image buffer"},\
   {"getSize", (PyCFunction)PyLeleImage::getSize, METH_NOARGS, "Get the image size as tuple x,y"},\
   {"setSize", (PyCFunction)PyLeleImage::setSize, METH_VARARGS, "Set the image size with tuple x,y"},\
   {"getPosition", (PyCFunction)PyLeleImage::getPosition, METH_NOARGS, "Get the image position"},\

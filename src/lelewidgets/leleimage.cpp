@@ -52,6 +52,29 @@ void LeleImage::drawImage() {
   lv_obj_set_pos(_lv_img, _img._offset._x, _img._offset._y);
 }
 
+std::vector<uint8_t> LeleImage::getBuffer() const {
+  if(!_img._img_dsc) {
+    return {};
+  }
+  const uint8_t* buffer = _img._img_dsc.value()->data;
+  size_t size = _img._img_dsc.value()->header.stride * _img._img_dsc.value()->header.h;
+  return std::vector<uint8_t>(buffer, buffer + size);
+}
+
+void LeleImage::setBuffer(const std::vector<uint8_t>& buffer) {
+  if(!_img._img_dsc) {
+    return;
+  }
+  char* buffer_ptr = reinterpret_cast<char*>(const_cast<uint8_t*>(_img._img_dsc.value()->data));
+  size_t size = _img._img_dsc.value()->header.stride * _img._img_dsc.value()->header.h;
+  if(size != buffer.size()) {
+    LL(WARNING, LVSIM) << "Buffer size does not match image size";
+    return;
+  }
+  std::copy(buffer.begin(), buffer.end(), buffer_ptr);
+  lv_image_set_src(_lv_img, _img._img_dsc.value().get());
+}
+
 std::string LeleImage::getSrc() const { 
   auto src = _img_style.find("img/src");
   if(src == _img_style.end() || !src->second) {

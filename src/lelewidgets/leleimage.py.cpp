@@ -29,6 +29,37 @@ void PyLeleImage::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+PyObject *PyLeleImage::getBuffer(PyObject *self_, PyObject *arg) {
+    PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
+    LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        const auto &buffer = lele_obj->getBuffer();
+        // PyBytes_FromStringAndSize(const char *str, Py_ssize_t size)
+        return PyBytes_FromStringAndSize(reinterpret_cast<const char*>(buffer.data()), buffer.size());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleImage::setBuffer(PyObject *self_, PyObject *args) {
+    PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
+    LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        char *bytes = nullptr;
+        Py_ssize_t size = 0;
+        if(!PyArg_ParseTuple(args, "y#", &bytes, &size)) {
+            // y# (read-only bytes-like object) [const char *, Py_ssize_t]
+            // w* (read-write bytes-like object) [Py_buffer],  must call PyBuffer_Release() when done 
+            // s# (read-only bytes-like object, also accepts Unicode) [const char *, Py_ssize_t],  string may contain embedded null bytes, as the length is provide separately
+            return Py_None;
+        }
+        if(bytes && size > 0) {
+            std::vector<uint8_t> buffer(bytes, bytes + size);
+            lele_obj->setBuffer(buffer);
+        }
+    }
+    return Py_None;
+}
+
 PyObject *PyLeleImage::getSrc(PyObject *self_, PyObject *arg) {
     PyLeleImage *self = reinterpret_cast<PyLeleImage *>(self_);
     LeleImage *lele_obj = dynamic_cast<LeleImage *>(self->ob_base._lele_obj);
