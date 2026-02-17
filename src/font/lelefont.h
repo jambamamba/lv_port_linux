@@ -13,11 +13,13 @@ public:
     Font(const std::string &lvf_file);
     ~Font();
   };
-  const lv_font_t *getFont(const std::string &family="montserrat", int size=16);
-  std::unordered_map<std::string, std::unordered_map<int, Font>> getFontDb() const;
-  virtual PyObject *createPyObject();
+  const lv_font_t *getFont(const std::string &family="montserrat", int size=16) const;
+  const std::unordered_map<std::string, std::unordered_map<int, Font>> &getFontDb() const;
+  PyObject *createPyObject();
+  static LeleFont &getLeleFont();
 protected:
-  std::unordered_map<std::string, std::unordered_map<int, Font>> _font_db;
+  LeleFont() = default;
+  mutable std::unordered_map<std::string, std::unordered_map<int, Font>> _font_db;
 };
 
 struct PyLeleFont {
@@ -29,7 +31,7 @@ struct PyLeleFont {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    const LeleFont *_lele_font = nullptr;
+    LeleFont *_lele_font = nullptr;
     static PyObject *getFontDb(PyObject *self_, PyObject *args);
 };
 

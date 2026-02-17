@@ -10,7 +10,7 @@ PyObject *LeleFont::createPyObject() {
     if (!self) {
         return Py_None;
     }
-    self->_lele_font = LeleObject::getLeleFont();
+    self->_lele_font = this;
     return (PyObject *)self;
 }
 
@@ -23,13 +23,114 @@ void PyLeleFont::dealloc(PyObject* self) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
+////////////////////
+namespace {
+PyObject *toPyDict(std::unordered_map<std::string, PyObject*> &style_name_value_map) {
+
+    struct RAII {
+        PyObject *_dict = nullptr;
+        std::map<PyObject*, PyObject*> _items;
+        void reset() {
+            _dict = nullptr;//this will prevent ref count decrement
+        }
+        ~RAII() {            
+            for(const auto &[name, value] : _items) {
+                Py_XDECREF(name);
+                Py_XDECREF(value);
+            }
+            Py_XDECREF(_dict);
+        }
+    }$;
+
+    $._dict = PyDict_New();
+    if(!$._dict) {
+        return Py_None;
+    }
+    for(const auto &[family, font] : style_name_value_map) {
+
+        PyObject *py_name = PyUnicode_FromString(family.c_str());
+        if(!py_name) {
+            break;
+        }
+        PyObject *py_value = font;
+
+        if(!py_value) {
+            Py_XDECREF(py_name);
+            break;
+        }
+        if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
+            Py_XDECREF(py_name);
+            Py_XDECREF(py_value);
+            break;
+        }
+        $._items[py_name] = py_value;
+    }
+    PyObject *dict = $._dict;
+    $.reset();
+    return dict;
+}
+
+PyObject *toPyDict(const std::unordered_map<int, LeleFont::Font> &style_name_value_map) {
+
+    struct RAII {
+        PyObject *_dict = nullptr;
+        std::map<PyObject*, PyObject*> _items;
+        void reset() {
+            _dict = nullptr;//this will prevent ref count decrement
+        }
+        ~RAII() {            
+            for(const auto &[name, value] : _items) {
+                Py_XDECREF(name);
+                Py_XDECREF(value);
+            }
+            Py_XDECREF(_dict);
+        }
+    }$;
+
+    $._dict = PyDict_New();
+    if(!$._dict) {
+        return Py_None;
+    }
+    for(const auto &[font_size, font] : style_name_value_map) {
+
+        PyObject *py_name = PyLong_FromLong(font_size);
+        if(!py_name) {
+            break;
+        }
+        PyObject *py_value = 
+            PyUnicode_FromString(font._lvf_file.c_str());
+        // PyLong_FromLong(std::get<int>(style.value()));
+
+        if(!py_value) {
+            Py_XDECREF(py_name);
+            break;
+        }
+        if(PyDict_SetItem($._dict, py_name, py_value) == -1) {
+            Py_XDECREF(py_name);
+            Py_XDECREF(py_value);
+            break;
+        }
+        $._items[py_name] = py_value;
+    }
+    PyObject *dict = $._dict;
+    $.reset();
+    return dict;
+}
+}//namespace
+
+////////////////////
 PyObject *PyLeleFont::getFontDb(PyObject *self_, PyObject *args) {
     PyLeleFont *self = reinterpret_cast<PyLeleFont *>(self_);
-    const LeleFont *lele_font = dynamic_cast<const LeleFont *>(self->_lele_font);
-    if(lele_font) {
-        lele_font->getFontDb();//osm todo, convert ret obj to py obj
+    LeleFont *lele_font = dynamic_cast<LeleFont *>(self->_lele_font);
+    if(!lele_font) {
+        return Py_None;
     }
-    return Py_None;
+    std::unordered_map<std::string, PyObject*> fontdb;
+    for(const auto &[family, fonts]: lele_font->getFontDb()) {
+        PyObject *font_sizes = toPyDict(fonts);
+        fontdb.insert({family, font_sizes});
+    }
+    return toPyDict(fontdb);
 }
 
 PyMemberDef PyLeleFont::_members[] = {
@@ -45,8 +146,7 @@ PyMethodDef PyLeleFont::_methods[] = {
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    LeleFont obj;
-    return obj.createPyObject();
+    return LeleFont::getLeleFont().createPyObject();
 }
 
 PyTypeObject PyLeleFont::_obj_type = {

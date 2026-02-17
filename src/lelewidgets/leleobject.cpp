@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <font/lelefont.h>
 #include <iostream>
 #include <ranges>
 #include <algorithm>
@@ -298,7 +299,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     font_family = std::get<std::string>(value.value());
   }
   // lv_obj_set_style_text_font(lv_obj, LeleStyle::getFont(font_family, font_size), LV_PART_MAIN);
-  lv_style_set_text_font(&_style, _lele_font.getFont(font_family, font_size));
+  lv_style_set_text_font(&_style, LeleFont::getLeleFont().getFont(font_family, font_size));
   // lv_style_set_text_font(&_style, &lv_font_dejavu_16_persian_hebrew);
 
   value = getStyle("background/color");
@@ -534,9 +535,6 @@ bool LeleObject::eventCallback(LeleEvent &&e) {
 }
 void LeleObject::addEventHandler(PyObject *py_callback) {
   _py_callbacks.push_back(py_callback);
-}
-const LeleFont *LeleObject::getLeleFont() {
-  return &_lele_font;
 }
 std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     // os << "LeleStyles id: " << p._id << ", ";

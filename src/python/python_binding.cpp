@@ -102,7 +102,7 @@ namespace {
         char *id = nullptr;
         if(!PyArg_ParseTuple(args, "s", //id
             &id)) {
-            return PyLong_FromLong(0);
+            return Py_None;
         }
         std::vector<PyObject*> py_objects;
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
@@ -117,51 +117,51 @@ namespace {
         });
         return PyLeleObject::pyListOrPyObjectFromStdVector(py_objects);
     }
-    static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
-        int num = 0;
-        char *str = nullptr;
-        PyObject *list = nullptr;
-        PyObject *dict = nullptr;
-        PyObject *py_callback = nullptr;
-        if(!PyArg_ParseTuple(args, "isOOO", //int,str,obj,obj,obj
-            &num,
-            &str,
-            &list,
-            &dict,
-            &py_callback)) {
-            return PyLong_FromLong(0);
-        }
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "num: " << num << "\n";
-        std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
+    // static PyObject* _mymodule_foo(PyObject *self, PyObject *args) {
+    //     int num = 0;
+    //     char *str = nullptr;
+    //     PyObject *list = nullptr;
+    //     PyObject *dict = nullptr;
+    //     PyObject *py_callback = nullptr;
+    //     if(!PyArg_ParseTuple(args, "isOOO", //int,str,obj,obj,obj
+    //         &num,
+    //         &str,
+    //         &list,
+    //         &dict,
+    //         &py_callback)) {
+    //         return Py_None;
+    //     }
+    //     std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "num: " << num << "\n";
+    //     std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "str: " << str << "\n";
 
-        int len = PyList_Size(list);
-        while (len--) {
-            std::string str(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "List item: " << str << "\n";
-        }
-        // Py_DECREF(list);
+    //     int len = PyList_Size(list);
+    //     while (len--) {
+    //         std::string str(PyUnicode_AsUTF8(PyList_GetItem(list, len)));
+    //         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "List item: " << str << "\n";
+    //     }
+    //     // Py_DECREF(list);
 
-        PyObject* keys = PyDict_Keys(dict); 
-        Py_ssize_t size = PyList_Size(keys);
-        for (Py_ssize_t i = 0; i < size; i++) {
-            PyObject* key = PyList_GetItem(keys, i);
-            PyObject* key_str = PyObject_Str(key);
-            const char* key_c_str = PyUnicode_AsUTF8(key_str);
-            PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
-            const char* value_c_str = PyUnicode_AsUTF8(value_str);
-            std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dict key: " << key_c_str << ", value: " << value_c_str << "\n";
-            Py_DECREF(key_str);
-            Py_DECREF(value_str);
-        }
-        // Py_DECREF(dic);     
+    //     PyObject* keys = PyDict_Keys(dict); 
+    //     Py_ssize_t size = PyList_Size(keys);
+    //     for (Py_ssize_t i = 0; i < size; i++) {
+    //         PyObject* key = PyList_GetItem(keys, i);
+    //         PyObject* key_str = PyObject_Str(key);
+    //         const char* key_c_str = PyUnicode_AsUTF8(key_str);
+    //         PyObject *value_str = PyDict_GetItemString(dict, key_c_str);
+    //         const char* value_c_str = PyUnicode_AsUTF8(value_str);
+    //         std::cout << "[PY]" << __FILE__ << ":" << __LINE__ << " " << "Dict key: " << key_c_str << ", value: " << value_c_str << "\n";
+    //         Py_DECREF(key_str);
+    //         Py_DECREF(value_str);
+    //     }
+    //     // Py_DECREF(dic);     
 
-        PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
-        PyObject *res = PyObject_CallObject(py_callback, arglist);
-        if(res) { Py_DECREF(res); }
-        // Py_DECREF(py_callback);
+    //     PyObject *arglist = Py_BuildValue("(s)", "hello from c++");
+    //     PyObject *res = PyObject_CallObject(py_callback, arglist);
+    //     if(res) { Py_DECREF(res); }
+    //     // Py_DECREF(py_callback);
 
-        return PyLong_FromLong(1);
-    }
+    //     return PyLong_FromLong(1);
+    // }
     static PyObject* _mymodule_loadConfig(PyObject *self, PyObject *args) {
         char *str = nullptr;
         if(!PyArg_ParseTuple(args, "s", //str
@@ -215,7 +215,7 @@ namespace {
     }
     static PyMethodDef _mymodule_methods[] = {
         {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
-        {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
+        // {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
         {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
         {"addEventHandler", _mymodule_addEventHandler, METH_VARARGS, "lele.addEventHandler(callback)"},
