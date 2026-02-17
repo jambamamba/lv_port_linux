@@ -10,7 +10,7 @@ PyObject *LeleFont::createPyObject() {
     if (!self) {
         return Py_None;
     }
-    self->_lele_font = nullptr;
+    self->_lele_font = nullptr;//osm todo
     return (PyObject *)self;
 }
 

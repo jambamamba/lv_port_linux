@@ -8,7 +8,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
 
-void updateFontDb(std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> &_font_db) {
+void updateFontDb(std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> &font_db) {
 
   std::string current_dir = std::filesystem::current_path().string() + "/fonts";
   for (const auto& entry : std::filesystem::directory_iterator(current_dir)) {
@@ -26,7 +26,7 @@ void updateFontDb(std::unordered_map<std::string, std::unordered_map<int, LeleFo
               for (unsigned char* c = (unsigned char*)font_name.data(); *c; ++c) {
                     *c = std::tolower(*c);
               }
-              _font_db[font_name].insert({pt_size, LeleFont::Font(entry.path().string())});
+              font_db[font_name].insert({pt_size, LeleFont::Font(entry.path().string())});
             }
       }
   }
@@ -45,6 +45,7 @@ LeleFont::Font::~Font() {
 std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> LeleFont::getFontDb() const {
   return _font_db;
 }
+
 const lv_font_t *LeleFont::getFont(const std::string &family_, int size) {
   std::string family(family_);
   for (unsigned char* c = (unsigned char*)family.data(); *c; ++c) {

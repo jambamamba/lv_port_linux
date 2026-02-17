@@ -299,6 +299,7 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyModule_AddType(module, &PyLeleEventType::_obj_type);
     PyModule_AddType(module, &PyLeleButton::_obj_type);
     PyModule_AddType(module, &PyLeleButtonType::_obj_type);
+    PyModule_AddType(module, &PyLeleFont::_obj_type);
     // PyModule_AddObject(module, "FooBar", 
     //     LeleObject::createPyEnum("FooBar", {
     //             {"FOO",1},
