@@ -11,6 +11,9 @@ namespace {
 void updateFontDb(std::unordered_map<std::string, std::unordered_map<int, LeleFont::Font>> &font_db) {
 
   std::string current_dir = std::filesystem::current_path().string() + "/fonts";
+  if(!std::filesystem::exists(std::filesystem::path(current_dir))){
+    std::filesystem::create_directory(std::filesystem::path(current_dir));
+  }
   for (const auto& entry : std::filesystem::directory_iterator(current_dir)) {
       const std::string LVF_EXT = ".lvf";
       if (std::filesystem::is_regular_file(entry.status()) &&

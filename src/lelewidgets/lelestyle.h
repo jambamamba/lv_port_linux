@@ -70,6 +70,7 @@ struct PyLeleStyle {
     static PyMemberDef _members[];
     static PyMethodDef _methods[];
     static PyObject *toPyDict(
+      LeleStyle *lele_style,
       const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
       const std::vector<std::string> &&white_list = {});
     static void dealloc(PyObject* self);

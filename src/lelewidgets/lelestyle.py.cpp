@@ -201,6 +201,7 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
 }//namespace
 
 PyObject *PyLeleStyle::toPyDict(
+    LeleStyle *lele_style,
     const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
     const std::vector<std::string> &&white_list) {
 
@@ -223,8 +224,18 @@ PyObject *PyLeleStyle::toPyDict(
     if(!$._dict) {
         return Py_None;
     }
-    LeleStyle lele_style;
-    PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style.createPyObject());
+    PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style->createPyObject());
+    for(const auto &name: white_list) {
+        auto res = lele_style->getValue(name);
+        if(res) {
+            auto res2 = res.value();//if (!std::holds_alternative<std::string>(token)) {
+            auto value = std::get<std::string>(res2);
+            int x = 0;
+        }
+        int x = 0;
+    }     
+
+//osm todo: instead of style_name_value_map which only for this style, get all style attribute types, and iterate through them, and call getValue  like above
     for(const auto &[name, value] : style_name_value_map) {
 
         if(!value) {
@@ -328,7 +339,7 @@ PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
     // const auto style = lele_style->getStyle();
     // return toPyDict(std::move(style), std::move(white_list));
 
-    return toPyDict(lele_style->getStyle(), pyListToStrings(args));
+    return toPyDict(lele_style, lele_style->getStyle(), pyListToStrings(args));
 }
 
 PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {

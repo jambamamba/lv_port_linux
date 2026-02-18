@@ -50,6 +50,13 @@
                 "border":"solid-1px-#555",
                 "font-size":"16pt"
             }
+        },
+        "button":{
+            "type":"push",
+            "id":"pushbutton",
+            "text":"Change Font Family",
+            "checkable":"false",
+            "checked":"false"
         }
-    }
+    }      
 }

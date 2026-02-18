@@ -57,7 +57,7 @@ bool LeleObject::pyCallback(PyObject *py_callback, PyObject *arg) {
         }
         else {
             int iret = PyObject_IsTrue(res);
-            LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned iret:%i\n", iret);
+            // LOG(DEBUG, LVSIM, "LeleObject::pyCallback returned iret:%i\n", iret);
             if(iret == 1) {
                 ret = true;
             }//else //We got Py_False or Error
