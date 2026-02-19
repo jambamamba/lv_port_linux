@@ -11,11 +11,24 @@ def pushbutton(event):
    # print(f"obj style font-family: {style.getValue("font-family")}")
    style = obj.getStyle("style:/hello-world-international/style")
    # print(f"obj style font-size: {style.getValue("font-size")}")
+   print("============================================")
+   user_attributes = [attr for attr in dir(lele) if not attr.startswith('__')]
+   print(f"lele: {user_attributes}")
+   print("============================================")
+   print(f"font_db: {lele.Font().getFontDb()}")
+   print("============================================")
+   print(f"obj style font-family: {style.getValue("font-family")}")
+   style.setValue({"font-family":"notosansarabic-bold"})
    print(f"obj style font-family: {style.getValue("font-family")}")
    print("============================================")
-   user_attributes = [attr for attr in dir(style) if not attr.startswith('__')]
-   print(user_attributes)
+   print(f"available languages: {lele.Translation().getAvailableLanguages()}")
    print("============================================")
+   print(f"current language: {lele.Translation().getCurrentLanguage()}")
+   lele.Translation().setCurrentLanguage("ar")
+   print("============================================")
+   # user_attributes = [attr for attr in dir(style) if not attr.startswith('__')]
+   # print(user_attributes)
+   # print("============================================")
    return True
 
 res = lele.loadConfig("hello-world-international.json")
@@ -28,17 +41,6 @@ print(f"label text: {label_hello_world}")
 label_version = lele.getObjectById("/hello-world-international/version")
 version = f"{lele.version()['Major']}.{lele.version()['Minor']}"
 label_version.setText(f"Lele-UI Version: {version}")
-
-print("============================================")
-user_attributes = [attr for attr in dir(lele) if not attr.startswith('__')]
-print(user_attributes)
-print("============================================")
-lele_font = lele.Font()
-font_db = lele_font.getFontDb()
-user_attributes = [attr for attr in dir(font_db) if not attr.startswith('__')]
-print(user_attributes)
-print(f"font_db: {font_db}")
-print("============================================")
 
 obj = lele.getObjectById("pushbutton")
 obj.addEventHandler(lambda event: pushbutton(event))

@@ -203,7 +203,7 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
 PyObject *PyLeleStyle::toPyDict(
     LeleStyle *lele_style,
     const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
-    const std::vector<std::string> &&white_list) {
+    const std::set<std::string> &&white_list) {
 
     struct RAII {
         PyObject *_dict = nullptr;
@@ -224,28 +224,14 @@ PyObject *PyLeleStyle::toPyDict(
     if(!$._dict) {
         return Py_None;
     }
+    std::set<std::string> keys = !white_list.empty() ? white_list : LeleStyle::_style_keys;
     PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style->createPyObject());
-    for(const auto &name: white_list) {
-        auto res = lele_style->getValue(name);
-        if(res) {
-            auto res2 = res.value();//if (!std::holds_alternative<std::string>(token)) {
-            auto value = std::get<std::string>(res2);
-            int x = 0;
-        }
-        int x = 0;
-    }     
-
-//osm todo: instead of style_name_value_map which only for this style, get all style attribute types, and iterate through them, and call getValue  like above
-    for(const auto &[name, value] : style_name_value_map) {
-
+    for(const std::string &key: keys) {
+        auto value = lele_style->getValue(key);
         if(!value) {
             continue;
         }
-        if(!white_list.empty() && 
-            std::ranges::find(white_list, name) == std::ranges::end(white_list)) {
-            continue;
-        }        
-        PyObject *py_name = PyUnicode_FromString(name.c_str());
+        PyObject *py_name = PyUnicode_FromString(key.c_str());
         if(!py_name) {
             Py_XDECREF(py_style);
             // return Py_None;
@@ -272,8 +258,8 @@ PyObject *PyLeleStyle::toPyDict(
 }
 
 namespace {
-std::vector<std::string> pyListToStrings(PyObject *args) {
-    std::vector<std::string> strings;
+std::set<std::string> pyListToStrings(PyObject *args) {
+    std::set<std::string> strings;
     Py_ssize_t num_args = PyTuple_Size(args);
     if(num_args != 1) {
         return strings;
@@ -287,7 +273,7 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
     if (PyUnicode_Check(obj)){
         const char *item = PyUnicode_AsUTF8(obj);
         if(item) {
-            strings.push_back(item);
+            strings.insert(item);
             return strings;
         }
     }
@@ -321,7 +307,7 @@ std::vector<std::string> pyListToStrings(PyObject *args) {
             Py_XDECREF(obj);
             continue;
         }
-        strings.push_back(item_);
+        strings.insert(item_);
     }
     Py_XDECREF(obj);
     return strings;

@@ -1,5 +1,6 @@
 #include "leletextbox.h"
 
+#include <tr/tr.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -32,7 +33,7 @@ lv_obj_t *LeleTextbox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_textarea_create(lele_parent->getLvObj()));
 
-  lv_textarea_set_text(_lv_obj, _text.c_str());
+  lv_textarea_set_text(_lv_obj, tr(_text).c_str());
   // lv_obj_align(_lv_obj, LV_ALIGN_TOP_MID, x, y);
   lv_textarea_set_text_selection(_lv_obj, true);
   lv_textarea_set_max_length(_lv_obj, _max_length);

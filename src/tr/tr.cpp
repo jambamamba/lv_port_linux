@@ -202,15 +202,15 @@ const std::unordered_map<std::string, std::string> _language_map = {
 std::string _default_language("en");
 std::string _current_language("es");
 
-bool setLanguage(const std::string &input, std::string &toset) {
+bool setLanguage(const std::string &input_lang_code, std::string &toset) {
     for(const auto &[lang_code, lang_name] : _language_map) {
-        std::string rhs(lang_code);
+        std::string lowercase_lang_code(lang_code);
 
-        for(char *c = (char*) rhs.c_str(); *c; c++) {
+        for(char *c = (char*) lowercase_lang_code.c_str(); *c; c++) {
             *c = std::tolower(*c);
         }
 
-        if(input == rhs) {
+        if(input_lang_code == lowercase_lang_code) {
             toset = lang_code;
             return true;
         }

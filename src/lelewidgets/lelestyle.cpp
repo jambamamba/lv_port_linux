@@ -11,6 +11,51 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
+std::set<std::string> LeleStyle::_style_keys = {
+   "class_name",
+   "id",
+   "x",
+   "y",
+   "width",
+   "height",
+   "corner_radius",
+   "padding",
+   "padding/top",
+   "padding/right",
+   "padding/bottom",
+   "padding/left",
+   "margin",
+   "margin/top",
+   "margin/right",
+   "margin/bottom",
+   "margin/left",
+   "border",
+   "border/type",
+   "border/width",
+   "border/color",
+   "scrollbar",
+   "fgcolor",
+   "bgcolor",
+   "checked_color",
+   "align",
+   "text-align",
+   "font-family",
+   "font-size",
+   "flex",
+   "background",
+   "background/rotation/angle",
+   "background/rotation/pivot",
+   "background/rotation/pivot/x",
+   "background/rotation/pivot/y",
+   "background/rotation/pivot/x",
+   "background/rotation/pivot/y",
+   "background/color",
+   "background/image",
+   "background/position",
+   "background/size",
+   "background/repeat"
+  };
+
 LeleStyle::LeleStyle(LeleObject *lele_obj, const std::string &json_str) 
 : _lele_obj(lele_obj) {
 
@@ -302,8 +347,15 @@ bool LeleStyle::setValue(
     const std::string &key, 
     const std::string &value) {
 
-
-    if(key == "class_name") {
+    if(key.empty()) {
+      LL(FATAL, LVSIM) << "Cannot set empty key";
+      return false;
+    }
+    else if(key.at(0) != '#' && _style_keys.find(key) == _style_keys.end()) {
+      LL(FATAL, LVSIM) << "No such key " << key << " exists for styles";
+      return false;
+    }
+    else if(key == "class_name") {
         _class_name = value;
     }
     else if(key == "id") {
