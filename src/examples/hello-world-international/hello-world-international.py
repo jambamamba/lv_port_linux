@@ -21,10 +21,10 @@ def pushbutton(event):
    style.setValue({"font-family":"notosansarabic-bold"})
    print(f"obj style font-family: {style.getValue("font-family")}")
    print("============================================")
-   print(f"available languages: {lele.Translation().getAvailableLanguages()}")
+   print(f"available languages: {lele.Language().getAvailableLanguages()}")
    print("============================================")
-   print(f"current language: {lele.Translation().getCurrentLanguage()}")
-   lele.Translation().setCurrentLanguage("ar")
+   print(f"current language: {lele.Language().getCurrentLanguage()}")
+   lele.Language().setCurrentLanguage("ar")
    print("============================================")
    # user_attributes = [attr for attr in dir(style) if not attr.startswith('__')]
    # print(user_attributes)

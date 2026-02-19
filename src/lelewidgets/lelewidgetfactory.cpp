@@ -422,8 +422,8 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         return std::vector<std::pair<std::string, Node>>();
     }
     auto [default_language, current_language] = languageFromJson(json);
-    LeleTranslation::getLeleTranslation().setDefaultLanguage(default_language);
-    LeleTranslation::getLeleTranslation().setCurrentLanguage(current_language);
+    LeleLanguage::getLeleLanguage().setDefaultLanguage(default_language);
+    LeleLanguage::getLeleLanguage().setCurrentLanguage(current_language);
 
     if(!parent->getLvObj()) {
         static click_counts counts;

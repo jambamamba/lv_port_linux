@@ -12,10 +12,10 @@ std::string tr(const std::string &txt);
 #include <vector>
 #include <unordered_map>
 
-class LeleTranslation {
+class LeleLanguage {
 public:
   PyObject *createPyObject();
-  static LeleTranslation &getLeleTranslation();
+  static LeleLanguage &getLeleLanguage();
 
   const std::unordered_map<std::string, std::string> &getAvailableLanguages();
   std::string getCurrentLanguage();
@@ -24,11 +24,11 @@ public:
   bool setDefaultLanguage(const std::string &language);
 
 protected:
-  LeleTranslation() = default;
+  LeleLanguage() = default;
 //   mutable std::unordered_map<std::string, std::unordered_map<int, Font>> _font_db;
 };
 
-struct PyLeleTranslation {
+struct PyLeleLanguage {
     PyObject ob_base;
     static PyTypeObject _obj_type;
     static PyMemberDef _members[];
@@ -36,7 +36,7 @@ struct PyLeleTranslation {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    LeleTranslation *_lele_translation = nullptr;
+    LeleLanguage *_lele_translation = nullptr;
     static PyObject *getAvailableLanguages(PyObject *self_, PyObject *args);
     static PyObject *getCurrentLanguage(PyObject *self_, PyObject *args);
     static PyObject *setCurrentLanguage(PyObject *self_, PyObject *args);
@@ -44,12 +44,12 @@ struct PyLeleTranslation {
     static PyObject *setDefaultLanguage(PyObject *self_, PyObject *args);
 };
 
-#define PY_LELETRANSLATION_MEMBERS() \
+#define PY_LELELANGUAGE_MEMBERS() \
 
-#define PY_LELETRANSLATION_METHODS() \
-  {"getAvailableLanguages", (PyCFunction)PyLeleTranslation::getAvailableLanguages, METH_NOARGS, "Get the available languages"},\
-  {"getCurrentLanguage", (PyCFunction)PyLeleTranslation::getCurrentLanguage, METH_NOARGS, "Get the current language"},\
-  {"setCurrentLanguage", (PyCFunction)PyLeleTranslation::setCurrentLanguage, METH_VARARGS, "Set the current language"},\
-  {"getDefaultLanguage", (PyCFunction)PyLeleTranslation::getDefaultLanguage, METH_NOARGS, "Get the default language"},\
-  {"setDefaultLanguage", (PyCFunction)PyLeleTranslation::setDefaultLanguage, METH_VARARGS, "Set the default language"},\
+#define PY_LELELANGUAGE_METHODS() \
+  {"getAvailableLanguages", (PyCFunction)PyLeleLanguage::getAvailableLanguages, METH_NOARGS, "Get the available languages"},\
+  {"getCurrentLanguage", (PyCFunction)PyLeleLanguage::getCurrentLanguage, METH_NOARGS, "Get the current language"},\
+  {"setCurrentLanguage", (PyCFunction)PyLeleLanguage::setCurrentLanguage, METH_VARARGS, "Set the current language"},\
+  {"getDefaultLanguage", (PyCFunction)PyLeleLanguage::getDefaultLanguage, METH_NOARGS, "Get the default language"},\
+  {"setDefaultLanguage", (PyCFunction)PyLeleLanguage::setDefaultLanguage, METH_VARARGS, "Set the default language"},\
 

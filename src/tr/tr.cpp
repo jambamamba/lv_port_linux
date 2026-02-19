@@ -232,12 +232,12 @@ std::string sha256(const std::string inputStr) {
 std::unordered_map<std::string, std::string> _translation_map = {};
 }//namespace
 
-LeleTranslation &LeleTranslation::getLeleTranslation() {
-  static LeleTranslation _lele_translation;
+LeleLanguage &LeleLanguage::getLeleLanguage() {
+  static LeleLanguage _lele_translation;
   return _lele_translation;
 }
 
-const std::unordered_map<std::string, std::string> &LeleTranslation::getAvailableLanguages() {
+const std::unordered_map<std::string, std::string> &LeleLanguage::getAvailableLanguages() {
     return _language_map;
     // std::vector<std::string> languages;
     // for(const auto &[lang_code, lang_name] : _language_map) {
@@ -246,15 +246,15 @@ const std::unordered_map<std::string, std::string> &LeleTranslation::getAvailabl
     // return languages;
 }
 
-std::string LeleTranslation::getCurrentLanguage() {
+std::string LeleLanguage::getCurrentLanguage() {
     return _language_map.at(_current_language);
 }
 
-std::string LeleTranslation::getDefaultLanguage() {
+std::string LeleLanguage::getDefaultLanguage() {
     return _language_map.at(_default_language);
 }
 
-bool LeleTranslation::setCurrentLanguage(const std::string &language) {
+bool LeleLanguage::setCurrentLanguage(const std::string &language) {
     for(char *c = (char*) language.c_str(); *c; c++) {
         *c = std::tolower(*c);
     }
@@ -266,7 +266,7 @@ bool LeleTranslation::setCurrentLanguage(const std::string &language) {
     return false;
 }
 
-bool LeleTranslation::setDefaultLanguage(const std::string &language) {
+bool LeleLanguage::setDefaultLanguage(const std::string &language) {
     for(char *c = (char*) language.c_str(); *c; c++) {
         *c = std::tolower(*c);
     }

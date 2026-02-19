@@ -1,11 +1,11 @@
 #include "tr.h"
 
-PyObject *LeleTranslation::createPyObject() {
+PyObject *LeleLanguage::createPyObject() {
     
     // LOG(DEBUG, LVSIM, "createPyObject\n");
-    PyTypeObject *type = &PyLeleTranslation::_obj_type;
+    PyTypeObject *type = &PyLeleLanguage::_obj_type;
     PyType_Ready(type);
-    PyLeleTranslation *self = (PyLeleTranslation *)type->tp_alloc(type, 0);
+    PyLeleLanguage *self = (PyLeleLanguage *)type->tp_alloc(type, 0);
     if (!self) {
         return Py_None;
     }
@@ -13,12 +13,12 @@ PyObject *LeleTranslation::createPyObject() {
     return (PyObject *)self;
 }
 
-int PyLeleTranslation::init(PyObject *self_, PyObject *args, PyObject *kwds) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
+int PyLeleLanguage::init(PyObject *self_, PyObject *args, PyObject *kwds) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
     return 0;
 }
 
-void PyLeleTranslation::dealloc(PyObject* self) {
+void PyLeleLanguage::dealloc(PyObject* self) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -72,9 +72,9 @@ PyObject *toPyDict(const std::unordered_map<std::string, std::string> &languages
 }
 }//namespace
 
-PyObject *PyLeleTranslation::getAvailableLanguages(PyObject *self_, PyObject *args) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
-    LeleTranslation *lele_translation = dynamic_cast<LeleTranslation *>(self->_lele_translation);
+PyObject *PyLeleLanguage::getAvailableLanguages(PyObject *self_, PyObject *args) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
+    LeleLanguage *lele_translation = dynamic_cast<LeleLanguage *>(self->_lele_translation);
     if(!lele_translation) {
         return Py_None;
     }
@@ -82,9 +82,9 @@ PyObject *PyLeleTranslation::getAvailableLanguages(PyObject *self_, PyObject *ar
     return toPyDict(languages);
 }
 
-PyObject *PyLeleTranslation::getCurrentLanguage(PyObject *self_, PyObject *args) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
-    LeleTranslation *lele_translation = dynamic_cast<LeleTranslation *>(self->_lele_translation);
+PyObject *PyLeleLanguage::getCurrentLanguage(PyObject *self_, PyObject *args) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
+    LeleLanguage *lele_translation = dynamic_cast<LeleLanguage *>(self->_lele_translation);
     if(!lele_translation) {
         return Py_None;
     }
@@ -92,9 +92,9 @@ PyObject *PyLeleTranslation::getCurrentLanguage(PyObject *self_, PyObject *args)
     return PyUnicode_FromString(current_language.c_str());
 }
 
-PyObject *PyLeleTranslation::setCurrentLanguage(PyObject *self_, PyObject *args) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
-    LeleTranslation *lele_translation = dynamic_cast<LeleTranslation *>(self->_lele_translation);
+PyObject *PyLeleLanguage::setCurrentLanguage(PyObject *self_, PyObject *args) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
+    LeleLanguage *lele_translation = dynamic_cast<LeleLanguage *>(self->_lele_translation);
     if(!lele_translation) {
         return Py_None;
     }
@@ -111,9 +111,9 @@ PyObject *PyLeleTranslation::setCurrentLanguage(PyObject *self_, PyObject *args)
     }
 }
 
-PyObject *PyLeleTranslation::getDefaultLanguage(PyObject *self_, PyObject *args) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
-    LeleTranslation *lele_translation = dynamic_cast<LeleTranslation *>(self->_lele_translation);
+PyObject *PyLeleLanguage::getDefaultLanguage(PyObject *self_, PyObject *args) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
+    LeleLanguage *lele_translation = dynamic_cast<LeleLanguage *>(self->_lele_translation);
     if(!lele_translation) {
         return Py_None;
     }
@@ -121,9 +121,9 @@ PyObject *PyLeleTranslation::getDefaultLanguage(PyObject *self_, PyObject *args)
     return PyUnicode_FromString(default_language.c_str());
 }
 
-PyObject *PyLeleTranslation::setDefaultLanguage(PyObject *self_, PyObject *args) {
-    PyLeleTranslation *self = reinterpret_cast<PyLeleTranslation *>(self_);
-    LeleTranslation *lele_translation = dynamic_cast<LeleTranslation *>(self->_lele_translation);
+PyObject *PyLeleLanguage::setDefaultLanguage(PyObject *self_, PyObject *args) {
+    PyLeleLanguage *self = reinterpret_cast<PyLeleLanguage *>(self_);
+    LeleLanguage *lele_translation = dynamic_cast<LeleLanguage *>(self->_lele_translation);
     if(!lele_translation) {
         return Py_None;
     }
@@ -140,28 +140,28 @@ PyObject *PyLeleTranslation::setDefaultLanguage(PyObject *self_, PyObject *args)
     }
 }
 
-PyMemberDef PyLeleTranslation::_members[] = {
-    PY_LELETRANSLATION_MEMBERS()
+PyMemberDef PyLeleLanguage::_members[] = {
+    PY_LELELANGUAGE_MEMBERS()
     {nullptr}  /* Sentinel */
 };
 
-PyMethodDef PyLeleTranslation::_methods[] = {
-    PY_LELETRANSLATION_METHODS()
+PyMethodDef PyLeleLanguage::_methods[] = {
+    PY_LELELANGUAGE_METHODS()
     {nullptr}  /* Sentinel */
 };
 
 static PyObject *
 PyType_New(PyTypeObject *type, PyObject *args, PyObject *kwds)
 {
-    return LeleTranslation::getLeleTranslation().createPyObject();
+    return LeleLanguage::getLeleLanguage().createPyObject();
 }
 
-PyTypeObject PyLeleTranslation::_obj_type = {
+PyTypeObject PyLeleLanguage::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "lele.Translation",             /* tp_name */
-    sizeof(PyLeleTranslation), /* tp_basicsize */
+    "lele.Language",             /* tp_name */
+    sizeof(PyLeleLanguage), /* tp_basicsize */
     0,                         /* tp_itemsize */
-    (destructor)PyLeleTranslation::dealloc, /* tp_dealloc */
+    (destructor)PyLeleLanguage::dealloc, /* tp_dealloc */
     0,                         /* tp_print */
     0,                         /* tp_getattr */
     0,                         /* tp_setattr */
@@ -177,22 +177,22 @@ PyTypeObject PyLeleTranslation::_obj_type = {
     0,                         /* tp_setattro */
     0,                         /* tp_as_buffer */
     Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,   /* tp_flags */
-    "Translation",            /* tp_doc */
+    "Language",            /* tp_doc */
     0,                         /* tp_traverse */
     0,                         /* tp_clear */
     0,                         /* tp_richcompare */
     0,                         /* tp_weaklistoffset */
     0,                         /* tp_iter */
     0,                         /* tp_iternext */
-    PyLeleTranslation::_methods,             /* tp_methods */
-    PyLeleTranslation::_members,             /* tp_members */
+    PyLeleLanguage::_methods,             /* tp_methods */
+    PyLeleLanguage::_members,             /* tp_members */
     0,                         /* tp_getset */
     0,                         /* tp_base */
     0,                         /* tp_dict */
     0,                         /* tp_descr_get */
     0,                         /* tp_descr_set */
     0,                         /* tp_dictoffset */
-    (initproc)PyLeleTranslation::init,      /* tp_init */
+    (initproc)PyLeleLanguage::init,      /* tp_init */
     0,                         /* tp_alloc */
     PyType_New,                 /* tp_new */
 };
