@@ -129,6 +129,8 @@ function(buildLvglSim
         lelewidgets/leletabview.cpp
         lelewidgets/leletextbox.cpp
         lelewidgets/leleview.cpp
+        lelewidgets/lelerollerview.cpp
+        lelewidgets/lelerollerview.py.cpp
         lelewidgets/lelewidgetfactory.cpp
     )
     list(TRANSFORM LV_LINUX_BACKEND_SRC PREPEND "${CMAKE_SOURCE_DIR}/")

@@ -5,6 +5,7 @@
 #include <lelewidgets/leleevent.h>
 #include <lelewidgets/lelemessagebox.h>
 #include <lelewidgets/leleobject.h>
+#include <lelewidgets/lelerollerview.h>
 #include <tr/tr.h>
 
 #include "python_wrapper.h"
@@ -302,6 +303,7 @@ PyMODINIT_FUNC PyInit_lele(void) {
     PyModule_AddType(module, &PyLeleButtonType::_obj_type);
     PyModule_AddType(module, &PyLeleFont::_obj_type);
     PyModule_AddType(module, &PyLeleLanguage::_obj_type);
+    PyModule_AddType(module, &PyLeleRollerView::_obj_type);
     // PyModule_AddObject(module, "FooBar", 
     //     LeleObject::createPyEnum("FooBar", {
     //             {"FOO",1},

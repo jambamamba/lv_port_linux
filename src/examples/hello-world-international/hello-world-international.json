@@ -34,6 +34,23 @@
                 "font-size":"40pt"
             }
         },
+        "rollerview":{
+            "id":"/hello-world-international/rollerview",
+            "items":[
+                "January",
+                "February",
+                "March",
+                "April",
+                "May",
+                "June",
+                "July",
+                "August",
+                "September",
+                "October",
+                "November",
+                "December"
+            ]
+        },
         "button":{
             "type":"push",
             "id":"pushbutton",

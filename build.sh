@@ -80,5 +80,5 @@ function run() {
     popd
 }
 
-buildelf $@ |tee x86-build/build.log
+# buildelf $@ |tee x86-build/build.log
 run

@@ -465,11 +465,11 @@ lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   else {
     _lv_obj = lv_obj;
   }
+  lv_obj_null_on_delete(&_lv_obj);
   setParent(lele_parent);
   setStyle(_lv_obj);
   _lv_obj->user_data = this;
   lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
-  lv_obj_null_on_delete(&_lv_obj);
   return _lv_obj;
 }
 
