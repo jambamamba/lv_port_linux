@@ -142,7 +142,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
         lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
-      lv_checkbox_set_text(_lv_obj, tr(_text).c_str());
+      lele_set_translatable_text([this](){
+        lv_checkbox_set_text(_lv_obj, tr(_text).c_str());
+      });
       break;
     }
     case LeleButtons::LeleButton::Type::Radio:{
@@ -150,7 +152,9 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
         lv_obj ? lv_obj : lv_checkbox_create(lele_parent->getLvObj()));
       lv_obj_remove_style(_lv_obj, &_style, LV_PART_MAIN);
       lv_obj_add_style(_lv_obj, &_style, LV_PART_INDICATOR);
-      lv_checkbox_set_text(_lv_obj, tr(_text).c_str());
+      lele_set_translatable_text([this](){
+        lv_checkbox_set_text(_lv_obj, tr(_text).c_str());
+      });
       break;
     }
     case LeleButtons::LeleButton::Type::Switch:{

@@ -50,7 +50,7 @@ cmake -G Ninja\
 }
 
 function run() {
-    local example="imageview" # hello-world | imageview | messagebox | stackview | tabview | testview
+    local example="imageview" # hello-world | hello-world-international | imageview | messagebox | stackview | tabview | testview
     local method="elfpy" # elfpy | elf | py
     local debug="true"
     export LD_LIBRARY_PATH="/usr/local/lib"

@@ -203,7 +203,7 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
 PyObject *PyLeleStyle::toPyDict(
     LeleStyle *lele_style,
     const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
-    const std::set<std::string> &&white_list) {
+    const std::unordered_set<std::string> &&white_list) {
 
     struct RAII {
         PyObject *_dict = nullptr;
@@ -224,7 +224,7 @@ PyObject *PyLeleStyle::toPyDict(
     if(!$._dict) {
         return Py_None;
     }
-    std::set<std::string> keys = !white_list.empty() ? white_list : LeleStyle::_style_keys;
+    std::unordered_set<std::string> keys = !white_list.empty() ? white_list : LeleStyle::_style_keys;
     PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style->createPyObject());
     for(const std::string &key: keys) {
         auto value = lele_style->getValue(key);
@@ -258,8 +258,8 @@ PyObject *PyLeleStyle::toPyDict(
 }
 
 namespace {
-std::set<std::string> pyListToStrings(PyObject *args) {
-    std::set<std::string> strings;
+std::unordered_set<std::string> pyListToStrings(PyObject *args) {
+    std::unordered_set<std::string> strings;
     Py_ssize_t num_args = PyTuple_Size(args);
     if(num_args != 1) {
         return strings;

@@ -5,8 +5,8 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <unordered_map>
 #include <openssl/sha.h>
+#include <unordered_map>
 #include <vector>
 
 #include "tr.h"
@@ -201,6 +201,7 @@ const std::unordered_map<std::string, std::string> _language_map = {
 
 std::string _default_language("en");
 std::string _current_language("es");
+std::vector<std::function<void()>> _all_text_objects = {};
 
 bool setLanguage(const std::string &input_lang_code, std::string &toset) {
     for(const auto &[lang_code, lang_name] : _language_map) {
@@ -261,6 +262,9 @@ bool LeleLanguage::setCurrentLanguage(const std::string &language) {
 
     if(setLanguage(language, _current_language)){
         _translation_map.clear();
+        for(const auto &set_text_func: _all_text_objects) {
+            set_text_func();
+        }
         return true;
     }
     return false;
@@ -311,4 +315,10 @@ std::string tr(const std::string &txt) {
     }
 
     return txt;
+}
+
+//global function:
+void lele_set_translatable_text(std::function<void()> set_text_func) {
+    _all_text_objects.emplace_back(set_text_func);
+    set_text_func();
 }

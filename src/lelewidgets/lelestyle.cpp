@@ -11,7 +11,7 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-std::set<std::string> LeleStyle::_style_keys = {
+std::unordered_set<std::string> LeleStyle::_style_keys = {
    "class_name",
    "id",
    "x",

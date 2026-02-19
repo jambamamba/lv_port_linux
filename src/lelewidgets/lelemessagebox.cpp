@@ -33,7 +33,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
     lv_msgbox_create(nullptr));
 
   _lv_title = lv_msgbox_add_title(_lv_obj, _title.c_str());
-  lv_msgbox_add_text(_lv_obj, tr(_text).c_str());
+  // lv_msgbox_add_text(_lv_obj, tr(_text).c_str());
 
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {

@@ -7,8 +7,8 @@
 #include <map>
 #include <memory>
 #include <optional>
-#include <set>
 #include <string>
+#include <unordered_set>
 #include <variant>
 #include <vector>
 #include <Python.h>
@@ -52,7 +52,7 @@ public:
   void applyStyle();
   static std::map<std::string, std::vector<std::string>> _flex_possible_values;
   static std::map<std::string, std::map<std::string,int>> _flex_possible_ivalues;
-  static std::set<std::string> _style_keys;
+  static std::unordered_set<std::string> _style_keys;
 
 protected:
   std::tuple<int,int,int,int> parsePaddingOrMargin(const std::string &padding_str);
@@ -75,7 +75,7 @@ struct PyLeleStyle {
     static PyObject *toPyDict(
       LeleStyle *lele_style,
       const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
-      const std::set<std::string> &&white_list = {});
+      const std::unordered_set<std::string> &&white_list = {});
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     static void dtor(PyObject *self_);

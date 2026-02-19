@@ -34,20 +34,6 @@
                 "font-size":"40pt"
             }
         },
-        "label":{
-            "id":"/hello-world-international/version",
-            "text":"",
-            "style":{
-                "id":"style:/hello-world-international/version",
-                "width":"20%",
-                "height":"5%",
-                "padding":"1px",
-                "text-align":"center",
-                "corner_radius":"5",
-                "border":"solid-1px-#555",
-                "font-size":"16pt"
-            }
-        },
         "button":{
             "type":"push",
             "id":"pushbutton",

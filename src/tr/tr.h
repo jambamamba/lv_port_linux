@@ -1,8 +1,10 @@
 #pragma once
 
+#include <functional>
 #include <string>
 
 std::string tr(const std::string &txt);
+void lele_set_translatable_text(std::function<void()> set_text_func);
 
 #pragma once
 

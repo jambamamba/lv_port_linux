@@ -38,10 +38,6 @@ if not res:
 label_hello_world = lele.getObjectById("/hello-world-international/label")
 print(f"label text: {label_hello_world}")
 
-label_version = lele.getObjectById("/hello-world-international/version")
-version = f"{lele.version()['Major']}.{lele.version()['Minor']}"
-label_version.setText(f"Lele-UI Version: {version}")
-
 obj = lele.getObjectById("pushbutton")
 obj.addEventHandler(lambda event: pushbutton(event))
 # lele.addEventHandler("pushbutton", lambda event: pushbutton(event))
