@@ -203,15 +203,17 @@ std::string _default_language("en");
 std::string _current_language("es");
 std::vector<std::function<void()>> _all_text_objects = {};
 
-bool setLanguage(const std::string &input_lang_code, std::string &toset) {
+bool setLanguage(const std::string &input_lang, std::string &toset) {
     for(const auto &[lang_code, lang_name] : _language_map) {
         std::string lowercase_lang_code(lang_code);
-
         for(char *c = (char*) lowercase_lang_code.c_str(); *c; c++) {
             *c = std::tolower(*c);
         }
-
-        if(input_lang_code == lowercase_lang_code) {
+        std::string lowercase_lang_name(lang_name);
+        for(char *c = (char*) lowercase_lang_name.c_str(); *c; c++) {
+            *c = std::tolower(*c);
+        }
+        if(input_lang == lowercase_lang_code || input_lang == lowercase_lang_name) {
             toset = lang_code;
             return true;
         }

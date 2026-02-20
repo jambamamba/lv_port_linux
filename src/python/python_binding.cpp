@@ -8,6 +8,7 @@
 #include <lelewidgets/lelerollerview.h>
 #include <tr/tr.h>
 
+#include "python_helper.h"
 #include "python_wrapper.h"
 #include "graphics_backend.h"
 

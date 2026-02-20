@@ -137,9 +137,11 @@ function(buildLvglSim
     set(sources
         graphics_backend.cpp
         python/python_binding.cpp
+        python/python_helper.cpp
         image_builder/image_builder.cpp
         font/lelefont.cpp
         font/lelefont.py.cpp
+        json/json_helper.cpp
         tr/tr.cpp
         tr/tr.py.cpp
         ${LELE_WIDGETS}

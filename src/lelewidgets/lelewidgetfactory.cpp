@@ -1,6 +1,7 @@
 #include "lelewidgetfactory.h"
 
 #include <filesystem>
+#include <json/json_helper.h>
 #include <unistd.h>
 #include <tr/tr.h>
 
@@ -21,27 +22,6 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
-struct cJSONRAII {
-    cJSONRAII(const std::string &json_str)
-    : _json(cJSON_Parse(json_str.c_str()))
-    , _json_str(json_str) {
-    }
-    ~cJSONRAII(){
-        if(_json) {
-            cJSON_Delete(_json);
-        }
-    }
-    cJSON *operator()(){
-        return _json;
-    }
-    const std::string &str() const {
-        return _json_str;
-    }
-    protected:
-    cJSON *_json;
-    const std::string &_json_str;
-};
-
 std::pair<std::string,std::string> languageFromJson(const cJSON* json) {
 
     std::string default_language("en");

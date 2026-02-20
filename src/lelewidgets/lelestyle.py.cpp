@@ -2,6 +2,7 @@
 #include <lelewidgets/lelestyle.h>
 #include <lelewidgets/lelewidgetfactory.h>
 #include <ranges>
+#include <python/python_helper.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -257,63 +258,6 @@ PyObject *PyLeleStyle::toPyDict(
     return dict;
 }
 
-namespace {
-std::unordered_set<std::string> pyListToStrings(PyObject *args) {
-    std::unordered_set<std::string> strings;
-    Py_ssize_t num_args = PyTuple_Size(args);
-    if(num_args != 1) {
-        return strings;
-    }
-    PyObject *obj = nullptr;
-    if(!PyArg_ParseTuple(args, "O", //list
-                &obj)) {
-        LOG(FATAL, LVSIM, "Failed to parse args\n");
-        return strings;
-    }
-    if (PyUnicode_Check(obj)){
-        const char *item = PyUnicode_AsUTF8(obj);
-        if(item) {
-            strings.insert(item);
-            return strings;
-        }
-    }
-    if (!PyList_Check(obj)) {
-        LOG(WARNING, LVSIM, "Is not list type!\n");
-        Py_XDECREF(obj);
-        return strings;
-    }
-    if (!Py_IS_TYPE(obj, &PyList_Type)) {
-        LOG(WARNING, LVSIM, "Is not list type!\n");
-        Py_XDECREF(obj);
-        return strings;
-    }
-    int len = PyList_Size(obj);
-    while (len--) {
-        PyObject *item = PyList_GetItem(obj, len);
-        if(!item) {
-            LOG(WARNING, LVSIM, "Could not parse list item!\n");
-            continue;
-        }
-        if(!PyUnicode_Check(item)) {
-        // if (!Py_IS_TYPE(obj, &PyUnicode_Type)) {
-            LOG(WARNING, LVSIM, "Is not string type!\n");
-            Py_XDECREF(item);
-            continue;
-        }
-        const char *item_ = PyUnicode_AsUTF8(item);
-        if(!item_) {
-            int num = PyList_Size(obj);
-            LOG(WARNING, LVSIM, "Could not parse list item!\n");
-            Py_XDECREF(obj);
-            continue;
-        }
-        strings.insert(item_);
-    }
-    Py_XDECREF(obj);
-    return strings;
-}
-}//namespace
-
 PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
     LeleStyle *lele_style = self->_lele_style;
@@ -321,11 +265,11 @@ PyObject *PyLeleStyle::getValue(PyObject *self_, PyObject *args) {
         LOG(WARNING, LVSIM, "There are no styles!\n");
         return Py_None;
     }
-    // std::vector<std::string> &&white_list = std::move(pyListToStrings(args));
+    // std::vector<std::string> &&white_list = std::move(pyListToStringSet(args));
     // const auto style = lele_style->getStyle();
     // return toPyDict(std::move(style), std::move(white_list));
 
-    return toPyDict(lele_style, lele_style->getStyle(), pyListToStrings(args));
+    return toPyDict(lele_style, lele_style->getStyle(), pyListToStringSet(args));
 }
 
 PyObject *PyLeleStyle::setValue(PyObject *self_, PyObject *args) {

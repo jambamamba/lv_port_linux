@@ -1,4 +1,9 @@
-#include <lelewidgets/lelerollerview.h>
+#include "lelerollerview.h"
+
+#include <debug_logger/debug_logger.h>
+#include <python/python_helper.h>
+
+LOG_CATEGORY(LVSIM, "LVSIM");
 
 PyObject *LeleRollerView::createPyObject() {
     PyTypeObject *type = &PyLeleRollerView::_obj_type;
@@ -29,28 +34,44 @@ void PyLeleRollerView::dealloc(PyObject* self_) {
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyObject *PyLeleRollerView::getText(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleRollerView::getItems(PyObject *self_, PyObject *arg) {
     PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
     LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
     if(lele_obj) {
-        return PyUnicode_FromString(lele_obj->getText().c_str());
+        PyObject *list = PyList_New(0);
+        for(const auto &item : lele_obj->getItems()) {
+            PyList_Append(list, PyUnicode_FromString(item.c_str()));
+        }
+        Py_INCREF(list);
+        return list;
     }
     return Py_None;
 }
 
-PyObject *PyLeleRollerView::setText(PyObject *self_, PyObject *args) {
+PyObject *PyLeleRollerView::setItems(PyObject *self_, PyObject *args) {
     PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
     LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
     if(lele_obj && args) {
-        char *str = nullptr;
-        if(!PyArg_ParseTuple(args, "s", &str)) {
-            return Py_None;
-        }
-        if(str) {
-            lele_obj->setText(str);
-        }
+        lele_obj->setItems(pyListToStringVector(args));
     }
     return Py_None;
+}
+
+PyObject *PyLeleRollerView::onValueChanged(PyObject *self_, PyObject *args) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    PyObject *py_callback = nullptr;
+    if(!PyArg_ParseTuple(args, "O", //obj
+        &py_callback)) {
+        return PyBool_FromLong(false);
+    }
+    Py_XINCREF(py_callback);
+    LOG(DEBUG, LVSIM, "PyLeleRollerView::onValueChanged:'%p'\n", py_callback);
+    lele_obj->onValueChanged(py_callback);
+    return PyBool_FromLong(true);
 }
 
 PyMemberDef PyLeleRollerView::_members[] = {
@@ -65,7 +86,7 @@ PyMethodDef PyLeleRollerView::_methods[] = {
 
 PyTypeObject PyLeleRollerView::_obj_type = {
     PyVarObject_HEAD_INIT(NULL, 0)
-    "lele.Label",             /* tp_name */
+    "lele.Roller",             /* tp_name */
     sizeof(PyLeleRollerView), /* tp_basicsize */
     0,                         /* tp_itemsize */
     (destructor)PyLeleRollerView::dealloc, /* tp_dealloc */

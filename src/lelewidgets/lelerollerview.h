@@ -2,6 +2,8 @@
 
 #include "leleobject.h"
 
+#include <vector>
+
 struct PyLeleRollerView;
 class LeleRollerView : public LeleObject  {
   public:
@@ -10,12 +12,17 @@ class LeleRollerView : public LeleObject  {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
-  void setText(const std::string &text);
-  std::string getText() const;
+  void setItems(const std::vector<std::string> &itemsZ);
+  std::vector<std::string> getItems() const;
+  void onValueChanged(PyObject *callback);
+  
   protected:
-  std::string _text;
+  int _num_visible_items = 4;
+  std::vector<std::string> _items;
+  int _max_item_len = 32;
 
   bool eventCallback(LeleEvent &&e) override;
+  bool pyCallback(PyObject *py_callback, const std::string &value);
 };
 
 struct PyLeleRollerView {
@@ -26,8 +33,9 @@ struct PyLeleRollerView {
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     // Type-specific fields go here
-    static PyObject *getText(PyObject *, PyObject *);
-    static PyObject *setText(PyObject *, PyObject *);
+    static PyObject *getItems(PyObject *, PyObject *);
+    static PyObject *setItems(PyObject *, PyObject *);
+    static PyObject *onValueChanged(PyObject *, PyObject *);
 };
 
 #define PY_LELEROLLERVIEW_MEMBERS() \
@@ -35,6 +43,7 @@ struct PyLeleRollerView {
 
 #define PY_LELEROLLERVIEW_METHODS() \
   PY_LELEOBJECT_METHODS() \
-  {"getText", (PyCFunction)PyLeleRollerView::getText, METH_NOARGS, "Get the text"},\
-  {"setText", (PyCFunction)PyLeleRollerView::setText, METH_VARARGS, "Set the text"},
+  {"getItems", (PyCFunction)PyLeleRollerView::getItems, METH_NOARGS, "Get the text"},\
+  {"setItems", (PyCFunction)PyLeleRollerView::setItems, METH_VARARGS, "Set the text"},\
+  {"onValueChanged", (PyCFunction)PyLeleRollerView::onValueChanged, METH_VARARGS, "Sets the event handler that is triggered when value changes"},\
 

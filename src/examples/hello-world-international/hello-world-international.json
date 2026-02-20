@@ -36,27 +36,34 @@
         },
         "rollerview":{
             "id":"/hello-world-international/rollerview",
+            "num_visible_items":"4",
             "items":[
-                "January",
-                "February",
-                "March",
-                "April",
-                "May",
-                "June",
-                "July",
-                "August",
-                "September",
-                "October",
-                "November",
-                "December"
-            ]
-        },
-        "button":{
-            "type":"push",
-            "id":"pushbutton",
-            "text":"Change Font Family",
-            "checkable":"false",
-            "checked":"false"
+                "English",
+                "Spanish",
+                "German",
+                "French",
+                "Chinese",
+                "Japanese",
+                "Arabic",
+                "Persian",
+                "Urdu",
+                "Hindi",
+                "Russian",
+                "Zulu"
+            ],
+            "style":{
+                "id":"style:/hello-world-international/rollerview",
+                "flex":"none",
+                "fgcolor":"#ccc",
+                "bgcolor":"#555",
+                "width":"40%",
+                "height":"10%",
+                "padding":"1px",
+                "text-align":"center",
+                "border":"solid-1px-#555",
+                "corner_radius":"10",
+                "font-size":"16pt"
+            }            
         }
     }      
 }

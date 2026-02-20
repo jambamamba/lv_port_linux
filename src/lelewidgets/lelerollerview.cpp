@@ -1,5 +1,7 @@
 #include "lelerollerview.h"
 
+#include <json/json_helper.h>
+#include <numeric>
 #include <tr/tr.h>
 
 LOG_CATEGORY(LVSIM, "LVSIM");
@@ -14,8 +16,17 @@ bool LeleRollerView::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::string>(token)) {
       const std::string &value = std::get<std::string>(token);
-      if(key == "text") {
-        _text = value;
+      if(key == "num_visible_items") {
+        _num_visible_items = std::stoi(value);
+      }
+      else if(key == "items") {
+        cJSONRAII json(value.c_str());
+        cJSON *item = nullptr;
+        cJSON_ArrayForEach(item, json()) {
+          if(cJSON_IsString(item)) {
+              _items.push_back(cJSON_GetStringValue(item));
+          }
+        }
       }
     }
   }
@@ -27,24 +38,10 @@ lv_obj_t *LeleRollerView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_roller_create(lele_parent->getLvObj()));
 
-  lele_set_translatable_text([this](){
-    lv_roller_set_options(_lv_obj,
-                          "January\n"
-                          "February\n"
-                          "March\n"
-                          "April\n"
-                          "May\n"
-                          "June\n"
-                          "July\n"
-                          "August\n"
-                          "September\n"
-                          "October\n"
-                          "November\n"
-                          "December",
-                          LV_ROLLER_MODE_INFINITE);    
-  });
-  lv_roller_set_visible_row_count(_lv_obj, 4);
+  setItems(_items);
+  lv_roller_set_visible_row_count(_lv_obj, _num_visible_items);
   lv_obj_center(_lv_obj);
+
   return _lv_obj;
 }
 
@@ -62,6 +59,15 @@ bool LeleRollerView::eventCallback(LeleEvent &&e) {
       break;
     }
     case LV_EVENT_VALUE_CHANGED: {
+      std::string sel_value;
+      sel_value.reserve(_max_item_len);
+      lv_roller_get_selected_str(_lv_obj, sel_value.data(), _max_item_len);
+      LL(DEBUG, LVSIM) << "Selected value: " << sel_value.c_str();
+      for(auto *py_callback:_py_callbacks) {
+        if(!pyCallback(py_callback, sel_value)) {
+          return false;
+        }
+      }
       break;
     }
     default: {
@@ -71,13 +77,45 @@ bool LeleRollerView::eventCallback(LeleEvent &&e) {
   return true;
 }
 
-void LeleRollerView::setText(const std::string &text) {
-  _text = text;
-  // lele_set_translatable_text([this](){
-  //   lv_label_set_text(_lv_obj, tr(_text).c_str());
+bool LeleRollerView::pyCallback(PyObject *py_callback, const std::string &value) {
+
+    // LOG(DEBUG, LVSIM, "LeleRollerView::pyCallback:'%p'\n", py_callback);
+
+    PyObject *py_value = Py_BuildValue("(s)", value.c_str());
+    if(!py_value) {
+      LL(WARNING, LVSIM) << "LeleRollerView::pyCallback could not build py_value from string value!";
+      return false;
+    }
+    Py_INCREF(py_value);
+    return LeleObject::pyCallback(py_callback, py_value);
+}
+
+void LeleRollerView::setItems(const std::vector<std::string> &items_) {
+  _items = items_;
+
+  for(const auto &item : _items) {
+    if(item.length() > _max_item_len) {
+      _max_item_len = item.length();
+    }
+  }
+  std::string items;
+  items = std::accumulate(_items.begin(), _items.end(), items,
+    [](const std::string& s0, const std::string& s1) {
+        return s0.empty() ? s1 : s0 + "\n" + s1;
+    }
+  );
+  // lele_set_translatable_text([this,items](){
+    lv_roller_set_options(_lv_obj, tr(items).c_str(), LV_ROLLER_MODE_INFINITE);    
+    // uint32_t sel_opt = lv_roller_get_selected(_lv_obj);
+    // lv_roller_set_selected(_lv_obj, sel_opt, LV_ANIM_ON);
   // });
 }
 
-std::string LeleRollerView::getText() const { 
-  return _text; 
+std::vector<std::string> LeleRollerView::getItems() const { 
+  return _items; 
+}
+
+void LeleRollerView::onValueChanged(PyObject *py_callback) {
+  LeleObject::addEventHandler(py_callback);
+  // Py_XINCREF(py_callback);
 }

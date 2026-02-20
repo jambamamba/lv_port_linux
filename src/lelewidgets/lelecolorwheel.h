@@ -35,7 +35,7 @@ struct PyLeleColorWheel {
     // Type-specific fields go here
     static PyObject *getColor(PyObject *, PyObject *);
     static PyObject *setColor(PyObject *, PyObject *);
-    static PyObject *onColorChanged(PyObject *, PyObject *);    
+    static PyObject *onColorChanged(PyObject *, PyObject *);
 };
 
 #define PY_LELECOLORWHEEL_MEMBERS() \

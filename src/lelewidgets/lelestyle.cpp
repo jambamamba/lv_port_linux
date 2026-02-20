@@ -42,6 +42,10 @@ std::unordered_set<std::string> LeleStyle::_style_keys = {
    "font-family",
    "font-size",
    "flex",
+   "flex/flow",
+   "flex/justify-content",
+   "flex/align-items",
+   "flex/align-content",
    "background",
    "background/rotation/angle",
    "background/rotation/pivot",
@@ -158,6 +162,13 @@ std::map<std::string, std::map<std::string,int>> LeleStyle::_flex_possible_ivalu
 
 void LeleStyle::parseFlex(const std::string &value_) {
 
+  if(value_ == "none") {
+   _style["flex/flow"] = "none";
+   _style["flex/justify-content"] = "none";
+   _style["flex/align-items"] = "none";
+   _style["flex/align-content"] = "none";
+    return;
+  }
   LeleWidgetFactory::fromJson(value_, [this](const std::string &subkey_, const std::string &value){
     const std::string key("flex");
     std::string subkey(subkey_);
@@ -331,6 +342,7 @@ const std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleStyle::get
 }
 
 std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
+  // LL(DEBUG, LVSIM) << "@@@ KEY: " << key;
   if(class_name == _class_name || _class_name.empty()) {
     auto it = _style.find(key);
     if(it != _style.end() && it->second) {
