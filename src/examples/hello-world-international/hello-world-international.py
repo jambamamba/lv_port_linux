@@ -2,35 +2,34 @@ import os
 import sys
 import lele
 
-def onRollerValueChanged(language):
-   print(f"@@@ onRollerValueChanged: {language}")
+def setFont(current_lang):
    obj = lele.getObjectById("/hello-world-international/label")
-   # style = obj.getStyle()
-   # print(f"obj style font-size: {style.getValue("font-size")}")
-   # print(f"obj style font-family: {style.getValue("font-family")}")
    style = obj.getStyle("style:/hello-world-international/style")
    # print(f"obj style font-size: {style.getValue("font-size")}")
    # print("============================================")
-   # user_attributes = [attr for attr in dir(lele) if not attr.startswith('__')]
-   # print(f"lele: {user_attributes}")
-   # print("============================================")
-   # print(f"font_db: {lele.Font().getFontDb()}")
-   print("============================================")
-   print(f"obj style font-family: {style.getValue("font-family")}")
-   if lele.Language().getCurrentLanguage() == "Arabic":
-      style.setValue({"font-family":"notosansarabic-bold"})
+   if (current_lang == "Arabic" or 
+       current_lang == "Persian"):
+      style.setValue({"font-family":"NotoSansArabic-Bold"})
+   elif (current_lang == "Hebrew"):
+      style.setValue({"font-family":"NotoSansHebrew-Black"})
+   elif (current_lang == "Hindi"):
+      style.setValue({"font-family":"NotoSerifDevanagari-Bold"})
+   elif (current_lang == "Thai"):
+      style.setValue({"font-family":"NotoSansThai-Medium"})
+   elif (current_lang == "Chinese" or
+         current_lang == "Japanese" or
+         current_lang == "Vietnamese" or
+         current_lang == "Burmese"):
+      style.setValue({"font-family":"NotoSansCJKjp-Regular-Alphabetic-10"})
    else:
-      style.setValue({"font-family":"ubuntu-b"})
+      style.setValue({"font-family":"Ubuntu-B"})
+   print(f"current_lang: {current_lang}")
    print(f"obj style font-family: {style.getValue("font-family")}")
-   # print("============================================")
-   # print(f"available languages: {lele.Language().getAvailableLanguages()}")
-   # print("============================================")
-   print(f"current language: {lele.Language().getCurrentLanguage()}")
-   lele.Language().setCurrentLanguage(language)
    print("============================================")
-   # user_attributes = [attr for attr in dir(style) if not attr.startswith('__')]
-   # print(user_attributes)
-   # print("============================================")
+
+def onRollerValueChanged(language):
+   lele.Language().setCurrentLanguage(language)
+   setFont(lele.Language().getCurrentLanguage())
    return True
 
 res = lele.loadConfig("hello-world-international.json")
@@ -42,6 +41,8 @@ print(f"label text: {label_hello_world}")
 
 roller = lele.getObjectById("/hello-world-international/rollerview")
 roller.onValueChanged(lambda value: onRollerValueChanged(value))
+print(f"selected item: {roller.getSelectedItem()}")
+roller.setSelectedItem("Arabic")
 
 while lele.handleEvents():
    pass

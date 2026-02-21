@@ -14,6 +14,10 @@ class LeleRollerView : public LeleObject  {
   virtual bool initPyObject(PyLeleObject *py_obj) override;
   void setItems(const std::vector<std::string> &itemsZ);
   std::vector<std::string> getItems() const;
+  std::string getSelectedItem() const;
+  void setSelectedItem(const std::string &value);
+  int getSelectedItemIndex() const;
+  void setSelectedItemIndex(int idx);
   void onValueChanged(PyObject *callback);
   
   protected:
@@ -35,6 +39,10 @@ struct PyLeleRollerView {
     // Type-specific fields go here
     static PyObject *getItems(PyObject *, PyObject *);
     static PyObject *setItems(PyObject *, PyObject *);
+    static PyObject *getSelectedItem(PyObject *, PyObject *);
+    static PyObject *setSelectedItem(PyObject *, PyObject *);
+    static PyObject *getSelectedItemIndex(PyObject *, PyObject *);
+    static PyObject *setSelectedItemIndex(PyObject *, PyObject *);
     static PyObject *onValueChanged(PyObject *, PyObject *);
 };
 
@@ -43,7 +51,11 @@ struct PyLeleRollerView {
 
 #define PY_LELEROLLERVIEW_METHODS() \
   PY_LELEOBJECT_METHODS() \
-  {"getItems", (PyCFunction)PyLeleRollerView::getItems, METH_NOARGS, "Get the text"},\
-  {"setItems", (PyCFunction)PyLeleRollerView::setItems, METH_VARARGS, "Set the text"},\
+  {"getItems", (PyCFunction)PyLeleRollerView::getItems, METH_NOARGS, "Get the items"},\
+  {"setItems", (PyCFunction)PyLeleRollerView::setItems, METH_VARARGS, "Set the items"},\
+  {"getSelectedItem", (PyCFunction)PyLeleRollerView::getSelectedItem, METH_NOARGS, "Get the selected item by value"},\
+  {"setSelectedItem", (PyCFunction)PyLeleRollerView::setSelectedItem, METH_VARARGS, "Set the selected item by value"},\
+  {"getSelectedItemIndex", (PyCFunction)PyLeleRollerView::getSelectedItemIndex, METH_NOARGS, "Get the selected item by index"},\
+  {"setSelectedItemIndex", (PyCFunction)PyLeleRollerView::setSelectedItemIndex, METH_VARARGS, "Set the selected item index"},\
   {"onValueChanged", (PyCFunction)PyLeleRollerView::onValueChanged, METH_VARARGS, "Sets the event handler that is triggered when value changes"},\
 

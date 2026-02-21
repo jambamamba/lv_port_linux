@@ -57,6 +57,50 @@ PyObject *PyLeleRollerView::setItems(PyObject *self_, PyObject *args) {
     return Py_None;
 }
 
+PyObject *PyLeleRollerView::getSelectedItem(PyObject *self_, PyObject *arg) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyUnicode_FromString(lele_obj->getSelectedItem().c_str());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleRollerView::setSelectedItem(PyObject *self_, PyObject *args) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        char *value = nullptr;
+        if(!PyArg_ParseTuple(args, "s", &value)) {
+            return Py_None;
+        }
+        lele_obj->setSelectedItem(value);
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleRollerView::getSelectedItemIndex(PyObject *self_, PyObject *arg) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyLong_FromLong(lele_obj->getSelectedItemIndex());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleRollerView::setSelectedItemIndex(PyObject *self_, PyObject *args) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        long value = 0;
+        if(!PyArg_ParseTuple(args, "i", &value)) {
+            return Py_None;
+        }
+        lele_obj->setSelectedItemIndex(value);
+    }
+    return Py_None;
+}
+
 PyObject *PyLeleRollerView::onValueChanged(PyObject *self_, PyObject *args) {
     PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
     LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);

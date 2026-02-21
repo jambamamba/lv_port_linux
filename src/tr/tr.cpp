@@ -13,6 +13,15 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
+//sans vs serif, serif vs sans
+//use serif fonts for printing
+//use sans fonts for digitial media
+//
+//latin fonts: sudo apt-get install -y fonts-noto-core
+//non-latin fonts can be found in Ubuntu in the path: /usr/share/fonts/truetype/noto/
+//japanese fonts: sudo apt install -y fonts-noto-cjk
+//  /repos/lv_port_linux/src/res/fonts/.ttc/noto/NotoSansCJK-*.ttc
+//hindi/indian font: Devanagari
 namespace {
 const std::unordered_map<std::string, std::string> _language_map = {
     {"ab", "Abkhazian"},

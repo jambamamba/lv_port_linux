@@ -66,6 +66,7 @@ qt.png
 src/examples/*/__pycache__/
 src/res/fonts/.lvf
 src/res/fonts/.ttf
+src/res/fonts/.ttc
 src/examples/hello-world/fonts
 src/examples/hello-world/fonts/Ubuntu*.lvf
 src/examples/hello-world/fonts/*

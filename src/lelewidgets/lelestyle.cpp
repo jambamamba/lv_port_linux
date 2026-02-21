@@ -34,6 +34,8 @@ std::unordered_set<std::string> LeleStyle::_style_keys = {
    "border/width",
    "border/color",
    "scrollbar",
+   "fgcolor-selected",
+   "bgcolor-selected",
    "fgcolor",
    "bgcolor",
    "checked_color",
@@ -465,6 +467,12 @@ bool LeleStyle::setValue(
       else {// "auto"
         _style[key] = LV_SCROLLBAR_MODE_AUTO;
       }
+    }
+    else if(key == "fgcolor-selected") {
+      _style[key] = ImageBuilder::parseColorCode(value);
+    }
+    else if(key == "bgcolor-selected") {
+      _style[key] = ImageBuilder::parseColorCode(value);
     }
     else if(key == "fgcolor") {
       _style[key] = ImageBuilder::parseColorCode(value);

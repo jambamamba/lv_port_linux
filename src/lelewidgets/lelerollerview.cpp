@@ -52,16 +52,16 @@ bool LeleRollerView::eventCallback(LeleEvent &&e) {
   //   " " << lv_event_code_get_name(e.getLvEvent()->code);
 
   switch(e.getLvEvent()->code) {
-    case LV_EVENT_CLICKED:
     case LV_EVENT_LONG_PRESSED:
     case LV_EVENT_LONG_PRESSED_REPEAT:
     case LV_EVENT_SCROLL: {
       break;
     }
-    case LV_EVENT_VALUE_CHANGED: {
-      std::string sel_value;
-      sel_value.reserve(_max_item_len);
-      lv_roller_get_selected_str(_lv_obj, sel_value.data(), _max_item_len);
+    // case LV_EVENT_SCROLL_END:
+    case LV_EVENT_CLICKED:
+    case LV_EVENT_VALUE_CHANGED: 
+    {
+      std::string sel_value = getSelectedItem();
       LL(DEBUG, LVSIM) << "Selected value: " << sel_value.c_str();
       for(auto *py_callback:_py_callbacks) {
         if(!pyCallback(py_callback, sel_value)) {
@@ -113,6 +113,38 @@ void LeleRollerView::setItems(const std::vector<std::string> &items_) {
 
 std::vector<std::string> LeleRollerView::getItems() const { 
   return _items; 
+}
+
+std::string LeleRollerView::getSelectedItem() const {
+  std::string sel_value;
+  sel_value.reserve(_max_item_len);
+  int opt_id = lv_roller_get_selected(_lv_obj);
+  lv_roller_get_option_str(_lv_obj, opt_id, sel_value.data(), _max_item_len);
+  return sel_value;
+}
+
+void LeleRollerView::setSelectedItem(const std::string &value) {
+  std::string sel_value;
+  sel_value.reserve(_max_item_len);
+  for(uint32_t idx = 0; idx < _items.size(); ++idx) {
+    lv_roller_get_option_str(_lv_obj, idx, sel_value.data(), _max_item_len);
+    if(strcmp(sel_value.c_str(), value.c_str())==0) {
+      lv_roller_set_selected(_lv_obj, idx, LV_ANIM_ON);
+      break;
+    }
+  }
+}
+
+int LeleRollerView::getSelectedItemIndex() const {
+  return lv_roller_get_selected(_lv_obj);
+}
+
+void LeleRollerView::setSelectedItemIndex(int idx) {
+  if(idx < 0 || idx >= _items.size()) {
+    LL(WARNING, LVSIM) << "Invalid index: " << idx << " is out of range: 0-" << _items.size();
+    return;
+  }
+  lv_roller_set_selected(_lv_obj, idx, LV_ANIM_ON);
 }
 
 void LeleRollerView::onValueChanged(PyObject *py_callback) {

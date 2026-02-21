@@ -266,11 +266,19 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     }
   }
 
-  value =getStyle("fgcolor");
+  value = getStyle("fgcolor-selected");
+  if(value) {
+    lv_obj_set_style_text_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_SELECTED);
+  }
+  value = getStyle("bgcolor-selected");
+  if(value) {
+    lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_SELECTED);
+  }
+  value = getStyle("fgcolor");
   if(value) {
     lv_obj_set_style_text_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
   }
-  value =getStyle("bgcolor");
+  value = getStyle("bgcolor");
   if(value) {
     int bgcolor = std::get<int>(value.value());
     lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
