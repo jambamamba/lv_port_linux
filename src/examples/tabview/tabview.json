@@ -6,14 +6,14 @@
         "tabbar_height":"75",
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
-        "img":"weather-hub-logo.png",
+        "img":"res/weather-hub-logo.png",
         "tabbar_location":"top",
         "tabs":[
             {
                 "tab":{
                     "tab_header":{
                         "name":"Home",
-                        "img":"home_icon.png"
+                        "img":"res/home_icon.png"
                     },
                     "tab_content":{
                         "label":{
@@ -27,7 +27,7 @@
                             "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner-radius":"5"}
                         },
                         "view":{
-                            "style":{"flow":"column","border":"solid-1px-#ffffff","checked_color":"#ff0000","x":"0","y":"35%","width":"40%","height":"40%"},
+                            "style":{"flex":{"flow":"column"},"border":"solid-1px-#ffffff","checked_color":"#ff0000","x":"0","y":"35%","width":"40%","height":"40%"},
                             "group":"true",
                             "buttons":[
                                 {
@@ -73,7 +73,7 @@
                 "tab":{
                     "tab_header":{
                         "name":"History",
-                        "img":"graph-icon.png"
+                        "img":"res/graph-icon.png"
                     },
                     "tab_content":{
                         "label":{
@@ -93,7 +93,7 @@
                 "tab":{
                     "tab_header":{
                         "name":"Settings",
-                        "img":"settings-hammer-wrench.png"
+                        "img":"res/settings-hammer-wrench.png"
                     },
                     "tab_content":{
                         "label":{

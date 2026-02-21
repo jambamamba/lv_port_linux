@@ -6,8 +6,10 @@
 #include <iostream>
 #include <openssl/sha.h>
 #include <sstream>
-
+#include <debug_logger/debug_logger.h>
 #include <utils/img_helper.h>
+
+LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
 std::string sha256sum(const std::string &input_str) {
@@ -127,7 +129,16 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> tileImg(
     return dst_img;
 }
 
-std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::string &img_file_path) {
+std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::string &img_file_path_) {
+
+    std::string img_file_path(img_file_path_);
+    if(img_file_path_.at(0) != '/') {
+      img_file_path = std::string (std::filesystem::current_path().string() + "/" + img_file_path_);
+      if(!std::filesystem::exists(img_file_path)) {
+        LL(FATAL, LVSIM) << "File does not exist:" << img_file_path;
+        return std::nullopt;
+      }
+    }
 
     std::filesystem::path img_path(img_file_path);
     if(!std::filesystem::is_regular_file(img_file_path)) {

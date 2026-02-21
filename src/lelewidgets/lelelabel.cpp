@@ -27,9 +27,7 @@ lv_obj_t *LeleLabel::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   _lv_obj = LeleObject::createLvObj(lele_parent,
     lv_label_create(lele_parent->getLvObj()));
 
-  lele_set_translatable_text([this](){
-    lv_label_set_text(_lv_obj, tr(_text).c_str());
-  });
+  setText(_text);
   return _lv_obj;
 }
 

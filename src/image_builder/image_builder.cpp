@@ -276,17 +276,7 @@ ImageBuilder::drawBackgroundImage(
   int obj_height) {
 
     Res res;
-    if(src.at(0) == '/') {
-      res._img_dsc = LeleImageConverter::generateImgDsc(src.c_str());
-    }
-    else {
-      std::string img_path(std::filesystem::current_path().string() + "/" + src);
-      if(!std::filesystem::exists(img_path)) {
-        LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
-      }
-      LOG(DEBUG, LVSIM, "Loading image: %s\n", img_path.c_str());
-      res._img_dsc = LeleImageConverter::generateImgDsc(img_path.c_str());
-    }
+    res._img_dsc = LeleImageConverter::generateImgDsc(src);
     if(!res._img_dsc) {
         LOG(FATAL, LVSIM, "Failed in generating image description");
         return res;

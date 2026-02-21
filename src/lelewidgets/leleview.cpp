@@ -115,18 +115,6 @@ lv_obj_t *LeleView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
       if(key == "group") {
         _group = (value == "true");
       }
-      // else if(key == "img") {
-      //   std::string img_path(std::filesystem::current_path().string() + "/" + value);
-      //   if(!std::filesystem::exists(img_path)) {
-      //     LOG(FATAL, LVSIM, "File does not exist: '%s'\n", img_path.c_str());
-      //   }
-      //   // LOG(DEBUG, LVSIM, "@@@ img_path %s\n", img_path.c_str());
-      //   _images[value] = LeleImageConverter::generateImgDsc(img_path.c_str());
-      //   if(_images[value]) {
-      //     lv_obj_t *logo = lv_image_create(_lv_obj);
-      //     lv_image_set_src(logo, _images[value].value().get());
-      //   }
-      // }
     }
   }
 

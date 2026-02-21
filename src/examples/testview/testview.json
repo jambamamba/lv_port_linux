@@ -1,6 +1,6 @@
 {
     "stackview":{
-        "style":{"id":"stackview/styles/style0","padding":"none","margin":"none","layout":"flex","flow":"column","width":"100%","fgcolor":"#ffffff","bgcolor":"#444444","corner-radius":"5"},
+        "style":{"id":"stackview/styles/style0","padding":"none","margin":"none","flex":{"flow":"column"},"width":"100%","fgcolor":"#ffffff","bgcolor":"#444444","corner-radius":"5"},
         "style":{"id":"stackview/styles/style1","class_name":"stackview/view","border":"solid-1px-#0000ff","x":"0","y":"0","width":"100%","height":"95%"},
         "style":{"id":"stackview/styles/style2","class_name":"stackview/view/header","border":"solid-1px-#ff0000","width":"0%","height":"0%"},
         "style":{"id":"stackview/styles/style3","class_name":"stackview/view/button","border":"solid-1px-#00ff00","width":"15%","height":"40","fgcolor":"#ffffff","bgcolor":"#ff0000"},
@@ -12,7 +12,7 @@
         "img":"weather-hub-logo.png",
         "view_header":{
             "id":"view_header",
-            "style":{"id":"view_header","border":"solid-1px-#ff0000","layout":"flex","flow":"row","width":"100%","height":"5%"},
+            "style":{"id":"view_header","border":"solid-1px-#ff0000","flex":{"flow":"row"},"width":"100%","height":"5%"},
             "label":{
                 "id":"view_header/label0",
                 "text":"",
@@ -35,7 +35,7 @@
             "button":{
                 "type":"push",
                 "id":"close",
-                "style":{"id":"close","layout":"none","width":"15%","height":"10%","align":"top_right","text-align":"right"},
+                "style":{"id":"close","flex":"none","width":"15%","height":"10%","align":"top_right","text-align":"right"},
                 "text":"X",
                 "event":{"type":"clicked","action":"stackview.pop","args":{}}
             }
@@ -50,7 +50,7 @@
                         "id":"views:0/view/view_header",
                         "style":{"id":"views:0/view/header","class_name":"stackview/view/header"},
                         "name":"Settings0",
-                        "img":"graph-icon.png"
+                        "img":"res/graph-icon.png"
                     },
                     "label":{
                         "id":"views:0/view/label",
@@ -106,7 +106,7 @@
                         "id":"views:1/view/view_header",
                         "style":{"id":"views:1/view/header","class_name":"stackview/view/header"},
                         "name":"Settings1",
-                        "img":"settings-hammer-wrench.png"
+                        "img":"res/settings-hammer-wrench.png"
                     },
                     "label":{
                         "id":"views:1/view/label",
@@ -137,7 +137,7 @@
                         "id":"views:2/view/view_header",
                         "style":{"id":"views:2/view/header","class_name":"stackview/view/header"},
                         "name":"Settings2",
-                        "img":"settings-hammer-wrench.png"
+                        "img":"res/settings-hammer-wrench.png"
                     },
                     "label":{
                         "id":"views:2/view/label",
@@ -168,7 +168,7 @@
                         "id":"views:3/view/view_header",
                         "style":{"id":"views:3/view/header","class_name":"stackview/view/header"},
                         "name":"Settings3",
-                        "img":"settings-hammer-wrench.png"
+                        "img":"res/settings-hammer-wrench.png"
                     },
                     "label":{
                         "id":"views:3/view/label",

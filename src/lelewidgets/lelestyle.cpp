@@ -366,7 +366,7 @@ bool LeleStyle::setValue(
       return false;
     }
     else if(key.at(0) != '#' && _style_keys.find(key) == _style_keys.end()) {
-      LL(FATAL, LVSIM) << "No such key " << key << " exists for styles";
+      LL(FATAL, LVSIM) << "No such key '" << key << "' exists for styles";
       return false;
     }
     else if(key == "class_name") {
