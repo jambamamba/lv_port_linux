@@ -152,7 +152,7 @@ int LeleRollerView::getNumberOfVisibleItems() const {
 }
 
 void LeleRollerView::setNumberOfVisibleItems(int num_visible_items) {
-  if(idx < 0 || num_visible_items >= _items.size()) {
+  if(num_visible_items < 0 || num_visible_items >= _items.size()) {
     LL(WARNING, LVSIM) << "Invalid index: " << num_visible_items << " is out of range: 0-" << _items.size();
     return;
   }
