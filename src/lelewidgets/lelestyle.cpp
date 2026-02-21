@@ -18,7 +18,7 @@ std::unordered_set<std::string> LeleStyle::_style_keys = {
    "y",
    "width",
    "height",
-   "corner_radius",
+   "corner-radius",
    "padding",
    "padding/top",
    "padding/right",
@@ -398,7 +398,7 @@ bool LeleStyle::setValue(
     else if(key == "height") {
       _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
     }
-    else if(key == "corner_radius") {
+    else if(key == "corner-radius") {
       _style[key] = parsePercentValue(value, std::max(ImageBuilder::getParentDimension(key, _lele_obj), ImageBuilder::getParentDimension(key, _lele_obj)));
     }
     else if(key == "padding") {

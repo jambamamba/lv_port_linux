@@ -209,7 +209,7 @@ void LeleObject::setStyle(lv_obj_t *lv_obj) {
     lv_obj_set_height(lv_obj, obj_height);
   }
 
-  value = getStyle("corner_radius");
+  value = getStyle("corner-radius");
   if(value) {
     lv_style_set_radius(&_style, std::get<int>(value.value()));
   }

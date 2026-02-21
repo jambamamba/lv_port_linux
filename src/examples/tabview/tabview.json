@@ -1,6 +1,6 @@
 {
     "tabview":{
-        "style":{"fgcolor":"#ffffff","bgcolor":"#444444","corner_radius":"5"},
+        "style":{"fgcolor":"#ffffff","bgcolor":"#444444","corner-radius":"5"},
         "active_tab_bgcolor":"#ffffff",
         "active_tab_bottom_border":"solid-3px-#cccccc",
         "tabbar_height":"75",
@@ -18,13 +18,13 @@
                     "tab_content":{
                         "label":{
                             "text":"Static Label",
-                            "style":{"x":"0","y":"0","width":"50%","height":"10%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"10%","corner-radius":"5"}
                         },
                         "textbox":{
                             "text":"Text Box",
                             "max_length":"1024",
                             "multiline":"true",
-                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner-radius":"5"}
                         },
                         "view":{
                             "style":{"flow":"column","border":"solid-1px-#ffffff","checked_color":"#ff0000","x":"0","y":"35%","width":"40%","height":"40%"},
@@ -33,7 +33,7 @@
                                 {
                                     "button":{
                                         "type":"switch",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner_radius":"0x7FFF"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner-radius":"0x7FFF"},
                                         "text":"Switch",
                                         "checkable":"true",
                                         "checked":"false"
@@ -42,7 +42,7 @@
                                 {
                                     "button":{
                                         "type":"radio",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner_radius":"0x7FFF"},
+                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner-radius":"0x7FFF"},
                                         "text":"Radio Button",
                                         "checkable":"true",
                                         "checked":"true"
@@ -78,13 +78,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world2",
-                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner-radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world2",
                             "max_length":"15",
                             "multiline":"false",
-                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner-radius":"5"}
                         }
                     }
                 }
@@ -98,13 +98,13 @@
                     "tab_content":{
                         "label":{
                             "text":"hello world3",
-                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"x":"0","y":"0","width":"50%","height":"20%","corner-radius":"5"}
                         },  
                         "textbox":{
                             "text":"hello world3",
                             "max_length":"15",
                             "multiline":"false",
-                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner_radius":"5"}
+                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"22%","width":"50%","height":"20%","corner-radius":"5"}
                         }
                     }
                 }

@@ -146,7 +146,7 @@ int ImageBuilder::getParentDimension(const std::string &key, const LeleObject *l
   else if(lele_obj) {
     if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
     else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
-    else if(key == "corner_radius") { 
+    else if(key == "corner-radius") { 
       return std::max(
         lv_obj_get_width(lv_screen_active()), 
         lv_obj_get_height(lv_screen_active())

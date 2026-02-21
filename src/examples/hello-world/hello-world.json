@@ -4,7 +4,7 @@
     "language":{"current":"en","default":"en"},
     "view":{
         "id":"/hello-world",
-        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner_radius":"0",
+        "style":{"padding":"none","margin":"none","width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444","corner-radius":"0",
             "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"},
             "font-family":"Ubuntu-B",
             "#font-family":"NotoSansArabic-Bold"
@@ -30,7 +30,7 @@
                 "padding":"1px",
                 "text-align":"center",
                 "border":"solid-1px-#555",
-                "corner_radius":"10",
+                "corner-radius":"10",
                 "font-size":"40pt",
                 "#font-size":"16pt"
             }
@@ -44,7 +44,7 @@
                 "height":"5%",
                 "padding":"1px",
                 "text-align":"center",
-                "corner_radius":"5",
+                "corner-radius":"5",
                 "border":"solid-1px-#555",
                 "font-size":"16pt"
             }
