@@ -41,8 +41,11 @@ print(f"label text: {label_hello_world}")
 
 roller = lele.getObjectById("/hello-world-international/rollerview")
 roller.onValueChanged(lambda value: onRollerValueChanged(value))
-print(f"selected item: {roller.getSelectedItem()}")
-roller.setSelectedItem("Arabic")
+
+# print(f"selected item: {roller.getSelectedItem()}")
+# roller.setSelectedItem("Arabic")
+# print(f"selected item index: {roller.getSelectedItemIndex()}")
+# roller.setSelectedItemIndex(2)
 
 while lele.handleEvents():
    pass
