@@ -99,6 +99,28 @@ PyObject *PyLeleRollerView::setSelectedItemIndex(PyObject *self_, PyObject *args
         lele_obj->setSelectedItemIndex(value);
     }
     return Py_None;
+} 
+
+PyObject *PyLeleRollerView::getNumberOfVisibleItems(PyObject *self_, PyObject *arg) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj) {
+        return PyLong_FromLong(lele_obj->getNumberOfVisibleItems());
+    }
+    return Py_None;
+}
+
+PyObject *PyLeleRollerView::setNumberOfVisibleItems(PyObject *self_, PyObject *args) {
+    PyLeleRollerView *self = reinterpret_cast<PyLeleRollerView *>(self_);
+    LeleRollerView *lele_obj = dynamic_cast<LeleRollerView *>(self->ob_base._lele_obj);
+    if(lele_obj && args) {
+        long value = 0;
+        if(!PyArg_ParseTuple(args, "i", &value)) {
+            return Py_None;
+        }
+        lele_obj->setNumberOfVisibleItems(value);
+    }
+    return Py_None;
 }
 
 PyObject *PyLeleRollerView::onValueChanged(PyObject *self_, PyObject *args) {

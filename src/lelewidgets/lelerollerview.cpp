@@ -147,6 +147,19 @@ void LeleRollerView::setSelectedItemIndex(int idx) {
   lv_roller_set_selected(_lv_obj, idx, LV_ANIM_ON);
 }
 
+int LeleRollerView::getNumberOfVisibleItems() const {
+  return _num_visible_items;
+}
+
+void LeleRollerView::setNumberOfVisibleItems(int num_visible_items) {
+  if(idx < 0 || num_visible_items >= _items.size()) {
+    LL(WARNING, LVSIM) << "Invalid index: " << num_visible_items << " is out of range: 0-" << _items.size();
+    return;
+  }
+  _num_visible_items = num_visible_items;
+  lv_roller_set_visible_row_count(_lv_obj, num_visible_items);
+}
+
 void LeleRollerView::onValueChanged(PyObject *py_callback) {
   LeleObject::addEventHandler(py_callback);
   // Py_XINCREF(py_callback);

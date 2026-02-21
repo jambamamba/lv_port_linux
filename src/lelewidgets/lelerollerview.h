@@ -18,6 +18,8 @@ class LeleRollerView : public LeleObject  {
   void setSelectedItem(const std::string &value);
   int getSelectedItemIndex() const;
   void setSelectedItemIndex(int idx);
+  int getNumberOfVisibleItems() const;
+  void setNumberOfVisibleItems(int num_visible_items);
   void onValueChanged(PyObject *callback);
   
   protected:
@@ -43,6 +45,8 @@ struct PyLeleRollerView {
     static PyObject *setSelectedItem(PyObject *, PyObject *);
     static PyObject *getSelectedItemIndex(PyObject *, PyObject *);
     static PyObject *setSelectedItemIndex(PyObject *, PyObject *);
+    static PyObject *getNumberOfVisibleItems(PyObject *, PyObject *);
+    static PyObject *setNumberOfVisibleItems(PyObject *, PyObject *);
     static PyObject *onValueChanged(PyObject *, PyObject *);
 };
 
@@ -57,5 +61,7 @@ struct PyLeleRollerView {
   {"setSelectedItem", (PyCFunction)PyLeleRollerView::setSelectedItem, METH_VARARGS, "Set the selected item by value"},\
   {"getSelectedItemIndex", (PyCFunction)PyLeleRollerView::getSelectedItemIndex, METH_NOARGS, "Get the selected item by index"},\
   {"setSelectedItemIndex", (PyCFunction)PyLeleRollerView::setSelectedItemIndex, METH_VARARGS, "Set the selected item index"},\
+  {"getNumberOfVisibleItems", (PyCFunction)PyLeleRollerView::getNumberOfVisibleItems, METH_NOARGS, "Get the number of visible items"},\
+  {"setNumberOfVisibleItems", (PyCFunction)PyLeleRollerView::setNumberOfVisibleItems, METH_VARARGS, "Set the number of visible items"},\
   {"onValueChanged", (PyCFunction)PyLeleRollerView::onValueChanged, METH_VARARGS, "Sets the event handler that is triggered when value changes"},\
 
