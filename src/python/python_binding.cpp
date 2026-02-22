@@ -94,7 +94,7 @@ namespace {
         }
         // LOG(DEBUG, LVSIM, "@@@> _mymodule_addEventHandler id:'%s'\n", id);
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id, py_callback](LeleObject &lele_object) {
-            if(lele_object.id() == id) {
+            if(lele_object.getId() == id) {
                 Py_XINCREF(py_callback);
                 lele_object.addEventHandler(py_callback);
             }
@@ -109,7 +109,7 @@ namespace {
         }
         std::vector<PyObject*> py_objects;
         LeleWidgetFactory::iterateNodes(_nodes, 0, [id,&py_objects](LeleObject &lele_object) {
-            if(lele_object.id() == id) {
+            if(lele_object.getId() == id) {
                 PyObject *py_obj = lele_object.createPyObject();
                 if(!py_obj){
                     LOG(FATAL, LVSIM, "Could not create PyObject!\n");

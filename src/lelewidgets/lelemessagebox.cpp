@@ -55,7 +55,7 @@ lv_obj_t *LeleMessageBox::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 
 void LeleMessageBox::addEventCallback(LeleButtons::LeleButton *lele_btn, lv_obj_t *lv_btn) const {
   lele_btn->setLvObj(lv_btn);
-  lele_btn->setStyle(lv_btn);
+  lele_btn->applyStyle(lv_btn);
   lv_obj_add_event_cb(lv_btn, [](lv_event_t *e){
     lv_obj_t *btn = static_cast<lv_obj_t *>(lv_event_get_current_target(e));
     lv_obj_t *mbox = lv_obj_get_parent(lv_obj_get_parent(btn));
@@ -81,7 +81,7 @@ LeleButtons::LeleButton *LeleMessageBox::getButtonClicked() const {
 
 bool LeleMessageBox::eventCallback(LeleEvent &&e) {
     LOG(DEBUG, LVSIM, "LeleMessageBox::eventCallback, class:%s, btn_clicked.id:%s\n", 
-      _class_name.c_str(), _btn_clicked ? _btn_clicked->id().c_str() : "");
+      _class_name.c_str(), _btn_clicked ? _btn_clicked->getId().c_str() : "");
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
 

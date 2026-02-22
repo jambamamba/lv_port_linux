@@ -46,8 +46,11 @@ bool LeleObject::fromJson(const std::string &json_str) {
 const std::string &LeleObject::className() const {
   return _class_name;
 }
-const std::string &LeleObject::id() const {
+const std::string &LeleObject::getId() const {
   return _id;
+}
+void LeleObject::setId(const std::string &id) {
+  _id = id;
 }
 
 bool LeleObject::enabled() const { 
@@ -181,7 +184,7 @@ LeleObject::getBackgroundStyle(const std::string &class_name) const {
   return {bg_keys, bg_style};
 }
 
-void LeleObject::setStyle(lv_obj_t *lv_obj) {
+void LeleObject::applyStyle(lv_obj_t *lv_obj) {
   lv_style_init(&_style);
 
   int obj_x = 0;
@@ -408,17 +411,18 @@ void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) 
     for(std::unique_ptr<LeleStyle> &lele_style : lele_styles) {
       _lele_styles.emplace_back(lele_style.get());
     }
-    setStyle(_lv_obj);
+    applyStyle(_lv_obj);
   }
 }
 
 void LeleObject::addStyle(LeleStyle* lele_style) {
   _lele_styles.emplace_back(lele_style);
-  setStyle(_lv_obj);
+  applyStyle(_lv_obj);
 }
 
 void LeleObject::removeStyle(const std::string &style_id) {
   //osm todo
+  _lele_styles.clear();
 }
 
 std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
@@ -475,7 +479,7 @@ lv_obj_t *LeleObject::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   }
   lv_obj_null_on_delete(&_lv_obj);
   setParent(lele_parent);
-  setStyle(_lv_obj);
+  applyStyle(_lv_obj);
   _lv_obj->user_data = this;
   lv_obj_add_event_cb(_lv_obj, EventCallback, LV_EVENT_ALL, this);
   return _lv_obj;

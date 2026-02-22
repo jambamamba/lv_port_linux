@@ -37,13 +37,14 @@ public:
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
   const std::string &className() const;
-  const std::string &id() const;
+  const std::string &getId() const;
+  void setId(const std::string &id);
 
   std::vector<LeleObject *> getLeleObj(const std::string &obj_name) const;
   bool enabled() const;
   lv_obj_t *getLvObj() const;
   void setLvObj(lv_obj_t *obj);
-  void setParent(LeleObject *parent);
+  virtual void setParent(LeleObject *parent);
   LeleObject *getParent() const;
   const std::vector<std::unique_ptr<LeleStyle>> &getStyles() const;
   std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::string &class_name = "") const;
@@ -56,10 +57,10 @@ public:
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleObject *py_obj);
   virtual bool fromJson(const std::string &json_str);
-  virtual void setStyle(lv_obj_t *lv_obj);
+  virtual void applyStyle(lv_obj_t *lv_obj);
   virtual void addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles);
   virtual void addStyle(LeleStyle* lele_style);
-  virtual void removeStyle(const std::string &style_id);
+  virtual void removeStyle(const std::string &style_id = "");
   // virtual void setObjAlignStyle(lv_obj_t *lv_obj);
   // virtual void setTextAlign(lv_obj_t *lv_obj);
   virtual void show();

@@ -130,17 +130,18 @@ std::map<std::string, float> parseRotation(const std::string &json_str, LeleObje
 int ImageBuilder::getParentDimension(const std::string &key, const LeleObject *lele_obj) {
   if(lele_obj && lele_obj->getParent()) {
     auto value = lele_obj->getParent()->getStyle(key);
-    if(value){
-      if(std::holds_alternative<int>(value.value())) {
-        int val = std::get<int>(value.value());
-        return std::get<int>(value.value());
-      }
-      else {
-        LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
-      }
+    if(!value) {
+      value = getParentDimension(key, lele_obj->getParent());
+    }
+    if(!value){
+      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
+    }
+    else if(std::holds_alternative<int>(value.value())) {
+      int val = std::get<int>(value.value());
+      return std::get<int>(value.value());
     }
     else {
-      LL(WARNING, LVSIM) << "style key:" << key << " has no value";
+      LL(WARNING, LVSIM) << "style key:" << key << " has non-int value";
     }
   }
   else if(lele_obj) {

@@ -1,13 +1,19 @@
 {
+    "screen":{"width":"1024","height":"768"},
+    "style":{"class_name":"tab_content","flex":{"flow":"column"},"x":"0","y":"50","width":"90%","height":"80%","border":"solid-4px-#f00"},
+    "style":{"class_name":"label","fgcolor":"#000","border":"solid-4px-#f00"},
+    "style":{"class_name":"textbox","fgcolor":"#000","border":"solid-4px-#f00"},
     "tabview":{
-        "style":{"fgcolor":"#ffffff","bgcolor":"#444444","corner-radius":"5"},
-        "active_tab_bgcolor":"#ffffff",
-        "active_tab_bottom_border":"solid-3px-#cccccc",
+        "style":{"fgcolor":"#fff","bgcolor":"#444","corner-radius":"5"},
+        "active_tab_bgcolor":"#fff",
+        "active_tab_bottom_border":"solid-3px-#ccc",
         "tabbar_height":"75",
         "title":"ACME Weather Hub",
         "subtitle":"Local Weather Station",
         "img":"res/weather-hub-logo.png",
         "tabbar_location":"top",
+        "show_tabs":"false",
+        "active_tab_index":"0",
         "tabs":[
             {
                 "tab":{
@@ -16,24 +22,27 @@
                         "img":"res/home_icon.png"
                     },
                     "tab_content":{
+                        "style":{"class_name":"tab_content","width":"90%","height":"80%","bgcolor":"#444","border":"solid-4px-#ff0"},
                         "label":{
-                            "text":"Static Label",
-                            "style":{"x":"0","y":"0","width":"50%","height":"10%","corner-radius":"5"}
+                            "id":"label1",
+                            "style":{"class_name":"label","fgcolor":"#f00","border":"solid-4px-#ff0"},
+                            "text":"Static Label"
                         },
                         "textbox":{
+                            "style":{"class_name":"textbox"},
                             "text":"Text Box",
                             "max_length":"1024",
                             "multiline":"true",
-                            "style":{"border":"solid-1px-#ffffff","x":"0","y":"12%","width":"50%","height":"20%","corner-radius":"5"}
+                            "style":{"x":"0","y":"50","width":"50%","height":"50%","fgcolor":"#000","border":"solid-4px-#ff0"}
                         },
                         "view":{
-                            "style":{"flex":{"flow":"column"},"border":"solid-1px-#ffffff","checked_color":"#ff0000","x":"0","y":"35%","width":"40%","height":"40%"},
+                            "style":{"flex":{"flow":"column"},"bgcolor":"#444","checked_color":"#f00","x":"10","y":"35%","width":"40%","height":"40%"},
                             "group":"true",
                             "buttons":[
                                 {
                                     "button":{
                                         "type":"switch",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"10%","height":"30","corner-radius":"0x7FFF"},
+                                        "style":{"fgcolor":"#fff","bgcolor":"#aaa","border":"none","width":"15%","height":"30","corner-radius":"0x7FFF"},
                                         "text":"Switch",
                                         "checkable":"true",
                                         "checked":"false"
@@ -42,7 +51,7 @@
                                 {
                                     "button":{
                                         "type":"radio",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"50","height":"50","corner-radius":"0x7FFF"},
+                                        "style":{"fgcolor":"#fff","bgcolor":"#aaaaaa","border":"none","width":"50%","height":"50","corner-radius":"0x7FFF"},
                                         "text":"Radio Button",
                                         "checkable":"true",
                                         "checked":"true"
@@ -51,7 +60,7 @@
                                 {
                                     "button":{
                                         "type":"checkbox",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"45%","height":"50"},
+                                        "style":{"fgcolor":"#fff","bgcolor":"#aaaaaa","border":"none","width":"50%","height":"50"},
                                         "text":"Checkbox",
                                         "checkable":"true"
                                     }
@@ -59,9 +68,10 @@
                                 {
                                     "button":{
                                         "type":"push",
-                                        "style":{"fgcolor":"#ffffff","bgcolor":"#aaaaaa","border":"none","width":"15%","height":"40"},
+                                        "style":{"fgcolor":"#fff","bgcolor":"#aaa","border":"none","width":"40%","height":"40"},
                                         "text":"Push button",
-                                        "checkable":"true"
+                                        "checkable":"true",
+                                        "label":{"text":"Push Button"}
                                     }
                                 }
                             ]
@@ -76,6 +86,7 @@
                         "img":"res/graph-icon.png"
                     },
                     "tab_content":{
+                        "style":{"class_name":"tab_content"},
                         "label":{
                             "text":"hello world2",
                             "style":{"x":"0","y":"0","width":"50%","height":"20%","corner-radius":"5"}
@@ -96,6 +107,7 @@
                         "img":"res/settings-hammer-wrench.png"
                     },
                     "tab_content":{
+                        "style":{"class_name":"tab_content"},
                         "label":{
                             "text":"hello world3",
                             "style":{"x":"0","y":"0","width":"50%","height":"20%","corner-radius":"5"}

@@ -602,7 +602,7 @@ std::string LeleStyle::getId() const {
 void LeleStyle::applyStyle() {
   if(_lele_obj) {
     (const_cast<LeleObject *>(_lele_obj))->
-      setStyle(_lele_obj->getLvObj());
+      applyStyle(_lele_obj->getLvObj());
   }
 }
 

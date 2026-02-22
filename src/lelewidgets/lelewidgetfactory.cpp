@@ -91,7 +91,7 @@ const cJSON* jsonFromConfig(const std::string &config_json) {
 }
 
 auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
-    auto nodes = LeleWidgetFactory::fromJson(json_str);
+    auto nodes = LeleWidgetFactory::fromJson(parent, json_str);
     for (const auto &[key, node]: nodes) {
         LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
         if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
@@ -408,6 +408,7 @@ std::vector<std::pair<std::string, Node>> fromConfig(
 
     if(!parent->getLvObj()) {
         static click_counts counts;
+        parent->setId("ROOT");
         parent->setLvObj(lv_screen_active());
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SHORT_CLICKED, &counts);

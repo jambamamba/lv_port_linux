@@ -19,10 +19,10 @@ LeleTabView::Tabs::Tabs(LeleObject *parent, const std::string &json_str)
 bool LeleTabView::Tabs::fromJson(const std::string &json_str) {
   return true;
 }
-lv_obj_t *LeleTabView::Tabs::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
-  return _lv_obj;
-}
+// lv_obj_t *LeleTabView::Tabs::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
+//   setParent(lele_parent);
+//   return _lv_obj;
+// }
 
 int LeleTabView::Tabs::count() const {
     return getChildren().size();
@@ -59,11 +59,11 @@ LeleTabView::Tab::Tab(LeleObject *parent, const std::string &json_str)
 bool LeleTabView::Tab::fromJson(const std::string &json_str) {
   return true;
 }
-lv_obj_t *LeleTabView::Tab::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
-  _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabHeader()->name().c_str());
-  return _lv_obj;
-}
+// lv_obj_t *LeleTabView::Tab::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
+//   setParent(lele_parent);
+//   _lv_obj = lv_tabview_add_tab(lele_parent->getLvObj(), getTabHeader()->name().c_str());
+//   return _lv_obj;
+// }//osm
 LeleTabView::TabHeader *LeleTabView::Tab::getTabHeader() const {
   std::vector<LeleObject *> objs = getLeleObj("tab_header");
   if(objs.size() > 0) {
@@ -109,11 +109,11 @@ lv_obj_t *LeleTabView::TabHeader::createLvObj(LeleObject *lele_parent, lv_obj_t 
     }
     lv_obj_center(logo);
     lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, "");
+    lv_label_set_text(label, "");//osm todo: need tr
   }
   else {
     lv_obj_t *label = lv_obj_get_child(lele_parent->getLvObj(), 0);
-    lv_label_set_text(label, _name.c_str());
+    lv_label_set_text(label, _name.c_str());//osm todo: need tr
   }
 
   setParent(lele_parent);
@@ -131,14 +131,13 @@ bool LeleTabView::TabContent::fromJson(const std::string &json_str) {
   return true;
 }
 lv_obj_t *LeleTabView::TabContent::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
-  setParent(lele_parent);
+  _lv_obj = LeleObject::createLvObj(lele_parent, lv_obj);
   for (const auto &[key, token]: _nodes) {
     if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
       auto &value = std::get<std::unique_ptr<LeleObject>>(token);
       value->createLvObj(lele_parent);
     }
   }
-  setParent(lele_parent);
   return _lv_obj;
 }
 
@@ -184,17 +183,48 @@ bool LeleTabView::fromJson(const std::string &json_str) {
       else if(key == "tabbar_location") {
         _tabbar_location = (value == "bottom") ? TabBarLocationE::Bottom : TabBarLocationE::Top;
       }
+      else if(key == "show_tabs") {
+        _show_tabs = value == "true";
+      }
+      else if(key == "selected_tab_index") {
+        _selected_tab_index = std::stoi(value.c_str(), nullptr, 10);
+      }
     }
   }
   return true;
 }
 
+namespace {
+#define MY_CLASS (&lv_tabview_class) 
+lv_obj_t * lv_tabview_add_tab2(lv_obj_t * obj, const char * name, bool show_buttons)
+{
+  if(show_buttons) {
+    return lv_tabview_add_tab(obj, name);
+  }
+    LV_ASSERT_OBJ(obj, MY_CLASS);
+    lv_obj_t * cont = lv_tabview_get_content(obj);
+
+    lv_obj_t * page = lv_obj_create(cont);
+    lv_obj_set_size(page, lv_pct(100), lv_pct(100));
+
+    lv_obj_t * tab_bar = lv_tabview_get_tab_bar(obj);
+
+    uint32_t tab_idx = lv_obj_get_child_count(cont) - 1;
+    lv_tabview_t * tabview = (lv_tabview_t *)obj;
+    if(tab_idx == tabview->tab_cur) {
+        lv_tabview_set_active(obj, tab_idx, LV_ANIM_OFF);
+    }
+
+    return page;
+} 
+}//namespace
+
 lv_obj_t *LeleTabView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
 
-  setParent(lele_parent);
-  _lv_obj = lv_tabview_create(lele_parent->getLvObj());
-  lv_tabview_set_tab_bar_position(_lv_obj, _tabbar_location == TabBarLocationE::Bottom ? LV_DIR_BOTTOM : LV_DIR_TOP);
+  _lv_obj = LeleObject::createLvObj(lele_parent,
+    lv_tabview_create(lele_parent->getLvObj()));
 
+  lv_tabview_set_tab_bar_position(_lv_obj, _tabbar_location == TabBarLocationE::Bottom ? LV_DIR_BOTTOM : LV_DIR_TOP);
   lv_tabview_set_tab_bar_size(_lv_obj, _tabbar_height);
   lv_obj_add_event_cb(_lv_obj, tabViewDeleteEventCb, LV_EVENT_DELETE, this);
 
@@ -218,22 +248,37 @@ lv_obj_t *LeleTabView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
     lv_obj_set_style_bg_color(tabview_header, lv_color_hex(std::get<int>(bgcolor.value())), LV_PART_MAIN);
   }
 
-  if(_tabs){
-    _tabs->createLvObj(this);
-    _tabs->setLvObj(_lv_obj);
+  if(_tabs) {
+    _tabs->setParent(this);
+    auto tabview_width = getStyle("width");
+    auto tabs_width = _tabs->getStyle("width");
     for(int idx = 0; idx < _tabs->count(); ++idx) {
       LeleTabView::Tab *tab = _tabs->getAt(idx);
-      tab->createLvObj(_tabs);
-      tab->getTabContent()->createLvObj(tab);
-
+      lv_obj_t *lv_tab = lv_tabview_add_tab2(
+        _lv_obj, 
+        tab->getTabHeader() ? 
+          tab->getTabHeader()->name().c_str() : 
+          "", 
+        _show_tabs);
+      setSelectedTabIndex(_selected_tab_index, false);
+      tab->createLvObj(this, lv_tab);
+      auto tab_width = tab->getStyle("width");
+      if(tab->getTabContent()) {
+        tab->getTabContent()->createLvObj(tab);
+        auto tab_content = tab->getTabContent()->getStyle("width");
+      }
       lv_obj_t *button = lv_obj_get_child(tabview_header, idx);
-      tab->setLvObj(button);
-      tab->getTabHeader()->createLvObj(tab);
-      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
-      lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_PRESSED);
-      if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
-        lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
-        lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+      if(button) {
+        tab->setLvObj(button);
+        if(tab->getTabHeader()) {
+          tab->getTabHeader()->createLvObj(tab);
+        }
+        lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+        lv_obj_set_style_bg_color(button, lv_color_hex(_active_tab_bgcolor), (int)LV_PART_MAIN | (int)LV_STATE_PRESSED);
+        if(_active_tab_bottom_border_type == LeleStyle::BorderTypeE::Solid) {
+          lv_obj_set_style_border_color(button, lv_color_hex(_active_tab_bottom_border_color), (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+          lv_obj_set_style_border_width(button, _active_tab_bottom_border_width, (int)LV_PART_MAIN | (int)LV_STATE_CHECKED);
+        }
       }
     }
   }
@@ -291,4 +336,22 @@ void LeleTabView::tabViewDeleteEventCb(lv_event_t * e) {
         //osm lv_style_reset(&pthis->_style_subtitle);
         //osm lv_style_reset(&pthis->_style_title);
     }
+}
+
+bool LeleTabView::getShowTabs() const {
+  return _show_tabs;
+}
+void LeleTabView::setShowTabs(bool show) {
+  _show_tabs = show;
+}
+bool LeleTabView::getSelectedTabIndex() const {
+  return _selected_tab_index;
+}
+void LeleTabView::setSelectedTabIndex(int idx, bool animate) {
+  if(idx < 0 || idx >= _tabs->count()) {
+    LL(WARNING, LVSIM) << "Invalid index: " << idx << " is out of range: 0-" << _tabs->count();
+    return;
+  }
+  _selected_tab_index = idx;
+  lv_tabview_set_active(_lv_obj, _selected_tab_index, animate);
 }
