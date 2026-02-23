@@ -51,7 +51,7 @@ endfunction()
 function(buildFonts OUT_VAR_FONTS_OUTPUT)
     message(STATUS "buildFonts()")
 
-    set(FONTS_OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/res/fonts")
+    set(FONTS_OUTPUT "${CMAKE_BINARY_DIR}/fonts/ttf_to_lvf")
     add_custom_command(
         OUTPUT ${FONTS_OUTPUT}
         COMMAND ${CMAKE_COMMAND} -B ${CMAKE_BINARY_DIR}/fonts -S ${CMAKE_CURRENT_SOURCE_DIR}/font -DCMAKE_BUILD_TYPE=Release

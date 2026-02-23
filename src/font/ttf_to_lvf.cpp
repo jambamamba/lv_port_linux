@@ -26,12 +26,23 @@ namespace {
 
 const char *default_font = "/usr/local/src/libgd-gd-2.3.3/tests/freetype/DejaVuSans.ttf";
 
+void printCmdArgs(const std::string &cmd, const std::vector<char*> args) {
+    printf("@@@ cmd: %s ", cmd.c_str());
+    for(const auto &arg: args){
+        printf("%s ", arg);
+    }
+    printf("\n");
+}
 std::vector<std::string> split_string(const std::string& str_, char delimiter) {
+    // printf("@@@ split_string str: :%s\n", str_.c_str());
+    // printf("@@@ str.size():%zu\n", str_.size());
     std::string str(str_); // Create a local copy of the string
-    auto new_end = std::remove(str.begin(), str.end(), '\'');
-    str.erase(new_end, str.end());
-    new_end = std::remove(str.begin(), str.end(), '\n');
-    str.erase(new_end, str.end());
+    std::erase(str, '\'');
+    std::erase(str, '\n');
+    // auto new_end = std::remove(str.begin(), str.end(), '\'');
+    // str.erase(new_end, str.end());
+    // new_end = std::remove(str.begin(), str.end(), '\n');
+    // str.erase(new_end, str.end());
 
     std::vector<std::string> tokens;
     size_t start = 0;
@@ -39,6 +50,10 @@ std::vector<std::string> split_string(const std::string& str_, char delimiter) {
     while (end != std::string::npos) {
         tokens.push_back(str.substr(start, end - start));
         start = end + 1;
+        // printf("@@@  pushed token:%s, start: %zu\n", tokens.back().c_str(), start);
+        if(start >= str.size()) {
+            break;
+        }
         end = str.find(delimiter, start);
     }
     tokens.push_back(str.substr(start)); // Add the last token
@@ -46,26 +61,43 @@ std::vector<std::string> split_string(const std::string& str_, char delimiter) {
 }
 
 std::vector<std::string> getGlyphRanges(const std::string& output) {
+    // printf("@@@ getGlyphRanges output.size():%zu\n", output.size());
     std::vector<std::string> ranges;
     std::vector<std::string> lines = split_string(output, ' ');
+    // printf("@@@ parsing output: %s\nsplit into %zu lines\n", output.c_str(), lines.size());
     for(auto& line : lines) {
+        // printf("@@@ parsing line: %s\n", line.c_str());
         auto nums = split_string(line, '-');
 
         int idx = 0;
         std::string range;
+        int hex[2] = {0};
         for(auto& num : nums) {
             if(num.size()==0 || num.at(0) == '\n'){
                 continue;
             }
+            if(idx > 1) {
+                perror("Cannot have 3 in a range! Skipping...\n");
+                range.clear();
+                break;
+            }
+            // printf("@@@ idx: %i, num: 0x%s\n", idx, num.c_str());
+            hex[idx] = std::stoi(num.c_str(), nullptr, 16);
             if(idx > 0) {
                 // printf("-");
                 range += '-';
+                if(hex[idx] < hex[idx-1]) {
+                    printf("Second number in range cannot be less than first number! 0x%x-0x%x. Skipping...\n", hex[idx-1], hex[idx]);
+                    range.clear();
+                    break;
+                }
             }
             // printf("0x%s", num.c_str());
             range += "0x" + num;
             ++idx;
         }
         if(range.size()) {
+            // printf("@@@ add range: %s\n", range.c_str());
             // range.erase(std::remove(range.begin(), range.end(), '\n'), range.end());
             // range.erase(std::remove(range.begin(), range.end(), '\r'), range.end());
             // range.erase(std::remove(range.begin(), range.end(), ' '), range.end());
@@ -76,28 +108,20 @@ std::vector<std::string> getGlyphRanges(const std::string& output) {
     return ranges;
 }
 std::string dump_child_stdout(int fd) {
-    char buffer[1024];
-    ssize_t bytesRead;
     std::string output;
-    while ((bytesRead = read(fd, buffer, sizeof(buffer) - 1)) > 0) {
-        buffer[bytesRead] = '\0'; // Null-terminate the buffer
-        // printf("%s", buffer); // Print the output from the child process
-        for(int i = 0; i < bytesRead; ++i) {
-            if(buffer[i] == '\n') {
-                // output.push_back(' ');
-                // continue;
-                break;
-            }
-            if(buffer[i] == '\'') {
-                continue;
-            }
-            output.push_back(buffer[i]);
+    while(true) {
+        char byte = 0;
+        int res = read(fd, &byte, 1);
+        if(res <= 0) {
+            break;
         }
-        output.push_back(0);
-        // output += std::string(buffer);
-    }
-    if (bytesRead == -1) {
-        perror("read");
+        else if(byte == '\n') {
+            break;
+        }
+        else if(byte == 0) {
+            break;
+        }
+        output.push_back(byte);
     }
     close(fd); // Close the read end of the pipe after reading
     // printf("### output: %s\n", output.c_str());
@@ -108,7 +132,7 @@ std::vector<char*> makeFcQueryArgs(const std::string &font_file) {
     std::vector<std::string> args = {};
     args = {
         "fc-query",
-        "--format='%{charset}\n'",
+        "--format='%{charset}\\n'",
         font_file
     };
     static std::vector<std::vector<std::string>> fc_query_args;
@@ -143,7 +167,7 @@ std::string fcquery(const std::string &font_file = default_font) {
     // The child doesn't need the read end
     posix_spawn_file_actions_addclose(&action, out_pipe_fds[0]);
     
-    // posix_spawn(pid, path, file_actions, attrp, argv_, envp)
+    // printCmdArgs(cmd, args);
     int status = posix_spawn(&pid, cmd.c_str(), &action, nullptr, args.data(), environ);
     if (status != 0) {
         perror("posix_spawn");
@@ -243,6 +267,10 @@ std::optional<std::string> createLvFont(
 
     std::string cmd("/usr/local/bin/lv_font_conv");
     auto args = makeLvFontConvArgs(font_file, out_dir, ranges, font_size, bpp);
+    // for(const auto &arg: args) {
+    //     printf("* %s\n", arg);
+    // }
+    // exit(-1);//osm
 
     std::string out_file = outFileExists(args);
     if(out_file.size()) {
@@ -255,6 +283,7 @@ std::optional<std::string> createLvFont(
     posix_spawn_file_actions_init(&action);
     
     pid_t pid;
+    // printCmdArgs(cmd, args);
     int status = posix_spawn(&pid, cmd.c_str(), &action, nullptr, args.data(), environ);
     if (status != 0) {
         perror("posix_spawn");
@@ -339,6 +368,9 @@ int main(int argc, char *argv[]) {
     const auto [font_files, font_sizes, bpps, current_dir] = mainArgs(argc, argv);
     for(std::string font_file: font_files) {
         auto ranges = getGlyphRanges(fcquery(font_file));
+        // for(const auto &range: ranges) {
+        //     printf("%s\n", range.c_str());
+        // }
         for(std::string bpp: bpps) {
             std::vector<std::thread> threads;
             for(std::string font_size: font_sizes) {

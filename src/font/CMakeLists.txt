@@ -1,3 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_FLAGS "-stdlib=libstdc++ -std=stdc++23")
 project(ttf_to_lvf LANGUAGES CXX)
 add_executable(ttf_to_lvf ttf_to_lvf.cpp)

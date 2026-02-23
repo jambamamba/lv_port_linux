@@ -22,6 +22,8 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 //japanese fonts: sudo apt install -y fonts-noto-cjk
 //  /repos/lv_port_linux/src/res/fonts/.ttc/noto/NotoSansCJK-*.ttc
 //hindi/indian font: Devanagari
+//chinese fonts: sudo apt-get install -y fonts-noto-cjk
+//
 namespace {
 const std::unordered_map<std::string, std::string> _language_map = {
     {"ab", "Abkhazian"},

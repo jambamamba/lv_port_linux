@@ -20,7 +20,7 @@ def setFont(current_lang):
          current_lang == "Japanese" or
          current_lang == "Vietnamese" or
          current_lang == "Burmese"):
-      style.setValue({"font-family":"NotoSansCJKjp-Regular-Alphabetic-10"})
+      style.setValue({"font-family":"NotoSansSC-VariableFont_wght"})
    else:
       style.setValue({"font-family":"Ubuntu-B"})
    print(f"current_lang: {current_lang}")
