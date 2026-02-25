@@ -53,6 +53,8 @@ public:
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
   static bool visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback);
   static std::pair<int,int> getTextSize(lv_obj_t *lv_obj, const char *text);
+  void parseAttributes(
+      const std::vector<std::pair<std::string, std::string>> &json_tokens);
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr);
   virtual PyObject *createPyObject();
   virtual bool initPyObject(PyLeleObject *py_obj);
@@ -78,8 +80,6 @@ public:
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
 #endif
 protected:
-  void parseAttributes(
-      const std::vector<std::pair<std::string, std::string>> &json_tokens);
   void setFlexStyle();
 
   std::string _class_name = "N/A";

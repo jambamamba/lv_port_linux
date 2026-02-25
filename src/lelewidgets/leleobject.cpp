@@ -149,14 +149,15 @@ const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
 }
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
 
-    if(_id == "tab_content1" && key == "border/color") {
-      int x = 0;
-      x = 1;
-    }
   auto value = std::optional<LeleStyle::StyleValue>();
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
     if(value) {
+    if(_id == "tab_content1" && key == "border/color") {
+      int x = 0;
+      x = 1;
+      LL(DEBUG, LVSIM) << "@@@ getStyle: key:" << key << ", value:" << std::hex << std::get<int>(value.value());
+    }
       return value;
     }
   }

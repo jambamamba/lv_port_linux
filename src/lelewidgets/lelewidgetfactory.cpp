@@ -4,6 +4,7 @@
 #include <json/json_helper.h>
 #include <unistd.h>
 #include <tr/tr.h>
+#include <tuple>
 
 #include "graphics_backend.h"
 #include "lelebutton.h"
@@ -22,53 +23,6 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 namespace {
-std::pair<std::string,std::string> languageFromJson(const cJSON* json) {
-
-    std::string default_language("en");
-    std::string current_language("en");
-    cJSON *language = cJSON_GetObjectItem(json, "language");
-    if(language && cJSON_IsObject(language)) {
-        cJSON *obj = cJSON_GetObjectItem(language, "default");
-        if (cJSON_IsString(obj)) {
-            default_language = obj->valuestring;
-        }
-        obj = cJSON_GetObjectItem(language, "current");
-        if (cJSON_IsString(obj)) {
-            current_language = obj->valuestring;
-        }
-    }
-    return std::pair<std::string,std::string>(default_language, current_language);
-}
-
-std::pair<int,int> screenWidthHeightFromJson(const cJSON* json) {
-
-    int width = 800;
-    int height = 480;
-    cJSON *screen = cJSON_GetObjectItem(json, "screen");
-    if(screen && cJSON_IsObject(screen)) {
-        cJSON *obj = cJSON_GetObjectItem(screen, "width");
-        if (cJSON_IsNumber(obj)) {
-            width = obj->valueint;
-        }
-        else if (cJSON_IsString(obj)) {
-            char *value_str = obj->valuestring;
-            if(value_str) {
-                width = std::stoi(value_str);
-            }
-        }
-        obj = cJSON_GetObjectItem(screen, "height");
-        if (cJSON_IsNumber(obj)) {
-            height = obj->valueint;
-        }
-        else if (cJSON_IsString(obj)) {
-            char *value_str = obj->valuestring;
-            if(value_str) {
-                height = std::stoi(value_str);
-            }
-        }
-    }
-    return std::pair<int,int>(width, height);
-}
 
 const cJSON* jsonFromConfig(const std::string &config_json) {
 
@@ -90,8 +44,8 @@ const cJSON* jsonFromConfig(const std::string &config_json) {
     return root;
 }
 
-auto leleObjectsFromJson(LeleObject *parent, const std::string &json_str) {
-    auto nodes = LeleWidgetFactory::fromJson(parent, json_str);
+auto leleObjectsFromJson(LeleObject *parent, const std::vector<std::pair<std::string, std::string>> &json_tokens) {
+    auto nodes = LeleWidgetFactory::fromJson(parent, json_tokens);
     for (const auto &[key, node]: nodes) {
         LOG(DEBUG, LVSIM, "Process node with key: %s\n", key.c_str());
         if (std::holds_alternative<std::unique_ptr<LeleObject>>(node)) {
@@ -123,16 +77,38 @@ auto leleStylesFromJson(const std::string &json_str) {
     return styles;
 }
 
+std::string read_entire_file(const std::string& filepath) {
+    std::ifstream file(filepath);
+    if (!file.is_open()) {
+        LL(WARNING, LVSIM) << "Failed to open file: " << filepath;
+        return ""; // Or throw an exception
+    }
+    std::ostringstream stream;
+    stream << file.rdbuf();
+    return stream.str();
+}
+
 }//namespace
 
 namespace LeleWidgetFactory {
 
-std::vector<std::pair<std::string, std::string>> tokenizeJson(const std::string &json_str) {
+std::vector<std::pair<std::string, std::string>> tokenizeJson(const std::string &json_str_) {
+    std::string json_str(json_str_);
     std::vector<std::pair<std::string, std::string>> res;
     if(json_str.empty()) {
         return res;
     }
+    std::error_code ec;
+    if(std::filesystem::exists(json_str, ec)) {
+        LOG(DEBUG, LVSIM, "Loading JSON from file: '%s'.\n", json_str.c_str());
+        json_str = read_entire_file(json_str);
+    }
+
     cJSONRAII json(json_str);
+    if(!json()) {
+        LOG(FATAL, LVSIM, "Failed to load JSON: '%s'\n", json_str.c_str());
+        return res;
+    }
     cJSON *item = nullptr;
     int idx = 0;
     cJSON_ArrayForEach(item, json()) {
@@ -371,30 +347,64 @@ static void click_event_cb(lv_event_t * e)
     lv_indev_t * indev = (lv_indev_t *)lv_event_get_param(e);
     counts->short_click_streak = lv_indev_get_short_click_streak(indev);
 }
+auto parseAttributes(
+    const std::vector<std::pair<std::string, std::string>> &json_tokens) {
+
+    float version = 1.0;
+    int screen_width = 800;
+    int screen_height = 480;
+    std::string default_language("en");
+    std::string current_language("en");
+
+    for(const auto &[lhs, rhs]: json_tokens) {
+        if(lhs == "version") {
+            version = std::stof(rhs);
+        }
+        else if(lhs == "screen") {
+            const auto &tokens = LeleWidgetFactory::tokenizeJson(rhs);
+            for(const auto &[lhs, rhs]: tokens) {
+                if(lhs == "width") {
+                    screen_width = std::stoi(rhs);
+                }
+                else if(lhs == "height") {
+                    screen_height = std::stoi(rhs);
+                }
+            }
+        }
+        else if(lhs == "language") {
+            const auto &tokens = LeleWidgetFactory::tokenizeJson(rhs);
+            for(const auto &[lhs, rhs]: tokens) {
+                if(lhs == "default") {
+                    default_language = rhs;
+                }
+                else if(lhs == "current") {
+                    current_language = rhs;
+                }
+            }
+        }
+    }
+    return std::tuple<float, int, int, std::string, std::string>{version, screen_width, screen_height, default_language, current_language};
+}
 
 }//namespace
 std::vector<std::pair<std::string, Node>> fromConfig(
     LeleObject *parent,
     const std::string &config) {
 
-    const cJSON* json = jsonFromConfig(config);
-    if(!json) {
-        LOG(WARNING, LVSIM, "Failed to parse config");
-        return std::vector<std::pair<std::string, Node>>();
-    }
-    auto [width, height] = screenWidthHeightFromJson(json);
-    if(!GraphicsBackend::getInstance().load(width, height)) {
-        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
-        return std::vector<std::pair<std::string, Node>>();
-    }
-    auto [default_language, current_language] = languageFromJson(json);
-    LeleLanguage::getLeleLanguage().setDefaultLanguage(default_language);
-    LeleLanguage::getLeleLanguage().setCurrentLanguage(current_language);
+    float version = 1.0;
+    int screen_width = 800;
+    int screen_height = 480;
+    std::string default_language("en");
+    std::string current_language("en");
 
+    const auto &tokens = tokenizeJson(config);
     if(!parent->getLvObj()) {
-        static click_counts counts;
         parent->setId("ROOT");
         parent->setLvObj(lv_screen_active());
+        parent->parseAttributes(tokens);
+        std::tie(version, screen_width, screen_height, default_language, current_language) = 
+            parseAttributes(tokens);
+        static click_counts counts;
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SHORT_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SINGLE_CLICKED, &counts);
@@ -402,7 +412,15 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
     }
-    return leleObjectsFromJson(parent, cJSON_Print(json));
+
+    if(!GraphicsBackend::getInstance().load(screen_width, screen_height)) {
+        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
+        return std::vector<std::pair<std::string, Node>>();
+    }
+    LeleLanguage::getLeleLanguage().setDefaultLanguage(default_language);
+    LeleLanguage::getLeleLanguage().setCurrentLanguage(current_language);
+
+    return leleObjectsFromJson(parent, tokens);
 }
 
 std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(

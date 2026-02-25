@@ -1,12 +1,13 @@
 #!/bin/bash
 set -xeuo pipefail #better for bash debugging
+script_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 #todo:
 #load bgcolor of tabview from json
 #show icons in tabs
 
-source share/pins.txt
-source share/scripts/helper-functions.sh
+source ${script_dir}/share/pins.txt
+source ${script_dir}/share/scripts/helper-functions.sh
 
 # Now done in cmake:
 # function buildpy() {
@@ -50,7 +51,8 @@ cmake -G Ninja\
 }
 
 function run() {
-    local example="imageview" # hello-world | hello-world-international | imageview | messagebox | stackview | tabview | testview
+    pushd ${script_dir}
+    local example="imageview" # hello-world | hello-world-international |  | messagebox | stackview | tabview | testview
     local method="elfpy" # elfpy | elf | py
     local debug="true"
     export LD_LIBRARY_PATH="/usr/local/lib"
@@ -77,8 +79,9 @@ function run() {
             ;;
         *);;
     esac
-    popd
+    popd #./src/examples/${example}/
+    popd #script dir
 }
 
-# buildelf $@ |tee x86-build/build.log
+buildelf $@ |tee x86-build/build.log
 run
