@@ -23,23 +23,28 @@ LeleObject::~LeleObject() {
     // lv_style_reset(&_style);
 }
 
+void LeleObject::parseAttributes(
+    const std::vector<std::pair<std::string, std::string>> &json_tokens) {
+
+    for(const auto &[lhs, rhs]: json_tokens) {
+        if(lhs == "id") {
+          _id = rhs;
+        }
+        else if(lhs == "enabled") {
+          _enabled = (rhs == "true");
+        }
+        else if(lhs == "style") {
+          _lele_styles.emplace_back(
+              std::make_unique<LeleStyle>(this, rhs));
+        }
+    }
+}
+
 bool LeleObject::fromJson(const std::string &json_str) {
 
   auto json_tokens = LeleWidgetFactory::tokenizeJson(json_str);
-  _lele_styles = LeleWidgetFactory::stylesFromJson(this, json_tokens);
-
+  parseAttributes(json_tokens);
   _nodes = LeleWidgetFactory::fromJson(this, json_tokens);
-  for (const auto &[key, token]: _nodes) {
-    if (std::holds_alternative<std::string>(token)) {
-      const std::string &value = std::get<std::string>(token);
-      if(key == "id") {
-        _id = value;
-      }
-      else if(key == "enabled") {
-        _enabled = (value == "true");
-      }
-    }
-  }
   return true;
 }
 
@@ -144,13 +149,21 @@ const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
 }
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
 
+    if(_id == "tab_content1" && key == "border/color") {
+      int x = 0;
+      x = 1;
+    }
+  auto value = std::optional<LeleStyle::StyleValue>();
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    auto value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
+    value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
     if(value) {
       return value;
     }
   }
-  return std::optional<LeleStyle::StyleValue>();
+  if(_lele_parent) {
+    value = _lele_parent->getStyle(key, class_name);
+  }
+  return value;
 }
 
 bool LeleObject::visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback) {

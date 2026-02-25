@@ -78,6 +78,8 @@ public:
   static PyObject* createPyEnum(const std::string &enum_name, const std::map<std::string,int> &&enum_map);
 #endif
 protected:
+  void parseAttributes(
+      const std::vector<std::pair<std::string, std::string>> &json_tokens);
   void setFlexStyle();
 
   std::string _class_name = "N/A";

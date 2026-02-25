@@ -177,21 +177,6 @@ std::vector<std::pair<std::string, std::string>> tokenizeJson(const std::string 
     return res;
 }
 
-std::vector<std::unique_ptr<LeleStyle>> stylesFromJson(
-    LeleObject *lele_obj,
-    const std::vector<std::pair<std::string, std::string>> &json_tokens) {
-
-    std::vector<std::unique_ptr<LeleStyle>> res;
-    for(const auto &[lhs, rhs]: json_tokens) {
-        if(lhs != "style") {
-            continue;
-        }
-        res.emplace_back(
-            std::make_unique<LeleStyle>(lele_obj, rhs));
-    }
-    return res;
-}
-
 std::vector<std::pair<std::string, Node>> fromJson(
     const std::string &json_str) {
 

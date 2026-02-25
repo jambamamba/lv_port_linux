@@ -6,16 +6,16 @@
         "type": "lldb",
         "program": "${workspaceFolder}/x86-build/bin/lvglsim",
         // "cwd": "${workspaceFolder}/src/examples/stackview",
-        // "cwd": "${workspaceFolder}/src/examples/tabview",
+        "cwd": "${workspaceFolder}/src/examples/tabview",
         // "cwd": "${workspaceFolder}/src/examples/imageview",
         // "cwd": "${workspaceFolder}/src/examples/hello-world",
-        "cwd": "${workspaceFolder}/src/examples/hello-world-international",
+        // "cwd": "${workspaceFolder}/src/examples/hello-world-international",
         "args": [
             // "${workspaceFolder}/src/examples/stackview/stackview.py",
-            // "${workspaceFolder}/src/examples/tabview/tabview.py",
+            "${workspaceFolder}/src/examples/tabview/tabview.py",
             // "${workspaceFolder}/src/examples/imageview/imageview.py",
             // "${workspaceFolder}/src/examples/hello-world/hello-world.py"
-            "${workspaceFolder}/src/examples/hello-world-international/hello-world-international.py"
+            // "${workspaceFolder}/src/examples/hello-world-international/hello-world-international.py"
         ],
         "env":{
             "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/ ",
