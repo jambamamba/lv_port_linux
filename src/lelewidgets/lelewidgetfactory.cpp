@@ -106,7 +106,7 @@ std::vector<std::pair<std::string, std::string>> tokenizeJson(const std::string 
 
     cJSONRAII json(json_str);
     if(!json()) {
-        LOG(FATAL, LVSIM, "Failed to load JSON: '%s'\n", json_str.c_str());
+        LOG(WARNING, LVSIM, "Not valid JSON: '%s'\n", json_str.c_str());
         return res;
     }
     cJSON *item = nullptr;
@@ -399,18 +399,8 @@ std::vector<std::pair<std::string, Node>> fromConfig(
 
     const auto &tokens = tokenizeJson(config);
     if(!parent->getLvObj()) {
-        parent->setId("ROOT");
-        parent->setLvObj(lv_screen_active());
-        parent->parseAttributes(tokens);
         std::tie(version, screen_width, screen_height, default_language, current_language) = 
             parseAttributes(tokens);
-        static click_counts counts;
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_CLICKED, &counts);
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SHORT_CLICKED, &counts);
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SINGLE_CLICKED, &counts);
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_DOUBLE_CLICKED, &counts);
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
-        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
     }
 
     if(!GraphicsBackend::getInstance().load(screen_width, screen_height)) {
@@ -420,6 +410,18 @@ std::vector<std::pair<std::string, Node>> fromConfig(
     LeleLanguage::getLeleLanguage().setDefaultLanguage(default_language);
     LeleLanguage::getLeleLanguage().setCurrentLanguage(current_language);
 
+    if(!parent->getLvObj()) {
+        parent->setId("ROOT");
+        parent->setLvObj(lv_screen_active());
+        parent->parseAttributes(tokens);
+        static click_counts counts;
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SHORT_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_SINGLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_DOUBLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
+        lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
+    }
     return leleObjectsFromJson(parent, tokens);
 }
 

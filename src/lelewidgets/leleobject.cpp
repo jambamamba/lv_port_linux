@@ -147,22 +147,28 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
 const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
-std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name_) const {
 
   auto value = std::optional<LeleStyle::StyleValue>();
+  std::vector<std::string> class_names;
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    value = lele_style->getValue(key, class_name.empty() ? lele_style->getClassName() : class_name);
-    if(value) {
-    if(_id == "tab_content1" && key == "border/color") {
-      int x = 0;
-      x = 1;
-      LL(DEBUG, LVSIM) << "@@@ getStyle: key:" << key << ", value:" << std::hex << std::get<int>(value.value());
+    std::string class_name(class_name_);
+    if(class_name.empty()) {
+      class_name = lele_style->getClassName();
+      class_names.push_back(class_name);
     }
+    value = lele_style->getValue(key, class_name);
+    if(value) {
+      if(_id == "tab_content2" && key == "bgcolor") {
+        int x = 0;
+        x = 1;
+        LL(DEBUG, LVSIM) << "@@@ getStyle: key:" << key << ", class_name:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
+      }
       return value;
     }
   }
-  if(_lele_parent) {
-    value = _lele_parent->getStyle(key, class_name);
+  if(_lele_parent && class_names.empty()) {
+    value = _lele_parent->getStyle(key, class_name_);
   }
   return value;
 }
