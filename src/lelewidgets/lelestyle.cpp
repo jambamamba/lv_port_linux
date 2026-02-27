@@ -12,7 +12,7 @@
 LOG_CATEGORY(LVSIM, "LVSIM");
 
 std::unordered_set<std::string> LeleStyle::_style_keys = {
-   "class_name",
+   "class",
    "id",
    "x",
    "y",
@@ -336,8 +336,8 @@ std::tuple<int,int,int,int> LeleStyle::parsePaddingOrMargin(const std::string &p
   return std::tuple<int,int,int,int>{top,right,bottom,left};
 }
 
-std::string LeleStyle::getClassName() const {
-  return _class_name;
+std::string LeleStyle::getClass() const {
+  return _class;
 }
 
 const std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleStyle::getStyle() const {
@@ -346,7 +346,7 @@ const std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleStyle::get
 
 std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
   // LL(DEBUG, LVSIM) << "@@@ KEY: " << key;
-  if(class_name == _class_name){//} || _class_name.empty()) {
+  if(class_name == _class){// || _class.empty()) {//osm
     auto it = _style.find(key);
     if(it != _style.end() && it->second) {
       return it->second;
@@ -370,8 +370,8 @@ bool LeleStyle::setValue(
       LL(FATAL, LVSIM) << "No such key '" << key << "' exists for styles";
       return false;
     }
-    else if(key == "class_name") {
-        _class_name = value;
+    else if(key == "class") {
+        _class = value;
     }
     else if(key == "id") {
         _id = value;
@@ -614,7 +614,6 @@ const LeleObject *LeleStyle::getLeleObject() const {
 std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
     os << "LeleStyle id: " << p._id << ", {";
     // os << "parent:" << (p._lele_obj ? p._lele_obj->id() : "") << ",";
-    // os << "parent class name:" << (p._lele_obj ? p._lele_obj->className() : "") << ",";
     for(const auto [style, value]: p._style) {
       if(value.has_value()) {
         os << style << ":";
@@ -638,7 +637,6 @@ std::ostream& operator<<(std::ostream& os, const LeleStyle& p) {
 // std::ostream& operator<<(std::ostream& os, const LeleStyles& p) {
 //     // os << "LeleStyles id: " << p._id << ", ";
 //     // os << "parent:" << (p._lele_obj ? p._lele_obj->id() : "") << ",";
-//     // os << "parent class name:" << (p._lele_obj ? p._lele_obj->className() : "") << ",";
 //     os << "\nStyles {\n";
 //     for(const LeleStyle *lele_style : p._lele_styles) {
 //       os << "\t" << *lele_style << ",\n";

@@ -36,7 +36,8 @@ public:
   virtual ~LeleObject();
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
-  const std::string &className() const;
+  const std::string &getClass() const;
+  const std::string &getType() const;
   const std::string &getId() const;
   void setId(const std::string &id);
 
@@ -82,7 +83,8 @@ public:
 protected:
   void setFlexStyle();
 
-  std::string _class_name = "N/A";
+  std::string _class = "";
+  std::string _type = "N/A";
   std::string _id;
   bool _enabled = true;
   lv_obj_t *_lv_obj = nullptr;
@@ -109,10 +111,12 @@ struct PyLeleObject {
     // Type-specific fields go here
     LeleObject *_lele_obj = nullptr;
     PyObject *_id = nullptr;
-    PyObject *_class_name = nullptr;
+    PyObject *_class = nullptr;
+    PyObject *_type = nullptr;
     static PyObject *addChild(PyObject *, PyObject *);
     static PyObject *fromConfig(PyObject *, PyObject *);
-    static PyObject *getClassName(PyObject *, PyObject *);
+    static PyObject *getType(PyObject *, PyObject *);
+    static PyObject *getClass(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
     static PyObject *getStyle(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
@@ -126,7 +130,8 @@ struct PyLeleObject {
 #define PY_LELEOBJECT_METHODS() \
   {"addChild", (PyCFunction)PyLeleObject::addChild, METH_VARARGS, "Adds one more more children from a configuration file with JSON description of the object"},\
   {"fromConfig", (PyCFunction)PyLeleObject::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
-  {"getClassName", (PyCFunction)PyLeleObject::getClassName, METH_NOARGS, "Get the class name"},\
+  {"getClass", (PyCFunction)PyLeleObject::getClass, METH_NOARGS, "Get the class name"},\
+  {"getType", (PyCFunction)PyLeleObject::getType, METH_NOARGS, "Get the object type"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
   {"getStyle", (PyCFunction)PyLeleObject::getStyle, METH_VARARGS, "Get the style attributes for this object"},\
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\

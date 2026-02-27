@@ -6,7 +6,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleLabel::LeleLabel(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
-  _class_name = __func__;
+  _type = __func__;
   fromJson(json_str);
 }
 

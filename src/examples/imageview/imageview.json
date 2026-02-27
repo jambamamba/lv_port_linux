@@ -1,7 +1,7 @@
 {
     "screen":{"width":"1024","height":"768"},
-    "style":{"id":"button0","class_name":"button0","border":"solid-1px-#ccc","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
-    "style":{"id":"slider0","class_name":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
+    "style":{"id":"button0","class":"button0","border":"solid-1px-#ccc","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
+    "style":{"id":"slider0","class":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
         "style":{"id":"view/global","padding":"none","margin":"none","flex":{"flow":"column"},
@@ -19,7 +19,7 @@
                 "xsize":{"x":"20%","y":"20%"},
                 "xsize":"100",
                 "xrotation":{"angle":"30","pivot":{"x":"0","y":"0"}},
-                "style":{"id":"img","class_name":"view/global","x":"0","y":"0","width":"78%","height":"100%","scrollbar":"off",
+                "style":{"id":"img","class":"view/global","x":"0","y":"0","width":"78%","height":"100%","scrollbar":"off",
                     "background":{
                         "image":"res/pumpkin-man.png",
                         "#image":"res/rgba.png",
@@ -137,7 +137,7 @@
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","class_name":"button0",
+                "style":{"id":"button0","class":"button0",
                     "flex":{"flow":"row","justify-content":"center","align-items":"center"},
                     "align":"center",
                     "width":"20%","height":"95%",

@@ -27,9 +27,9 @@ bool LeleStyle::initPyObject(PyLeleStyle *py_obj) {
     if (py_obj->_id == nullptr) {
         return false;
     }
-    py_obj->_class_name = PyUnicode_FromString(
-        _class_name.size() ? _class_name.c_str() : "");
-    if (py_obj->_class_name == nullptr) {
+    py_obj->_class = PyUnicode_FromString(
+        _class.size() ? _class.c_str() : "");
+    if (py_obj->_class == nullptr) {
         return false;
     }
     py_obj->_layout = reinterpret_cast<PyObject *>(&PyLeleStyleLayout::_obj_type);
@@ -102,7 +102,7 @@ void PyLeleStyle::onfree(PyObject *self_) {
 void PyLeleStyle::dealloc(PyObject* self_) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
     Py_XDECREF(self->_id);
-    Py_XDECREF(self->_class_name);
+    Py_XDECREF(self->_class);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -136,13 +136,13 @@ PyObject *PyLeleStyle::fromConfig(PyObject *self_, PyObject *args) {
     return reinterpret_cast<PyObject*>(self);
 }
 
-PyObject *PyLeleStyle::getClassName(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleStyle::getClass(PyObject *self_, PyObject *arg) {
     PyLeleStyle *self = reinterpret_cast<PyLeleStyle *>(self_);
-    if (!self->_class_name) {
-        PyErr_SetString(PyExc_AttributeError, "class_name");
+    if (!self->_class) {
+        PyErr_SetString(PyExc_AttributeError, "class");
         return Py_None;
     }
-    return self->_class_name;
+    return self->_class;
 }
 
 namespace {

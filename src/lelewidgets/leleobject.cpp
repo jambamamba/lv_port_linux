@@ -14,7 +14,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleObject::LeleObject(LeleObject *parent, const std::string &json_str)
   : _lele_parent(parent), 
-  _class_name(__func__ ) {
+  _type(__func__ ) {
   fromJson(json_str);
   // std::cout << "styles:" << _lele_styles << "\n";
 }
@@ -29,6 +29,9 @@ void LeleObject::parseAttributes(
     for(const auto &[lhs, rhs]: json_tokens) {
         if(lhs == "id") {
           _id = rhs;
+        }
+        else if(lhs == "class") {
+          _class = rhs;
         }
         else if(lhs == "enabled") {
           _enabled = (rhs == "true");
@@ -48,8 +51,11 @@ bool LeleObject::fromJson(const std::string &json_str) {
   return true;
 }
 
-const std::string &LeleObject::className() const {
-  return _class_name;
+const std::string &LeleObject::getClass() const {
+  return _class;
+}
+const std::string &LeleObject::getType() const {
+  return _type;
 }
 const std::string &LeleObject::getId() const {
   return _id;
@@ -135,7 +141,7 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
       keys.push_back(key);
     }
     for(const auto &key : keys) {
-      auto value = lele_style->getValue(key, lele_style->getClassName());
+      auto value = lele_style->getValue(key, lele_style->getClass());
       if(value && ret.find(key) == ret.end()) {
         ret[key] = value;
       }
@@ -147,28 +153,30 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
 const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
-std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name_) const {
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
 
+  if(_id == "tab_content1" && key == "width") {
+    int x = 0;
+    x = 1;
+  }
   auto value = std::optional<LeleStyle::StyleValue>();
-  std::vector<std::string> class_names;
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    std::string class_name(class_name_);
-    if(class_name.empty()) {
-      class_name = lele_style->getClassName();
-      class_names.push_back(class_name);
-    }
-    value = lele_style->getValue(key, class_name);
+    value = lele_style->getValue(key, class_name.empty() ? _class : class_name);
     if(value) {
-      if(_id == "tab_content2" && key == "bgcolor") {
-        int x = 0;
-        x = 1;
-        LL(DEBUG, LVSIM) << "@@@ getStyle: key:" << key << ", class_name:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
-      }
+      // if(_id == "tab_content1") {
+      //   LL(WARNING, LVSIM) << "@@@ getStyle: key:" << key << ", class:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
+      // }
       return value;
     }
   }
-  if(_lele_parent && class_names.empty()) {
-    value = _lele_parent->getStyle(key, class_name_);
+  if(!_lele_parent) {
+    return value;
+  }
+  value = _lele_parent->getStyle(key, class_name.empty() ? _class : class_name);
+  if(value) {
+    // if(_id == "tab_content1") {
+    //   LL(WARNING, LVSIM) << "@@@ getStyle: key:" << key << ", class:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
+    // }
   }
   return value;
 }
@@ -194,7 +202,7 @@ LeleObject::getBackgroundStyle(const std::string &class_name) const {
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     for(const std::string &key : lele_style->getBackgroundAttributesAsOrderedInJson()) {
       std::string bg_key("background/" + key);
-      auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClassName() : class_name);
+      auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClass() : class_name);
       if(value && bg_style.find(bg_key) == bg_style.end()) {
         bg_style[bg_key] = value;
         bg_keys.push_back(bg_key);
@@ -524,8 +532,8 @@ void LeleObject::EventCallback(lv_event_t *e) {
     if(base) {
       // LL(DEBUG, LVSIM) << "LeleObject::eventCallback " <<
       //   "id:" << base->id() << 
-      //   ", class_name: " << base->className() <<
-      //   ", _lele_parent: " << base->getParent()->className() <<
+      //   ", class_name: " << base->getCxxClass() <<
+      //   ", _lele_parent: " << base->getParent()->getCxxClass() <<
       //   ", event_code: " << e->code <<
       //   " " << lv_event_code_get_name(e->code);
       base->eventCallback(LeleEvent(e, base));
@@ -554,7 +562,7 @@ void LeleObject::show() {
 
 bool LeleObject::eventCallback(LeleEvent &&e) {
   // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s, code:[0x%x]%s,\n", 
-  //   _id.c_str(), _class_name.c_str(), _lele_parent ? _lele_parent->className().c_str() : "", 
+  //   _id.c_str(), _type.c_str(), _lele_parent ? _lele_parent->getCxxClass().c_str() : "", 
   //   e.getLvEvent()->code, lv_event_code_get_name(e.getLvEvent()->code));
   for(auto *py_callback:_py_callbacks) {
     if(!pyCallback(py_callback, std::move(e))) {
@@ -572,7 +580,7 @@ void LeleObject::addEventHandler(PyObject *py_callback) {
 std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     // os << "LeleStyles id: " << p._id << ", ";
     os << "_id:" << p._id << ",";
-    os << "_class_name:" << p._class_name << ",";
+    os << "_class:" << p._class << ",";
     os << "\nStyles {\n";
     for(const auto &lele_style : p._lele_styles) {
       os << lele_style.get();

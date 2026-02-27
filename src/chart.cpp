@@ -31,7 +31,7 @@ struct ChartSeriesContext {
 };
 
 struct ChartContext {
-  std::string _class_name;
+  std::string _type;
   std::vector<std::string> _xlabels;
   std::vector<std::string> _ylabels;
   std::string _update_timer_function;
@@ -143,7 +143,7 @@ ChartContext::ChartContext(
     int num_series, 
     int update_hz
   )
-  : _class_name(id)
+  : _type(id)
   , _xlabels(xlabels)
   , _ylabels(ylabels)
   , _update_timer_function(update_timer_function)

@@ -7,7 +7,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 ////////////////////////////////////////////////////////////////////////
 LeleViews::LeleViews(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
-    _class_name = __func__ ;//
+    _type = __func__ ;//
     LOG(DEBUG, LVSIM, "LeleViews json_str:%s\n", json_str.c_str());
     fromJson(json_str);
 }
@@ -62,7 +62,7 @@ void LeleViews::hide(){
 ////////////////////////////////////////////////////////////////////////
 LeleViewHeader::LeleViewHeader(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
-    _class_name = __func__ ;//
+    _type = __func__ ;//
     fromJson(json_str);
 }
 bool LeleViewHeader::fromJson(const std::string &json_str) {
@@ -97,7 +97,7 @@ lv_obj_t *LeleViewHeader::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 
 LeleView::LeleView(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
-    _class_name = __func__ ;//
+    _type = __func__ ;//
     fromJson(json_str);
 }
 bool LeleView::fromJson(const std::string &json_str) {
@@ -127,7 +127,7 @@ bool LeleView::eventCallback(LeleEvent &&e) {
       return false;
     }
     LeleObject *base = static_cast<LeleObject*>(lv_event->user_data);
-    // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->className().c_str());
+    // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->getCxxClass().c_str());
     
     //uncheck all other buttons in the group, only one button should be checked at a time
     lv_obj_t *container = (lv_obj_t *)lv_event_get_current_target(lv_event);//get the object to which an event was sent. I.e. the object whose event handler is being called.
@@ -143,7 +143,7 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     lv_obj_add_state(act_cb, LV_STATE_CHECKED);
     _active_child_idx = lv_obj_get_index(act_cb);
 
-    // LOG(DEBUG, LVSIM, "_lele_parent %s\n", _lele_parent->className().c_str());
+    // LOG(DEBUG, LVSIM, "_lele_parent %s\n", _lele_parent->getCxxClass().c_str());
     return LeleObject::eventCallback(std::move(e));
 }
 ////////////////////////////////////////////////////////////////////////

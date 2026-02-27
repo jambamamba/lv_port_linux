@@ -20,7 +20,7 @@ def setAngleMethod2(theta):
       obj = lele.getObjectById("/view/with_bg_img")
       style = obj.getStyle("img")
       # print(f"@@@py style {style}")
-      # print(f"@@@py style.className() {style.getClassName()}")
+      # print(f"@@@py style.getCxxClass() {style.getCxxClass()}")
       # print(f"@@@py style.getValue() {style.getValue()}")
       dic = obj.getStyle()
       print(f"@@@py style.dic0  {dic}")

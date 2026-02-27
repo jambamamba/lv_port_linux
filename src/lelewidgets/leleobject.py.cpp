@@ -23,9 +23,14 @@ bool LeleObject::initPyObject(PyLeleObject *py_obj) {
     if (py_obj->_id == nullptr) {
         return false;
     }
-    py_obj->_class_name = PyUnicode_FromString(
-        _class_name.size() ? _class_name.c_str() : "");
-    if (py_obj->_class_name == nullptr) {
+    py_obj->_class = PyUnicode_FromString(
+        _class.size() ? _class.c_str() : "");
+    if (py_obj->_class == nullptr) {
+        return false;
+    }
+    py_obj->_type = PyUnicode_FromString(
+        _type.size() ? _type.c_str() : "");
+    if (py_obj->_type == nullptr) {
         return false;
     }
     return true;
@@ -196,7 +201,8 @@ int PyLeleObject::init(PyObject *self_, PyObject *args, PyObject *kwds) {
 void PyLeleObject::dealloc(PyObject* self_) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     Py_XDECREF(self->_id);
-    Py_XDECREF(self->_class_name);
+    Py_XDECREF(self->_class);
+    Py_XDECREF(self->_type);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
@@ -302,13 +308,22 @@ PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
     return reinterpret_cast<PyObject *>(self_);
 }
 
-PyObject *PyLeleObject::getClassName(PyObject *self_, PyObject *arg) {
+PyObject *PyLeleObject::getClass(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
-    if (!self->_class_name) {
-        PyErr_SetString(PyExc_AttributeError, "class_name");
+    if (!self->_class) {
+        PyErr_SetString(PyExc_AttributeError, "class");
         return Py_None;
     }
-    return self->_class_name;
+    return self->_class;
+}
+
+PyObject *PyLeleObject::getType(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    if (!self->_type) {
+        PyErr_SetString(PyExc_AttributeError, "type");
+        return Py_None;
+    }
+    return self->_type;
 }
 
 PyObject *PyLeleObject::getParent(PyObject *self_, PyObject *arg) {

@@ -29,7 +29,6 @@ public:
 protected:
   void parseArgs(const std::string &json_str);
 
-  std::string _class_name;
   std::string _id;
   std::string _type;
   std::string _action;

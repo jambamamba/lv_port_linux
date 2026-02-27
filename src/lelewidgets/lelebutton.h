@@ -48,11 +48,11 @@ class LeleButtons : public LeleObject {
     // void setEndValue(int value) { _end_value = value; }
     int getRotation() const { return _rotation; }
     // void setRotation(int value) { _rotation = value; }
-    Type getType() const { return _type; }
+    Type getType() const { return _button_type; }
     protected:
     bool _checkable = false;
     bool _checked = false;
-    Type _type = Type::Push;
+    Type _button_type = Type::Push;
     int _min = 0;
     int _max = 100;
     mutable int _value = 0;

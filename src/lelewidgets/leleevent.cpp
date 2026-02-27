@@ -6,7 +6,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 
 LeleEvent::LeleEvent(const std::string &json_str) {
 
-  _class_name = __func__ ;//typeid(this).name();
+  _type = __func__ ;//typeid(this).name();
   fromJson(json_str);
 }
 bool LeleEvent::fromJson(const std::string &json_str) {

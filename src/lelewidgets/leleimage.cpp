@@ -5,7 +5,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleImage::LeleImage(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
 
-  _class_name = __func__ ;//typeid(this).name();
+  _type = __func__ ;//typeid(this).name();
   fromJson(json_str);
 }
 

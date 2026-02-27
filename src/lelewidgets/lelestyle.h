@@ -43,8 +43,8 @@ public:
   void parseFlex(const std::string &value);
   static int parsePercentValue(const std::string &x, int parent_x);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
-  std::string getClassName() const;
-  std::optional<StyleValue> getValue(const std::string &key, const std::string &class_name = "") const;
+  std::string getClass() const;
+  std::optional<StyleValue> getValue(const std::string &key, const std::string &class_ = "") const;
   bool setValue(const std::string &key, const std::string &value);
   std::vector<std::string> getBackgroundAttributesAsOrderedInJson() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;
@@ -59,7 +59,7 @@ protected:
   std::tuple<std::string,std::string,std::string,std::string> parseTopRightBottomLeft(const std::string &value);
 
   LeleObject *_lele_obj = nullptr;
-  std::string _class_name;
+  std::string _class;
   std::string _id;
   std::map<std::string, std::optional<StyleValue>> _style = {};
   mutable std::vector<std::string> _background_attributes_as_ordered_in_json;
@@ -84,13 +84,13 @@ struct PyLeleStyle {
     std::vector<std::unique_ptr<LeleStyle>> _lele_styles;
     LeleStyle* _lele_style = nullptr;
     PyObject *_id = nullptr;
-    PyObject *_class_name = nullptr;
+    PyObject *_class = nullptr;
     PyObject *_layout = nullptr;
     PyObject *_flow = nullptr;
     PyObject *_scrollbar = nullptr;
     PyObject *_border = nullptr;
     static PyObject *fromConfig(PyObject *, PyObject *);
-    static PyObject *getClassName(PyObject *, PyObject *);
+    static PyObject *getClass(PyObject *, PyObject *);
     static PyObject *getValue(PyObject *, PyObject *);
     static PyObject *setValue(PyObject *, PyObject *);
 };
@@ -104,7 +104,7 @@ struct PyLeleStyle {
 
 #define PY_LELESTYLE_METHODS() \
   {"fromConfig", (PyCFunction)PyLeleStyle::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
-  {"getClassName", (PyCFunction)PyLeleStyle::getClassName, METH_NOARGS, "Get the class name"},\
+  {"getClass", (PyCFunction)PyLeleStyle::getClass, METH_NOARGS, "Get the class name"},\
   {"getValue", (PyCFunction)PyLeleStyle::getValue, METH_VARARGS, "Get a dictionary with the style's attribute/value pairs"},\
   {"setValue", (PyCFunction)PyLeleStyle::setValue, METH_VARARGS, "Set the style from a dictionary containing the style's attribute/value pairs"},\
 

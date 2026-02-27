@@ -9,7 +9,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleMessageBox::LeleMessageBox(LeleObject *parent, const std::string &json_str)
   : LeleLabel(parent, json_str) {
 
-  _class_name = __func__ ;//typeid(this).name();
+  _type = __func__ ;//typeid(this).name();
   fromJson(json_str);
 }
 bool LeleMessageBox::fromJson(const std::string &json_str) {
@@ -81,12 +81,12 @@ LeleButtons::LeleButton *LeleMessageBox::getButtonClicked() const {
 
 bool LeleMessageBox::eventCallback(LeleEvent &&e) {
     LOG(DEBUG, LVSIM, "LeleMessageBox::eventCallback, class:%s, btn_clicked.id:%s\n", 
-      _class_name.c_str(), _btn_clicked ? _btn_clicked->getId().c_str() : "");
+      _type.c_str(), _btn_clicked ? _btn_clicked->getId().c_str() : "");
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
 
     if(code == LV_EVENT_CLICKED) {
-        LOG(DEBUG, LVSIM, "%s: clicked\n", _class_name.c_str());
+        LOG(DEBUG, LVSIM, "%s: clicked\n", _type.c_str());
         for(LeleEvent *event: _events) {
           if(event->getType() == "clicked"){
             event->setTargetObj(e.getTargetObj());

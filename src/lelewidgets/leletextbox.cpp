@@ -7,7 +7,7 @@ LOG_CATEGORY(LVSIM, "LVSIM");
 LeleTextbox::LeleTextbox(LeleObject *parent, const std::string &json_str)
   : LeleObject(parent, json_str) {
 
-  _class_name = __func__ ;//
+  _type = __func__ ;//
   fromJson(json_str);
 }
 bool LeleTextbox::fromJson(const std::string &json_str) {
