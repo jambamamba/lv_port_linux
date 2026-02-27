@@ -19,7 +19,8 @@
                 "xsize":{"x":"20%","y":"20%"},
                 "xsize":"100",
                 "xrotation":{"angle":"30","pivot":{"x":"0","y":"0"}},
-                "style":{"id":"img","class":"view/global","x":"0","y":"0","width":"78%","height":"100%","scrollbar":"off",
+                "class":"view/global",
+                "style":{"id":"img","x":"0","y":"0","width":"78%","height":"100%","scrollbar":"off",
                     "background":{
                         "image":"res/pumpkin-man.png",
                         "#image":"res/rgba.png",
@@ -137,7 +138,8 @@
             "button":{
                 "id":"run_test",
                 "type":"push",
-                "style":{"id":"button0","class":"button0",
+                "class":"button0",
+                "style":{"id":"button0",
                     "flex":{"flow":"row","justify-content":"center","align-items":"center"},
                     "align":"center",
                     "width":"20%","height":"95%",
