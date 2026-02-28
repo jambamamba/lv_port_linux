@@ -156,6 +156,10 @@ const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
 }
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::vector<std::string> &class_names) const {
 
+  if(_id == "abc" && key == "bgcolor") {
+    int x = 0;
+    x = 1;
+  }
   auto value = std::optional<LeleStyle::StyleValue>();
   std::vector<std::string> classes = class_names.empty() ? _classes : class_names;
   for(const auto &class_name : std::ranges::views::reverse(classes)) {
@@ -426,6 +430,11 @@ void LeleObject::setFlexStyle() {
     static_cast<lv_flex_align_t>(align_items), 
     static_cast<lv_flex_align_t>(align_content)
   );
+  auto grow_value = getStyle("flex/grow");
+  if(grow_value) {
+    int grow = std::get<int>(grow_value.value());
+    lv_obj_set_flex_grow(_lv_obj, grow);
+  }
 }
 
 void LeleObject::addStyle(std::vector<std::unique_ptr<LeleStyle>> &lele_styles) {
