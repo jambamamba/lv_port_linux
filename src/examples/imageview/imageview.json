@@ -167,8 +167,8 @@
                 },
                 "label":{
                     "id":"label:/run_test",
-                    "#text":"Run Test",
-                    "text":"تشغيل الاختبار",
+                    "text":"Run Test",
+                    "#text":"تشغيل الاختبار",
                     "style":{"id":"style:/button/run_test/label",
                         "text-align":"left",
                         "align":"center",
