@@ -36,7 +36,7 @@ public:
   virtual ~LeleObject();
   friend std::ostream& operator<<(std::ostream& os, const LeleObject& p);
 
-  const std::string &getClass() const;
+  const std::vector<std::string> &getClasses() const;
   const std::string &getType() const;
   const std::string &getId() const;
   void setId(const std::string &id);
@@ -48,7 +48,7 @@ public:
   virtual void setParent(LeleObject *parent);
   LeleObject *getParent() const;
   const std::vector<std::unique_ptr<LeleStyle>> &getStyles() const;
-  std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::string &class_name = "") const;
+  std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::vector<std::string> &class_name = {}) const;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;
   std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle(const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &children();
@@ -83,7 +83,7 @@ public:
 protected:
   void setFlexStyle();
 
-  std::string _class = "";
+  std::vector<std::string> _classes = {};
   std::string _type = "N/A";
   std::string _id;
   bool _enabled = true;
@@ -111,12 +111,12 @@ struct PyLeleObject {
     // Type-specific fields go here
     LeleObject *_lele_obj = nullptr;
     PyObject *_id = nullptr;
-    PyObject *_class = nullptr;
+    PyObject *_classes = nullptr;
     PyObject *_type = nullptr;
     static PyObject *addChild(PyObject *, PyObject *);
     static PyObject *fromConfig(PyObject *, PyObject *);
     static PyObject *getType(PyObject *, PyObject *);
-    static PyObject *getClass(PyObject *, PyObject *);
+    static PyObject *getClasses(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
     static PyObject *getStyle(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
@@ -130,7 +130,7 @@ struct PyLeleObject {
 #define PY_LELEOBJECT_METHODS() \
   {"addChild", (PyCFunction)PyLeleObject::addChild, METH_VARARGS, "Adds one more more children from a configuration file with JSON description of the object"},\
   {"fromConfig", (PyCFunction)PyLeleObject::fromConfig, METH_VARARGS, "Parent object. Json config file: The object is loaded from a configuration file with JSON description of the object"},\
-  {"getClass", (PyCFunction)PyLeleObject::getClass, METH_NOARGS, "Get the class name"},\
+  {"getClasses", (PyCFunction)PyLeleObject::getClasses, METH_NOARGS, "Get the class names"},\
   {"getType", (PyCFunction)PyLeleObject::getType, METH_NOARGS, "Get the object type"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
   {"getStyle", (PyCFunction)PyLeleObject::getStyle, METH_VARARGS, "Get the style attributes for this object"},\

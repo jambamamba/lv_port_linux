@@ -26,12 +26,13 @@ LeleObject::~LeleObject() {
 void LeleObject::parseAttributes(
     const std::vector<std::pair<std::string, std::string>> &json_tokens) {
 
+    _classes.push_back("");
     for(const auto &[lhs, rhs]: json_tokens) {
         if(lhs == "id") {
           _id = rhs;
         }
         else if(lhs == "class") {
-          _class = rhs;
+          _classes.push_back(rhs);
         }
         else if(lhs == "enabled") {
           _enabled = (rhs == "true");
@@ -51,8 +52,8 @@ bool LeleObject::fromJson(const std::string &json_str) {
   return true;
 }
 
-const std::string &LeleObject::getClass() const {
-  return _class;
+const std::vector<std::string> &LeleObject::getClasses() const {
+  return _classes;
 }
 const std::string &LeleObject::getType() const {
   return _type;
@@ -153,30 +154,23 @@ std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyle
 const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
-std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::string &class_name) const {
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::vector<std::string> &class_names) const {
 
-  if(_id == "tab_content1" && key == "width") {
-    int x = 0;
-    x = 1;
-  }
   auto value = std::optional<LeleStyle::StyleValue>();
-  for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    value = lele_style->getValue(key, class_name.empty() ? _class : class_name);
-    if(value) {
-      // if(_id == "tab_content1") {
-      //   LL(WARNING, LVSIM) << "@@@ getStyle: key:" << key << ", class:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
-      // }
-      return value;
+  std::vector<std::string> classes = class_names.empty() ? _classes : class_names;
+  for(const auto &class_name : std::ranges::views::reverse(classes)) {
+    for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
+      value = lele_style->getValue(key, class_name);
+      if(value) {
+        return value;
+      }
     }
   }
   if(!_lele_parent) {
     return value;
   }
-  value = _lele_parent->getStyle(key, class_name.empty() ? _class : class_name);
+  value = _lele_parent->getStyle(key, classes);
   if(value) {
-    // if(_id == "tab_content1") {
-    //   LL(WARNING, LVSIM) << "@@@ getStyle: key:" << key << ", class:" << class_name << ", value:" << std::hex << std::get<int>(value.value());
-    // }
   }
   return value;
 }
@@ -580,10 +574,15 @@ void LeleObject::addEventHandler(PyObject *py_callback) {
 std::ostream& operator<<(std::ostream& os, const LeleObject& p) {
     // os << "LeleStyles id: " << p._id << ", ";
     os << "_id:" << p._id << ",";
-    os << "_class:" << p._class << ",";
-    os << "\nStyles {\n";
+    os << "\nClasses: [\n";
+    for(const auto &class_name : p._classes) {
+      os << class_name << ",";
+    }
+    os << "\n]\n";
+    os << "\nStyles: {\n";
     for(const auto &lele_style : p._lele_styles) {
       os << lele_style.get();
     }
+    os << "\n}\n";
     return os;
 }

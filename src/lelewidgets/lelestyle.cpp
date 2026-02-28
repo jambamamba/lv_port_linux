@@ -353,7 +353,7 @@ std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key,
     }
   }
   if(_lele_obj && _lele_obj->getParent()) {
-    return _lele_obj->getParent()->getStyle(key, class_name);
+    return _lele_obj->getParent()->getStyle(key, {class_name});
   }
   return std::nullopt;
 }

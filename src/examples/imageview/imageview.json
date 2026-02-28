@@ -1,6 +1,9 @@
 {
+    "version":"1.0",
     "screen":{"width":"1024","height":"768"},
-    "style":{"id":"button0","class":"button0","border":"solid-1px-#ccc","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
+    "language":{"current":"en","default":"en"},
+    "style":{"padding":"0","margin":"0"},
+    "style":{"id":"button0","class":"button0","border":"none","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
     "style":{"id":"slider0","class":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
@@ -64,11 +67,12 @@
                     "xevent":{"type":"clicked","action":"action0","args":{}}
                 },
                 "view":{
-                    "style":{"flex":{"flow":"column"},"border":"none","width":"95%","height":"25%","corner-radius":"0x7FFF"},
+                    "style":{"flex":{"flow":"column"},"width":"95%","height":"35%"},
                     "group":"true",
                     "buttons":[
                         {
                             "button":{
+                                "class":"button0",
                                 "type":"radio",
                                 "id":"repeat",
                                 "text":"Repeat-XY",
@@ -78,6 +82,7 @@
                         },
                         {
                             "button":{
+                                "class":"button0",
                                 "type":"radio",
                                 "id":"repeat-x",
                                 "text":"Repeat-X",
@@ -87,6 +92,7 @@
                         },
                         {
                             "button":{
+                                "class":"button0",
                                 "type":"radio",
                                 "id":"repeat-y",
                                 "text":"Repeat-Y",
@@ -96,6 +102,7 @@
                         },
                         {
                             "button":{
+                                "class":"button0",
                                 "type":"radio",
                                 "id":"repeat-none",
                                 "text":"Repeat-None",
@@ -124,7 +131,7 @@
                 "label":{
                     "id":"rotation-label",
                     "text":"Angle",
-                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"95%","height":"95%","fgcolor":"#fff"}
+                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"95%","height":"5%","fgcolor":"#fff"}
                 }
             }
         },
@@ -149,12 +156,11 @@
                 "img":{
                     "id":"img:/run_test",
                     "src":"res/play-button.png",
-                    "size":{"x":"50%","y":"80%"},
+                    "size":{"x":"50%","y":"90%"},
                     "border":"none",
                     "#border":"solid-2px-#00f",
                     "style":{"id":"style:/button/run_test/img",
-                        "x":"0","y":"0",
-                        "width":"48%","height":"100%",
+                        "width":"30%","height":"70%",
                         "#border":"solid-2px-#00f",
                         "border":"none"
                     }
@@ -166,8 +172,7 @@
                     "style":{"id":"style:/button/run_test/label",
                         "text-align":"left",
                         "align":"center",
-                        "x":"0","y":"23",
-                        "width":"50%","height":"40%",
+                        "width":"80%","height":"100%",
                         "#font-family":"montserrat",
                         "font-family":"dejavu",
                         "font-size":"16px",
