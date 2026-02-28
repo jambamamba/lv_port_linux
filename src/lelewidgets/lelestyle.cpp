@@ -125,7 +125,7 @@ std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() con
 std::map<std::string, std::vector<std::string>> LeleStyle::_flex_possible_values = {
   {"flow", {"row","column","row-wrap","column-wrap","row-reverse","column-reverse","row-wrap-reverse","column-wrap-reverse"}},
   {"justify-content", {"start","center","space-between","space-around","space-evenly"}},
-  {"c", {"start","end","center"}},
+  {"align-items", {"start","end","center"}},
   {"align-content", {"start","center","space-between","space-around"}}
 };
 std::map<std::string, std::map<std::string,int>> LeleStyle::_flex_possible_ivalues = {

@@ -74,7 +74,6 @@
                                     "button":{
                                         "type":"push",
                                         "style":{"fgcolor":"#fff","bgcolor":"#aaa","border":"none","width":"15%","height":"40"},
-                                        "text":"Push button",
                                         "checkable":"true",
                                         "label":{"text":"Push Button"}
                                     }
