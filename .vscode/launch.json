@@ -35,11 +35,12 @@
             "options": [
                 "hello-world",
                 "hello-world-international",
+                "hello-world-flags",
                 "stackview",
                 "tabview",
                 "imageview"
             ],
-            "default": "tabview"
+            "default": "hello-world-flags"
         }
     ]
 }

@@ -156,7 +156,7 @@
                 "img":{
                     "id":"img:/run_test",
                     "src":"res/play-button.png",
-                    "size":{"x":"50%","y":"90%"},
+                    "size":{"width":"50%","height":"90%"},
                     "border":"none",
                     "#border":"solid-2px-#00f",
                     "style":{"id":"style:/button/run_test/img",

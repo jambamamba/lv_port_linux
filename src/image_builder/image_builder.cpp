@@ -13,18 +13,18 @@ namespace {
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImageWithValuesParsedFromJson(
   const lv_image_dsc_t *src_img, std::string val, int container_width, int container_height) {
 
-  int x = -1;
-  int y = -1;
+  int width = -1;
+  int height = -1;
   val = LeleWidgetFactory::trim(val);
   if(LeleWidgetFactory::parsePercentValues(
     val, 
-    {{"x", &x}, {"y", &y}}, 
-    {{"x", container_width}, {"y", container_height}})) {
-    return LeleImageConverter::resizeImg(src_img, x, y);
+    {{"width", &width}, {"height", &height}}, 
+    {{"width", container_width}, {"height", container_height}})) {
+    return LeleImageConverter::resizeImg(src_img, width, height);
   }
-  x = LeleStyle::parsePercentValue(val, container_width);
-  y = LeleStyle::parsePercentValue(val, container_height);
-  return LeleImageConverter::resizeImg(src_img, x, y);
+  width = LeleStyle::parsePercentValue(val, container_width);
+  height = LeleStyle::parsePercentValue(val, container_height);
+  return LeleImageConverter::resizeImg(src_img, width, height);
 }
 
 std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeContentToFillContainerPotentiallyCroppingContent(
@@ -65,7 +65,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeToShowEntireContentPotent
   return LeleImageConverter::resizeImg(src_img, new_width, new_height);
 }
 
-std::tuple<int,int> parseBackgroundPosition(
+std::tuple<int,int> parseImageJsonPosition(
   const std::optional<LeleStyle::StyleValue> &value, int container_width, int container_height) {
   int x = 0;
   int y = 0;
@@ -204,7 +204,7 @@ int ImageBuilder::parseColorCode(const std::string &color_str) {
 }
 
 std::pair<std::map<std::string, std::optional<LeleStyle::StyleValue>>, std::vector<std::string>>
-ImageBuilder::parseBackground(const std::string &key, const std::string &value_, LeleObject *lele_obj) {
+ImageBuilder::parseImageJson(const std::string &key, const std::string &value_, LeleObject *lele_obj) {
 
   std::map<std::string, std::optional<LeleStyle::StyleValue>> style;
   std::vector<std::string> attributes;
@@ -301,7 +301,7 @@ ImageBuilder::drawBackgroundImage(
         }
       }
       else if(key == (prefix + "/position")) {
-        std::tie(res._offset._x, res._offset._y) = parseBackgroundPosition(value, obj_width, obj_height);
+        std::tie(res._offset._x, res._offset._y) = parseImageJsonPosition(value, obj_width, obj_height);
       }
       else if(key == (prefix + "/rotation/pivot/x")) {
         // background_rotation_pivot._x = std::stoi(std::get<std::string>(value.value()));

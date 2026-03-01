@@ -441,7 +441,7 @@ bool parsePercentValues(
     const std::string &json_str, 
     std::map<std::string, int*> &&values, 
     const std::map<std::string, int> &&max_values) {
-        
+
   bool ret = false;
   LeleWidgetFactory::fromJson(json_str, [&values, &max_values, &ret](const std::string &key, const std::string &value) {
     if(key.empty()) { // e.g. json_str: "10%", so all values in the values map should get 10% of value for the given max_value[]
@@ -450,15 +450,27 @@ bool parsePercentValues(
         for(auto &[key, val]: values) {
             const auto &it = max_values.find(key);
             if(it != max_values.end()) {
-                *val = std::stoi(value) * it->second / 100;
-                ++iret;
+                if(std::all_of(value.begin(), value.end()-1,
+                        [&iret, &val](unsigned char ch){ return std::isdigit(ch); })) {
+                    *val = std::stoi(value) * it->second / 100;
+                    ++iret;
+                }
+                else {
+                    LL(WARNING, LVSIM) << "Failed to parse value as number: " << value;
+                }
             }
         }
         ret = (iret == values.size());
       }
       else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
         for(auto &[key, val]: values) {
-            *val = std::stoi(value);
+            if(std::all_of(value.begin(), value.end(),
+                    [&ret, &values](unsigned char ch){ return std::isdigit(ch); })) {
+                *val = std::stoi(value);
+            }
+            else {
+                LL(WARNING, LVSIM) << "Failed to parse value as number: " << value;
+            }
         }
         ret = true;
       }
@@ -467,13 +479,25 @@ bool parsePercentValues(
       if(value.size() > 1 && value.at(value.size() - 1) == '%') {
         const auto &it = max_values.find(key);
         if(it != max_values.end()) {
-            *values[key] = std::stoi(value) * it->second / 100;
-            ret = true;
+            if(std::all_of(value.begin(), value.end()-1,
+                [&ret, &values](unsigned char ch){ return std::isdigit(ch); })) {
+                *values[key] = std::stoi(value) * it->second / 100;
+                ret = true;
+            }
+            else {
+                LL(WARNING, LVSIM) << "Failed to parse value as number: " << value;
+            }
         }
       }
       else if(value.size() > 0 && value.at(value.size() - 1) != '%') {
-        *values[key] = std::stoi(value);
-        ret = true;
+        if(std::all_of(value.begin(), value.end(),
+                [&ret, &values](unsigned char ch){ return std::isdigit(ch); })) {
+            *values[key] = std::stoi(value);
+            ret = true;
+        }
+        else {
+            LL(WARNING, LVSIM) << "Failed to parse value as number: " << value;
+        }
       }
     }
   });

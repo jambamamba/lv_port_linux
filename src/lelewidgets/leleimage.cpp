@@ -14,7 +14,7 @@ const std::string prefix("img");
 }
 
 bool LeleImage::fromJson(const std::string &json_str) {
-  std::tie(_img_style, _attributes_as_ordered_in_json) = ImageBuilder::parseBackground("img", json_str, this);
+  std::tie(_img_style, _attributes_as_ordered_in_json) = ImageBuilder::parseImageJson("img", json_str, this);
   for(auto &item: _attributes_as_ordered_in_json) {
     item = prefix + "/" + item;
   }

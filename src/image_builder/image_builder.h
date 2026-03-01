@@ -25,7 +25,7 @@ namespace ImageBuilder {
     int getParentDimension(const std::string &key, const LeleObject *lele_obj);
     int parseColorCode(const std::string &color_str);
     std::pair<std::map<std::string, std::optional<LeleStyle::StyleValue>>, std::vector<std::string>>
-        parseBackground(const std::string &key, const std::string &value_, LeleObject *lele_obj);
+        parseImageJson(const std::string &key, const std::string &value_, LeleObject *lele_obj);
     std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> fillBackgroundColor(int color, int obj_width, int obj_height);
     Res drawBackgroundImage(
         const std::string &prefix,

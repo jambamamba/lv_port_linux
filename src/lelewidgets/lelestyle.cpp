@@ -543,7 +543,7 @@ bool LeleStyle::setValue(
       parseFlex(value);
     }
     else if(key == "background") {
-      auto [style, attributes] = ImageBuilder::parseBackground(key, value, _lele_obj);
+      auto [style, attributes] = ImageBuilder::parseImageJson(key, value, _lele_obj);
       _style.merge(style);
       _background_attributes_as_ordered_in_json = attributes;
     }
