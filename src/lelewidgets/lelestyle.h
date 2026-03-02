@@ -23,11 +23,13 @@ public:
   };
   using StyleValue = std::variant<
     int,
+    bool,
     float,
     std::string,
     lv_layout_t,
     lv_flex_flow_t,
     lv_scrollbar_mode_t,
+    lv_scroll_snap_t,
     LeleStyle::BorderTypeE
   >;
   // static LeleStyle fromJson(int parent_width = 0, int parent_height = 0, const cJSON *json = nullptr);

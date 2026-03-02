@@ -188,6 +188,15 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
             case LV_SCROLLBAR_MODE_AUTO: default: value = PyObject_GetAttrString(py_style->_scrollbar, "Auto"); break;
         }
     }
+    else if (std::holds_alternative<lv_scroll_snap_t>(style.value())) {
+        int ival = static_cast<int>(std::get<lv_scroll_snap_t>(style.value()));
+        switch(ival) {
+            case LV_SCROLL_SNAP_START: value = PyObject_GetAttrString(py_style->_scrollbar, "Start"); break;
+            case LV_SCROLL_SNAP_END: value = PyObject_GetAttrString(py_style->_scrollbar, "End"); break;
+            case LV_SCROLL_SNAP_CENTER: value = PyObject_GetAttrString(py_style->_scrollbar, "Center"); break;
+            case LV_SCROLL_SNAP_NONE: default: value = PyObject_GetAttrString(py_style->_scrollbar, "None"); break;
+        }
+    }
     else if (std::holds_alternative<LeleStyle::BorderTypeE>(style.value())) {
         int ival = static_cast<int>(std::get<LeleStyle::BorderTypeE>(style.value()));
         switch(ival) {

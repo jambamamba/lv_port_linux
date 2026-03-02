@@ -34,6 +34,11 @@ std::unordered_set<std::string> LeleStyle::_style_keys = {
    "border/width",
    "border/color",
    "scrollbar",
+   "scroll/snap/x", //LV_SCROLL_SNAP_NONE,LV_SCROLL_SNAP_START,LV_SCROLL_SNAP_END,LV_SCROLL_SNAP_CENTER : how this parent object snaps the child when scrolling
+   "scroll/snap/y", //LV_SCROLL_SNAP_NONE,LV_SCROLL_SNAP_START,LV_SCROLL_SNAP_END,LV_SCROLL_SNAP_CENTER : how this parent object snaps the child when scrolling
+   "scroll/snap/one", 
+   "scroll/snappable", //child object is snappable when parent is scrolling - i.e. scrolling will stop/snap at the child object
+   "scroll/elastic", 
    "fgcolor-selected",
    "bgcolor-selected",
    "fgcolor",
@@ -467,6 +472,44 @@ bool LeleStyle::setValue(
       }
       else {// "auto"
         _style[key] = LV_SCROLLBAR_MODE_AUTO;
+      }
+    }
+    else if(key == "scroll/snap/x" || key == "scroll/snap/y") { // lv_obj_set_scroll_snap_x(container, value)
+      if(strncmp(value.c_str(), "center", 6)==0) {
+        _style[key] = LV_SCROLL_SNAP_CENTER;
+      }
+      else if(strncmp(value.c_str(), "start", 5)==0) {
+        _style[key] = LV_SCROLL_SNAP_START;
+      }
+      else if(strncmp(value.c_str(), "end", 3)==0) {
+        _style[key] = LV_SCROLL_SNAP_END;
+      }
+      else {// "none"
+        _style[key] = LV_SCROLL_SNAP_NONE;
+      }
+    }
+    else if(key == "scroll/snap/one") { // lv_obj_add_flag(container, LV_OBJ_FLAG_SCROLL_ONE);
+      if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "yes", 3)==0 || strncmp(value.c_str(), "true", 4)==0) {
+        _style[key] = true;
+      }
+      else {
+        _style[key] = false;
+      }
+    }
+    else if(key == "scroll/snappable") {
+      if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "yes", 3)==0 || strncmp(value.c_str(), "true", 4)==0) {
+        _style[key] = true;
+      }
+      else {
+        _style[key] = false;
+      }
+    }
+    else if(key == "scroll/elastic") { // lv_obj_add_flag(container, LV_OBJ_FLAG_SCROLL_ELASTIC);
+      if(strncmp(value.c_str(), "on", 2)==0 || strncmp(value.c_str(), "yes", 3)==0 || strncmp(value.c_str(), "true", 4)==0) {
+        _style[key] = true;
+      }
+      else {
+        _style[key] = false;
       }
     }
     else if(key == "fgcolor-selected") {

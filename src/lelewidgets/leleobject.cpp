@@ -156,10 +156,6 @@ const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
 }
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::vector<std::string> &class_names) const {
 
-  if(_id == "abc" && key == "bgcolor") {
-    int x = 0;
-    x = 1;
-  }
   auto value = std::optional<LeleStyle::StyleValue>();
   std::vector<std::string> classes = class_names.empty() ? _classes : class_names;
   for(const auto &class_name : std::ranges::views::reverse(classes)) {
@@ -371,11 +367,35 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
     _bg_img = std::move(res._img_dsc);
     lv_image_set_src(_lv_bg_img, _bg_img.value().get());
   }
+  // https://docs.lvgl.io/8.3/overview/scroll.html
   value = getStyle("scrollbar");
   if(value) {
     lv_obj_set_scrollbar_mode(lv_obj, std::get<lv_scrollbar_mode_t>(value.value()));
   }
-  
+  value = getStyle("scroll/snap/x");
+  if(value) {
+    lv_obj_set_scroll_snap_x(lv_obj, std::get<lv_scroll_snap_t>(value.value()));
+  }
+  value = getStyle("scroll/snap/y");
+  if(value) {
+    lv_obj_set_scroll_snap_y(lv_obj, std::get<lv_scroll_snap_t>(value.value()));
+  }
+  value = getStyle("scroll/snap/one");
+  if(value) {
+    bool bvalue = std::get<bool>(value.value());
+    bvalue ? lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ONE) : lv_obj_clear_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ONE);
+  }
+  value = getStyle("scroll/snappable");
+  if(value) {
+    bool bvalue = std::get<bool>(value.value());
+    bvalue ? lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_SNAPPABLE) : lv_obj_clear_flag(lv_obj, LV_OBJ_FLAG_SNAPPABLE);
+  }
+  value = getStyle("scroll/elastic");
+  if(value) {
+    bool bvalue = std::get<bool>(value.value());
+    bvalue ? lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ELASTIC) : lv_obj_clear_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
+  }
+
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
 

@@ -2,9 +2,9 @@
     "version":"1.0",
     "screen":{"width":"1024","height":"768","padding":"none","margin":"none","corner-radius":"0"},
     "language":{"current":"en","default":"en"},
-    "style":{"class":"pane","width":"50%","height":"100%","bgcolor":"#222"},
-    "style":{"class":"pane/img","width":"20%","height":"30%","fgcolor":"#fff","flex":"none","border":"none"},
-    "style":{"class":"pane/label","width":"10%","height":"6%","fgcolor":"#fff","flex":"none","border":"solid-10px-#f00"},
+    "style":{"class":"pane","width":"25%","height":"25%","bgcolor":"#222","scroll/snap/x":"none","scroll/elastic":"none","border":"solid-4px-#fff"},
+    "style":{"class":"pane/img","width":"20%","height":"20%","fgcolor":"#fff","flex":"none","border":"solid-2px-#f00"},
+    "style":{"class":"pane/label","width":"1%","height":"5%","fgcolor":"#fff","flex":"none","border":"solid-2px-#f00"},
     "view":{
         "id":"/hello-world",
         "style":{"width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444",
@@ -13,66 +13,122 @@
         },
         "view":{
             "id":"/slider",
-            "style":{"width":"500%","height":"50%","border":"solid-1px-#fff"
+            "style":{"width":"100%","height":"25%","border":"none","scrollbar":"none",
+                "scroll/snap/x":"center",
+                "#scroll/snap/one":"true"
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/spain.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"0"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/mexico.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"1"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/germany.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"2"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/france.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"3"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/italy.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"4"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/portugal.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"5"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/china.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"6"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/japan.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"7"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/korea.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"8"}
             },
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "img":{"class":"pane/img","src":"res/play-button.png","size":{"width":"100%","height":"100%"}},
+                "img":{"class":"pane/img","src":"flags/vietnam.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/thailand.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/israel.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/saudi_arabia.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/iran.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/india.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/russia.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/ukraine.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/rwanda.png","size":{"width":"100%","height":"100%"}},
+                "label":{"class":"pane/label","text":"9"}
+            },
+            "view":{
+                "id":"/pane0",
+                "class":"pane",
+                "img":{"class":"pane/img","src":"flags/south_africa.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"9"}
             }
         }
