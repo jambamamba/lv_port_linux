@@ -147,7 +147,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     }
 
     ImgHelper img;
-    if(!img.processImgFile(img_file_path)){
+    if(!img.loadFromFile(img_file_path)){
         // return AutoFreePtr<lv_image_dsc_t>::nullopt();
         return std::nullopt;
     }
@@ -159,14 +159,17 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     lv_image_dsc_t *p = img_dsc.get();
     uint8_t *img_data = (uint8_t *)&p[1];
     p->data = img_data;
-    if(!img.processImgFile(img_file_path, [img_data,&bytes_copied](const uint8_t *row, size_t num_bytes) {
-        memcpy(&img_data[bytes_copied], (const void*)row, num_bytes);
-        bytes_copied += num_bytes;
-        return true;
-    })) {
-        // return AutoFreePtr<lv_image_dsc_t>::nullopt();
+    if(!img.data(img_data, img.stride() * img.height())) {
         return std::nullopt;
     }
+    // if(!img.processImgFile(img_file_path, [img_data,&bytes_copied](const uint8_t *row, size_t num_bytes) {
+    //     memcpy(&img_data[bytes_copied], (const void*)row, num_bytes);
+    //     bytes_copied += num_bytes;
+    //     return true;
+    // })) {
+    //     // return AutoFreePtr<lv_image_dsc_t>::nullopt();
+    //     return std::nullopt;
+    // }
 
     // printf("width:%i, height:%i\n", img.width(), img.height());
     return img_dsc;
@@ -239,20 +242,34 @@ uint8_t img_";
 
     std::string c_file_scanlines;
     ImgHelper img;
-    if(!img.processImgFile(img_file_path, [&c_file_scanlines](const uint8_t *row, size_t num_bytes){
-
+    if(!img.loadFromFile(img_file_path)){
+        // return AutoFreePtr<lv_image_dsc_t>::nullopt();
+        return std::nullopt;
+    }
+    std::vector<uint8_t> img_data = img.data();
+    for(int row = 0; row < img.height(); ++row) {
         const std::string index[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
-        for(size_t col = 0; col < num_bytes; ++col) {
-            uint8_t byte = row[col];
+        for(int col = 0; col < img.stride(); ++col) {
+            uint8_t byte = img_data[row*img.stride() + col];
             c_file_scanlines += "0x";
             c_file_scanlines += index[((byte & 0xf0) >> 4)];
             c_file_scanlines += index[((byte & 0x0f))];
             c_file_scanlines += ",";
         }
-        return true;
-    })) {
-        return std::nullopt;
     }
+    // if(!img.processImgFile(img_file_path, [&c_file_scanlines](const uint8_t *row, size_t num_bytes){
+
+    //     for(size_t col = 0; col < num_bytes; ++col) {
+    //         uint8_t byte = row[col];
+    //         c_file_scanlines += "0x";
+    //         c_file_scanlines += index[((byte & 0xf0) >> 4)];
+    //         c_file_scanlines += index[((byte & 0x0f))];
+    //         c_file_scanlines += ",";
+    //     }
+    //     return true;
+    // })) {
+    //     return std::nullopt;
+    // }
     int bpp = img.stride()/img.width();
     std::string color_format;
     switch(bpp) {
@@ -337,7 +354,7 @@ void writeLvImgDscCpp(std::ofstream &c_img_filestream, const std::map<std::strin
 }
 
 void saveGdImage(const std::string &filename, const lv_image_dsc_t *src_img) {
-    ImgHelper::saveGdImage(
+    ImgHelper::saveToFile(
         filename.c_str(), 
         src_img->header.w, 
         src_img->header.h, 
