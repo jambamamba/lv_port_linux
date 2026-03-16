@@ -23,7 +23,6 @@ source ${script_dir}/share/scripts/helper-functions.sh
 # }
 
 function buildelf() {
-    sudo apt purge libjpeg8 -y
     local deps=(zlib debug_logger json_utils curl libssh2 utils)
     installDeps $@ deps depsdir="/usr/local"
 

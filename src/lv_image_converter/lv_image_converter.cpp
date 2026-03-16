@@ -240,13 +240,14 @@ uint8_t img_";
         c_file_begin += "_map[] = {\n\
 ";
 
-    std::string c_file_scanlines;
     ImgHelper img;
     if(!img.loadFromFile(img_file_path)){
         // return AutoFreePtr<lv_image_dsc_t>::nullopt();
         return std::nullopt;
     }
+    std::string c_file_scanlines;
     std::vector<uint8_t> img_data = img.data();
+    printf("@@@ img.height():%d, img.stride():%zu, img_data.size():%zu\n", img.height(), img.stride(), img_data.size());
     for(int row = 0; row < img.height(); ++row) {
         const std::string index[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
         for(int col = 0; col < img.stride(); ++col) {
