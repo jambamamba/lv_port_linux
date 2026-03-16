@@ -85,7 +85,7 @@ void GraphicsBackend::dumpScreenshot() const {
     static int i = 0;
     std::stringstream ss;
     ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i) << ".png";
-    ImgHelper::saveGdImage(
+    ImgHelper::saveToFile(
             ss.str().c_str(),
             snapshot->header.w, 
             snapshot->header.h, 
