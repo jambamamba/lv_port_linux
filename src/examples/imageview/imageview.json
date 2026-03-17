@@ -32,7 +32,7 @@
                         "xsize":"contain",
                         "xsize":"cover",
                         "xsize":{"x":"20%","y":"20%"},
-                        "size":"100",
+                        "xsize":"100",
                         "rotation":{"angle":"0","pivot":{"x":"100","y":"100"}},
                         "repeat":"repeat",
                         "color":"#0f0"

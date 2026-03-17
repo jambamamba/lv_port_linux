@@ -42,6 +42,15 @@ void initImageDsc(lv_image_dsc_t *dst_img, int width, int height, int bpp) {
     dst_img->data = reinterpret_cast<uint8_t*>(&dst_img[1]);
 }
 
+auto bppToColorFormat(int bpp) {
+    ImgHelper::Img::ColorFormatE color_format;
+    switch(bpp) {
+        case 4: return ImgHelper::Img::ColorFormatE::BGRA8888;
+        case 3: return ImgHelper::Img::ColorFormatE::BGR888;
+        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << bpp; return ImgHelper::Img::ColorFormatE::BGR888;
+    }
+}
+
 }//namespace
 
 namespace LeleImageConverter {
@@ -56,7 +65,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
     }
 
     if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        new_width, new_height, const_cast<uint8_t*>(dst_img->data))) {
+        new_width, new_height, bppToColorFormat(bpp), const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
     return dst_img;
@@ -70,7 +79,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(
     initImageDsc(dst_img.get(), cropped_width, cropped_height, bpp);
 
     if(!ImgHelper::cropImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        0, 0, cropped_width, cropped_height, const_cast<uint8_t*>(dst_img->data))) {
+        0, 0, cropped_width, cropped_height, bppToColorFormat(bpp), const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
 
@@ -162,16 +171,28 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     if(!img.data(img_data, img.stride() * img.height())) {
         return std::nullopt;
     }
-    // if(!img.processImgFile(img_file_path, [img_data,&bytes_copied](const uint8_t *row, size_t num_bytes) {
-    //     memcpy(&img_data[bytes_copied], (const void*)row, num_bytes);
-    //     bytes_copied += num_bytes;
-    //     return true;
-    // })) {
-    //     // return AutoFreePtr<lv_image_dsc_t>::nullopt();
-    //     return std::nullopt;
-    // }
-
-    // printf("width:%i, height:%i\n", img.width(), img.height());
+    for(size_t row = 0; row < img.height(); ++row) {
+        for(size_t col = 0; col < img.stride(); col += bpp) {
+            if(bpp == 4) {//osm todo: can optimize swap
+                uint8_t a = img_data[row * img.stride() + col + 0];
+                uint8_t r = img_data[row * img.stride() + col + 1];
+                uint8_t g = img_data[row * img.stride() + col + 2];
+                uint8_t b = img_data[row * img.stride() + col + 3];
+                img_data[row * img.stride() + col + 0] = b;
+                img_data[row * img.stride() + col + 1] = g;
+                img_data[row * img.stride() + col + 2] = r;
+                img_data[row * img.stride() + col + 3] = a;
+            }
+            else if(bpp == 3) {//osm todo: can optimize swap
+                uint8_t r = img_data[row * img.stride() + col + 0];
+                uint8_t g = img_data[row * img.stride() + col + 1];
+                uint8_t b = img_data[row * img.stride() + col + 2];
+                img_data[row * img.stride() + col + 0] = b;
+                img_data[row * img.stride() + col + 1] = g;
+                img_data[row * img.stride() + col + 2] = r;
+            }
+        }
+    }
     return img_dsc;
 }
 
@@ -361,6 +382,7 @@ void saveGdImage(const std::string &filename, const lv_image_dsc_t *src_img) {
         src_img->header.h, 
         src_img->header.stride, 
         src_img->header.stride/src_img->header.w, 
+        bppToColorFormat(src_img->header.stride/src_img->header.w), 
         src_img->data);
 }
 }//namespace LeleImageConverter

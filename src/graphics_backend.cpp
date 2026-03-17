@@ -49,6 +49,15 @@ struct window *getWindow(backend_t *backend){
     }
     return window;
 }
+
+auto bppToColorFormat(int bpp) {
+    ImgHelper::Img::ColorFormatE color_format;
+    switch(bpp) {
+        case 4: return ImgHelper::Img::ColorFormatE::BGRA8888;
+        case 3: return ImgHelper::Img::ColorFormatE::BGR888;
+        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << bpp; return ImgHelper::Img::ColorFormatE::BGR888;
+    }
+}
 }//namespace
 
 GraphicsBackend &GraphicsBackend::getInstance() {
@@ -85,12 +94,14 @@ void GraphicsBackend::dumpScreenshot() const {
     static int i = 0;
     std::stringstream ss;
     ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i) << ".png";
+    int bpp = snapshot->header.stride/snapshot->header.w;
     ImgHelper::saveToFile(
             ss.str().c_str(),
             snapshot->header.w, 
             snapshot->header.h, 
             snapshot->header.stride, 
-            snapshot->header.stride/snapshot->header.w, 
+            bpp, 
+            bppToColorFormat(bpp),
             snapshot->data);
     lv_draw_buf_destroy(snapshot);
     i = (i+1)%100;
