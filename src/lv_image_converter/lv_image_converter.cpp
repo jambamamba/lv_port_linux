@@ -42,12 +42,12 @@ void initImageDsc(lv_image_dsc_t *dst_img, int width, int height, int bpp) {
     dst_img->data = reinterpret_cast<uint8_t*>(&dst_img[1]);
 }
 
-auto bppToColorFormat(int bpp) {
+auto lvColorFormatToImgHelperColorFormat(int lv_color_format) {
     ImgHelper::Img::ColorFormatE color_format;
-    switch(bpp) {
-        case 4: return ImgHelper::Img::ColorFormatE::BGRA8888;
-        case 3: return ImgHelper::Img::ColorFormatE::BGR888;
-        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << bpp; return ImgHelper::Img::ColorFormatE::BGR888;
+    switch(lv_color_format) {
+        case LV_COLOR_FORMAT_RGB888: return ImgHelper::Img::ColorFormatE::RGB888;
+        case LV_COLOR_FORMAT_ARGB8888: return ImgHelper::Img::ColorFormatE::ARGB8888;
+        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << lv_color_format; return ImgHelper::Img::ColorFormatE::ARGB8888;
     }
 }
 
@@ -65,7 +65,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
     }
 
     if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        new_width, new_height, bppToColorFormat(bpp), const_cast<uint8_t*>(dst_img->data))) {
+        new_width, new_height, lvColorFormatToImgHelperColorFormat(src_img->header.cf), const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
     return dst_img;
@@ -79,7 +79,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> cropImg(
     initImageDsc(dst_img.get(), cropped_width, cropped_height, bpp);
 
     if(!ImgHelper::cropImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        0, 0, cropped_width, cropped_height, bppToColorFormat(bpp), const_cast<uint8_t*>(dst_img->data))) {
+        0, 0, cropped_width, cropped_height, lvColorFormatToImgHelperColorFormat(src_img->header.cf), const_cast<uint8_t*>(dst_img->data))) {
         return std::nullopt;
     }
 
@@ -382,7 +382,7 @@ void saveGdImage(const std::string &filename, const lv_image_dsc_t *src_img) {
         src_img->header.h, 
         src_img->header.stride, 
         src_img->header.stride/src_img->header.w, 
-        bppToColorFormat(src_img->header.stride/src_img->header.w), 
+        lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
         src_img->data);
 }
 }//namespace LeleImageConverter

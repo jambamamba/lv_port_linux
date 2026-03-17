@@ -50,14 +50,15 @@ struct window *getWindow(backend_t *backend){
     return window;
 }
 
-auto bppToColorFormat(int bpp) {
+auto lvColorFormatToImgHelperColorFormat(int lv_color_format) {
     ImgHelper::Img::ColorFormatE color_format;
-    switch(bpp) {
-        case 4: return ImgHelper::Img::ColorFormatE::BGRA8888;
-        case 3: return ImgHelper::Img::ColorFormatE::BGR888;
-        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << bpp; return ImgHelper::Img::ColorFormatE::BGR888;
+    switch(lv_color_format) {
+        case LV_COLOR_FORMAT_RGB888: return ImgHelper::Img::ColorFormatE::RGB888;
+        case LV_COLOR_FORMAT_ARGB8888: return ImgHelper::Img::ColorFormatE::ARGB8888;
+        default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << lv_color_format; return ImgHelper::Img::ColorFormatE::ARGB8888;
     }
 }
+
 }//namespace
 
 GraphicsBackend &GraphicsBackend::getInstance() {
@@ -101,7 +102,7 @@ void GraphicsBackend::dumpScreenshot() const {
             snapshot->header.h, 
             snapshot->header.stride, 
             bpp, 
-            bppToColorFormat(bpp),
+            lvColorFormatToImgHelperColorFormat(snapshot->header.cf),
             snapshot->data);
     lv_draw_buf_destroy(snapshot);
     i = (i+1)%100;
