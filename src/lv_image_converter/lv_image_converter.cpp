@@ -50,6 +50,32 @@ auto lvColorFormatToImgHelperColorFormat(int lv_color_format) {
         default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << lv_color_format; return ImgHelper::Img::ColorFormatE::ARGB8888;
     }
 }
+void rgbToBgr(const ImgHelper &img, uint8_t *img_data) {
+    // return;//osm
+    int bpp = img.stride()/img.width();
+    for(size_t row = 0; row < img.height(); ++row) {
+        for(size_t col = 0; col < img.stride(); col += bpp) {
+            if(bpp == 4) {//osm todo: can optimize swap
+                uint8_t a = img_data[row * img.stride() + col + 0];
+                uint8_t r = img_data[row * img.stride() + col + 1];
+                uint8_t g = img_data[row * img.stride() + col + 2];
+                uint8_t b = img_data[row * img.stride() + col + 3];
+                img_data[row * img.stride() + col + 0] = b;
+                img_data[row * img.stride() + col + 1] = g;
+                img_data[row * img.stride() + col + 2] = r;
+                img_data[row * img.stride() + col + 3] = a;
+            }
+            else if(bpp == 3) {//osm todo: can optimize swap
+                uint8_t r = img_data[row * img.stride() + col + 0];
+                uint8_t g = img_data[row * img.stride() + col + 1];
+                uint8_t b = img_data[row * img.stride() + col + 2];
+                img_data[row * img.stride() + col + 0] = b;
+                img_data[row * img.stride() + col + 1] = g;
+                img_data[row * img.stride() + col + 2] = r;
+            }
+        }
+    }
+}
 
 }//namespace
 
@@ -64,10 +90,36 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
         return std::nullopt;
     }
 
-    if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-        new_width, new_height, lvColorFormatToImgHelperColorFormat(src_img->header.cf), const_cast<uint8_t*>(dst_img->data))) {
-        return std::nullopt;
-    }
+    ImgHelper img_helper;
+    img_helper.loadFromData(src_img->header.w, src_img->header.h, src_img->header.stride, 
+        src_img->header.stride/src_img->header.w, 
+        // ImgHelper::Img::ColorFormatE::ARGB8888,
+        lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
+        src_img->data);
+    // static int idx = 0;
+    // std::stringstream ss;
+    // ss << "/home/oosman/trash/foo" << idx << ".png";
+    // img_helper.saveToFile(ss.str());
+    img_helper.resize(new_width, new_height);
+    memcpy(const_cast<uint8_t*>(dst_img->data), img_helper.data().data(), img_helper.data().size());
+    rgbToBgr(img_helper, const_cast<uint8_t*>(dst_img->data));
+    img_helper.loadFromData(new_width, new_height, new_width * src_img->header.stride/src_img->header.w,
+        src_img->header.stride/src_img->header.w, 
+        // ImgHelper::Img::ColorFormatE::ARGB8888,
+        lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
+        const_cast<uint8_t*>(dst_img->data));
+    // ss.str("");ss.clear();
+    // ss << "/home/oosman/trash/foo" << idx << "_resized.png";
+    // img_helper.saveToFile(ss.str());
+    // ++idx;
+
+    // if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+    //     new_width, new_height, 
+    //     ImgHelper::Img::ColorFormatE::BGRA8888,
+    //     // lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
+    //     const_cast<uint8_t*>(dst_img->data))) {
+    //     return std::nullopt;
+    // }
     return dst_img;
 }
 
@@ -171,28 +223,7 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     if(!img.data(img_data, img.stride() * img.height())) {
         return std::nullopt;
     }
-    for(size_t row = 0; row < img.height(); ++row) {
-        for(size_t col = 0; col < img.stride(); col += bpp) {
-            if(bpp == 4) {//osm todo: can optimize swap
-                uint8_t a = img_data[row * img.stride() + col + 0];
-                uint8_t r = img_data[row * img.stride() + col + 1];
-                uint8_t g = img_data[row * img.stride() + col + 2];
-                uint8_t b = img_data[row * img.stride() + col + 3];
-                img_data[row * img.stride() + col + 0] = b;
-                img_data[row * img.stride() + col + 1] = g;
-                img_data[row * img.stride() + col + 2] = r;
-                img_data[row * img.stride() + col + 3] = a;
-            }
-            else if(bpp == 3) {//osm todo: can optimize swap
-                uint8_t r = img_data[row * img.stride() + col + 0];
-                uint8_t g = img_data[row * img.stride() + col + 1];
-                uint8_t b = img_data[row * img.stride() + col + 2];
-                img_data[row * img.stride() + col + 0] = b;
-                img_data[row * img.stride() + col + 1] = g;
-                img_data[row * img.stride() + col + 2] = r;
-            }
-        }
-    }
+    rgbToBgr(img, img_data);
     return img_dsc;
 }
 
@@ -268,7 +299,7 @@ uint8_t img_";
     }
     std::string c_file_scanlines;
     std::vector<uint8_t> img_data = img.data();
-    printf("@@@ img.height():%d, img.stride():%zu, img_data.size():%zu\n", img.height(), img.stride(), img_data.size());
+    printf("generateCImgFile img.height():%d, img.stride():%zu, img_data.size():%zu\n", img.height(), img.stride(), img_data.size());
     for(int row = 0; row < img.height(); ++row) {
         const std::string index[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
         for(int col = 0; col < img.stride(); ++col) {
