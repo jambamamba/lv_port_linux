@@ -12,38 +12,6 @@
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
-namespace {
-
-void rgbToBgr(lv_image_dsc_t *img_dsc) { //int stride, int height, int bpp, uint8_t *img_data) {
-  int stride = img_dsc->header.stride;
-  int height = img_dsc->header.h;
-  int bpp = img_dsc->header.stride/img_dsc->header.w;
-  uint8_t *img_data = const_cast<uint8_t *>(img_dsc->data);
-  for(size_t row = 0; row < height; ++row) {
-      for(size_t col = 0; col < stride; col += bpp) {
-          if(bpp == 4) {//osm todo: can optimize swap
-              uint8_t a = img_data[row * stride + col + 0];
-              uint8_t r = img_data[row * stride + col + 1];
-              uint8_t g = img_data[row * stride + col + 2];
-              uint8_t b = img_data[row * stride + col + 3];
-              img_data[row * stride + col + 0] = b;
-              img_data[row * stride + col + 1] = g;
-              img_data[row * stride + col + 2] = r;
-              img_data[row * stride + col + 3] = a;
-          }
-          else if(bpp == 3) {//osm todo: can optimize swap
-              uint8_t r = img_data[row * stride + col + 0];
-              uint8_t g = img_data[row * stride + col + 1];
-              uint8_t b = img_data[row * stride + col + 2];
-              img_data[row * stride + col + 0] = b;
-              img_data[row * stride + col + 1] = g;
-              img_data[row * stride + col + 2] = r;
-          }
-      }
-  }
-}
-}//namespace
-
 LeleObject::LeleObject(LeleObject *parent, const std::string &json_str)
   : _lele_parent(parent), 
   _type(__func__ ) {
@@ -397,7 +365,6 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
         return;
     }
     _bg_img = std::move(res._img_dsc);
-    // rgbToBgr(_bg_img.value().get());
     lv_image_set_src(_lv_bg_img, _bg_img.value().get());
   }
   // https://docs.lvgl.io/8.3/overview/scroll.html

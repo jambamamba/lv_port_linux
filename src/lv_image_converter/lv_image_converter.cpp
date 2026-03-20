@@ -50,61 +50,6 @@ auto lvColorFormatToImgHelperColorFormat(int lv_color_format) {
         default: LL(FATAL, LVSIM) << "Invalid bytes per pixel (bpp):" << lv_color_format; return ImgHelper::Img::ColorFormatE::ARGB8888;
     }
 }
-void rgbToBgr(lv_image_dsc_t *img_dsc) { //int stride, int height, int bpp, uint8_t *img_data) {
-  int stride = img_dsc->header.stride;
-  int height = img_dsc->header.h;
-  int bpp = img_dsc->header.stride/img_dsc->header.w;
-  uint8_t *img_data = const_cast<uint8_t *>(img_dsc->data);
-  for(size_t row = 0; row < height; ++row) {
-      for(size_t col = 0; col < stride; col += bpp) {
-          if(bpp == 4) {//osm todo: can optimize swap
-              uint8_t a = img_data[row * stride + col + 0];
-              uint8_t r = img_data[row * stride + col + 1];
-              uint8_t g = img_data[row * stride + col + 2];
-              uint8_t b = img_data[row * stride + col + 3];
-              img_data[row * stride + col + 0] = b;
-              img_data[row * stride + col + 1] = g;
-              img_data[row * stride + col + 2] = r;
-              img_data[row * stride + col + 3] = a;
-          }
-          else if(bpp == 3) {//osm todo: can optimize swap
-              uint8_t r = img_data[row * stride + col + 0];
-              uint8_t g = img_data[row * stride + col + 1];
-              uint8_t b = img_data[row * stride + col + 2];
-              img_data[row * stride + col + 0] = b;
-              img_data[row * stride + col + 1] = g;
-              img_data[row * stride + col + 2] = r;
-          }
-      }
-  }
-}
-void rgbToBgr(const ImgHelper &img, uint8_t *img_data) {
-    // return;//osm
-    int bpp = img.stride()/img.width();
-    for(size_t row = 0; row < img.height(); ++row) {
-        for(size_t col = 0; col < img.stride(); col += bpp) {
-            if(bpp == 4) {//osm todo: can optimize swap
-                uint8_t a = img_data[row * img.stride() + col + 0];
-                uint8_t r = img_data[row * img.stride() + col + 1];
-                uint8_t g = img_data[row * img.stride() + col + 2];
-                uint8_t b = img_data[row * img.stride() + col + 3];
-                img_data[row * img.stride() + col + 0] = b;
-                img_data[row * img.stride() + col + 1] = g;
-                img_data[row * img.stride() + col + 2] = r;
-                img_data[row * img.stride() + col + 3] = a;
-            }
-            else if(bpp == 3) {//osm todo: can optimize swap
-                uint8_t r = img_data[row * img.stride() + col + 0];
-                uint8_t g = img_data[row * img.stride() + col + 1];
-                uint8_t b = img_data[row * img.stride() + col + 2];
-                img_data[row * img.stride() + col + 0] = b;
-                img_data[row * img.stride() + col + 1] = g;
-                img_data[row * img.stride() + col + 2] = r;
-            }
-        }
-    }
-}
-
 }//namespace
 
 namespace LeleImageConverter {
@@ -117,31 +62,12 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImg(const lv_image_dsc_t 
     auto dst_img = AutoFreeSharedPtr<lv_image_dsc_t>::create(new_width * bpp * new_height);
     initImageDsc(dst_img.get(), new_width, new_height, bpp);
 
-    //osm todo: put this in img_helper resize function:
-    ImgHelper img_helper;
-    rgbToBgr(const_cast<lv_image_dsc_t *>(src_img));
-    img_helper.loadFromData(src_img->header.w, src_img->header.h, src_img->header.stride, bpp, 
-        lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
-        src_img->data);
-    std::stringstream ss;
-    Magick::Image magick(src_img->header.w, src_img->header.h, "ARGB", Magick::StorageType::CharPixel, src_img->data);
-    ss.str("");ss.clear();
-    ss << new_width << "x" << new_height << "!";
-    magick.resize(ss.str().c_str());
-    magick.write(0, 0, new_width, new_height, "ARGB", 
-        Magick::StorageType::CharPixel, const_cast<uint8_t*>(dst_img->data));
-    rgbToBgr(const_cast<lv_image_dsc_t *>(dst_img.get()));
-    img_helper.loadFromData(new_width, new_height, new_width*bpp, bpp, 
-        lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
-        dst_img->data);
-
-    // if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
-    //     new_width, new_height, 
-    //     ImgHelper::Img::ColorFormatE::BGRA8888,
-    //     // lvColorFormatToImgHelperColorFormat(src_img->header.cf), 
-    //     const_cast<uint8_t*>(dst_img->data))) {
-    //     return std::nullopt;
-    // }
+    if(!ImgHelper::resizeImageData(src_img->header.w, src_img->header.h, src_img->header.stride, src_img->data,
+        new_width, new_height, 
+        bpp == 4 ? ImgHelper::Img::ColorFormatE::BGRA8888 : ImgHelper::Img::ColorFormatE::BGR888,
+        const_cast<uint8_t*>(dst_img->data))) {
+        return std::nullopt;
+    }
     return dst_img;
 }
 
@@ -242,10 +168,9 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> generateImgDsc(const std::strin
     lv_image_dsc_t *p = img_dsc.get();
     uint8_t *img_data = (uint8_t *)&p[1];
     p->data = img_data;
-    if(!img.data(img_data, img.stride() * img.height())) {
+    if(!img.data(img_data, img.stride() * img.height(), bpp == 4 ? "BGRA" : "BGR")) {
         return std::nullopt;
     }
-    rgbToBgr(img, img_data);
     return img_dsc;
 }
 
