@@ -553,12 +553,14 @@ void LeleObject::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleObject *base = static_cast<LeleObject*>(e->user_data);
     if(base) {
-      // LL(DEBUG, LVSIM) << "LeleObject::eventCallback " <<
-      //   "id:" << base->id() << 
-      //   ", class_name: " << base->getCxxClass() <<
-      //   ", _lele_parent: " << base->getParent()->getCxxClass() <<
-      //   ", event_code: " << e->code <<
-      //   " " << lv_event_code_get_name(e->code);
+      if(false) { //base->_id == "/slider") {
+      LL(DEBUG, LVSIM) << "LeleObject::eventCallback " <<
+        "id:" << base->getId() << 
+        ", class_name: " << base->getType() <<
+        ", _lele_parent: " << base->getParent()->getType() <<
+        ", event_code: " << e->code <<
+        " " << lv_event_code_get_name(e->code);
+      }
       base->eventCallback(LeleEvent(e, base));
     }
     // if(e->current_target) {

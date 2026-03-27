@@ -124,7 +124,7 @@ bool LeleView::eventCallback(LeleEvent &&e) {
     lv_event_t* lv_event = const_cast<lv_event_t*>(e.getLvEvent());
     lv_event_code_t code = lv_event_get_code(lv_event);
     if(code != LV_EVENT_CLICKED) {
-      return false;
+      return LeleObject::eventCallback(std::move(e));
     }
     LeleObject *base = static_cast<LeleObject*>(lv_event->user_data);
     // LOG(DEBUG, LVSIM, "%s: LeleView::eventCallback\n", base->getCxxClass().c_str());

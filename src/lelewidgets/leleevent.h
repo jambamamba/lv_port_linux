@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <src/lelewidgets/lelewidgetfactory.h>
+
 #include <Python.h>
 
 // struct lv_event_t;
@@ -21,9 +22,12 @@ public:
   void setTargetObj(LeleObject *target_obj) { _target_obj = target_obj; }
   virtual PyObject *createPyObject();
   const std::map<std::string, std::string> &getArgs() const { return _args; }
-  enum Type {
-      Clicked = 10,
-      ValueChanged = 35
+  enum Type {//osm todo this enum needs to go
+      Clicked = LV_EVENT_CLICKED,
+      ValueChanged = LV_EVENT_VALUE_CHANGED,
+      ScrollBegin = LV_EVENT_SCROLL_BEGIN,
+      ScrollEnd = LV_EVENT_SCROLL_END,
+      Scroll = LV_EVENT_SCROLL
     };
   int getValue() const { return _ivalue; }
 protected:
@@ -87,5 +91,8 @@ struct PyLeleEventType {
 
 #define PY_LELEEVENT_TYPE_MEMBERS() \
     {"Clicked", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Clicked"},\
-    {"ValueChanged", Py_T_INT, offsetof(PyLeleEventType, _value_changed), 0, "ValueChanged"},
+    {"ValueChanged", Py_T_INT, offsetof(PyLeleEventType, _value_changed), 0, "ValueChanged"},\
+    {"ScrollBegin", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "ScrollBegin"},\
+    {"ScrollEnd", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "ScrollEnd"},\
+    {"Scroll", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Scroll"},\
 
