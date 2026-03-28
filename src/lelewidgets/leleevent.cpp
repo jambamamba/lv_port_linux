@@ -30,6 +30,16 @@ bool LeleEvent::fromJson(const std::string &json_str) {
   return true;
 }
 
+LeleEvent::LeleEvent(lv_event_t *lv_event, LeleObject *target_obj) 
+: _id(target_obj->getId())
+, _type(target_obj->getType())
+, _lv_event(lv_event)
+, _target_obj(target_obj)
+, _code(lv_event ? lv_event_get_code(lv_event) : 0)
+, _ivalue(0)
+, _ivalue2(0) {
+}
+
 LeleEvent::LeleEvent(const LeleEvent& rhs, const lv_event_t *lv_event, int ivalue, int ivalue2) 
 : _id(rhs._id)
 , _type(rhs._type)

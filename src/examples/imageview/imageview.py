@@ -49,7 +49,7 @@ def setAngleMethod1(theta):
       obj.addStyle(style)
 
 def scaleImage(event):
-   print(f"@@@py SCALE SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
+   print(f"@@@py SCALE SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Code.EVENT_CLICKED,rhs: {lele.Event().Type.ValueChanged}")
    # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
    if event.code == lele.Event().Type.ValueChanged:
          print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
@@ -166,9 +166,6 @@ def runTest(event):
    if event.code == lele.Event().Type.Clicked:
       # print(f"@@@py: event: {event}")
       # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
-      # print(user_attributes)
-      # print(f"@@@py: event.Type.Clicked: {event.Type.Clicked}")
-      # user_attributes = [attr for attr in dir(event.Type.Clicked) if not attr.startswith('__')]
       # print(user_attributes)
       # print(f"@@@py button pressed, event.object: {event.object}")
       # user_attributes = [attr for attr in dir(event.object) if not attr.startswith('__')]
@@ -302,11 +299,6 @@ def main():
    # print(f"@@@py getObjectById {obj}, obj.getText() {obj.getText()}")
    obj.setText("Cocoa bean!")
 
-   print(f"@@@py======================================x")
-   print(f"event.Type: {lele.Event().Type}")
-   user_attributes = [attr for attr in dir(lele.Event().Type) if not attr.startswith('__')]
-   print(f"event.Type: {user_attributes}")
-   print(f"event.Type.Clicked: {lele.Event().Type.Clicked}")
    # import enum
    # lele.FooBar = enum.Enum('FooBar', dict(FOO=1, BAR=2))
    # user_attributes = [attr for attr in dir(lele.FooBar) if not attr.startswith('__')]

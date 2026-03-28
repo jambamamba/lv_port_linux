@@ -11,7 +11,7 @@ class LeleEvent {
 public:
   LeleEvent(const std::string &json_str = "");
   virtual bool fromJson(const std::string &json_str);
-  LeleEvent(lv_event_t *e, LeleObject *target_obj) : _lv_event(e), _target_obj(target_obj) {}
+  LeleEvent(lv_event_t *lv_event, LeleObject *target_obj);
   LeleEvent(const LeleEvent& rhs, const lv_event_t *e = nullptr, int ivalue = 0, int ivalue2 = 0);
   const std::string &getAction() const { return _action; }
   const std::string &getType() const { return _type; }
@@ -87,12 +87,15 @@ struct PyLeleEventType {
     // Type-specific fields go here
     PyObject *_clicked = nullptr;
     PyObject *_value_changed = nullptr;
+    PyObject *_scroll_begin = nullptr;
+    PyObject *_scroll_end = nullptr;
+    PyObject *_scroll = nullptr;
 };
 
 #define PY_LELEEVENT_TYPE_MEMBERS() \
     {"Clicked", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Clicked"},\
     {"ValueChanged", Py_T_INT, offsetof(PyLeleEventType, _value_changed), 0, "ValueChanged"},\
-    {"ScrollBegin", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "ScrollBegin"},\
-    {"ScrollEnd", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "ScrollEnd"},\
-    {"Scroll", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Scroll"},\
+    {"ScrollBegin", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll_begin), 0, "ScrollBegin"},\
+    {"ScrollEnd", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll_end), 0, "ScrollEnd"},\
+    {"Scroll", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll), 0, "Scroll"},\
 

@@ -395,9 +395,9 @@ PyTypeObject PyLeleStyle::_obj_type = {
 ///////////////////////////////////////////////////////////////////////////
 int PyLeleStyleLayout::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleStyleLayout *self = reinterpret_cast<PyLeleStyleLayout *>(self_);
-    self->_flex = PyLong_FromLong(LeleEvent::Type::Clicked);
-    self->_grid = PyLong_FromLong(LeleEvent::Type::Clicked);
-    self->_no = PyLong_FromLong(LeleEvent::Type::Clicked);
+    self->_flex = PyLong_FromLong(0);//osm todo: what should these 3 be initialized with?
+    self->_grid = PyLong_FromLong(0);
+    self->_no = PyLong_FromLong(  0);
     return 0;
 }
 

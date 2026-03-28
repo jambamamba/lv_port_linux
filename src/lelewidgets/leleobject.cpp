@@ -395,6 +395,7 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
     bool bvalue = std::get<bool>(value.value());
     bvalue ? lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ELASTIC) : lv_obj_clear_flag(lv_obj, LV_OBJ_FLAG_SCROLL_ELASTIC);
   }
+  lv_obj_clear_flag(lv_obj, LV_OBJ_FLAG_SCROLL_MOMENTUM);
 
   // lv_theme_t * my_theme = lv_theme_create_from_default(lv_disp_get_default(), lv_color_hex(0x0000FF), lv_color_hex(0x00FF00)); // Create a new theme
   // lv_theme_set_active(my_theme); // Set the new theme as active
@@ -553,7 +554,7 @@ void LeleObject::EventCallback(lv_event_t *e) {
     lv_event_code_t code = lv_event_get_code(e);
     LeleObject *base = static_cast<LeleObject*>(e->user_data);
     if(base) {
-      if(false) { //base->_id == "/slider") {
+      if(false) {//base->_id == "/slider") {
       LL(DEBUG, LVSIM) << "LeleObject::eventCallback " <<
         "id:" << base->getId() << 
         ", class_name: " << base->getType() <<
