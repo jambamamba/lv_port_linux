@@ -30,11 +30,11 @@ PyObject *LeleEvent::createPyObject() {
         Py_DECREF(self);
         return nullptr;
     }
-    // self->_type = reinterpret_cast<PyObject*>(&PyLeleEventType::_obj_type);
-    // if (self->_type == nullptr) {
-    //     Py_DECREF(self);
-    //     return nullptr;
-    // }
+    self->_type = reinterpret_cast<PyObject*>(&PyLeleEventType::_obj_type);
+    if (self->_type == nullptr) {
+        Py_DECREF(self);
+        return nullptr;
+    }
     // switch(_code) {//osm todo
     //     case LeleEvent::Type::Clicked: self->_code = PyObject_GetAttrString(self->_type, "Clicked"); break;
     //     case LeleEvent::Type::ValueChanged: self->_code = PyObject_GetAttrString(self->_type, "ValueChanged"); break;
@@ -50,6 +50,7 @@ PyObject *LeleEvent::createPyObject() {
 
     return (PyObject *)self;
 }
+
 
 int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
     // PyLeleEvent *self = reinterpret_cast<PyLeleEvent *>(self_);
@@ -127,22 +128,35 @@ PyTypeObject PyLeleEvent::_obj_type = {
 ///////////////////////////////////////////////////////////////////////////
 int PyLeleEventType::init(PyObject *self_, PyObject *args, PyObject *kwds) {
     PyLeleEventType *self = reinterpret_cast<PyLeleEventType *>(self_);
-    self->_clicked = PyLong_FromLong(LeleEvent::Type::Clicked);
-    self->_value_changed = PyLong_FromLong(LeleEvent::Type::ValueChanged);
+    // self->_clicked = PyLong_FromLong(LeleEvent::Type::Clicked);
+    // self->_value_changed = PyLong_FromLong(LeleEvent::Type::ValueChanged);
     return 0;
 }
 
 void PyLeleEventType::dealloc(PyObject* self_) {
     PyLeleEventType *self = reinterpret_cast<PyLeleEventType *>(self_);
-    Py_XDECREF(self->_clicked);
-    Py_XDECREF(self->_value_changed);
+    // Py_XDECREF(self->_clicked);
+    // Py_XDECREF(self->_value_changed);
     Py_TYPE(self)->tp_free((PyObject*)self);
 }
 
-PyMemberDef PyLeleEventType::_members[] = {
-    PY_LELEEVENT_TYPE_MEMBERS() \
-    {nullptr}  /* Sentinel */
+struct PyLeleEventTypeMembersInitializer {
+    std::string _code_str[LV_EVENT_LAST];
+    PyLeleEventTypeMembersInitializer() {
+        constexpr size_t cursor0 = offsetof(struct PyLeleEventType, _enum[0]);
+        constexpr size_t cursor1 = offsetof(struct PyLeleEventType, _enum[1]);
+        const size_t cursor_delta = cursor1 - cursor0;
+        for(int i = LV_EVENT_ALL; i < LV_EVENT_LAST; ++i) {
+            _code_str[i] = std::string(lv_event_code_get_name(static_cast<lv_event_code_t>(i)));
+            PyLeleEventType::_members[i] = {_code_str[i].c_str(), Py_T_OBJECT_EX, 
+                (Py_ssize_t)(cursor0 + cursor_delta*i),
+                0, _code_str[i].c_str()};
+        }
+    }
 };
+
+PyMemberDef PyLeleEventType::_members[] = {nullptr};
+static PyLeleEventTypeMembersInitializer _PyLeleEventTypeMembersInitializer;
 
 //osm todo: google "make PyTypeObject iteratable"
 PyTypeObject PyLeleEventType::_obj_type = {

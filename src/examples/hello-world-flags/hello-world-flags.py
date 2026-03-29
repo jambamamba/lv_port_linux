@@ -3,10 +3,11 @@ import sys
 import lele
 
 def sliderEventHandler(event):
-   print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}")
-   user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
-   print(user_attributes)
-   # if event.code == lele.Event().Code.EVENT_VALUE_CHANGED:
+   # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}")
+   # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
+   # print(user_attributes)
+   if event.code == lele.Event().Type.EVENT_SCROLL_END:
+      print(f"@@@ scroll ended")
    #       print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
    #       obj = lele.getObjectById("/view/with_bg_img")
    #       style = obj.getStyle("img")

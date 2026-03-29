@@ -49,9 +49,9 @@ def setAngleMethod1(theta):
       obj.addStyle(style)
 
 def scaleImage(event):
-   print(f"@@@py SCALE SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Code.EVENT_CLICKED,rhs: {lele.Event().Type.ValueChanged}")
-   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
-   if event.code == lele.Event().Type.ValueChanged:
+   print(f"@@@py SCALE SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.EVENT_CLICKED,rhs: {lele.Event().Type.EVENT_VALUE_CHANGED}")
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.EVENT_CLICKED:{lele.Event().Type.EVENT_CLICKED.value}")
+   if event.code == lele.Event().Type.EVENT_VALUE_CHANGED:
          print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
          obj = lele.getObjectById("/view/with_bg_img")
          style = obj.getStyle("img")
@@ -64,9 +64,9 @@ def scaleImage(event):
    pass
 
 def tileImage(event):
-   print(f"@@@py REPEAT RADIO BUTTON CLIKED @@@ event.code,lhs:{event.code}, lele.Event().Type.Clicked,rhs: {lele.Event().Type.Clicked}")
-   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
-   if event.code == lele.Event().Type.Clicked:
+   print(f"@@@py REPEAT RADIO BUTTON CLIKED @@@ event.code,lhs:{event.code}, lele.Event().Type.EVENT_CLICKED,rhs: {lele.Event().Type.EVENT_CLICKED}")
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.EVENT_CLICKED:{lele.Event().Type.EVENT_CLICKED.value}")
+   if event.code == lele.Event().Type.EVENT_CLICKED:
          print(f"@@@py repeat radio slider {event.object.id}, event.type: {event.code}")
          obj = lele.getObjectById(event.object.id)
          # match event.object.id:
@@ -89,9 +89,9 @@ def tileImage(event):
    pass
 
 def rotateImage(event):
-   print(f"@@@py rotateImage @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
-   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
-   if event.code == lele.Event().Type.ValueChanged:
+   print(f"@@@py rotateImage @@@ event.code,lhs:{event.code}, lele.Event().Type.EVENT_VALUE_CHANGED,rhs: {lele.Event().Type.EVENT_VALUE_CHANGED}")
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.EVENT_CLICKED:{lele.Event().Type.EVENT_CLICKED.value}")
+   if event.code == lele.Event().Type.EVENT_VALUE_CHANGED:
          print(f"@@@py arc {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
          obj = lele.getObjectById("rotation-label")
          obj.setText(f"Angle: {event.value}°")
@@ -100,9 +100,9 @@ def rotateImage(event):
    pass
 
 def sliderMoved(event):
-   print(f"@@@py SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.ValueChanged,rhs: {lele.Event().Type.ValueChanged}")
-   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked.value}")
-   if event.code == lele.Event().Type.ValueChanged:
+   print(f"@@@py SLIDER MOVED @@@ event.code,lhs:{event.code}, lele.Event().Type.EVENT_VALUE_CHANGED,rhs: {lele.Event().Type.EVENT_VALUE_CHANGED}")
+   # print(f"@@@py res:{lele.Event().Type} lele.Event().Type.EVENT_CLICKED:{lele.Event().Type.EVENT_CLICKED.value}")
+   if event.code == lele.Event().Type.EVENT_VALUE_CHANGED:
          print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
          obj = lele.getObjectById("rotation-label")
          obj.setText(f"Angle: {event.value}°")
@@ -162,8 +162,8 @@ def runTest(event):
    # user_attributes = [attr for attr in dir(lele.Button) if not attr.startswith('__')]
    # print(f"@@@py:33 lele.Button attributes: {user_attributes}")
    # print(f"@@@py:34 res:{lele.Button.Type} lele.Button.Type.Push:{lele.Button.Type.Push.value}")
-   # print(f"@@@py:35 res:{lele.Event().Type} lele.Event().Type.Clicked:{lele.Event().Type.Clicked}")
-   if event.code == lele.Event().Type.Clicked:
+   # print(f"@@@py:35 res:{lele.Event().Type} lele.Event().Type.EVENT_CLICKED:{lele.Event().Type.EVENT_CLICKED}")
+   if event.code == lele.Event().Type.EVENT_CLICKED:
       # print(f"@@@py: event: {event}")
       # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
       # print(user_attributes)
