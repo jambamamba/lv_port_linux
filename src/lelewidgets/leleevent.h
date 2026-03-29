@@ -87,11 +87,3 @@ struct PyLeleEventType {
     // Type-specific fields go here
     PyObject *_enum[LV_EVENT_LAST+1] = {nullptr};
 };
-
-// #define PY_LELEEVENT_TYPE_MEMBERS() \
-//     {"Clicked", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _clicked), 0, "Clicked"},\
-//     {"ValueChanged", Py_T_INT, offsetof(PyLeleEventType, _value_changed), 0, "ValueChanged"},\
-//     {"ScrollBegin", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll_begin), 0, "ScrollBegin"},\
-//     {"ScrollEnd", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll_end), 0, "ScrollEnd"},\
-//     {"Scroll", Py_T_OBJECT_EX, offsetof(PyLeleEventType, _scroll), 0, "Scroll"},\
-

@@ -35,14 +35,6 @@ PyObject *LeleEvent::createPyObject() {
         Py_DECREF(self);
         return nullptr;
     }
-    // switch(_code) {//osm todo
-    //     case LeleEvent::Type::Clicked: self->_code = PyObject_GetAttrString(self->_type, "Clicked"); break;
-    //     case LeleEvent::Type::ValueChanged: self->_code = PyObject_GetAttrString(self->_type, "ValueChanged"); break;
-    //     case LeleEvent::Type::ScrollBegin: self->_code = PyObject_GetAttrString(self->_type, "ScrollBegin"); break;
-    //     case LeleEvent::Type::ScrollEnd: self->_code = PyObject_GetAttrString(self->_type, "ScrollEnd"); break;
-    //     case LeleEvent::Type::Scroll: self->_code = PyObject_GetAttrString(self->_type, "Scroll"); break;
-    //     default: LL(WARNING, LVSIM) << "Unhandled event code: " << self->_code; self->_code = Py_None;//osm todo: need to capture scroll event when flag view scrolls horizontally
-    // }
     std::string code_str(lv_event_code_get_name(static_cast<lv_event_code_t>(_code)));
     self->_code = PyObject_GetAttrString(self->_type, code_str.c_str());//"Clicked");//osm todo replace "Clicked" with LV_EVENT_CLICKED and same for the rest of cases above
     self->_ivalue = _ivalue;
