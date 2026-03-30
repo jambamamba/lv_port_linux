@@ -343,6 +343,18 @@ PyObject *PyLeleObject::getParent(PyObject *self_, PyObject *arg) {
     return lele_obj->getParent()->createPyObject();
 }
 
+PyObject *PyLeleObject::getScrollX(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    return PyLong_FromLong(lele_obj->getScrollX());
+}
+
+PyObject *PyLeleObject::getScrollY(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    return PyLong_FromLong(lele_obj->getScrollY());
+}
+
 PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);

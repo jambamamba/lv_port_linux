@@ -586,6 +586,15 @@ void LeleObject::show() {
   lv_obj_remove_flag(getLvObj(), LV_OBJ_FLAG_HIDDEN);
 }
 
+int32_t LeleObject::getScrollX() const {
+  int32_t scroll_value = lv_obj_get_scroll_x(getLvObj());
+  return scroll_value;
+}
+int32_t LeleObject::getScrollY() const {
+  int32_t scroll_value = lv_obj_get_scroll_y(getLvObj());
+  return scroll_value;
+}
+
 bool LeleObject::eventCallback(LeleEvent &&e) {
   // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s, code:[0x%x]%s,\n", 
   //   _id.c_str(), _type.c_str(), _lele_parent ? _lele_parent->getCxxClass().c_str() : "", 

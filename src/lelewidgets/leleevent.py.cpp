@@ -14,7 +14,7 @@ PyObject *LeleEvent::createPyObject() {
     if (!self) {
         return Py_None;
     }
-    self->_object = _target_obj ? _target_obj->createPyObject() : Py_None;
+    self->_target = _target_obj ? _target_obj->createPyObject() : Py_None;
     self->_id = PyUnicode_FromString(_id.size() ? _id.c_str() : "");
     if (self->_id == nullptr) {
         Py_DECREF(self);
@@ -51,7 +51,7 @@ int PyLeleEvent::init(PyLeleEvent *self, PyObject *args, PyObject *kwds) {
 
 void PyLeleEvent::dealloc(PyLeleEvent* self) {
     Py_XDECREF(self->_id);
-    Py_XDECREF(self->_object);
+    Py_XDECREF(self->_target);
     Py_XDECREF(self->_type);
     Py_XDECREF(self->_action);
     Py_XDECREF(self->_args);

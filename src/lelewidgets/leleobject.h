@@ -47,6 +47,8 @@ public:
   void setLvObj(lv_obj_t *obj);
   virtual void setParent(LeleObject *parent);
   LeleObject *getParent() const;
+  int32_t getScrollX() const;
+  int32_t getScrollY() const;
   const std::vector<std::unique_ptr<LeleStyle>> &getStyles() const;
   std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::vector<std::string> &class_name = {}) const;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;
@@ -122,6 +124,8 @@ struct PyLeleObject {
     static PyObject *addStyle(PyObject *, PyObject *);
     static PyObject *removeStyle(PyObject *, PyObject *);
     static PyObject *getParent(PyObject *, PyObject *);
+    static PyObject *getScrollX(PyObject *, PyObject *);
+    static PyObject *getScrollY(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
@@ -137,4 +141,6 @@ struct PyLeleObject {
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
   {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
   {"getParent", (PyCFunction)PyLeleObject::getParent, METH_NOARGS, "Get the parent object"},\
+  {"getScrollX", (PyCFunction)PyLeleObject::getScrollX, METH_NOARGS, "Get current X scroll position"},\
+  {"getScrollY", (PyCFunction)PyLeleObject::getScrollY, METH_NOARGS, "Get current Y scroll position"},\
 
