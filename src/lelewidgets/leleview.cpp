@@ -19,7 +19,7 @@ lv_obj_t *LeleViews::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj) {
   setParent(lele_parent);
   return _lv_obj;
 }
-std::vector<LeleView*> LeleViews::getChildren() const {
+std::vector<LeleView*> LeleViews::childrenNodes() const {
     std::vector<LeleView*> ret;
     for(const auto &pair: _nodes) {
       if (std::holds_alternative<std::unique_ptr<LeleObject>>(pair.second)) {
@@ -35,10 +35,10 @@ std::vector<LeleView*> LeleViews::getChildren() const {
     return ret;
 }
 int LeleViews::count() const {
-    return getChildren().size();
+    return childrenNodes().size();
 }
 LeleView* LeleViews::getAt(int index) const {
-    auto list = getChildren();
+    auto list = childrenNodes();
     if(list.size() > index) {
         return list.at(index);
     }
@@ -46,14 +46,14 @@ LeleView* LeleViews::getAt(int index) const {
 }
 
 void LeleViews::show(){
-  for(LeleView *view : getChildren()) {
+  for(LeleView *view : childrenNodes()) {
     if(view) {
       view->show();
     }
   }
 }
 void LeleViews::hide(){
-  for(LeleView *view : getChildren()) {
+  for(LeleView *view : childrenNodes()) {
     if(view) {
       view->hide();
     }

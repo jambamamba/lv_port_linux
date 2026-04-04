@@ -209,7 +209,7 @@ void LeleStackView::pushView(const std::map<std::string, std::string> &args) {
   for(auto &[name,id]: args) {
     LOG(DEBUG, LVSIM, "LeleStackView::eventCallback arg: name:%s, id:%s\n", name.c_str(), id.c_str());
     if(name == "id") {
-      for(LeleView *view : _views->getChildren()) {
+      for(LeleView *view : _views->childrenNodes()) {
         if(view->getId() == id) {
           view->show();
           _stack.push_back(view);

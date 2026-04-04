@@ -300,7 +300,7 @@ void iterateNodes(
             if(on_visit_lele_base_obj) {
                 on_visit_lele_base_obj(*lele_object.get());
             }
-            LeleWidgetFactory::iterateNodes(lele_object->children(), depth+1, on_visit_lele_base_obj);
+            LeleWidgetFactory::iterateNodes(lele_object->childrenNodes(), depth+1, on_visit_lele_base_obj);
         }
     }
 }

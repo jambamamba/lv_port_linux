@@ -35,7 +35,7 @@ public:
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   int count() const;
   LeleView* getAt(int idx) const;
-  std::vector<LeleView*> getChildren() const;
+  std::vector<LeleView*> childrenNodes() const;
   virtual void show() override;
   virtual void hide() override;
 protected:

@@ -4,12 +4,25 @@ import lele
 
 def sliderEventHandler(event):
    if (event.code == lele.Event().Type.EVENT_SCROLL):
+      slider = lele.getObjectById("/slider")
+      views = slider.getChildren()
+      for view in views:
+         view.removeClass("pane/selected")
+         img = view.getChildById(f"{view.getId()}/img")
+         if img:
+            img.removeClass("pane/selected/img")
       # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}, scroll_x:{event.target.getScrollX()}")
       # when first element is centered: -384
       # each element's width: 267
       center_element = (event.target.getScrollX() - (-384))/267
-      print(f"@@@py center_element: {int(center_element)}")
-      center_element = lele.getObjectById("/pane" + str(int(center_element)))
+      center_element = int(center_element)
+      print(f"@@@py center_element: {center_element}")
+      view = lele.getObjectById("/pane" + str(center_element))
+      if view:
+         view.addClass("pane/selected")
+         img = view.getChildById(f"{view.getId()}/img")
+         if img:
+            img.addClass("pane/selected/img")
 
    # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
    # print(user_attributes)

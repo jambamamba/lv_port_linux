@@ -262,8 +262,8 @@ PyObject *PyLeleObject::addChild(PyObject *self_, PyObject *args) {
         }
     }
     if(py_objects.size() > 0) {
-        lele_obj->children().insert(
-            lele_obj->children().end(), 
+        lele_obj->childrenNodes().insert(
+            lele_obj->childrenNodes().end(), 
             std::make_move_iterator(nodes.begin()), std::make_move_iterator(nodes.end()));
     }
     return pyListOrPyObjectFromStdVector(py_objects);
@@ -309,8 +309,8 @@ PyObject *PyLeleObject::fromConfig(PyObject *self_, PyObject *args) {
             break;//osm todo: ensure the json config has just one object, becasue we only instantiate one object
         }
     }
-    self->_lele_obj->children().insert(
-        self->_lele_obj->children().end(), 
+    self->_lele_obj->childrenNodes().insert(
+        self->_lele_obj->childrenNodes().end(), 
         std::make_move_iterator(nodes.begin()), std::make_move_iterator(nodes.end()));
     return reinterpret_cast<PyObject *>(self_);
 }
@@ -336,11 +336,43 @@ PyObject *PyLeleObject::getType(PyObject *self_, PyObject *arg) {
 PyObject *PyLeleObject::getParent(PyObject *self_, PyObject *arg) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
-    if (!lele_obj->getParent()) {
+    LeleObject *parent = lele_obj->getParent();
+    if (!parent) {
         PyErr_SetString(PyExc_AttributeError, "no parent");
         return Py_None;
     }
-    return lele_obj->getParent()->createPyObject();
+    return parent->createPyObject();
+}
+
+PyObject *PyLeleObject::getChildById(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    char *id = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //id
+        &id)) {
+        return Py_None;
+    }
+    LeleObject *child = lele_obj->getChildById(id);
+    if (!child) {
+        PyErr_SetString(PyExc_AttributeError, "no child");
+        return Py_None;
+    }
+    return child->createPyObject();
+}
+
+PyObject *PyLeleObject::getChildren(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    auto children = lele_obj->getChildren();
+    if (children.size() == 0) {
+        PyErr_SetString(PyExc_AttributeError, "no children");
+        return Py_None;
+    }
+    std::vector<PyObject *> list;
+    for(auto &child : children) {
+        list.emplace_back(child->createPyObject());
+    }
+    return pyListOrPyObjectFromStdVector(list);
 }
 
 PyObject *PyLeleObject::getScrollX(PyObject *self_, PyObject *arg) {
@@ -443,7 +475,45 @@ PyObject *PyLeleObject::removeStyle(PyObject *self_, PyObject *args) {
     if(lele_obj && args) {
         //osm todo
     }
-    return Py_None;
+    return PyBool_FromLong(false);
+}
+
+PyObject *PyLeleObject::addClass(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args != 1) {
+        return PyBool_FromLong(false);
+    }
+    const char* class_name = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //str
+                &class_name)) {
+        LOG(WARNING, LVSIM, "Failed to parse args\n");
+        return PyBool_FromLong(false);
+    }
+    return PyBool_FromLong(lele_obj->addClass(class_name));
+}
+
+PyObject *PyLeleObject::removeClass(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    Py_ssize_t num_args = PyTuple_Size(args);
+    if(num_args != 1) {
+        return PyBool_FromLong(false);
+    }
+    const char* class_name = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //str
+                &class_name)) {
+        LOG(WARNING, LVSIM, "Failed to parse args\n");
+        return Py_None;
+    }
+    return PyBool_FromLong(lele_obj->removeClass(class_name));
 }
 
 PyMemberDef PyLeleObject::_members[] = {

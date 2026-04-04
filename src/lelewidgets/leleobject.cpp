@@ -86,13 +86,37 @@ LeleObject *LeleObject::getParent() const{
   return _lele_parent;
 }
 
+LeleObject *LeleObject::getChildById(const std::string &id) {
+  for (auto *child : getChildren()) {
+    if(child->getId() == id) {
+      return child;
+    }
+  }
+  LL(WARNING, LVSIM) << "LeleObject::getChildById no child with given id: " << id;
+  return nullptr;
+}
+
+std::vector<LeleObject*> LeleObject::getChildren() {
+  std::vector<LeleObject*> children;
+  for (const auto &[key,token]: childrenNodes()) {
+    if (std::holds_alternative<std::unique_ptr<LeleObject>>(token)) {
+      auto &lele_object = std::get<std::unique_ptr<LeleObject>>(token);
+      children.push_back(lele_object.get());
+    }
+  }
+  if(children.size() == 0) {
+    LL(WARNING, LVSIM) << "LeleObject::getChildren has no children";
+  }
+  return children;
+}
+
+std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &LeleObject::childrenNodes() {
+  return _nodes;
+}
 // const LeleStyles *LeleObject::styles() const {
 //   return &_lele_styles;
 // }
 
-std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &LeleObject::children() {
-  return _nodes;
-}
 
 namespace {
 //Extending current theme:
@@ -475,6 +499,24 @@ void LeleObject::addStyle(LeleStyle* lele_style) {
 void LeleObject::removeStyle(const std::string &style_id) {
   //osm todo
   _lele_styles.clear();
+}
+
+bool LeleObject::addClass(const std::string &class_name) {
+  if (std::find(_classes.begin(), _classes.end(), class_name) != _classes.end()) {
+    LL(WARNING, LVSIM) << "addClass '" << class_name << "' already exists";
+    return false;
+  }
+  _classes.push_back(class_name);
+  return true;
+}
+
+bool LeleObject::removeClass(const std::string &class_name) {
+  if (std::find(_classes.begin(), _classes.end(), class_name) == _classes.end()) {
+    LL(WARNING, LVSIM) << "removeClass '" << class_name << "' does not exist";
+    return false;
+  }
+  std::erase(_classes, class_name);
+  return true;
 }
 
 std::pair<int,int> LeleObject::getTextSize(lv_obj_t *lv_obj, const char *text) {
