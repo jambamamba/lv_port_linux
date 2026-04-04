@@ -15,7 +15,7 @@ def sliderEventHandler(event):
    # print(user_attributes)
    # if (event.code == lele.Event().Type.EVENT_SCROLL_END or event.code == lele.Event().Type.EVENT_SCROLL):
       # print(f"@@@ event.code:{event.code}, event.id:{event.id}")
-   #       print(f"@@@py slider {event.object.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
+   #       print(f"@@@py slider {event.target.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
    #       obj = lele.getObjectById("/view/with_bg_img")
    #       style = obj.getStyle("img")
    #       dic = style.getValue(["background/size"])

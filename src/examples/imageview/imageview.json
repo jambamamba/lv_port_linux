@@ -27,13 +27,14 @@
                     "background":{
                         "ximage":"res/yellow.png",
                         "image":"res/pumpkin-man.png",
-                        "xposition":"20",
-                        "xposition":{"x":"20","y":"20"},
-                        "xsize":"contain",
-                        "xsize":"cover",
-                        "xsize":{"x":"20%","y":"20%"},
-                        "size":"100",
-                        "rotation":{"angle":"0","pivot":{"x":"100","y":"100"}},
+                        "#position":"20",
+                        "position":{"x":"20","y":"20"},
+                        "#size":"contain",
+                        "#size":"cover",
+                        "#size":{"x":"20%","y":"20%", "todo":"todo: does not work"},
+                        "#size":"100",
+                        "rotation":{"angle":"0","pivot":{"x":"106","y":"106"}},
+                        "#rotation":{"angle":"0", "todo":"todo: should work if no pivot is provided, use center of image as pivot"},
                         "repeat":"repeat",
                         "color":"#0f0"
                     }

@@ -20,8 +20,8 @@ print(f"@@@py lele.Button:{lele.Button}")
 print(f"@@@py attributes: {[attr for attr in dir(lele.Button) if not attr.startswith('__')]}")
 
 def buttonClicked(event):
-   print(f"@@@py: button clicked, event:{event}, event.object.id:{event.object.id}")
-   msgbox = event.object
+   print(f"@@@py: button clicked, event:{event}, event.target.id:{event.target.id}")
+   msgbox = event.target
    btn = msgbox.getButtonClicked()
    print(f"@@@py btn clicked: {btn.id}, {btn.getText()}")
    if btn.id == "push2":
