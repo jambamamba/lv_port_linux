@@ -404,7 +404,39 @@ PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     return PyBool_FromLong(true);
 }
 
-PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
+PyObject *PyLeleObject::getStyleByKey(PyObject *self_, PyObject *args) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+    if(!lele_obj || !args) {
+        return PyBool_FromLong(false);
+    }
+    const char* style_key = nullptr;
+    if(!PyArg_ParseTuple(args, "s", //str
+                &style_key)) {
+        LOG(FATAL, LVSIM, "Failed to parse args\n");
+        return Py_None;
+    }
+    if(!style_key || !*style_key) {
+        LOG(WARNING, LVSIM, "No style key was given\n");
+        return Py_None;
+    }
+    auto value = lele_obj->getStyle(style_key);
+    if(!value) {
+        LL(WARNING, LVSIM) << "No style exists for key: " << style_key;
+        return Py_None;
+    }
+    LeleStyle lele_style;
+    PyLeleStyle *py_style = reinterpret_cast<PyLeleStyle *>(lele_style.createPyObject());
+    PyObject *py_value = PyLeleStyle::toPyObject(py_style, value);
+    Py_DECREF(py_style);
+    if(!py_value) {
+        LL(WARNING, LVSIM) << "Failed to get style value for key: " << style_key;
+        return Py_None;
+    }
+    return py_value;
+}
+
+PyObject *PyLeleObject::getStyleById(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(!lele_obj || !args) {
@@ -412,13 +444,6 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
     }
     Py_ssize_t num_args = PyTuple_Size(args);
     if(num_args == 0) {
-        // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes());
-        // static LeleStyle style(lele_obj->getStyleAttributes(), lele_obj->getParent()->getLvObj());//osm not used anymore
-        // const auto &styles = lele_obj->getStyles();
-        // if(styles.size() == 0) {
-        //     return Py_None;
-        // }
-        // return styles.at(0)->createPyObject();
         std::vector<PyObject *> res;
         for (const auto &style : lele_obj->getStyles()) {
             res.emplace_back(style->createPyObject());
@@ -446,7 +471,6 @@ PyObject *PyLeleObject::getStyle(PyObject *self_, PyObject *args) {
         }
     }
     return pyListOrPyObjectFromStdVector(res);
-    // return PyLeleStyle::toPyDict(lele_obj->getStyleAttributes(style_id));
 }
 
 PyObject *PyLeleObject::addStyle(PyObject *self_, PyObject *args) {

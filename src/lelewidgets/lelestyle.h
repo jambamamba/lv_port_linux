@@ -78,6 +78,7 @@ struct PyLeleStyle {
       LeleStyle *lele_style,
       const std::map<std::string, std::optional<LeleStyle::StyleValue>> &&style_name_value_map,
       const std::unordered_set<std::string> &&white_list = {});
+    static PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle::StyleValue> &style);
     static void dealloc(PyObject* self);
     static int init(PyObject *self, PyObject *args, PyObject *kwds);
     static void dtor(PyObject *self_);
@@ -86,6 +87,7 @@ struct PyLeleStyle {
     std::vector<std::unique_ptr<LeleStyle>> _lele_styles;
     LeleStyle* _lele_style = nullptr;
     PyObject *_id = nullptr;
+    PyObject *_keys = nullptr;
     PyObject *_class = nullptr;
     PyObject *_layout = nullptr;
     PyObject *_flow = nullptr;
@@ -99,6 +101,7 @@ struct PyLeleStyle {
 
 #define PY_LELESTYLE_MEMBERS() \
   {"id", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _id), 0, "id"},\
+  {"Keys", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _keys), 0, "Keys"},\
   {"Layout", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _layout), 0, "Layout"},\
   {"Flow", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _flow), 0, "Flow"},\
   {"Scrollbar", Py_T_OBJECT_EX, offsetof(PyLeleStyle, _scrollbar), 0, "Scrollbar"},\

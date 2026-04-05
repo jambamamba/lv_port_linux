@@ -53,7 +53,6 @@ public:
   int32_t getScrollY() const;
   const std::vector<std::unique_ptr<LeleStyle>> &getStyles() const;
   std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::vector<std::string> &class_name = {}) const;
-  std::map<std::string, std::optional<LeleStyle::StyleValue>> getStyleAttributes(const std::string &style_id = "") const;
   std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle(const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &childrenNodes();
   static bool visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback);
@@ -124,7 +123,8 @@ struct PyLeleObject {
     static PyObject *getType(PyObject *, PyObject *);
     static PyObject *getClasses(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
-    static PyObject *getStyle(PyObject *, PyObject *);
+    static PyObject *getStyleById(PyObject *, PyObject *);
+    static PyObject *getStyleByKey(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
     static PyObject *removeStyle(PyObject *, PyObject *);
     static PyObject *addClass(PyObject *, PyObject *);
@@ -145,7 +145,8 @@ struct PyLeleObject {
   {"getClasses", (PyCFunction)PyLeleObject::getClasses, METH_NOARGS, "Get the class names"},\
   {"getType", (PyCFunction)PyLeleObject::getType, METH_NOARGS, "Get the object type"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
-  {"getStyle", (PyCFunction)PyLeleObject::getStyle, METH_VARARGS, "Get the style attributes for this object"},\
+  {"getStyleById", (PyCFunction)PyLeleObject::getStyleById, METH_VARARGS, "Get the style attributes for this object"},\
+  {"getStyleByKey", (PyCFunction)PyLeleObject::getStyleByKey, METH_VARARGS, "Get the style value for this object by style key"},\
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
   {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
   {"addClass", (PyCFunction)PyLeleObject::addClass, METH_VARARGS, "Add a class to the object that references a style with the same class"},\

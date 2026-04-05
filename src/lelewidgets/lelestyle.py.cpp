@@ -27,6 +27,13 @@ bool LeleStyle::initPyObject(PyLeleStyle *py_obj) {
     if (py_obj->_id == nullptr) {
         return false;
     }
+
+    std::vector<PyObject*> py_keys;
+    for(const std::string &key : _style_keys) {
+        py_keys.emplace_back(PyUnicode_FromString(key.c_str()));
+    }
+    py_obj->_keys = PyLeleObject::pyListOrPyObjectFromStdVector(py_keys);
+
     py_obj->_class = PyUnicode_FromString(
         _class.size() ? _class.c_str() : "");
     if (py_obj->_class == nullptr) {
@@ -145,8 +152,7 @@ PyObject *PyLeleStyle::getClass(PyObject *self_, PyObject *arg) {
     return self->_class;
 }
 
-namespace {
-PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle::StyleValue> &style) {
+PyObject *PyLeleStyle::toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle::StyleValue> &style) {
 
     PyObject *value = nullptr;
     if (std::holds_alternative<int>(style.value())) {
@@ -208,7 +214,6 @@ PyObject *toPyObject(const PyLeleStyle *py_style, const std::optional<LeleStyle:
     }
     return value;
 }
-}//namespace
 
 PyObject *PyLeleStyle::toPyDict(
     LeleStyle *lele_style,

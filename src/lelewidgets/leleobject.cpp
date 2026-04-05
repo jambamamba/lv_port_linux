@@ -154,30 +154,10 @@ static void new_theme_init_and_set(void)
 #endif//0
 }//namespace
 
-std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleObject::getStyleAttributes(const std::string &style_id) const {
-
-  std::map<std::string, std::optional<LeleStyle::StyleValue>> ret;
-  for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-    if(!style_id.empty() && style_id != lele_style->getId()) {
-      continue;
-    }
-    std::vector<std::string> keys;
-    for(const auto &[key, value] : lele_style->getStyle()) {
-      keys.push_back(key);
-    }
-    for(const auto &key : keys) {
-      auto value = lele_style->getValue(key, lele_style->getClass());
-      if(value && ret.find(key) == ret.end()) {
-        ret[key] = value;
-      }
-    }
-  }
-  return ret;
-}
-
 const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
+
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::vector<std::string> &class_names) const {
 
   auto value = std::optional<LeleStyle::StyleValue>();
@@ -499,23 +479,26 @@ void LeleObject::addStyle(LeleStyle* lele_style) {
 void LeleObject::removeStyle(const std::string &style_id) {
   //osm todo
   _lele_styles.clear();
+  applyStyle(_lv_obj);
 }
 
 bool LeleObject::addClass(const std::string &class_name) {
   if (std::find(_classes.begin(), _classes.end(), class_name) != _classes.end()) {
-    LL(WARNING, LVSIM) << "addClass '" << class_name << "' already exists";
+    LL(WARNING, LVSIM) << _id << " addClass '" << class_name << "' already exists";
     return false;
   }
   _classes.push_back(class_name);
+  applyStyle(_lv_obj);
   return true;
 }
 
 bool LeleObject::removeClass(const std::string &class_name) {
   if (std::find(_classes.begin(), _classes.end(), class_name) == _classes.end()) {
-    LL(WARNING, LVSIM) << "removeClass '" << class_name << "' does not exist";
+    LL(WARNING, LVSIM) << _id << " removeClass '" << class_name << "' does not exist";
     return false;
   }
   std::erase(_classes, class_name);
+  applyStyle(_lv_obj);
   return true;
 }
 

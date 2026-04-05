@@ -3,26 +3,34 @@ import sys
 import lele
 
 def sliderEventHandler(event):
-   if (event.code == lele.Event().Type.EVENT_SCROLL):
-      slider = lele.getObjectById("/slider")
-      views = slider.getChildren()
-      for view in views:
-         view.removeClass("pane/selected")
-         img = view.getChildById(f"{view.getId()}/img")
-         if img:
-            img.removeClass("pane/selected/img")
-      # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}, scroll_x:{event.target.getScrollX()}")
-      # when first element is centered: -384
-      # each element's width: 267
-      center_element = (event.target.getScrollX() - (-384))/267
-      center_element = int(center_element)
-      print(f"@@@py center_element: {center_element}")
-      view = lele.getObjectById("/pane" + str(center_element))
-      if view:
-         view.addClass("pane/selected")
-         img = view.getChildById(f"{view.getId()}/img")
-         if img:
-            img.addClass("pane/selected/img")
+   if (event.code != lele.Event().Type.EVENT_SCROLL):
+      return
+   slider = lele.getObjectById("/slider")
+   posx = event.target.getScrollX()
+   posx = slider.getScrollX()
+   deltax = 418-151
+   # style = slider.getStyle()
+   # if style:
+   #    print(f"@@@py slider style.Keys: {style.Keys}")
+   views = slider.getChildren()
+   for view in views:
+      # print(f"@@@py view : {view.id}")
+      view.removeClass("pane/selected")
+      img = view.getChildById(f"{view.id}/img")
+      if img:
+         img.removeClass("pane/selected/img")
+   # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}, scroll_x:{event.target.getScrollX()}")
+   # when first element is centered: -384
+   # each element's width: 267
+   center_element = (event.target.getScrollX() - (-384))/267
+   center_element = int(center_element)
+   # print(f"@@@py center_element: {center_element}")
+   view = lele.getObjectById("/pane" + str(center_element))
+   if view:
+      img = view.getChildById(f"{view.id}/img")
+      if img:
+         img.addClass("pane/selected/img")
+      view.addClass("pane/selected")
 
    # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]
    # print(user_attributes)
