@@ -231,6 +231,10 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
     obj_width = std::get<int>(value.value());
     lv_obj_set_width(lv_obj, obj_width);
   }
+  if(_id == "/pane0/img") {
+    int x = 0;
+    x = 1;
+  }
   int obj_height = -1;
   value = getStyle("height");
   if(value) {

@@ -35,7 +35,15 @@ lv_obj_t *LeleImage::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj_) {
   return _lv_obj;
 }
 
+void LeleImage::applyStyle(lv_obj_t *lv_obj) {
+  LeleObject::applyStyle(lv_obj);
+  drawImage();
+}
+
 void LeleImage::drawImage() {
+  if(!_lv_img) {
+    return;
+  }
   auto width = getStyle("width");
   auto height = getStyle("height");
 

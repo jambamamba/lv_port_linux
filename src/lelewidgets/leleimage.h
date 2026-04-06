@@ -14,6 +14,7 @@ class LeleImage : public LeleObject  {
   virtual lv_obj_t *createLvObj(LeleObject *lele_parent = nullptr, lv_obj_t *lv_obj = nullptr) override;
   virtual PyObject *createPyObject() override;
   virtual bool initPyObject(PyLeleObject *py_obj) override;
+  virtual void applyStyle(lv_obj_t *lv_obj) override;
   std::string getSrc() const;
   void setSrc(const std::string& src);
   std::vector<uint8_t> getBuffer() const;

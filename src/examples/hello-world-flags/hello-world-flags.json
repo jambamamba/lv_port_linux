@@ -3,9 +3,9 @@
     "screen":{"width":"1024","height":"768","padding":"none","margin":"none","corner-radius":"0"},
     "language":{"current":"en","default":"en"},
     "style":{"class":"pane","width":"25%","height":"25%","flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"},"scroll/snap/x":"none","scroll/elastic":"none","border":"none"},
-    "style":{"class":"pane/selected","height":"35%","bgcolor":"#222","border":"none"},
+    "style":{"class":"pane/selected","height":"35%","#bgcolor":"#222","border":"none"},
     "style":{"class":"pane/img","width":"15%","height":"15%","fgcolor":"#fff","flex":"none","border":"none"},
-    "style":{"class":"pane/selected/img","width":"25%","height":"25%","border":"solid-2px-#fff"},
+    "style":{"class":"pane/selected/img","width":"25%","height":"25%"},
     "style":{"class":"pane/label","width":"2%","height":"5%","fgcolor":"#fff","flex":"none","border":"none"},
     "view":{
         "id":"/container",
@@ -22,9 +22,9 @@
             "view":{
                 "id":"/pane0",
                 "class":"pane",
-                "#class":"pane/selected",
+                "class":"pane/selected",
                 "#osm todo: adding 'style' here should override class 'pane': style":{"border":"solid-2px-#f00"},
-                "img":{"id":"/pane0/img", "class":"pane/img", "#class":"pane/selected/img", "src":"flags/spain.png","size":{"width":"100%","height":"100%"}},
+                "img":{"id":"/pane0/img", "class":"pane/img", "class":"pane/selected/img", "src":"flags/spain.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"0"}
             },
             "view":{
@@ -36,6 +36,7 @@
             "view":{
                 "id":"/pane2",
                 "class":"pane",
+                "class":"pane/selected",
                 "img":{"id":"/pane2/img", "class":"pane/img","src":"flags/germany.png","size":{"width":"100%","height":"100%"}},
                 "label":{"class":"pane/label","text":"2"}
             },

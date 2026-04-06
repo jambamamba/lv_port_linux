@@ -80,7 +80,7 @@ LeleStyle::LeleStyle(LeleObject *lele_obj, const std::string &json_str)
 //     _style[key] = value;
 //   }
 // }
-  
+
 bool LeleStyle::fromJson(const std::string &json_str) {
   for (const auto &[key, token]: LeleWidgetFactory::fromJson(_lele_obj, json_str)) {
     if (std::holds_alternative<std::string>(token)) {
