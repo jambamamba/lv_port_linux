@@ -4,7 +4,7 @@ import lele
 
 def setFont(current_lang):
    obj = lele.getObjectById("/hello-world-international/label")
-   style = obj.getStyle("style:/hello-world-international/style")
+   style = obj.getStyleById("style:/hello-world-international/style")
    # print(f"obj style font-size: {style.getValue("font-size")}")
    # print("============================================")
    if (current_lang == "Arabic" or 

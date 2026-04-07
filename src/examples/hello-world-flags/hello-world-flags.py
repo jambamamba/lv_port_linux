@@ -9,9 +9,6 @@ def sliderEventHandler(event):
    posx = event.target.getScrollX()
    posx = slider.getScrollX()
    deltax = 418-151
-   # style = slider.getStyle()
-   # if style:
-   #    print(f"@@@py slider style.Keys: {style.Keys}")
    views = slider.getChildren()
    for view in views:
       # print(f"@@@py view : {view.id}")
@@ -38,7 +35,7 @@ def sliderEventHandler(event):
       # print(f"@@@ event.code:{event.code}, event.id:{event.id}")
    #       print(f"@@@py slider {event.target.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
    #       obj = lele.getObjectById("/view/with_bg_img")
-   #       style = obj.getStyle("img")
+   #       style = obj.getStyleById("img")
    #       dic = style.getValue(["background/size"])
    #       print(f"@@@py style.dic3 {dic}")
    #       style.setValue({"background/size":str(event.value)})

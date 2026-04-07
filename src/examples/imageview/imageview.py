@@ -18,11 +18,11 @@ def callback(str):
 def setAngleMethod2(theta):
       print(f"@@@py======================================1")
       obj = lele.getObjectById("/view/with_bg_img")
-      style = obj.getStyle("img")
+      style = obj.getStyleById("img")
       # print(f"@@@py style {style}")
       # print(f"@@@py style.getCxxClass() {style.getCxxClass()}")
       # print(f"@@@py style.getValue() {style.getValue()}")
-      dic = obj.getStyle()
+      dic = obj.getStyleById()
       print(f"@@@py style.dic0  {dic}")
       dic = style.getValue(["background/image", "background/repeat", "background/rotation/angle", "background/rotation/pivot", "background/rotation/pivot/x", "background/rotation/pivot/y"])
       angle = dic['background/rotation/angle']
@@ -54,7 +54,7 @@ def scaleImage(event):
    if event.code == lele.Event().Type.EVENT_VALUE_CHANGED:
          print(f"@@@py slider {event.target.id} moved to: {event.value}%, event.type: {event.code}, event.action: {event.action}")
          obj = lele.getObjectById("/view/with_bg_img")
-         style = obj.getStyle("img")
+         style = obj.getStyleById("img")
          dic = style.getValue(["background/size"])
          print(f"@@@py style.dic3 {dic}")
          style.setValue({"background/size":str(event.value)})
@@ -81,7 +81,7 @@ def tileImage(event):
          #    case _:
          #       return
          obj = lele.getObjectById("/view/with_bg_img")
-         style = obj.getStyle("img")
+         style = obj.getStyleById("img")
          dic = style.getValue(["background/repeat"])
          print(f"@@@py style.dic4 {dic}")
          style.setValue({"background/repeat":event.target.id})
@@ -112,7 +112,7 @@ def sliderMoved(event):
 def setImgBgColor(rgb):
    obj = lele.getObjectById("/view/with_bg_img")
    print(f"@@@py setImgBgColor obj: {obj}")
-   style = obj.getStyle("img")
+   style = obj.getStyleById("img")
    print(f"@@@py setImgBgColor style: {style}")
    dic = style.getValue("background/color")
    print(f"@@@py style.dic {dic}")
@@ -121,11 +121,11 @@ def setImgBgColor(rgb):
 
    #####osm
    obj = lele.getObjectById("rotation-label")
-   style = obj.getStyle("views/view0/label")
+   style = obj.getStyleById("views/view0/label")
    dic = style.getValue("height")
    print(f"@@@py views/view0/label dic: {dic}")
    obj = obj.getParent()
-   style = obj.getStyle()
+   style = obj.getStyleById()
    print(f"@@@py views/view0/label parent style: {style}")
    dic = style.getValue("height")
    print(f"@@@py views/view0/label parent dic: {dic}")
@@ -288,7 +288,7 @@ def main():
       #    print(f"@@@py attr.name {attr.name}, attr.value: {attr.value}")
 
    obj = lele.getObjectById("/view/with_bg_img")
-   style = obj.getStyle()
+   style = obj.getStyleById()
    print(f"@@@py======================================1")
    print(f"@@@py lele.Style().Border: {lele.Style().Border}")
    print(f"@@@py style:{style}")
