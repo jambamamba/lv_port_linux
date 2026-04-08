@@ -2,13 +2,37 @@ import os
 import sys
 import lele
 
+def setFont(current_lang):
+   obj = lele.getObjectById("/hello-world-international/label")
+   style = obj.getStyleById("style:/hello-world-international/style")
+   # print(f"obj style font-size: {style.getValue("font-size")}")
+   # print("============================================")
+   if (current_lang == "Arabic" or 
+       current_lang == "Persian"):
+      style.setValue({"font-family":"NotoSansArabic-Bold"})
+   elif (current_lang == "Hebrew"):
+      style.setValue({"font-family":"NotoSansHebrew-Black"})
+   elif (current_lang == "Hindi"):
+      style.setValue({"font-family":"NotoSerifDevanagari-Bold"})
+   elif (current_lang == "Thai"):
+      style.setValue({"font-family":"NotoSansThai-Medium"})
+   elif (current_lang == "Chinese" or
+         current_lang == "Japanese" or
+         current_lang == "Vietnamese" or
+         current_lang == "Burmese"):
+      style.setValue({"font-family":"NotoSansSC-VariableFont_wght"})
+   else:
+      style.setValue({"font-family":"Ubuntu-B"})
+   print(f"current_lang: {current_lang}")
+   print(f"obj style font-family: {style.getValue("font-family")}")
+   print("============================================")
+
 def sliderEventHandler(event):
    if (event.code != lele.Event().Type.EVENT_SCROLL):
       return
    slider = lele.getObjectById("/slider")
    posx = event.target.getScrollX()
    posx = slider.getScrollX()
-   deltax = 418-151
    views = slider.getChildren()
    for view in views:
       # print(f"@@@py view : {view.id}")
@@ -16,17 +40,25 @@ def sliderEventHandler(event):
       img = view.getChildById(f"{view.id}/img")
       if img:
          img.removeClass("pane/selected/img")
+         # width = view.getStyleAttribute("width") #osm todo: calling getStyleAttribute crashes
+         # print(f"@@@py width: {width}")
    # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}, scroll_x:{event.target.getScrollX()}")
    # when first element is centered: -384
    # each element's width: 267
    center_element = (event.target.getScrollX() - (-384))/267
    center_element = int(center_element)
+   # width = center_element.getStyleAttribute("width")
+   # print(f"@@@py width: {width}")
    # print(f"@@@py center_element: {center_element}")
    view = lele.getObjectById("/pane" + str(center_element))
    if view:
       img = view.getChildById(f"{view.id}/img")
       if img:
          img.addClass("pane/selected/img")
+         language = view.getAttribute("language")
+         lele.Language().setCurrentLanguage(language)
+         setFont(lele.Language().getCurrentLanguage())
+
       view.addClass("pane/selected")
 
    # user_attributes = [attr for attr in dir(event) if not attr.startswith('__')]

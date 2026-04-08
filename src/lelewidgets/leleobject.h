@@ -116,6 +116,7 @@ struct PyLeleObject {
     // Type-specific fields go here
     LeleObject *_lele_obj = nullptr;
     PyObject *_id = nullptr;
+    PyObject *_attributes = nullptr;
     PyObject *_classes = nullptr;
     PyObject *_type = nullptr;
     static PyObject *addChild(PyObject *, PyObject *);
@@ -124,7 +125,7 @@ struct PyLeleObject {
     static PyObject *getClasses(PyObject *, PyObject *);
     static PyObject *addEventHandler(PyObject *, PyObject *);
     static PyObject *getStyleById(PyObject *, PyObject *);
-    static PyObject *getStyleByKey(PyObject *, PyObject *);
+    static PyObject *getStyleAttribute(PyObject *, PyObject *);
     static PyObject *addStyle(PyObject *, PyObject *);
     static PyObject *removeStyle(PyObject *, PyObject *);
     static PyObject *addClass(PyObject *, PyObject *);
@@ -134,10 +135,13 @@ struct PyLeleObject {
     static PyObject *getChildren(PyObject *, PyObject *);
     static PyObject *getScrollX(PyObject *, PyObject *);
     static PyObject *getScrollY(PyObject *, PyObject *);
+    static PyObject *getAttribute(PyObject *, PyObject *);
 };
 
 #define PY_LELEOBJECT_MEMBERS() \
-  {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},
+  {"id", Py_T_OBJECT_EX, offsetof(PyLeleObject, _id), 0, "id"},\
+  {"attributes", Py_T_OBJECT_EX, offsetof(PyLeleObject, _attributes), 0, "attributes"},\
+
 
 #define PY_LELEOBJECT_METHODS() \
   {"addChild", (PyCFunction)PyLeleObject::addChild, METH_VARARGS, "Adds one more more children from a configuration file with JSON description of the object"},\
@@ -146,7 +150,7 @@ struct PyLeleObject {
   {"getType", (PyCFunction)PyLeleObject::getType, METH_NOARGS, "Get the object type"},\
   {"addEventHandler", (PyCFunction)PyLeleObject::addEventHandler, METH_VARARGS, "Sets the event handler"},\
   {"getStyleById", (PyCFunction)PyLeleObject::getStyleById, METH_VARARGS, "Get the style attributes for this object"},\
-  {"getStyleByKey", (PyCFunction)PyLeleObject::getStyleByKey, METH_VARARGS, "Get the style value for this object by style key"},\
+  {"getStyleAttribute", (PyCFunction)PyLeleObject::getStyleAttribute, METH_VARARGS, "Get the style value for this object by style attribute name"},\
   {"addStyle", (PyCFunction)PyLeleObject::addStyle, METH_VARARGS, "Add a style to the object"},\
   {"removeStyle", (PyCFunction)PyLeleObject::removeStyle, METH_VARARGS, "Remove a style by its given id from the object"},\
   {"addClass", (PyCFunction)PyLeleObject::addClass, METH_VARARGS, "Add a class to the object that references a style with the same class"},\
@@ -156,4 +160,5 @@ struct PyLeleObject {
   {"getChildren", (PyCFunction)PyLeleObject::getChildren, METH_NOARGS, "Get the list of children"},\
   {"getScrollX", (PyCFunction)PyLeleObject::getScrollX, METH_NOARGS, "Get current X scroll position"},\
   {"getScrollY", (PyCFunction)PyLeleObject::getScrollY, METH_NOARGS, "Get current Y scroll position"},\
+  {"getAttribute", (PyCFunction)PyLeleObject::getAttribute, METH_VARARGS, "Get value of an attribute from the attribute name"},\
 

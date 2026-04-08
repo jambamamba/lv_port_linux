@@ -23,13 +23,20 @@ bool LeleObject::initPyObject(PyLeleObject *py_obj) {
     if (py_obj->_id == nullptr) {
         return false;
     }
+
+    PyObject *list = PyList_New(0);
+    for(const auto &[name, value]: _nodes) {
+        PyList_Append(list, PyUnicode_FromString(name.c_str()));
+    }
+    Py_INCREF(list);
+    py_obj->_attributes = list;
     // py_obj->_class = PyUnicode_FromString(
     //     _class.size() ? _class.c_str() : "");
     // if (py_obj->_class == nullptr) {
     //     return false;
     // }
-    PyObject *list = PyList_New(0);
-    for(const std::string &class_name: _classes){
+    list = PyList_New(0);
+    for(const std::string &class_name: _classes) {
         PyList_Append(list, PyUnicode_FromString(class_name.c_str()));
     }
     Py_INCREF(list);
@@ -387,6 +394,33 @@ PyObject *PyLeleObject::getScrollY(PyObject *self_, PyObject *arg) {
     return PyLong_FromLong(lele_obj->getScrollY());
 }
 
+PyObject *PyLeleObject::getAttribute(PyObject *self_, PyObject *arg) {
+    PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
+    LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
+
+    for(const auto &[name, value]: lele_obj->childrenNodes()) {
+        const char* py_name = nullptr;
+        if(!PyArg_ParseTuple(arg, "s", //str
+                    &py_name)) {
+            LOG(FATAL, LVSIM, "Failed to parse args\n");
+            return Py_None;
+        }
+        if(name != py_name) {
+            continue;
+        }
+        if (std::holds_alternative<std::string>(value)) {
+            return PyUnicode_FromString(std::get<std::string>(value).c_str());
+        }
+        else if (std::holds_alternative<std::unique_ptr<LeleObject>>(value)) {
+            auto &lele_object = std::get<std::unique_ptr<LeleObject>>(value);
+            auto py_obj = lele_object->createPyObject();
+            Py_XINCREF(py_obj);
+            return py_obj;
+        }
+    }
+    return Py_None;
+}
+
 PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
@@ -404,7 +438,7 @@ PyObject *PyLeleObject::addEventHandler(PyObject *self_, PyObject *args) {
     return PyBool_FromLong(true);
 }
 
-PyObject *PyLeleObject::getStyleByKey(PyObject *self_, PyObject *args) {
+PyObject *PyLeleObject::getStyleAttribute(PyObject *self_, PyObject *args) {
     PyLeleObject *self = reinterpret_cast<PyLeleObject *>(self_);
     LeleObject *lele_obj = dynamic_cast<LeleObject *>(self->_lele_obj);
     if(!lele_obj || !args) {

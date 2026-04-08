@@ -6,7 +6,7 @@
     "style":{"class":"pane/selected","height":"35%","#bgcolor":"#222","border":"none"},
     "style":{"class":"pane/img","width":"15%","height":"15%","fgcolor":"#fff","flex":"none","border":"none"},
     "style":{"class":"pane/selected/img","width":"25%","height":"25%"},
-    "style":{"class":"pane/label","width":"25%","height":"5%","fgcolor":"#fff","flex":"none","border":"none"},
+    "style":{"class":"pane/label","text-align":"center","width":"25%","height":"5%","fgcolor":"#fff","flex":"none","border":"none"},
     "view":{
         "id":"/container",
         "style":{"width":"100%","height":"100%","fgcolor":"#fff","bgcolor":"#444",
@@ -14,15 +14,21 @@
                 "font-family":"Ubuntu-B","padding":"none","margin":"none","border":"none"
         },
         "label":{
-            "style":{"width":"100%","height":"10%","fgcolor":"#fff","bgcolor":"#444",
-                    "font-family":"Ubuntu-B","padding":"none","margin":"none","border":"solid-1px-#ccc"
+            "style":{
+                "id":"style:/hello-world-international/style",
+                "width":"100%",
+                "height":"10%",
+                "text-align":"center",
+                "border":"none",
+                "font-family":"Ubuntu-B",
+                "font-size":"40pt"
             },
             "id":"/hello-world-international/label",
             "text":"Hello World!"
         },
         "view":{
             "id":"/slider",
-            "style":{"width":"100%","height":"50%","border":"solid-1px-#ccc","scrollbar":"none",
+            "style":{"width":"100%","height":"50%","border":"none","scrollbar":"none",
                 "flex":{"flow":"row"},
                 "scroll/snap/x":"center",
                 "#scroll/snap/one":"true"
@@ -31,130 +37,150 @@
                 "id":"/pane0",
                 "class":"pane",
                 "class":"pane/selected",
-                "#osm todo: adding 'style' here should override class 'pane': style":{"border":"solid-2px-#f00"},
                 "img":{"id":"/pane0/img", "class":"pane/img", "class":"pane/selected/img", "src":"flags/spain.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Spain"}
+                "label":{"class":"pane/label","text":"Spain"},
+                "language":"Spanish"
             },
             "view":{
                 "id":"/pane1",
                 "class":"pane",
                 "img":{"id":"/pane1/img", "class":"pane/img","src":"flags/mexico.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Mexico"}
+                "label":{"class":"pane/label","text":"Mexico"},
+                "language":"Spanish"
             },
             "view":{
                 "id":"/pane2",
                 "class":"pane",
                 "class":"pane/selected",
                 "img":{"id":"/pane2/img", "class":"pane/img","src":"flags/germany.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Germany"}
+                "label":{"class":"pane/label","text":"Germany"},
+                "language":"German"
             },
             "view":{
                 "id":"/pane3",
                 "class":"pane",
                 "img":{"id":"/pane3/img", "class":"pane/img","src":"flags/france.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"France"}
+                "label":{"class":"pane/label","text":"France"},
+                "language":"French"
             },
             "view":{
                 "id":"/pane4",
                 "class":"pane",
                 "img":{"id":"/pane4/img", "class":"pane/img","src":"flags/italy.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Italy"}
+                "label":{"class":"pane/label","text":"Italy"},
+                "language":"Italian"
             },
             "view":{
                 "id":"/pane5",
                 "class":"pane",
                 "img":{"id":"/pane5/img", "class":"pane/img","src":"flags/portugal.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Portugal"}
+                "label":{"class":"pane/label","text":"Portugal"},
+                "language":"Portuguese"
             },
             "view":{
                 "id":"/pane6",
                 "class":"pane",
                 "img":{"id":"/pane6/img", "class":"pane/img","src":"flags/china.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"China"}
+                "label":{"class":"pane/label","text":"China"},
+                "language":"Chinese"
             },
             "view":{
                 "id":"/pane7",
                 "class":"pane",
                 "img":{"id":"/pane7/img", "class":"pane/img","src":"flags/japan.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Japan"}
+                "label":{"class":"pane/label","text":"Japan"},
+                "language":"Japanese"
             },
             "view":{
                 "id":"/pane8",
                 "class":"pane",
                 "img":{"id":"/pane8/img", "class":"pane/img","src":"flags/north-korea.webp","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"North Korea"}
+                "label":{"class":"pane/label","text":"North Korea"},
+                "language":"Korean"
             },
             "view":{
                 "id":"/pane9",
                 "class":"pane",
                 "img":{"id":"/pane9/img", "class":"pane/img","src":"flags/south-korea.webp","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"South Korea"}
+                "label":{"class":"pane/label","text":"South Korea"},
+                "language":"Korean"
             },
             "view":{
                 "id":"/pane10",
                 "class":"pane",
                 "img":{"id":"/pane10/img", "class":"pane/img","src":"flags/vietnam.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Vietnam"}
+                "label":{"class":"pane/label","text":"Vietnam"},
+                "language":"Vietnamese"
             },
             "view":{
                 "id":"/pane11",
                 "class":"pane",
                 "img":{"id":"/pane11/img", "class":"pane/img","src":"flags/thailand.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Thailand"}
+                "label":{"class":"pane/label","text":"Thailand"},
+                "language":"Thai"
             },
             "view":{
                 "id":"/pane12",
                 "class":"pane",
                 "img":{"id":"/pane12/img", "class":"pane/img","src":"flags/israel.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Israel"}
+                "label":{"class":"pane/label","text":"Israel"},
+                "language":"Hebrew"
             },
             "view":{
                 "id":"/pane13",
                 "class":"pane",
                 "img":{"id":"/pane13/img", "class":"pane/img","src":"flags/saudi-arabia.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Saudi Arabia"}
+                "label":{"class":"pane/label","text":"Saudi Arabia"},
+                "language":"Arabic"
             },
             "view":{
                 "id":"/pane14",
                 "class":"pane",
                 "img":{"id":"/pane14/img", "class":"pane/img","src":"flags/iran.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Iran"}
+                "label":{"class":"pane/label","text":"Iran"},
+                "language":"Persian"
             },
             "view":{
                 "id":"/pane15",
                 "class":"pane",
                 "img":{"id":"/pane15/img", "class":"pane/img","src":"flags/india.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"India"}
+                "label":{"class":"pane/label","text":"India"},
+                "language":"Hindi"
             },
             "view":{
                 "id":"/pane16",
                 "class":"pane",
                 "img":{"id":"/pane16/img", "class":"pane/img","src":"flags/russia.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Russia"}
+                "label":{"class":"pane/label","text":"Russia"},
+                "language":"Russian"
             },
             "view":{
                 "id":"/pane17",
                 "class":"pane",
                 "img":{"id":"/pane17/img", "class":"pane/img","src":"flags/ukraine.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Ukraine"}
+                "label":{"class":"pane/label","text":"Ukraine"},
+                "language":"Ukrainian"
             },
             "view":{
                 "id":"/pane18",
                 "class":"pane",
                 "img":{"id":"/pane18/img", "class":"pane/img","src":"flags/united-states.webp","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"United States"}
+                "label":{"class":"pane/label","text":"United States"},
+                "language":"English"
             },
             "view":{
                 "id":"/pane19",
                 "class":"pane",
                 "img":{"id":"/pane19/img", "class":"pane/img","src":"flags/rwanda.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"Rwanda"}
+                "label":{"class":"pane/label","text":"Rwanda"},
+                "language":"Swahili"
             },
             "view":{
                 "id":"/pane20",
                 "class":"pane",
                 "img":{"id":"/pane20/img", "class":"pane/img","src":"flags/south-africa.png","size":{"width":"100%","height":"100%"}},
-                "label":{"class":"pane/label","text":"South Africa"}
+                "label":{"class":"pane/label","text":"South Africa"},
+                "language":"Zulu"
             }
         }
     }
