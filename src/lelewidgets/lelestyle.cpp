@@ -126,7 +126,7 @@ std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() con
   return _background_attributes_as_ordered_in_json;
 }
 
-// https://www.w3schools.com/css/css3_flexbox_container.aspss
+// https://www.w3schools.com/Css/css3_flexbox_container.asp
 std::map<std::string, std::vector<std::string>> LeleStyle::_flex_possible_values = {
   {"flow", {"row","column","row-wrap","column-wrap","row-reverse","column-reverse","row-wrap-reverse","column-wrap-reverse"}},
   {"justify-content", {"start","center","space-between","space-around","space-evenly"}},

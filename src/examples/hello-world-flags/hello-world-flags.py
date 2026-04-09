@@ -40,15 +40,9 @@ def sliderEventHandler(event):
       img = view.getChildById(f"{view.id}/img")
       if img:
          img.removeClass("pane/selected/img")
-         # width = view.getStyleAttribute("width") #osm todo: calling getStyleAttribute crashes
-         # print(f"@@@py width: {width}")
-   # print(f"@@@py sliderEventHandler id:{event.id}, code:{event.code}, value:{event.value}, scroll_x:{event.target.getScrollX()}")
-   # when first element is centered: -384
-   # each element's width: 267
-   center_element = (event.target.getScrollX() - (-384))/267
-   center_element = int(center_element)
-   # width = center_element.getStyleAttribute("width")
-   # print(f"@@@py width: {width}")
+   width = views[0].getStyleAttribute("width")
+   center_element = event.target.getScrollX()/width
+   center_element = int(center_element) + 2
    # print(f"@@@py center_element: {center_element}")
    view = lele.getObjectById("/pane" + str(center_element))
    if view:
@@ -80,9 +74,16 @@ if not res:
    sys.exit(1)
 
 # lele.getObjectById("/container").addEventHandler(lambda event: sliderEventHandler(event))
-lele.getObjectById("/slider").addEventHandler(lambda event: sliderEventHandler(event))
+slider = lele.getObjectById("/slider")
+slider.addEventHandler(lambda event: sliderEventHandler(event))
 # lele.addEventHandler("/slider", lambda event: sliderEventHandler(event))
 # objs = lele.getObjectById("/pane0")
 # print(f"@@@ objs len: {len(objs)}")
+
+# view = slider.getChildById("/pane0")
+# width = view.getStyleAttribute("width")
+# scroll_pos = slider.getScrollX()
+# print(f"@@@py width: {width}, scroll_pos: {scroll_pos}")
+
 while lele.handleEvents():
    pass

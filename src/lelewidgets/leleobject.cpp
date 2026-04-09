@@ -459,6 +459,12 @@ void LeleObject::setFlexStyle() {
     static_cast<lv_flex_align_t>(align_items), 
     static_cast<lv_flex_align_t>(align_content)
   );
+  if((flow & LV_FLEX_FLOW_ROW) == LV_FLEX_FLOW_ROW) {
+    lv_obj_set_style_pad_column(_lv_obj, 0, LV_PART_MAIN);
+  }
+  if((flow & LV_FLEX_FLOW_COLUMN) == LV_FLEX_FLOW_COLUMN) {
+    lv_obj_set_style_pad_row(_lv_obj, 0, LV_PART_MAIN);
+  }
   auto grow_value = getStyle("flex/grow");
   if(grow_value) {
     int grow = std::get<int>(grow_value.value());
