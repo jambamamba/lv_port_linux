@@ -38,9 +38,10 @@
                 "hello-world-flags",
                 "stackview",
                 "tabview",
-                "imageview"
+                "imageview",
+                "restaurant-1"
             ],
-            "default": "hello-world-flags"
+            "default": "restaurant-1"
         }
     ]
 }

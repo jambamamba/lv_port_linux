@@ -128,9 +128,41 @@ std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() con
 
 // https://www.w3schools.com/Css/css3_flexbox_container.asp
 std::map<std::string, std::vector<std::string>> LeleStyle::_flex_possible_values = {
-  {"flow", {"row","column","row-wrap","column-wrap","row-reverse","column-reverse","row-wrap-reverse","column-wrap-reverse"}},
-  {"justify-content", {"start","center","space-between","space-around","space-evenly"}},
-  {"align-items", {"start","end","center"}},
+  {"flow", {
+    "row",    // [[1][2][3]      ]
+    "column", // [[1]            ]
+              // [[2]            ]
+              // [[3]            ]
+    "row-wrap",   // [[1][2][3][4][5][6]]
+                  // [[7][8]            ]
+    "column-wrap",
+    "row-reverse",    // [      [1][2][3]]
+    "column-reverse", // [[3]            ]
+                      // [[2]            ]
+                      // [[1]            ]
+    "row-wrap-reverse",
+    "column-wrap-reverse"}
+  },
+  {"justify-content", {
+      "start",              // [[1][2][3]        ]
+      "center",             // [    [1][2][3]    ]
+      "space-between",      // [[1]    [2]    [3]]
+      "space-around",       // [ [1]   [2]   [3] ]
+      "space-evenly"        // [  [1]  [2]  [3]  ]
+    }
+  },
+  {"align-items", {
+      "start",        // [[1][2][3]   ]
+                      // [            ]
+                      // [            ]
+      "end",          // [            ]
+                      // [            ]
+                      // [[1][2][3]   ]
+      "center"        // [            ]
+                      // [[1][2][3]   ]
+                      // [            ]
+    }
+  },
   {"align-content", {"start","center","space-between","space-around"}}
 };
 std::map<std::string, std::map<std::string,int>> LeleStyle::_flex_possible_ivalues = {
