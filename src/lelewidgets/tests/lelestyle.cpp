@@ -11,6 +11,7 @@ class MyClass {
     MyClass() = default;
     bool isEmpty() const { return true; }
 };
+
 // Test with a fixture
 class MyClassTest : public ::testing::Test {
 protected:

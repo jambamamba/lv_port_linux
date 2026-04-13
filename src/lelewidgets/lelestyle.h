@@ -46,7 +46,8 @@ public:
   static int parsePercentValue(const std::string &x, int parent_x);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
   std::string getClass() const;
-  std::optional<StyleValue> getValue(const std::string &key, const std::string &class_ = "") const;
+  std::optional<LeleStyle::StyleValue> getValue(const std::string &key) const;
+  // std::optional<StyleValue> getValue(const std::string &key, const std::string &class_ = "") const;
   bool setValue(const std::string &key, const std::string &value);
   std::vector<std::string> getBackgroundAttributesAsOrderedInJson() const;
   const std::map<std::string, std::optional<StyleValue>> getStyle() const;

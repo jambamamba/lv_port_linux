@@ -381,19 +381,28 @@ const std::map<std::string, std::optional<LeleStyle::StyleValue>> LeleStyle::get
   return _style;
 }
 
-std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
+std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key) const {
   // LL(DEBUG, LVSIM) << "@@@ KEY: " << key;
-  if(class_name == _class){// || _class.empty()) {//osm
-    auto it = _style.find(key);
-    if(it != _style.end() && it->second) {
-      return it->second;
-    }
-  }
-  if(_lele_obj && _lele_obj->getParent()) {
-    return _lele_obj->getParent()->getStyle(key, {class_name});
+  auto it = _style.find(key);
+  if(it != _style.end() && it->second) {
+    return it->second;
   }
   return std::nullopt;
 }
+
+// std::optional<LeleStyle::StyleValue> LeleStyle::getValue(const std::string &key, const std::string &class_name) const {
+//   // LL(DEBUG, LVSIM) << "@@@ KEY: " << key;
+//   if(class_name == _class){// || _class.empty()) {//osm
+//     auto it = _style.find(key);
+//     if(it != _style.end() && it->second) {
+//       return it->second;
+//     }
+//   }
+//   if(_lele_obj && _lele_obj->getParent()) {
+//     return _lele_obj->getParent()->getStyle(key, {class_name});
+//   }
+//   return std::nullopt;
+// }
 
 bool LeleStyle::setValue(
     const std::string &key, 

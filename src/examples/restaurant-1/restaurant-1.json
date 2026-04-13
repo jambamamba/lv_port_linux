@@ -39,7 +39,7 @@
                 "flex":{"flow":"row-wrap","justify-content":"space-around","align-items":"start","align-content":"center"}
             },
             "view":{
-                "view":{"class":"item","label":{"class":"item/label","text":"1"}},
+                "view":{"id":"foo","class":"item","label":{"class":"item/label","text":"1"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"2"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"3"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"4"}},

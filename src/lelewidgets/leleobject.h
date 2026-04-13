@@ -51,9 +51,10 @@ public:
   std::vector<LeleObject*> getChildren();
   int32_t getScrollX() const;
   int32_t getScrollY() const;
+  std::pair<std::vector<const LeleStyle *>, std::vector<const LeleStyle *>> getStylesByClass(const std::vector<std::string> &classes) const;
   const std::vector<std::unique_ptr<LeleStyle>> &getStyles() const;
-  std::optional<LeleStyle::StyleValue> getStyle(const std::string &key, const std::vector<std::string> &class_name = {}) const;
-  std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle(const std::string &class_name = "") const;
+  std::optional<LeleStyle::StyleValue> getStyle(const std::string &key) const; //, const std::vector<std::string> &class_name = {}) const;
+  std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> getBackgroundStyle() const ;//const std::string &class_name = "") const;
   std::vector<std::pair<std::string, LeleWidgetFactory::Node>> &childrenNodes();
   static bool visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *)>callback);
   static std::pair<int,int> getTextSize(lv_obj_t *lv_obj, const char *text);

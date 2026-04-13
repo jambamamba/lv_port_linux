@@ -26,7 +26,7 @@ LeleObject::~LeleObject() {
 void LeleObject::parseAttributes(
     const std::vector<std::pair<std::string, std::string>> &json_tokens) {
 
-    _classes.push_back("");
+    //osm _classes.push_back("");
     for(const auto &[lhs, rhs]: json_tokens) {
         if(lhs == "id") {
           _id = rhs;
@@ -158,23 +158,44 @@ const std::vector<std::unique_ptr<LeleStyle>> &LeleObject::getStyles() const {
   return _lele_styles;
 }
 
-std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key, const std::vector<std::string> &class_names) const {
-
-  auto value = std::optional<LeleStyle::StyleValue>();
-  std::vector<std::string> classes = class_names.empty() ? _classes : class_names;
-  for(const auto &class_name : std::ranges::views::reverse(classes)) {
-    for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
-      value = lele_style->getValue(key, class_name);
-      if(value) {
-        return value;
+std::pair<std::vector<const LeleStyle *>, std::vector<const LeleStyle *>> LeleObject::getStylesByClass(const std::vector<std::string> &classes) const {
+  std::vector<const LeleStyle *> styles_with_class;
+  std::vector<const LeleStyle *> styles_with_no_class;
+  if(_lele_parent) {
+    std::tie(styles_with_class, styles_with_no_class) = _lele_parent->getStylesByClass(classes);
+  }
+  for(const auto &class_name : classes) {
+    for(const auto &style : _lele_styles) {
+      if(style->getClass() == class_name) {
+        styles_with_class.push_back(style.get());
       }
     }
   }
-  if(!_lele_parent) {
-    return value;
+  for(const auto &style : _lele_styles) {
+    if(style->getClass().empty()){
+      styles_with_no_class.push_back(style.get());
+    }
   }
-  value = _lele_parent->getStyle(key, classes);
-  if(value) {
+  return {styles_with_class, styles_with_no_class};
+}
+
+std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key) const {
+  //osm todo: remove parsePercentValue from LeleStyle::setValue(), 
+  //  LeleStyle::setValue should set raw string value, e.g. 30%, and not try to compute integer value
+  //  In this function, when we do style->getValue(), we get this raw value, then try to do parsePercentValue and convert to integer
+  auto [styles_with_class, styles_with_no_class] = getStylesByClass(_classes);
+  auto value = std::optional<LeleStyle::StyleValue>();
+  for(const LeleStyle *style : std::ranges::views::reverse(styles_with_class)) {
+    value = style->getValue(key);
+    if(value) {
+      return value;
+    }
+  }
+  for(const LeleStyle *style : std::ranges::views::reverse(styles_with_no_class)) {
+    value = style->getValue(key);
+    if(value) {
+      return value;
+    }
   }
   return value;
 }
@@ -193,14 +214,14 @@ bool LeleObject::visitLvChildren(lv_obj_t *lv_obj, std::function<bool(lv_obj_t *
 }
 
 std::tuple<std::vector<std::string> ,std::map<std::string, std::optional<LeleStyle::StyleValue>>> 
-LeleObject::getBackgroundStyle(const std::string &class_name) const {
+LeleObject::getBackgroundStyle() const {//const std::string &class_name) const {
 
   std::vector<std::string> bg_keys;
   std::map<std::string, std::optional<LeleStyle::StyleValue>> bg_style;
   for(const auto &lele_style : std::ranges::views::reverse(_lele_styles)) {
     for(const std::string &key : lele_style->getBackgroundAttributesAsOrderedInJson()) {
       std::string bg_key("background/" + key);
-      auto value = lele_style->getValue(bg_key, class_name.empty() ? lele_style->getClass() : class_name);
+      auto value = getStyle(bg_key);
       if(value && bg_style.find(bg_key) == bg_style.end()) {
         bg_style[bg_key] = value;
         bg_keys.push_back(bg_key);
