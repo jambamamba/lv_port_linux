@@ -67,6 +67,9 @@ function startRdpServer() {
 	sudo chown $(id -u):$(id -g) $WAYLAND_DISPLAY
 	#run on remote host:
 	#sudo apt install remmina remmina-plugin-rdp remmina-plugin-vnc remmina-plugin-secret -y
+        # or
+	# sudo apt install freerdp3-sdl -y 
+        # WLOG_LEVEL=DEBUG sdl-freerdp3 /v:192.168.4.78:4000 /u:oosman /p:a 
 
     #else
     #    echo "RDP server is already running with  pid $pid"
@@ -107,5 +110,5 @@ function run() {
     popd #script dir
 }
 
-buildelf $@ |tee x86-build/build.log
+#buildelf $@ |tee x86-build/build.log
 run
