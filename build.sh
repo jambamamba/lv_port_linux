@@ -56,7 +56,8 @@ function run() {
     local method="elfpy" # elfpy | elf | py
     local debug="true"
     export LD_LIBRARY_PATH="/usr/local/lib"
-
+    export WAYLAND_DISPLAY="wayland-0"
+    
     parseArgs $@
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
     echo "set confirm off" |sudo tee ~/.gdbinit
