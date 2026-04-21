@@ -66,9 +66,11 @@ function run() {
     local example="imageview" # hello-world | hello-world-international |  | messagebox | stackview | tabview | testview
     local method="elfpy" # elfpy | elf | py
     local debug="true"
-    export LD_LIBRARY_PATH="/usr/local/lib"
-    export WAYLAND_DISPLAY="wayland-0"
+    
     startRdpServer
+    export LD_LIBRARY_PATH="/usr/local/lib"
+    export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR/wayland-?)
+    sudo chown $(id -u):$(id -g) $WAYLAND_DISPLAY
 
     parseArgs $@
     echo fs.inotify.max_user_watches=1048575 | sudo tee -a /etc/sysctl.conf && sudo sysctl -p
