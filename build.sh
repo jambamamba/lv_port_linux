@@ -52,28 +52,20 @@ cmake -G Ninja\
 
 function startRdpServer() {
 
-    #local pid=$(ps -xa|grep westo[n] || true);
-    #if [ -z "$pid" ]; then
-	export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR/wayland-?)
-	if [ ! -z $WAYLAND_DISPLAY ]; then
-		sudo rm -f $WAYLAND_DISPLAY
-	fi
-	sudo killall weston || true
+    local pid=$(ps -xa|grep westo[n] || true);
+    if [ -z "$pid" ]; then
+        export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR/wayland-?)
+        if [ ! -z $WAYLAND_DISPLAY ]; then
+            sudo rm -f $WAYLAND_DISPLAY
+        fi
+        # sudo killall weston || true
         sudo -E weston --backend=rdp-backend.so --rdp-tls-cert=/usr/local/weston.keys/server.crt --rdp-tls-key=/usr/local/weston.keys/server.key --address=0.0.0.0 --port=3389 &
         echo "Starting RDP server..."
         sleep 5	
+    fi
 	#configure to allow remote viewing:
 	export WAYLAND_DISPLAY=$(ls $XDG_RUNTIME_DIR/wayland-?)
 	sudo chown $(id -u):$(id -g) $WAYLAND_DISPLAY
-	#run on remote host:
-	#sudo apt install remmina remmina-plugin-rdp remmina-plugin-vnc remmina-plugin-secret -y
-        # or
-	# sudo apt install freerdp3-sdl -y 
-        # WLOG_LEVEL=DEBUG sdl-freerdp3 /v:192.168.4.78:4000 /u:oosman /p:a 
-
-    #else
-    #    echo "RDP server is already running with  pid $pid"
-    #fi
 }
 
 function run() {
