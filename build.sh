@@ -70,7 +70,7 @@ function startRdpServer() {
 
 function run() {
     pushd ${script_dir}
-    local example="imageview" # hello-world | hello-world-international |  | messagebox | stackview | tabview | testview
+    local example="restaurant-1" # hello-world | hello-world-international | imageview | messagebox | stackview | tabview | testview | restaurant-1
     local method="elfpy" # elfpy | elf | py
     local debug="true"
     export LD_LIBRARY_PATH="/usr/local/lib"
