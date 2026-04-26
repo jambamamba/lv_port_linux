@@ -22,8 +22,8 @@ std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> resizeImageWithValuesParsedFrom
     {{"width", container_width}, {"height", container_height}})) {
     return LeleImageConverter::resizeImg(src_img, width, height);
   }
-  width = LeleStyle::parsePercentValue(val, container_width);
-  height = LeleStyle::parsePercentValue(val, container_height);
+  width = ImageBuilder::parsePercentValue(val, container_width);
+  height = ImageBuilder::parsePercentValue(val, container_height);
   return LeleImageConverter::resizeImg(src_img, width, height);
 }
 
@@ -73,11 +73,11 @@ std::tuple<int,int> parseImageJsonPosition(
   if(!val.empty()) {
     val = LeleWidgetFactory::trim(val);
     if(!LeleWidgetFactory::parsePercentValues(
-      val, 
+      val,
       {{"x", &x}, {"y", &y}}, 
       {{"x", container_width}, {"y", container_height}})) {
-      x = LeleStyle::parsePercentValue(val, container_width);
-      y = LeleStyle::parsePercentValue(val, container_height);
+      x = ImageBuilder::parsePercentValue(val, container_width);
+      y = ImageBuilder::parsePercentValue(val, container_height);
     }
   }
   return std::tuple<int,int>(x, y);
@@ -126,6 +126,35 @@ std::map<std::string, float> parseRotation(const std::string &json_str, LeleObje
 }
 
 }//namespace
+
+int ImageBuilder::parsePercentValue(const std::string &x, int parent_x) {
+    if(x.size() > 0 && x.at(x.size() - 1) == '%' && parent_x > 0) {
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else {
+          i = std::stoi(x, 0, 10);
+        }
+        // return absFromPercent(i, parent_x);
+        return i * parent_x / 100;
+    }
+    else if(x.size() > 0) {
+        int i = 0;
+        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
+          i = std::stoi(x, 0, 16);
+        }
+        else if(std::all_of(x.begin(), x.end(),
+          [&i](unsigned char ch){ return std::isdigit(ch); })) {
+          i = std::stoi(x, 0, 10);
+        }
+        else {
+          LL(WARNING, LVSIM) << "input is not a number: " << x;
+        }
+        return i;
+    }
+    return 0;
+} 
 
 int ImageBuilder::getParentDimension(const std::string &key, const LeleObject *lele_obj) {
   if(lele_obj && lele_obj->getParent()) {

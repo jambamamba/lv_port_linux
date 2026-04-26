@@ -9,37 +9,38 @@
         "font-family":"Ubuntu-B"
     },
     "style":{
-        "class":"item","width":"30%","height":"25%","bgcolor":"#c4d450","border":"solid-1px-#fff","corner-radius":"5",
+        "class":"item","width":"33%","height":"25%","bgcolor":"#c4d450","border":"solid-1px-#fff","corner-radius":"5",
         "flex":"none"
     },
     "style":{
-        "class":"item/label","width":"15%","height":"12%","fgcolor":"#000","border":"solid-1px-#000"
+        "class":"item/label","width":"99%","height":"99%","fgcolor":"#000","border":"solid-1px-#000"
     },
     "language":{"current":"en","default":"en"},
     "view":{
         "id":"/main",
         "style":{"width":"100%","height":"100%",
-                "flex":{"flow":"column","justify-content":"start","align-items":"center","align-content":"center"}
+                "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
         },
         "view":{
             "id":"/header",
             "style":{"width":"100%","height":"5%",
-                "flex":{"flow":"row","justify-content":"start","align-items":"center","align-content":"center"}
+                "flex":{"flow":"row","justify-content":"start","align-items":"start","align-content":"center"}
             }
         },
         "view":{
             "id":"/menu",
             "style":{"width":"100%","height":"15%","bgcolor":"#4f631c",
-                "flex":{"flow":"row","justify-content":"start","align-items":"center","align-content":"center"}
+                "flex":{"flow":"row","justify-content":"start","align-items":"start","align-content":"center"}
             }
         },
         "view":{
             "id":"/container",
             "style":{"width":"100%","height":"80%",
-                "flex":{"flow":"row-wrap","justify-content":"space-around","align-items":"start","align-content":"center"}
+                "flex":{"flow":"row-wrap","justify-content":"space-around","align-items":"start","align-content":"start"}
             },
             "view":{
-                "view":{"id":"foo","class":"item","label":{"class":"item/label","text":"1"}},
+                "style":{"width":"100%","height":"100%"},
+                "view":{"class":"item","label":{"class":"item/label","text":"1"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"2"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"3"}},
                 "view":{"class":"item","label":{"class":"item/label","text":"4"}},

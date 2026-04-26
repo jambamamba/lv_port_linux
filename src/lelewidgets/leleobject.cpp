@@ -188,12 +188,18 @@ std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key
   for(const LeleStyle *style : std::ranges::views::reverse(styles_with_class)) {
     value = style->getValue(key);
     if(value) {
+      if(key == "x" || key == "y" || key == "width" || key == "height" || key == "corner-radius") {
+        return ImageBuilder::parsePercentValue(std::get<std::string>(value.value()), ImageBuilder::getParentDimension(key, this));
+      }
       return value;
     }
   }
   for(const LeleStyle *style : std::ranges::views::reverse(styles_with_no_class)) {
     value = style->getValue(key);
     if(value) {
+      if(key == "x" || key == "y" || key == "width" || key == "height" || key == "corner-radius") {
+        return ImageBuilder::parsePercentValue(std::get<std::string>(value.value()), ImageBuilder::getParentDimension(key, this));
+      }
       return value;
     }
   }

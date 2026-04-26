@@ -1,7 +1,7 @@
 {
     "configurations": [
     {
-        "name": "Launch LLDB",
+        "name": "Debug Remote C++",
         "request": "launch",
         "type": "lldb",
         "program": "${workspaceFolder}/x86-build/bin/lvglsim",
@@ -20,8 +20,9 @@
             "${workspaceFolder}/src/examples/${input:example}/${input:example}.py"
         ],
         "env":{
-            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/",
-            "PYTHONHOME":"${workspaceFolder}/x86-build/bin/Python/"
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
+            "PYTHONHOME":"${workspaceFolder}/x86-build/bin/Python/",
+            "WAYLAND_DISPLAY":"/run/user/1000/wayland-1"
         }
     }
     ],

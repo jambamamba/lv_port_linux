@@ -93,35 +93,6 @@ bool LeleStyle::fromJson(const std::string &json_str) {
   return true;
 }
 
-int LeleStyle::parsePercentValue(const std::string &x, int parent_x) {
-    if(x.size() > 0 && x.at(x.size() - 1) == '%' && parent_x > 0) {
-        int i = 0;
-        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
-          i = std::stoi(x, 0, 16);
-        }
-        else {
-          i = std::stoi(x, 0, 10);
-        }
-        // return absFromPercent(i, parent_x);
-        return i * parent_x / 100;
-    }
-    else if(x.size() > 0) {
-        int i = 0;
-        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
-          i = std::stoi(x, 0, 16);
-        }
-        else if(std::all_of(x.begin(), x.end(),
-          [&i](unsigned char ch){ return std::isdigit(ch); })) {
-          i = std::stoi(x, 0, 10);
-        }
-        else {
-          LL(WARNING, LVSIM) << "input is not a number: " << x;
-        }
-        return i;
-    }
-    return 0;
-}
-
 std::vector<std::string> LeleStyle::getBackgroundAttributesAsOrderedInJson() const {
   return _background_attributes_as_ordered_in_json;
 }
@@ -433,20 +404,8 @@ bool LeleStyle::setValue(
     //   LOG(WARNING, LVSIM, "No such key ('%s') exists for styles", key.empty() ? "" : key.c_str());
     //   return false;
     // }
-    else if(key == "x") {
-      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
-    }
-    else if(key == "y") {
-      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
-    }
-    else if(key == "width") {
-      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
-    }
-    else if(key == "height") {
-      _style[key] = parsePercentValue(value, ImageBuilder::getParentDimension(key, _lele_obj));
-    }
-    else if(key == "corner-radius") {
-      _style[key] = parsePercentValue(value, std::max(ImageBuilder::getParentDimension(key, _lele_obj), ImageBuilder::getParentDimension(key, _lele_obj)));
+    else if(key == "x" || key == "y" || key == "width" || key == "height" || key == "corner-radius") {
+      _style[key] = value;
     }
     else if(key == "padding") {
       std::tie(_style["padding/top"], _style["padding/right"], _style["padding/bottom"], _style["padding/left"]) = parsePaddingOrMargin(value);

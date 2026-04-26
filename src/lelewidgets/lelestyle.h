@@ -43,7 +43,6 @@ public:
   const LeleObject *getLeleObject() const;
   static std::string trim(const std::string& str);
   void parseFlex(const std::string &value);
-  static int parsePercentValue(const std::string &x, int parent_x);
   static std::tuple<LeleStyle::BorderTypeE,int,int> parseBorder(const std::string &border_type_width_color);
   std::string getClass() const;
   std::optional<LeleStyle::StyleValue> getValue(const std::string &key) const;

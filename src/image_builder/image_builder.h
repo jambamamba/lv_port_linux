@@ -22,6 +22,7 @@ namespace ImageBuilder {
         std::optional<AutoFreeSharedPtr<lv_image_dsc_t>> _img_dsc;
     };
 
+    int parsePercentValue(const std::string &x, int parent_x);
     int getParentDimension(const std::string &key, const LeleObject *lele_obj);
     int parseColorCode(const std::string &color_str);
     std::pair<std::map<std::string, std::optional<LeleStyle::StyleValue>>, std::vector<std::string>>
