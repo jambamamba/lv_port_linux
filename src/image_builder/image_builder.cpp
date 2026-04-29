@@ -315,6 +315,7 @@ ImageBuilder::drawBackgroundImage(
       const auto &value = style_map.at(key);
       if(key == (prefix + "/size")) {
         std::string val = std::get<std::string>(value.value());
+        // osm todo 4.29.2026: when obj_width/obj_height changes, then res._img_dsc must be updated
         if(val == "cover") {
           res._img_dsc = resizeContentToFillContainerPotentiallyCroppingContent(res._img_dsc.value().get(), obj_width, obj_height);
         }

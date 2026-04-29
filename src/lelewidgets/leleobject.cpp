@@ -180,8 +180,8 @@ std::pair<std::vector<const LeleStyle *>, std::vector<const LeleStyle *>> LeleOb
 }
 
 std::optional<LeleStyle::StyleValue> LeleObject::getStyle(const std::string &key) const {
-  //osm todo: remove parsePercentValue from LeleStyle::setValue(), 
-  //  LeleStyle::setValue should set raw string value, e.g. 30%, and not try to compute integer value
+  //we removed parsePercentValue from LeleStyle::setValue(), 
+  //  LeleStyle::setValue will set raw string value, e.g. 30%, and not try to compute integer value
   //  In this function, when we do style->getValue(), we get this raw value, then try to do parsePercentValue and convert to integer
   auto [styles_with_class, styles_with_no_class] = getStylesByClass(_classes);
   auto value = std::optional<LeleStyle::StyleValue>();
