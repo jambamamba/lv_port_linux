@@ -49,6 +49,10 @@ def sliderEventHandler(event):
       img = view.getChildById(f"{view.id}/img")
       if img:
          img.addClass("pane/selected/img")
+         width,height = img.getSize()
+         print(f"@@@py img_size:{width}x{height }")
+         img.setSize(width + 10, height + 10)
+         # img.setSize(204+20, 81+20)
          language = view.getAttribute("language")
          lele.Language().setCurrentLanguage(language)
          setFont(lele.Language().getCurrentLanguage())

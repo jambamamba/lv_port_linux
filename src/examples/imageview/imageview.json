@@ -3,8 +3,8 @@
     "screen":{"width":"1024","height":"768"},
     "language":{"current":"en","default":"en"},
     "style":{"padding":"0","margin":"0"},
-    "style":{"id":"button0","class":"button0","border":"none","width":"15%","height":"40","fgcolor":"#fff","bgcolor":"#f00"},
-    "style":{"id":"slider0","class":"slider0","width":"50%","height":"20","fgcolor":"#fff","bgcolor":"#444"},
+    "style":{"id":"button0","class":"button0","border":"none","width":"100%","height":"25%","fgcolor":"#fff","bgcolor":"#f00"},
+    "style":{"id":"slider0","class":"slider0","width":"50%","height":"10%","fgcolor":"#fff","bgcolor":"#444"},
     "view":{
         "id":"/views:0/view",
         "style":{"id":"view/global","padding":"none","margin":"none","flex":{"flow":"column"},
@@ -42,7 +42,7 @@
             },
             "view":{
                 "id":"controll-panel",
-                "style":{"flex":{"flow":"column"},"width":"20%","border":"solid-1px-#ccc","scrollbar":"off"},
+                "style":{"flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"},"width":"20%","border":"solid-1px-#ccc","scrollbar":"off"},
                 "xbutton":{
                     "id":"slider0",
                     "type":"slider-range",
@@ -56,7 +56,7 @@
                 "label":{
                     "id":"scale-label",
                     "text":"Scale",
-                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"100%","height":"5%","fgcolor":"#fff"}
+                    "style":{"id":"views/view0/label","x":"0","y":"0","width":"100%","height":"10%","fgcolor":"#fff"}
                 },               
                 "button":{
                     "id":"scale",
@@ -68,7 +68,7 @@
                     "xevent":{"type":"clicked","action":"action0","args":{}}
                 },
                 "view":{
-                    "style":{"flex":{"flow":"column"},"width":"95%","height":"35%"},
+                    "style":{"flex":{"flow":"column"},"width":"100%","height":"35%"},
                     "group":"true",
                     "buttons":[
                         {
@@ -115,12 +115,12 @@
                 },
                 "colorwheel":{
                     "id":"colorwheel",
-                    "style":{"id":"colorwheel","width":"95%","height":"25%","fgcolor":"#fff","bgcolor":"#666"}
+                    "style":{"id":"colorwheel","width":"100%","height":"25%","fgcolor":"#fff","bgcolor":"#666"}
                 },
                 "button":{
                     "id":"rotate",
                     "type":"arc",
-                    "style":{"id":"rotate","padding":"5px","width":"95%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
+                    "style":{"id":"rotate","padding":"5px","width":"40%","height":"20%","fgcolor":"#fff","bgcolor":"#444"},
                     "value":"90",
                     "rotation":"90",
                     "start":"20",
@@ -139,7 +139,8 @@
         "view":{
             "style":{
                 "flex":{"flow":"row"},
-                "height":"8%",
+                "width":"10%",
+                "height":"15%",
                 "#border":"solid-1px-#ccc",
                 "border":"none"
             },
