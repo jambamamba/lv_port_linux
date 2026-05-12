@@ -40,7 +40,8 @@
                 "stackview",
                 "tabview",
                 "imageview",
-                "restaurant-1"
+                "restaurant-1",
+                "apple-info"
             ],
             "default": "restaurant-1"
         }

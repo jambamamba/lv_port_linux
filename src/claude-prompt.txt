@@ -1,0 +1,83 @@
+======================================================================
+claude prompt:
+
+look at the image file [Image #1] and study the files /repos/lv_port_linux/src/examples/imageview/imageview.json and /repos/lv_port_linux/src/examples/imageview/imageview.py . Then in     
+  similar manner, look the image file [Image #2] and the files /repos/lv_port_linux/src/examples/hello-world-flags/hello-world-flags.json and                                                 
+  /repos/lv_port_linux/src/examples/hello-world-flags/hello-world-flags.py, and image file [Image #3] and the files                                                                           
+  /repos/lv_port_linux/src/examples/hello-world-international/hello-world-international.json and /repos/lv_port_linux/src/examples/hello-world-international/hello-world-international.py,    
+  and the image file [Image #4] and /repos/lv_port_linux/src/examples/hello-world/hello-world.json and /repos/lv_port_linux/src/examples/hello-world/hello-world.py, and the image file
+  [Image #5] and the files /repos/lv_port_linux/src/examples/restaurant-1/restaurant-1.json and /repos/lv_port_linux/src/examples/restaurant-1/restaurant-1.py, then understand how the json
+  and py files are used to create the respective image png files. You can also study other files in the /repos/lv_port_linux/src/examples/ folder to help you.
+
+======================================================================
+
+                                                                             
+● Now I understand the full pattern. Here's how each example's JSON + Python combine to produce its screenshot.
+                                                                                                                                                                                              
+  The common pattern                                                         
+                                                                                                                                                                                              
+  Every example follows the same two-phase recipe:                                                                                                                                            
+                                                                                                                                                                                              
+  1. JSON declares the static UI tree: window size, language, reusable styles (by class), and a nested view { ... } hierarchy of widgets (view, label, img, button, colorwheel, rollerview,   
+  etc.). Each node may have an id, class, inline style { ... }, child widgets, and event { ... } bindings. Layout uses CSS-like flex (flow:row|column, justify-content, align-items) with %
+  sizing.                                                                                                                                                                                     
+  2. Python calls lele.loadConfig(<json>) to instantiate that tree, then attaches behavior via lele.getObjectById(...) + addEventHandler(...) / onValueChanged(...) / onColorChanged(...)
+  callbacks, and finally spins while lele.handleEvents(): ... to run the event loop. Callbacks mutate the same lele.Style / LeleObject instances at runtime (setText, setValue, setSize,      
+  setRotation, addClass, removeClass, lele.Language().setCurrentLanguage(...)).
+                                                                                                                                                                                              
+  Keys starting with # (e.g. "#font-size", "#border") are JSON-level "comments" — alternate values the author left in place but disabled. Keys like text_arabic, text_french, … are           
+  translation slots picked up by tr/ based on the current language.
+                                                                                                                                                                                              
+  Per-example mapping
+
+  Image #4 — hello-world (hello-world.png)
+
+  JSON builds a column-flex full-screen view with two stacked labels centered: Hello World! (40pt, bordered, rounded) and an empty second label. The Python looks up /hello-world/version,    
+  reads lele.version() → {Major:1, Minor:0}, and calls setText("Lele-UI Version: 1.0"). Result: the two bordered, rounded labels you see — title plus version string.
+                                                                                                                                                                                              
+  Image #3 — hello-world-international (hello-world-international.png)
+
+  JSON places a label ("Hello World!" with text_french, text_arabic, text_japanese, … alternatives) above a rollerview listing 17 languages. Python sets                                      
+  lele.Language().setCurrentLanguage(...) from the roller's onValueChanged callback and swaps the label's font-family to the appropriate Noto font for RTL / CJK / Devanagari / Thai. The
+  screenshot shows the roller mid-spin with "English" highlighted (and "Hello World!" still in Latin script because English is selected).                                                     
+                  
+  Image #2 — hello-world-flags (hello-world-flags.png)
+
+  JSON declares three reusable classes (pane, pane/img, pane/selected/img) and a horizontal scroll strip /slider containing 21 view "panes," each carrying a flag image, country label, and a 
+  language attribute (Spain→Spanish, Germany→German, …). A 40pt Hello World! label sits below. The Python's sliderEventHandler reacts to EVENT_SCROLL: it computes which pane is centered from
+   getScrollX() / paneWidth, removes pane/selected/img from all panes, adds it to the centered one (making that flag 80%/80% instead of 50%/50%), then reads the pane's language attribute and
+   calls setCurrentLanguage(...) + setFont(...). In the screenshot the German flag is centered and visibly larger, the label has switched to German ("Hallo Welt!"), and the other flags are
+  at the small unselected size.
+
+  Image #1 — imageview (imageview.png)
+
+  The most complex example. JSON splits the screen: a left view /view/with_bg_img whose style.background paints a tiled pumpkin-man.png over a green color, with a foreground goose.png image;
+   and a right control panel containing a Scale slider, four radio buttons (Repeat-XY, Repeat-X, Repeat-Y, Repeat-None) grouped, a colorwheel, an arc rotate widget, and an angle label
+  (initially "Angle", overwritten to "Cocoa bean!" by Python on startup). A Run Test button with a play-icon image sits below. Python wires every control to a handler:                       
+  - scaleImage → updates background/size and the Scale label.
+  - tileImage → updates background/repeat ("repeat" / "repeat-x" / "repeat-y" / "repeat-none").                                                                                               
+  - rotateImage / sliderMoved → mutate background/rotation/angle via Style.setValue or by adding a new lele.Style(...) JSON snippet.
+  - colorChanged (from colorwheel.onColorChanged) → updates background/color.                                                                                                                 
+  - runTest → toggles play/pause icon and label, then runTestLoop() walks scale 0→200 and rotation 0→360 each frame and programmatically .click()s the repeat radios.                         
+                                                                                                                                                                                              
+  The screenshot is a frame from that test: green background/color, tiled pumpkins (Repeat-XY checked), goose foreground at its rotated position, the rotation-label has been overwritten to  
+  Cocoa bean!, and the Run Test button is still showing the play icon (test not running).                                                                                                     
+                                                                                                                                                                                              
+  Image #5 — restaurant-1 (restaurant-1.png)                                                                                                                                                  
+                  
+  JSON only — Python just calls loadConfig and spins the event loop. The tree is a column of three views inside /main: a 5% header (blank pale strip), a 15% /menu (olive #4f631c), and an 80%
+   /container using flex:{flow:"row-wrap"} filled with 61 child views of class item (33% × 25% each, yellow-green #c4d450 with white border). Three items per row × auto-wrap rows produces
+  the visible 3-column tiled grid numbered 1, 2, 3, 4, 5, 6, … each tile holding a small label of class:"item/label".                                                                         
+                  
+  Summary
+
+  JSON = declarative scene graph + stylesheet. Python = event wiring and dynamic mutation through the lele extension module (getObjectById, Style.setValue, addClass/removeClass, Language(), 
+  etc.). The PNG is the rendered frame after the JSON is loaded and any Python-initiated mutations (like setText("Lele-UI Version: 1.0") or setText("Cocoa bean!")) have run.
+
+  ========================================================================================================================
+
+  can you generate a new set of json and py files now to render a screen that shows an image of an apply on the top left corner , about 20% width and height. And the rest of the screen has  
+  text describing the apple. Make it a macintosh apple.   
+
+  
+                     

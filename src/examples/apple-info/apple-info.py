@@ -1,0 +1,9 @@
+import sys
+import lele
+
+res = lele.loadConfig("apple-info.json")
+if not res:
+   sys.exit(1)
+
+while lele.handleEvents():
+   pass
