@@ -89,13 +89,16 @@ backend_t *GraphicsBackend::getBackend() const {
 void GraphicsBackend::dumpScreenshot() const {
 
     lv_obj_t *screen = lv_scr_act();
-    lv_area_t snapshot_area = {0};
     lv_draw_buf_t * snapshot = lv_snapshot_take(screen, LV_COLOR_FORMAT_RGB888);
+    if (!snapshot) {
+        LOG(WARNING, LVSIM, "Screenshot failed: lv_snapshot_take returned null\n");
+        return;
+    }
 
     static int i = 0;
     std::stringstream ss;
-    ss << "/home/oosman/Downloads/foo/foo" << std::to_string(i) << ".png";
-    int bpp = snapshot->header.stride/snapshot->header.w;
+    ss << "/tmp/screenshot-" << std::to_string(i) << ".png";
+    int bpp = snapshot->header.stride / snapshot->header.w;
     ImgHelper::saveToFile(
             ss.str().c_str(),
             snapshot->header.w, 
@@ -149,6 +152,5 @@ bool GraphicsBackend::handleEvents() const {
     // lv_point_t point = {};
     // struct window *window = getWindow(_backend);
     // lv_indev_get_point(window->lv_indev_pointer, &point);
-    // dumpScreenshot();
     return true;
 }

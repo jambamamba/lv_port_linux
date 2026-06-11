@@ -1,107 +1,319 @@
 {
     "version":"1.0",
-    "screen":{
-        "width":"1024","height":"768"
-    },
-    "style":{
-        "padding":"none","margin":"none","corner-radius":"0",
-        "fgcolor":"#fff","bgcolor":"#dddfde","border":"none",
-        "font-family":"Ubuntu-B"
-    },
-    "style":{
-        "class":"item","width":"33%","height":"25%","bgcolor":"#c4d450","border":"solid-1px-#fff","corner-radius":"5",
-        "flex":"none"
-    },
-    "style":{
-        "class":"item/label","width":"99%","height":"99%","fgcolor":"#000","border":"solid-1px-#000"
-    },
+    "screen":{"width":"1024","height":"768"},
     "language":{"current":"en","default":"en"},
-    "view":{
-        "id":"/main",
-        "style":{"width":"100%","height":"100%",
-                "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
+    "style":{"class":"page","padding":"0","margin":"0","corner-radius":"0","bgcolor":"#f7f7f5","fgcolor":"#1f2937","border":"none","font-family":"Ubuntu-B"},
+    "style":{"class":"topbar","width":"100%","height":"15%","bgcolor":"#5a6e1a","border":"none","corner-radius":"0","padding":"0",
+        "flex":{"flow":"row","justify-content":"start","align-items":"center","align-content":"center"}
+    },
+    "style":{"class":"topbar/cat","width":"10%","height":"95%","bgcolor":"#5a6e1a","border":"none","padding":"0",
+        "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"}
+    },
+    "style":{"class":"topbar/circle","width":"62","height":"62","bgcolor":"#c4d450","fgcolor":"#1f2937","border":"none","corner-radius":"31","text-align":"center","font-size":"14pt"},
+    "style":{"class":"topbar/circle_active","width":"62","height":"62","bgcolor":"#2f3e0e","fgcolor":"#ffffff","border":"none","corner-radius":"31","text-align":"center","font-size":"14pt"},
+    "style":{"class":"topbar/cat_label","width":"98%","height":"30%","bgcolor":"#5a6e1a","fgcolor":"#ffffff","border":"none","text-align":"center","font-size":"10pt"},
+    "style":{"class":"topbar/cat_label_active","width":"98%","height":"30%","bgcolor":"#5a6e1a","fgcolor":"#ffffff","border":"none","text-align":"center","font-size":"10pt"},
+    "style":{"class":"topbar/spacer","border":"none","bgcolor":"#5a6e1a","flex":{"grow":"1"}},
+    "style":{"class":"topbar/search","width":"15%","height":"42%","bgcolor":"#ffffff","fgcolor":"#374151","border":"none","corner-radius":"22","text-align":"center","font-size":"14pt"},
+    "style":{"class":"topbar/bag","width":"10%","height":"80%","bgcolor":"#ffffff","fgcolor":"#1f2937","border":"none","corner-radius":"20","text-align":"center","font-size":"15pt"},
+    "style":{"class":"detail/topbar","width":"100%","height":"10%","bgcolor":"#5a6e1a","border":"none","corner-radius":"0","padding":"0",
+        "flex":{"flow":"row","justify-content":"start","align-items":"center","align-content":"center"}
+    },
+    "style":{"class":"subtabs","width":"100%","height":"6%","bgcolor":"#f7f7f5","border":"none","corner-radius":"0","padding":"0",
+        "flex":{"flow":"row","justify-content":"start","align-items":"center","align-content":"center"}
+    },
+    "style":{"class":"subtabs/tab","width":"15%","height":"100%","bgcolor":"#f7f7f5","fgcolor":"#6b7280","border":"none","text-align":"center","font-size":"13pt"},
+    "style":{"class":"subtabs/tab_active","width":"15%","height":"100%","bgcolor":"#f7f7f5","fgcolor":"#1f2937","border":"solid-3px-#c4d450","text-align":"center","font-size":"13pt"},
+    "style":{"class":"grid","width":"100%","height":"79%","bgcolor":"#f7f7f5","border":"none","corner-radius":"0","padding":"0",
+        "flex":{"flow":"row-wrap","justify-content":"space-around","align-items":"start","align-content":"start"}
+    },
+    "style":{"class":"card","width":"31%","height":"45%","bgcolor":"#ffffff","fgcolor":"#1f2937","border":"solid-1px-#e5e7eb","corner-radius":"10","padding":"0",
+        "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
+    },
+    "style":{"class":"card/img","width":"100%","height":"65%","border":"none","corner-radius":"0"},
+    "style":{"class":"card/title","width":"96%","height":"15%","bgcolor":"#ffffff","fgcolor":"#1f2937","border":"none","text-align":"left","font-size":"14pt"},
+    "style":{"class":"card/sub","width":"96%","height":"15%","bgcolor":"#ffffff","fgcolor":"#6b7280","border":"none","text-align":"left","font-size":"11pt"},
+    "style":{"class":"detail/body","width":"100%","height":"90%","bgcolor":"#f7f7f5","border":"none","padding":"0",
+        "flex":{"flow":"row","justify-content":"start","align-items":"start","align-content":"start"}
+    },
+    "style":{"class":"detail/img","width":"50%","height":"100%","border":"none","corner-radius":"0"},
+    "style":{"class":"detail/info","width":"50%","height":"100%","bgcolor":"#f7f7f5","border":"none","padding":"0",
+        "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
+    },
+    "style":{"class":"detail/name","width":"95%","height":"12%","bgcolor":"#f7f7f5","fgcolor":"#1f2937","border":"none","text-align":"left","font-size":"24pt"},
+    "style":{"class":"detail/desc","width":"95%","height":"40%","bgcolor":"#f7f7f5","fgcolor":"#4b5563","border":"none","text-align":"left","font-size":"14pt"},
+    "style":{"class":"detail/price","width":"95%","height":"10%","bgcolor":"#f7f7f5","fgcolor":"#1f2937","border":"none","text-align":"left","font-size":"22pt"},
+    "style":{"class":"detail/order","width":"60%","height":"12%","bgcolor":"#c4d450","fgcolor":"#1f2937","border":"none","corner-radius":"24","text-align":"center","font-size":"18pt"},
+    "style":{"class":"detail/back","width":"10%","height":"80%","bgcolor":"#c4d450","fgcolor":"#1f2937","border":"none","corner-radius":"20","text-align":"center","font-size":"15pt"},
+    "style":{"class":"detail/title","width":"35%","height":"80%","bgcolor":"#5a6e1a","fgcolor":"#ffffff","border":"none","text-align":"left","font-size":"18pt"},
+    "stackview":{
+        "id":"/stack",
+        "style":{"id":"stack/style0","class":"page","width":"100%","height":"100%"},
+        "style":{"id":"stack/style1","class":"stackview/view","border":"none","x":"0","y":"0","width":"100%","height":"100%"},
+        "style":{"id":"stack/style2","class":"stackview/view/header","border":"none","width":"0%","height":"0%"},
+        "tabbar_height":"0",
+        "title":"",
+        "subtitle":"",
+        "view_header":{
+            "id":"stack/view_header",
+            "style":{"id":"stack/view_header","border":"none","width":"0%","height":"0%"},
+            "label":{"id":"stack/view_header/label","style":{"id":"stack/view_header/label","border":"none","width":"0%","height":"0%"},"text":""}
         },
-        "view":{
-            "id":"/header",
-            "style":{"width":"100%","height":"5%",
-                "flex":{"flow":"row","justify-content":"start","align-items":"start","align-content":"center"}
-            }
-        },
-        "view":{
-            "id":"/menu",
-            "style":{"width":"100%","height":"15%","bgcolor":"#4f631c",
-                "flex":{"flow":"row","justify-content":"start","align-items":"start","align-content":"center"}
-            }
-        },
-        "view":{
-            "id":"/container",
-            "style":{"width":"100%","height":"80%",
-                "flex":{"flow":"row-wrap","justify-content":"space-around","align-items":"start","align-content":"start"}
+        "views":[
+            {
+                "id":"views:0",
+                "view":{
+                    "id":"views:0/view",
+                    "class":"stackview/view",
+                    "style":{"id":"views:0/view","width":"100%","height":"100%","bgcolor":"#f7f7f5","border":"none","padding":"none",
+                        "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
+                    },
+                    "view_header":{
+                        "id":"views:0/view/view_header",
+                        "style":{"id":"views:0/view/view_header","border":"none","width":"0%","height":"0%"},
+                        "name":"Menu"
+                    },
+                    "view":{
+                        "id":"/grid/topbar",
+                        "class":"topbar",
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"NEW"},
+                            "label":{"class":"topbar/cat_label","text":"What's New"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"2"},
+                            "label":{"class":"topbar/cat_label","text":"You Pick Two"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"MHM"},
+                            "label":{"class":"topbar/cat_label","text":"Must-Have"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"M&M"},
+                            "label":{"class":"topbar/cat_label","text":"Mix & Match"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"SW"},
+                            "label":{"class":"topbar/cat_label","text":"Sandwiches"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle_active","text":"S&M"},
+                            "label":{"class":"topbar/cat_label_active","text":"Soups & Mac"}
+                        },
+                        "view":{"class":"topbar/cat",
+                            "label":{"class":"topbar/circle","text":"SAL"},
+                            "label":{"class":"topbar/cat_label","text":"Salads"}
+                        },
+                        "label":{"class":"topbar/spacer","text":""},
+                        "label":{"class":"topbar/search","text":"Q  Search"}
+                    },
+                    "view":{
+                        "id":"/grid/subtabs",
+                        "class":"subtabs",
+                        "label":{"class":"subtabs/tab_active","text":"Featured"},
+                        "label":{"class":"subtabs/tab","text":"Popular"},
+                        "label":{"class":"subtabs/tab","text":"New"},
+                        "label":{"class":"topbar/spacer","text":""},
+                        "label":{"id":"/bag-grid","class":"topbar/bag","text":"Bag  0"}
+                    },
+                    "view":{
+                        "id":"/grid/scroll",
+                        "class":"grid",
+                        "button":{"type":"push","id":"card-0","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_0232.png"},
+                            "label":{"class":"card/title","text":"Truffle Mac & Cheese"},
+                            "label":{"class":"card/sub","text":"Bowl  920 Cal  $13.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-1","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_0943.png"},
+                            "label":{"class":"card/title","text":"Buffalo Chicken Sandwich"},
+                            "label":{"class":"card/sub","text":"Sandwich  780 Cal  $11.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-2","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_1668.png"},
+                            "label":{"class":"card/title","text":"Caprese Salad"},
+                            "label":{"class":"card/sub","text":"Bowl  410 Cal  $10.79"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-3","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_1724.png"},
+                            "label":{"class":"card/title","text":"Wood-fired Margherita"},
+                            "label":{"class":"card/sub","text":"Plate  680 Cal  $12.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-4","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_2768.png"},
+                            "label":{"class":"card/title","text":"Greek Bowl"},
+                            "label":{"class":"card/sub","text":"Bowl  590 Cal  $11.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-5","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_2846.png"},
+                            "label":{"class":"card/title","text":"Berry Croissant"},
+                            "label":{"class":"card/sub","text":"Bakery  360 Cal  $4.79"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-6","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3157.png"},
+                            "label":{"class":"card/title","text":"Loaded Potato Soup"},
+                            "label":{"class":"card/sub","text":"Bowl  540 Cal  $8.29"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-7","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3315.png"},
+                            "label":{"class":"card/title","text":"Avocado Toast"},
+                            "label":{"class":"card/sub","text":"Plate  380 Cal  $9.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-8","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3318.png"},
+                            "label":{"class":"card/title","text":"Iced Caramel Latte"},
+                            "label":{"class":"card/sub","text":"Drink  220 Cal  $5.29"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-9","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3760.png"},
+                            "label":{"class":"card/title","text":"Roasted Tomato Bisque"},
+                            "label":{"class":"card/sub","text":"Bowl  320 Cal  $7.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-10","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3773.png"},
+                            "label":{"class":"card/title","text":"Steak Frites"},
+                            "label":{"class":"card/sub","text":"Plate  920 Cal  $16.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-11","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_3950.png"},
+                            "label":{"class":"card/title","text":"Cobb Salad"},
+                            "label":{"class":"card/sub","text":"Bowl  620 Cal  $11.29"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-12","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_4431.png"},
+                            "label":{"class":"card/title","text":"Lemon Tart"},
+                            "label":{"class":"card/sub","text":"Bakery  410 Cal  $5.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-13","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_4651.png"},
+                            "label":{"class":"card/title","text":"Pad Thai Bowl"},
+                            "label":{"class":"card/sub","text":"Bowl  740 Cal  $13.79"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-14","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_5514.png"},
+                            "label":{"class":"card/title","text":"Cold Brew"},
+                            "label":{"class":"card/sub","text":"Drink  5 Cal  $4.59"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-15","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_5956.png"},
+                            "label":{"class":"card/title","text":"Steak Quesadilla"},
+                            "label":{"class":"card/sub","text":"Plate  880 Cal  $13.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-16","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_6133.png"},
+                            "label":{"class":"card/title","text":"Beet & Goat Cheese Salad"},
+                            "label":{"class":"card/sub","text":"Bowl  520 Cal  $10.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-17","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_6314.png"},
+                            "label":{"class":"card/title","text":"Chocolate Lava Cake"},
+                            "label":{"class":"card/sub","text":"Bakery  680 Cal  $6.79"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-18","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_6580.png"},
+                            "label":{"class":"card/title","text":"Lobster Roll"},
+                            "label":{"class":"card/sub","text":"Sandwich  720 Cal  $18.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-19","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_7111.png"},
+                            "label":{"class":"card/title","text":"Mushroom Risotto"},
+                            "label":{"class":"card/sub","text":"Bowl  690 Cal  $14.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-20","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_7240.png"},
+                            "label":{"class":"card/title","text":"Matcha Latte"},
+                            "label":{"class":"card/sub","text":"Drink  180 Cal  $5.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-21","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_8337.png"},
+                            "label":{"class":"card/title","text":"Caesar Salad"},
+                            "label":{"class":"card/sub","text":"Bowl  480 Cal  $9.79"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-22","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_8340.png"},
+                            "label":{"class":"card/title","text":"Cuban Sandwich"},
+                            "label":{"class":"card/sub","text":"Sandwich  850 Cal  $12.49"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-23","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_8641.png"},
+                            "label":{"class":"card/title","text":"Bacon Cheese Burger"},
+                            "label":{"class":"card/sub","text":"Sandwich  1050 Cal  $13.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        },
+                        "button":{"type":"push","id":"card-24","class":"card",
+                            "img":{"class":"card/img","src":"foods/IMG_9934.png"},
+                            "label":{"class":"card/title","text":"Cinnamon Roll"},
+                            "label":{"class":"card/sub","text":"Bakery  480 Cal  $4.99"},
+                            "event":{"type":"clicked","action":"stackview.push","args":{"id":"views:1/view"}}
+                        }
+                    }
+                }
             },
-            "view":{
-                "style":{"width":"100%","height":"100%"},
-                "view":{"class":"item","label":{"class":"item/label","text":"1"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"2"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"3"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"4"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"5"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"6"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"7"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"8"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"9"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"10"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"11"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"12"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"13"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"14"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"15"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"16"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"17"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"18"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"19"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"20"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"21"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"22"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"23"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"24"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"25"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"26"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"27"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"28"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"29"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"30"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"31"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"32"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"33"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"34"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"35"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"36"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"37"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"38"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"39"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"40"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"41"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"42"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"43"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"44"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"45"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"46"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"47"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"48"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"49"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"50"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"51"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"52"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"53"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"54"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"55"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"56"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"57"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"58"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"59"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"60"}},
-                "view":{"class":"item","label":{"class":"item/label","text":"61"}}
+            {
+                "id":"views:1",
+                "view":{
+                    "id":"views:1/view",
+                    "class":"stackview/view",
+                    "style":{"id":"views:1/view","width":"100%","height":"100%","bgcolor":"#f7f7f5","border":"none","padding":"none",
+                        "flex":{"flow":"column","justify-content":"start","align-items":"start","align-content":"start"}
+                    },
+                    "view_header":{
+                        "id":"views:1/view/view_header",
+                        "style":{"id":"views:1/view/view_header","border":"none","width":"0%","height":"0%"},
+                        "name":"Detail"
+                    },
+                    "view":{
+                        "id":"/detail/topbar",
+                        "class":"detail/topbar",
+                        "button":{"type":"push","id":"/detail/back","class":"detail/back",
+                            "label":{"text":"< Back"},
+                            "event":{"type":"clicked","action":"stackview.pop","args":{}}
+                        },
+                        "label":{"class":"detail/title","text":"Menu Detail"},
+                        "label":{"class":"topbar/spacer","text":""},
+                        "label":{"id":"/bag-detail","class":"topbar/bag","text":"Bag  0"}
+                    },
+                    "view":{
+                        "id":"/detail/body",
+                        "class":"detail/body",
+                        "img":{"id":"/detail/img","class":"detail/img","src":"foods/IMG_0232.png"},
+                        "view":{
+                            "id":"/detail/info",
+                            "class":"detail/info",
+                            "label":{"id":"/detail/name","class":"detail/name","text":"Truffle Mac & Cheese"},
+                            "label":{"id":"/detail/desc","class":"detail/desc","text":"Creamy cavatappi tossed in truffle-infused cheese sauce, finished with crispy panko."},
+                            "label":{"id":"/detail/price","class":"detail/price","text":"$13.49"},
+                            "button":{"type":"push","id":"/detail/order","class":"detail/order",
+                                "label":{"text":"+  Add to Bag"},
+                                "event":{"type":"clicked","action":"stackview.pop","args":{}}
+                            }
+                        }
+                    }
+                }
             }
-        }
+        ]
     }
 }

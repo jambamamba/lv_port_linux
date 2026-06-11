@@ -51,8 +51,20 @@ int main(int argc, char **argv) {
     }
     std::string input_file = argv[1];
     if(std::filesystem::path(input_file).extension() == ".json") {
+        // Resolve to absolute path and chdir to JSON's directory so relative paths resolve
+        auto json_path = std::filesystem::absolute(input_file);
+        auto json_dir = json_path.parent_path();
+        if(!json_dir.empty()) {
+            std::filesystem::current_path(json_dir);
+        }
         static LeleObject _root(nullptr);
-        auto nodes = LeleWidgetFactory::fromConfig(&_root, input_file);
+        auto nodes = LeleWidgetFactory::fromConfig(&_root, json_path.string());
+        // Let LVGL process events a few times so the display can render
+        for(int i = 0; i < 20; i++) {
+            GraphicsBackend::getInstance().handleEvents();
+        }
+        GraphicsBackend::getInstance().dumpScreenshot();
+        LOG(DEBUG, LVSIM, "Screenshot saved to /tmp/screenshot-0.png\n");
         while(GraphicsBackend::getInstance().handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {

@@ -7,6 +7,7 @@
 #include <lelewidgets/leleobject.h>
 #include <lelewidgets/lelerollerview.h>
 #include <tr/tr.h>
+#include <lvgl/lvgl.h>
 
 #include "python_helper.h"
 #include "python_wrapper.h"
@@ -208,6 +209,15 @@ namespace {
             LOG(WARNING, LVSIM, "Failed to load config: '%s'\n", input_file.c_str());
             return PyBool_FromLong(false);
         }
+
+        // Schedule a one-shot screenshot after the UI has rendered
+        lv_timer_t *shot_timer = lv_timer_create([](lv_timer_t *t) {
+            GraphicsBackend::getInstance().dumpScreenshot();
+            LOG(DEBUG, LVSIM, "Screenshot saved to /tmp/screenshot-0.png\n");
+            lv_timer_del(t);
+        }, 3000, nullptr);
+        lv_timer_set_repeat_count(shot_timer, 1);
+
         return PyBool_FromLong(true);
     }
     static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
