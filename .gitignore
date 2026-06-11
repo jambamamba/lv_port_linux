@@ -70,3 +70,4 @@ src/res/fonts/.ttc
 src/examples/hello-world/fonts
 src/examples/hello-world/fonts/Ubuntu*.lvf
 src/examples/hello-world/fonts/*
+.opencode
