@@ -1,0 +1,186 @@
+import os
+import sys
+import lele
+import time
+
+# Same setup as mandelbrot.py but auto-plays and captures screenshots
+status_label = None
+image_widget = None
+play_btn = None
+pause_btn = None
+reset_btn = None
+speed_slider = None
+
+has_cuda = False
+playing = False
+paused = False
+speed_factor = 1.03
+center_x = -0.5
+center_y = 0.0
+zoom = 1.0
+frame_count = 0
+
+def updateStatus(text):
+    global status_label
+    if status_label:
+        status_label.setText(text)
+
+def update_image():
+    global center_x, center_y, zoom
+    real_range = 3.0 / zoom
+    imag_range = 2.0 / zoom
+    real_min = center_x - real_range / 2
+    real_max = center_x + real_range / 2
+    imag_min = center_y - imag_range / 2
+    imag_max = center_y + imag_range / 2
+    ok = lele.updateMandelbrotImage("/mandelbrot/image", 1000, 4.0,
+                                    real_min, real_max, imag_min, imag_max)
+    if not ok:
+        updateStatus("Failed to render frame")
+    return ok
+
+def on_play(event):
+    global playing, paused
+    playing = True
+    paused = False
+    updateStatus("Zooming...")
+
+def on_pause(event):
+    global paused
+    if playing:
+        paused = not paused
+        updateStatus("Paused" if paused else "Zooming...")
+
+def on_reset(event):
+    global playing, paused, center_x, center_y, zoom, frame_count
+    playing = False
+    paused = False
+    center_x = -0.5
+    center_y = 0.0
+    zoom = 1.0
+    frame_count = 0
+    updateStatus("Reset")
+    update_image()
+
+def on_nudge(dx, dy):
+    global center_x, center_y
+    shift = 0.2 / zoom
+    center_x += dx * shift
+    center_y += dy * shift
+    if playing:
+        updateStatus(f"Center: ({center_x:.4f}, {center_y:.4f}) zoom: {zoom:.1f}x")
+    else:
+        update_image()
+
+def on_left(event):
+    on_nudge(-1, 0)
+
+def on_right(event):
+    on_nudge(1, 0)
+
+def on_up(event):
+    on_nudge(0, -1)
+
+def on_down(event):
+    on_nudge(0, 1)
+
+def on_speed_change(event):
+    global speed_factor
+    val = event.value
+    speed_factor = 1.0 + val * 0.005
+
+has_cuda = lele.hasCuda()
+print(f"CUDA available: {has_cuda}", flush=True)
+
+if has_cuda:
+    updateStatus("Generating Mandelbrot set with CUDA...")
+    img_path = os.path.join(os.getcwd(), "res/mandelbrot.png")
+    ok = lele.generateMandelbrot(img_path, 800, 600)
+    if not ok:
+        has_cuda = False
+        print("CUDA generation failed, falling back to static image", flush=True)
+
+res = lele.loadConfig("mandelbrot.json")
+if not res:
+    sys.exit(1)
+
+status_label = lele.getObjectById("/mandelbrot/status")
+image_widget = lele.getObjectById("/mandelbrot/image")
+play_btn = lele.getObjectById("/mandelbrot/play")
+pause_btn = lele.getObjectById("/mandelbrot/pause")
+reset_btn = lele.getObjectById("/mandelbrot/reset")
+left_btn = lele.getObjectById("/mandelbrot/left")
+right_btn = lele.getObjectById("/mandelbrot/right")
+up_btn = lele.getObjectById("/mandelbrot/up")
+down_btn = lele.getObjectById("/mandelbrot/down")
+speed_slider = lele.getObjectById("/mandelbrot/speed_slider")
+
+if play_btn and pause_btn and reset_btn and speed_slider:
+    play_btn.addEventHandler(on_play)
+    pause_btn.addEventHandler(on_pause)
+    reset_btn.addEventHandler(on_reset)
+    left_btn.addEventHandler(on_left)
+    right_btn.addEventHandler(on_right)
+    up_btn.addEventHandler(on_up)
+    down_btn.addEventHandler(on_down)
+    speed_slider.addEventHandler(on_speed_change)
+else:
+    updateStatus("Warning: some controls not found")
+    print("Warning: some controls not found", file=sys.stderr)
+
+if has_cuda:
+    updateStatus("Ready - press Play to zoom")
+else:
+    updateStatus("GPU required - this app needs CUDA to render")
+
+print("ENTRY: Entering event loop", flush=True)
+last_frame_time = time.time()
+screenshot_count = 0
+start_time = time.time()
+auto_play_triggered = False
+
+while lele.handleEvents():
+    # Auto-play after 1 second
+    now = time.time()
+    if not auto_play_triggered and now - start_time > 1.0:
+        if has_cuda and play_btn:
+            print("Auto-playing...", flush=True)
+            play_btn.click()
+        auto_play_triggered = True
+
+    # Take screenshots at intervals
+    if now - start_time > 2.0 and screenshot_count == 0:
+        lele.dumpScreenshot()
+        print(f"Screenshot 1 (initial) taken at t={now-start_time:.1f}s", flush=True)
+        screenshot_count = 1
+
+    if now - start_time > 5.0 and screenshot_count == 1:
+        lele.dumpScreenshot()
+        print(f"Screenshot 2 (after play) taken at t={now-start_time:.1f}s", flush=True)
+        screenshot_count = 2
+
+    # Exit after 15 seconds
+    if now - start_time > 15.0:
+        print("Test complete, exiting", flush=True)
+        break
+
+    if playing and not paused:
+        dt = now - last_frame_time
+        if dt >= 0.033:
+            last_frame_time = now
+            zoom *= speed_factor
+            if zoom > 100000.0:
+                zoom = 100000.0
+                updateStatus(f"Max zoom reached ({zoom:.0f}x)")
+            frame_count += 1
+            if frame_count % 5 == 0:
+                updateStatus(f"Zoom: {zoom:.1f}x  Center: ({center_x:.4f}, {center_y:.4f})")
+            if has_cuda:
+                ok = update_image()
+                if not ok:
+                    playing = False
+                    updateStatus("Render failed - stopped")
+
+    time.sleep(0.001)
+
+print("Exited event loop", flush=True)

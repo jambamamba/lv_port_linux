@@ -1,37 +1,40 @@
 {
     "configurations": [
     {
-        "name": "Debug Remote C++",
+        "name": "Debug (JSON)",
         "request": "launch",
         "type": "lldb",
         "program": "${workspaceFolder}/x86-build/bin/lvglsim",
-        // "cwd": "${workspaceFolder}/src/examples/stackview",
-        // "cwd": "${workspaceFolder}/src/examples/tabview",
-        // "cwd": "${workspaceFolder}/src/examples/imageview",
-        // "cwd": "${workspaceFolder}/src/examples/hello-world",
-        // "cwd": "${workspaceFolder}/src/examples/hello-world-international",
         "cwd": "${workspaceFolder}/src/examples/${input:example}",
         "args": [
-            // "${workspaceFolder}/src/examples/stackview/stackview.py",
-            // "${workspaceFolder}/src/examples/tabview/tabview.py",
-            // "${workspaceFolder}/src/examples/imageview/imageview.py",
-            // "${workspaceFolder}/src/examples/hello-world/hello-world.py"
-            // "${workspaceFolder}/src/examples/hello-world-international/hello-world-international.py"
+            "${workspaceFolder}/src/examples/${input:example}/${input:example}.json"
+        ],
+        "env":{
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
+            "PYTHONHOME":"/usr/local/python3",
+            "WAYLAND_DISPLAY":"wayland-1"
+        }
+    },
+    {
+        "name": "Debug (Python)",
+        "request": "launch",
+        "type": "lldb",
+        "program": "${workspaceFolder}/x86-build/bin/lvglsim",
+        "cwd": "${workspaceFolder}/src/examples/${input:example}",
+        "args": [
             "${workspaceFolder}/src/examples/${input:example}/${input:example}.py"
         ],
         "env":{
             "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
-            "PYTHONHOME":"${workspaceFolder}/x86-build/bin/Python/",
-            "WAYLAND_DISPLAY":"/run/user/1000/wayland-1"
+            "PYTHONHOME":"/usr/local/python3",
+            "WAYLAND_DISPLAY":"wayland-1"
         }
     }
     ],
     "inputs": [
         {
-            // The "id" is referenced by the ${input:...} syntax
-            "id": "example", 
-            // "type" can be "promptString", "pickString", or "command"
-            "type": "pickString", 
+            "id": "example",
+            "type": "pickString",
             "description": "Select one of these:",
             "options": [
                 "hello-world",
@@ -41,7 +44,10 @@
                 "tabview",
                 "imageview",
                 "restaurant-1",
-                "apple-info"
+                "mandelbrot",
+                "apple-info",
+                "messagebox",
+                "testview"
             ],
             "default": "restaurant-1"
         }

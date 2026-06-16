@@ -3,9 +3,11 @@
 #include <iostream>
 #include <lelewidgets/lelebutton.h>
 #include <lelewidgets/leleevent.h>
+#include <lelewidgets/leleimage.h>
 #include <lelewidgets/lelemessagebox.h>
 #include <lelewidgets/leleobject.h>
 #include <lelewidgets/lelerollerview.h>
+#include <mandelbrot/mandelbrot.h>
 #include <tr/tr.h>
 #include <lvgl/lvgl.h>
 
@@ -210,15 +212,27 @@ namespace {
             return PyBool_FromLong(false);
         }
 
-        // Schedule a one-shot screenshot after the UI has rendered
-        lv_timer_t *shot_timer = lv_timer_create([](lv_timer_t *t) {
-            GraphicsBackend::getInstance().dumpScreenshot();
-            LOG(DEBUG, LVSIM, "Screenshot saved to /tmp/screenshot-0.png\n");
-            lv_timer_del(t);
-        }, 3000, nullptr);
-        lv_timer_set_repeat_count(shot_timer, 1);
-
         return PyBool_FromLong(true);
+    }
+    static PyObject* _mymodule_hasCuda(PyObject *self, PyObject *args) {
+        return PyBool_FromLong(Mandelbrot::hasCuda());
+    }
+    static PyObject* _mymodule_generateMandelbrot(PyObject *self, PyObject *args) {
+        char *filename = nullptr;
+        int width = 800, height = 600, max_iterations = 1000;
+        double escape_radius_sq = 4.0;
+        double real_min = -2.0, real_max = 1.0;
+        double imag_min = -1.0, imag_max = 1.0;
+        if(!PyArg_ParseTuple(args, "sii|idddddd",
+            &filename, &width, &height,
+            &max_iterations, &escape_radius_sq,
+            &real_min, &real_max, &imag_min, &imag_max)) {
+            return PyBool_FromLong(false);
+        }
+        bool ok = Mandelbrot::generateToFile(
+            filename, width, height, max_iterations, escape_radius_sq,
+            real_min, real_max, imag_min, imag_max);
+        return PyBool_FromLong(ok);
     }
     static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
         if(!_graphics_backend.handleEvents()) {
@@ -226,13 +240,66 @@ namespace {
         }
         return PyLong_FromLong(1);
     }
+    static PyObject* _mymodule_updateMandelbrotImage(PyObject *self, PyObject *args) {
+        char *img_id = nullptr;
+        int max_iterations = 1000;
+        double escape_radius_sq = 4.0;
+        double real_min = -2.0, real_max = 1.0;
+        double imag_min = -1.0, imag_max = 1.0;
+        if(!PyArg_ParseTuple(args, "s|idddddd",
+            &img_id,
+            &max_iterations, &escape_radius_sq,
+            &real_min, &real_max, &imag_min, &imag_max)) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: arg parse failed\n");
+            return PyBool_FromLong(false);
+        }
+
+        LeleImage *target_img = nullptr;
+        LeleWidgetFactory::iterateNodes(_nodes, 0, [img_id, &target_img](LeleObject &lele_object) {
+            if(lele_object.getId() == img_id) {
+                target_img = dynamic_cast<LeleImage*>(&lele_object);
+            }
+        });
+        if(!target_img) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: could not find image with id: %s\n", img_id);
+            return PyBool_FromLong(false);
+        }
+
+        auto [w, h] = target_img->getSize();
+        if(w <= 0 || h <= 0) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: invalid dims: %dx%d\n", w, h);
+            return PyBool_FromLong(false);
+        }
+
+        LOG(DEBUG, LVSIM, "updateMandelbrotImage: generating %dx%d (real=[%0.3f,%0.3f] imag=[%0.3f,%0.3f])\n",
+            w, h, real_min, real_max, imag_min, imag_max);
+        auto bgr = Mandelbrot::generateBGR(w, h, max_iterations, escape_radius_sq,
+                                           real_min, real_max, imag_min, imag_max);
+        if(bgr.empty()) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: generateBGR returned empty!\n");
+            return PyBool_FromLong(false);
+        }
+        LOG(DEBUG, LVSIM, "updateMandelbrotImage: generated %zu bytes\n", bgr.size());
+
+        bool ok = target_img->setBGRBuffer(w, h, bgr);
+        LOG(DEBUG, LVSIM, "updateMandelbrotImage: setBGRBuffer returned %d\n", (int)ok);
+        return PyBool_FromLong(ok);
+    }
+    static PyObject* _mymodule_dumpScreenshot(PyObject *self, PyObject *args) {
+        GraphicsBackend::getInstance().dumpScreenshot();
+        Py_RETURN_NONE;
+    }
     static PyMethodDef _mymodule_methods[] = {
         {"version", _mymodule_version, METH_VARARGS, "lele.version()"},
         // {"foo", _mymodule_foo, METH_VARARGS, "lele.foo(num, str, list, dic, callback)"},
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
         {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
+        {"hasCuda", _mymodule_hasCuda, METH_NOARGS, "lele.hasCuda() -> bool"},
+        {"generateMandelbrot", _mymodule_generateMandelbrot, METH_VARARGS, "lele.generateMandelbrot(filename, width, height, ...) -> bool"},
         {"addEventHandler", _mymodule_addEventHandler, METH_VARARGS, "lele.addEventHandler(callback)"},
         {"getObjectById", _mymodule_getObjectById, METH_VARARGS, "lele.getObjectById(id)"},
+        {"dumpScreenshot", _mymodule_dumpScreenshot, METH_NOARGS, "lele.dumpScreenshot()"},
+        {"updateMandelbrotImage", _mymodule_updateMandelbrotImage, METH_VARARGS, "lele.updateMandelbrotImage(img_id, max_iterations, escape_radius_sq, real_min, real_max, imag_min, imag_max) -> bool"},
         {nullptr, nullptr, 0, nullptr} // Sentinel
     };
 #ifdef MULTI_PHASE_INIT

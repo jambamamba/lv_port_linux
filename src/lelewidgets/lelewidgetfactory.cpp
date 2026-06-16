@@ -403,14 +403,17 @@ std::vector<std::pair<std::string, Node>> fromConfig(
             parseAttributes(tokens);
     }
 
+    LOG(DEBUG, LVSIM, "fromConfig: calling GraphicsBackend::load()\n");
     if(!GraphicsBackend::getInstance().load(screen_width, screen_height)) {
         LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
         return std::vector<std::pair<std::string, Node>>();
     }
+    LOG(DEBUG, LVSIM, "fromConfig: backend loaded, setting language\n");
     LeleLanguage::getLeleLanguage().setDefaultLanguage(default_language);
     LeleLanguage::getLeleLanguage().setCurrentLanguage(current_language);
 
     if(!parent->getLvObj()) {
+        LOG(DEBUG, LVSIM, "fromConfig: setting up root\n");
         parent->setId("ROOT");
         parent->setLvObj(lv_screen_active());
         parent->parseAttributes(tokens);
@@ -422,7 +425,10 @@ std::vector<std::pair<std::string, Node>> fromConfig(
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_TRIPLE_CLICKED, &counts);
         lv_obj_add_event_cb(parent->getLvObj(), click_event_cb, LV_EVENT_LONG_PRESSED, &counts);
     }
-    return leleObjectsFromJson(parent, tokens);
+    LOG(DEBUG, LVSIM, "fromConfig: calling leleObjectsFromJson\n");
+    auto result = leleObjectsFromJson(parent, tokens);
+    LOG(DEBUG, LVSIM, "fromConfig: returning with %zu nodes\n", result.size());
+    return result;
 }
 
 std::vector<std::unique_ptr<LeleStyle>> stylesFromConfig(

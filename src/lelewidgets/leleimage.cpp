@@ -105,12 +105,15 @@ void LeleImage::setSrc(const std::string& src) {
 }
 
 std::tuple<int,int> LeleImage::getSize() const {
-  if(!_img._img_dsc){
-    return {0,0};
+  if(_img._img_dsc){
+    int width = _img._img_dsc.value()->header.w;
+    int height = _img._img_dsc.value()->header.h;
+    return {width, height};
   }
-  int width = _img._img_dsc.value()->header.w;
-  int height = _img._img_dsc.value()->header.h;
-  return {width, height};
+  if(_lv_img){
+    return {lv_obj_get_width(_lv_img), lv_obj_get_height(_lv_img)};
+  }
+  return {0,0};
 }
 void LeleImage::setSize(int width, int height) {
   if(!_img._img_dsc){
@@ -179,4 +182,19 @@ void LeleImage::setRotation(float angle, int pivot_x, int pivot_y) {
   _img_style["img/rotation/pivot/x"] = pivot_x;
   _img_style["img/rotation/pivot/y"] = pivot_y;
   drawImage();
+}
+
+bool LeleImage::setBGRBuffer(int width, int height, const std::vector<uint8_t>& bgr) {
+    auto img_dsc = LeleImageConverter::generateImgDsc(width, height, 3);
+    if(!img_dsc) {
+        return false;
+    }
+    uint8_t *data = const_cast<uint8_t*>(img_dsc->get()->data);
+    std::copy(bgr.begin(), bgr.end(), data);
+    _img._img_dsc = img_dsc;
+    if(_lv_img && _img._img_dsc) {
+        lv_image_set_src(_lv_img, _img._img_dsc.value().get());
+        lv_obj_invalidate(_lv_obj);
+    }
+    return true;
 }

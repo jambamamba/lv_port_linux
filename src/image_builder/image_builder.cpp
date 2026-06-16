@@ -141,12 +141,16 @@ int ImageBuilder::parsePercentValue(const std::string &x, int parent_x) {
     }
     else if(x.size() > 0) {
         int i = 0;
-        if(x.size() > 2 && x.c_str()[0] == '0' && x.c_str()[1] == 'x') {
-          i = std::stoi(x, 0, 16);
+        std::string cleaned = x;
+        if(cleaned.size() > 2 && cleaned.substr(cleaned.size() - 2) == "px") {
+            cleaned = cleaned.substr(0, cleaned.size() - 2);
         }
-        else if(std::all_of(x.begin(), x.end(),
+        if(cleaned.size() > 2 && cleaned.c_str()[0] == '0' && cleaned.c_str()[1] == 'x') {
+          i = std::stoi(cleaned, 0, 16);
+        }
+        else if(std::all_of(cleaned.begin(), cleaned.end(),
           [&i](unsigned char ch){ return std::isdigit(ch); })) {
-          i = std::stoi(x, 0, 10);
+          i = std::stoi(cleaned, 0, 10);
         }
         else {
           LL(WARNING, LVSIM) << "input is not a number: " << x;
@@ -167,6 +171,7 @@ int ImageBuilder::getParentDimension(const std::string &key, const LeleObject *l
     }
     else if(std::holds_alternative<int>(value.value())) {
       int val = std::get<int>(value.value());
+      LL(DEBUG, LVSIM) << "getParentDimension(" << key << ") for obj " << lele_obj->getId() << " = " << val;
       return std::get<int>(value.value());
     }
     else {
@@ -174,17 +179,17 @@ int ImageBuilder::getParentDimension(const std::string &key, const LeleObject *l
     }
   }
   else if(lele_obj) {
-    if(key == "x" || key == "width") { return lv_obj_get_width(lv_screen_active()); }
-    else if(key == "y" || key == "height") { return lv_obj_get_height(lv_screen_active()); }
+    int dim = 0;
+    if(key == "x" || key == "width") { dim = lv_obj_get_width(lv_screen_active()); }
+    else if(key == "y" || key == "height") { dim = lv_obj_get_height(lv_screen_active()); }
     else if(key == "corner-radius") { 
-      return std::max(
+      dim = std::max(
         lv_obj_get_width(lv_screen_active()), 
         lv_obj_get_height(lv_screen_active())
-      ); 
+      );
     }
-    else {
-      LL(WARNING, LVSIM) << "style key:" << key << " not handled";
-    }
+    LL(DEBUG, LVSIM) << "getParentDimension(" << key << ") for root obj " << lele_obj->getId() << " = " << dim << " (from lv_screen_active)";
+    return dim;
   }
   return 0;
 }

@@ -333,6 +333,7 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
   value = getStyle("bgcolor-selected");
   if(value) {
     lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_SELECTED);
+    lv_obj_set_style_bg_opa(lv_obj, LV_OPA_COVER, LV_PART_SELECTED);
   }
   value = getStyle("fgcolor");
   if(value) {
@@ -341,7 +342,8 @@ void LeleObject::applyStyle(lv_obj_t *lv_obj) {
   value = getStyle("bgcolor");
   if(value) {
     int bgcolor = std::get<int>(value.value());
-    lv_obj_set_style_bg_color(lv_obj, lv_color_hex(std::get<int>(value.value())), LV_PART_MAIN);
+    lv_style_set_bg_color(&_style, lv_color_hex(bgcolor));
+    lv_style_set_bg_opa(&_style, LV_OPA_COVER);
   }
   value = getStyle("align");
   if(value) {
@@ -657,13 +659,43 @@ int32_t LeleObject::getScrollY() const {
   return scroll_value;
 }
 
-bool LeleObject::eventCallback(LeleEvent &&e) {
-  // LOG(DEBUG, LVSIM, "LeleObject::eventCallback id:%s, class_name:%s, _lele_parent:%s, code:[0x%x]%s,\n", 
-  //   _id.c_str(), _type.c_str(), _lele_parent ? _lele_parent->getCxxClass().c_str() : "", 
-  //   e.getLvEvent()->code, lv_event_code_get_name(e.getLvEvent()->code));
-  for(auto *py_callback:_py_callbacks) {
-    if(!pyCallback(py_callback, std::move(e))) {
+bool LeleObject::isUserInteractionEvent(lv_event_code_t code) {
+  switch(code) {
+    case LV_EVENT_PRESSED:
+    case LV_EVENT_PRESSING:
+    case LV_EVENT_SHORT_CLICKED:
+    case LV_EVENT_SINGLE_CLICKED:
+    case LV_EVENT_DOUBLE_CLICKED:
+    case LV_EVENT_TRIPLE_CLICKED:
+    case LV_EVENT_LONG_PRESSED:
+    case LV_EVENT_LONG_PRESSED_REPEAT:
+    case LV_EVENT_CLICKED:
+    case LV_EVENT_RELEASED:
+    case LV_EVENT_SCROLL_BEGIN:
+    case LV_EVENT_SCROLL_END:
+    case LV_EVENT_SCROLL:
+    case LV_EVENT_GESTURE:
+    case LV_EVENT_KEY:
+    case LV_EVENT_ROTARY:
+    case LV_EVENT_FOCUSED:
+    case LV_EVENT_DEFOCUSED:
+    case LV_EVENT_VALUE_CHANGED:
+    case LV_EVENT_INSERT:
+    case LV_EVENT_READY:
+    case LV_EVENT_CANCEL:
+      return true;
+    default:
       return false;
+  }
+}
+
+bool LeleObject::eventCallback(LeleEvent &&e) {
+  lv_event_code_t code = lv_event_get_code(const_cast<lv_event_t*>(e.getLvEvent()));
+  if(isUserInteractionEvent(code)) {
+    for(auto *py_callback : _py_callbacks) {
+      if(!pyCallback(py_callback, std::move(e))) {
+        return false;
+      }
     }
   }
   if(_lele_parent) {

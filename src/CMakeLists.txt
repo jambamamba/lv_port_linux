@@ -13,6 +13,17 @@ set(LELE_VERSION_MINOR 0)
 add_compile_definitions(LELE_VERSION_MAJOR=${LELE_VERSION_MAJOR})
 add_compile_definitions(LELE_VERSION_MINOR=${LELE_VERSION_MINOR})
 
+if(NOT CUDAToolkit_ROOT)
+    set(CUDAToolkit_ROOT "/usr/local/cuda-12.8")
+endif()
+find_package(CUDAToolkit QUIET)
+if(CUDAToolkit_FOUND)
+    add_compile_definitions(USE_CUDA)
+    message(STATUS "CUDA found: ${CUDAToolkit_VERSION} at ${CUDAToolkit_INCLUDE_DIRS}")
+else()
+    message(STATUS "CUDA not found, building without CUDA support")
+endif()
+
 set(LV_CONF_INCLUDE_SIMPLE 1)
 set(LV_USE_WAYLAND 1)
 
@@ -144,6 +155,7 @@ function(buildLvglSim
         json/json_helper.cpp
         tr/tr.cpp
         tr/tr.py.cpp
+        mandelbrot/mandelbrot.cpp
         ${LELE_WIDGETS}
         ${LV_LINUX_SRC} 
         ${LV_LINUX_BACKEND_SRC} 
@@ -171,6 +183,27 @@ function(buildLvglSim
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION} #pyconfig.h
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}/Include
     )
+    if(CUDAToolkit_FOUND)
+        list(APPEND inc_dirs "${CUDAToolkit_INCLUDE_DIRS}")
+        list(APPEND link_dirs "/usr/local/cuda-12.8/targets/x86_64-linux/lib")
+        list(APPEND link_libs "cudart")
+        set(CUDA_OBJ "${CMAKE_CURRENT_BINARY_DIR}/mandelbrot_cuda.o")
+        add_custom_command(
+            OUTPUT ${CUDA_OBJ}
+            COMMAND nvcc -c -o ${CUDA_OBJ}
+                -Xcompiler -fPIC
+                -I${CMAKE_SOURCE_DIR}/src
+                -I${CUDAToolkit_INCLUDE_DIRS}
+                -I/usr/local/include
+                --std=c++17
+                --extended-lambda
+                -arch=sm_52
+                ${CMAKE_SOURCE_DIR}/src/mandelbrot/mandelbrot_cuda.cu
+            DEPENDS ${CMAKE_SOURCE_DIR}/src/mandelbrot/mandelbrot_cuda.cu
+            COMMENT "Compiling CUDA mandelbrot kernel"
+        )
+        list(APPEND sources "${CUDA_OBJ}")
+    endif()
     set(props
         CMAKE_CXX_STANDARD 23
         CMAKE_CXX_STANDARD_REQUIRED ON

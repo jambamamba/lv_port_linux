@@ -25,6 +25,7 @@ class LeleImage : public LeleObject  {
   void setPosition(int width, int height);
   std::tuple<float, int,int> getRotation() const;
   void setRotation(float angle, int pivot_x, int pivot_y);
+  bool setBGRBuffer(int width, int height, const std::vector<uint8_t>& bgr);
 
   protected:
   void drawImage();

@@ -75,6 +75,7 @@ public:
   virtual void show();
   virtual void hide();
   static void EventCallback(lv_event_t *e);
+  static bool isUserInteractionEvent(lv_event_code_t code);
   virtual bool eventCallback(LeleEvent &&e);
   void addEventHandler(PyObject *callback);
   bool pyCallback(PyObject *py_callback, LeleEvent &&e);

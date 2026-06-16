@@ -1,7 +1,10 @@
 #pragma once
 
-#include <src/drivers/wayland/lv_wayland_private.h>
+#include <lvgl/lvgl.h>
 #include <src/lib/backends.h>
+#if LV_USE_WAYLAND
+#include <src/drivers/wayland/lv_wayland_private.h>
+#endif
 
 class GraphicsBackend {
 public:

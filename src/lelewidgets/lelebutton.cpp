@@ -174,6 +174,15 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
         lv_slider_set_mode(_lv_obj, LV_SLIDER_MODE_RANGE);
         lv_slider_set_start_value(_lv_obj, _start_value, LV_ANIM_OFF);
       }
+      {
+        auto indicator_color = getStyle("fgcolor");
+        if(indicator_color) {
+          lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(indicator_color.value())), LV_PART_INDICATOR);
+          lv_obj_set_style_bg_opa(_lv_obj, LV_OPA_COVER, LV_PART_INDICATOR);
+          lv_obj_set_style_bg_color(_lv_obj, lv_color_hex(std::get<int>(indicator_color.value())), LV_PART_KNOB);
+          lv_obj_set_style_bg_opa(_lv_obj, LV_OPA_COVER, LV_PART_KNOB);
+        }
+      }
       break;
     }
     case LeleButtons::LeleButton::Type::Arc:{
@@ -218,29 +227,14 @@ lv_obj_t *LeleButtons::LeleButton::createLvObj(LeleObject *lele_parent, lv_obj_t
     default: {
       _lv_obj = LeleObject::createLvObj(lele_parent, 
         lv_obj ? lv_obj : lv_button_create(lele_parent->getLvObj()));
-      // lv_obj_t *label = lv_label_create(_lv_obj);
-      // lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
-      // lv_label_set_text(label, tr(_text).c_str());
-      // lv_obj_update_layout(_lv_obj);
-      // lv_obj_set_width(label, lv_obj_get_width(_lv_obj)); 
-      // lv_obj_set_height(label, lv_obj_get_height(_lv_obj));
-
-      // auto [width, height] = LeleObject::getTextSize(label, tr(_text).c_str());
-      // lv_obj_set_height(label, height);
-      // lv_obj_update_layout(label);
-
-      // LL(WARNING, LVSIM) << "@@@@ TEXT SIZE: " <<  width << "x" << height;
-      // width = lv_obj_get_width(label); 
-      // height = lv_obj_get_height(label);
-      // LL(WARNING, LVSIM) << "@@@@ LABEL SIZE: " << width << "x" << height;
-      // width = lv_obj_get_width(_lv_obj); 
-      // height = lv_obj_get_height(_lv_obj);
-      // LL(WARNING, LVSIM) << "@@@@ BUTTON SIZE: " << width << "x" << height;
-
-      // setTextAlign(label);
-      // setObjAlignStyle(label);
-      // lv_obj_set_layout(_lv_obj, LV_LAYOUT_FLEX);//LV_LAYOUT_NONE);
-
+      lv_obj_t *label = lv_label_create(_lv_obj);
+      lv_label_set_long_mode(label, LV_LABEL_LONG_WRAP);
+      if(_text.empty()) {
+        LOG(WARNING, LVSIM, "BUTTON '%s' has EMPTY text!\n", _id.c_str());
+      }
+      lv_label_set_text(label, tr(_text).c_str());
+      lv_obj_set_width(label, lv_pct(100));
+      lv_obj_center(label);
       break;
     }
   }

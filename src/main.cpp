@@ -59,17 +59,26 @@ int main(int argc, char **argv) {
         }
         static LeleObject _root(nullptr);
         auto nodes = LeleWidgetFactory::fromConfig(&_root, json_path.string());
-        // Let LVGL process events a few times so the display can render
-        for(int i = 0; i < 20; i++) {
-            GraphicsBackend::getInstance().handleEvents();
+        // Let LVGL process events so the display can render
+        for(int i = 0; i < 50; i++) {
+            if(!GraphicsBackend::getInstance().handleEvents()) break;
         }
+        // Force a full display refresh so the snapshot captures rendered content
+        lv_display_t *disp = lv_disp_get_default();
+        if(disp) lv_refr_now(disp);
         GraphicsBackend::getInstance().dumpScreenshot();
         LOG(DEBUG, LVSIM, "Screenshot saved to /tmp/screenshot-0.png\n");
         while(GraphicsBackend::getInstance().handleEvents()){}
     }
     else if(std::filesystem::path(input_file).extension() == ".py") {
-        if(!PythonWrapper::load(input_file)) {
-            LOG(FATAL, LVSIM, "Failed to run Python module: '%s'\n", input_file.c_str());
+        // Resolve to absolute path and chdir to script's directory so relative paths resolve
+        auto py_path = std::filesystem::absolute(input_file);
+        auto py_dir = py_path.parent_path();
+        if(!py_dir.empty()) {
+            std::filesystem::current_path(py_dir);
+        }
+        if(!PythonWrapper::load(py_path.string())) {
+            LOG(FATAL, LVSIM, "Failed to run Python module: '%s'\n", py_path.c_str());
         }
     }
     else {

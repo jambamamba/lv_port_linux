@@ -33,6 +33,7 @@ std::unordered_set<std::string> LeleStyle::_style_keys = {
    "border/type",
    "border/width",
    "border/color",
+   "size",
    "scrollbar",
    "scroll/snap/x", //LV_SCROLL_SNAP_NONE,LV_SCROLL_SNAP_START,LV_SCROLL_SNAP_END,LV_SCROLL_SNAP_CENTER : how this parent object snaps the child when scrolling
    "scroll/snap/y", //LV_SCROLL_SNAP_NONE,LV_SCROLL_SNAP_START,LV_SCROLL_SNAP_END,LV_SCROLL_SNAP_CENTER : how this parent object snaps the child when scrolling
@@ -627,6 +628,9 @@ bool LeleStyle::setValue(
     }
     else if(key == "background/repeat") {
         _style["background/repeat"] = value;
+    }
+    else if(key == "size") {
+        _style["size"] = value;
     }
     else if(key.at(0) == '#') {
       LL(WARNING, LVSIM) << "Ignoring key " << key << " for styles";

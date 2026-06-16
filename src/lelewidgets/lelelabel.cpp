@@ -36,6 +36,9 @@ void LeleLabel::setText(const std::string &text) {
   lele_set_translatable_text([this](){
     lv_label_set_text(_lv_obj, tr(_text).c_str());
   });
+  if(_lv_obj) {
+    lv_label_set_text(_lv_obj, tr(_text).c_str());
+  }
 }
 
 std::string LeleLabel::getText() const { 
