@@ -9,70 +9,97 @@
         },
         "label":{
             "id":"/mandelbrot/title","text":"Mandelbrot Set",
-            "style":{"width":"100%","height":"6%","text-align":"center","font-size":"20pt","fgcolor":"#fff","padding":"5px"}
+            "style":{"width":"100%","height":"5%","text-align":"center","font-size":"20pt","fgcolor":"#fff","padding":"5px"}
+        },
+        "view":{
+            "style":{"padding":"none","margin":"none","width":"100%","height":"20%","fgcolor":"#fff","bgcolor":"#111","corner-radius":"0",
+                "flex":{"flow":"row","justify-content":"flex-start","align-items":"center","align-content":"center"}
+            },
+            "view":{
+                "id":"/mandelbrot/controls_and_speed",
+                "style":{"padding":"2px","margin":"none","width":"60%","height":"100%",
+                    "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"}
+                },
+                "view":{
+                    "id":"/mandelbrot/controls",
+                    "style":{"padding":"4px","margin":"none","width":"95%","height":"70%",
+                        "flex":{"flow":"row","justify-content":"center","align-items":"center","align-content":"center"},
+                        "font-size":"11pt"
+                    },
+                    "button":{
+                        "id":"/mandelbrot/play","text":"play",
+                        "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/pause","text":"pause",
+                        "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/reset","text":"reset",
+                        "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/left","text":"left",
+                        "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/right","text":"right",
+                        "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/up","text":"up",
+                        "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/down","text":"down",
+                        "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
+                    }
+                },
+                "view":{
+                    "id":"/mandelbrot/speed_row",
+                    "style":{"padding":"2px","margin":"none","width":"95%","height":"15%",
+                        "flex":{"flow":"row","justify-content":"center","align-items":"center","align-content":"center"}
+                    },
+                    "label":{
+                        "id":"/mandelbrot/speed_label","text":"Speed:",
+                        "style":{"width":"50px","height":"100%","text-align":"right","font-size":"11pt","fgcolor":"#aaa"}
+                    },
+                    "button":{
+                        "id":"/mandelbrot/speed_slider","text":"","type":"slider","min":1,"max":20,"value":5,
+                        "style":{"width":"200px","height":"50%","fgcolor":"#4a9eff","bgcolor":"#444"}
+                    }
+                }
+            },
+            "view":{
+                "id":"/mandelbrot/palette_row",
+                "style":{"padding":"2px","margin":"none","width":"40%","height":"100%",
+                    "flex":{"flow":"column","justify-content":"center","align-items":"center","align-content":"center"}
+                },
+                "label":{
+                    "id":"/mandelbrot/palette_label","text":"Palette:",
+                    "style":{"width":"60px","height":"20%","text-align":"right","font-size":"11pt","fgcolor":"#aaa"}
+                },
+                "rollerview":{
+                    "id":"/mandelbrot/palette",
+                    "items":["Classic Blue","Fire Heat","Rainbow","Electric"],
+                    "num_visible_items":4,
+                    "style":{"width":"340px","height":"80%","font-size":"11pt","fgcolor":"#4a9eff"}
+                }
+            }
         },
         "view":{
             "id":"/mandelbrot/image_wrapper",
-            "style":{"width":"100%","height":"80%",
+            "style":{"width":"100%","height":"70%",
                 "flex":{"flow":"row","justify-content":"center","align-items":"center"}
             },
             "img":{
                 "id":"/mandelbrot/image","src":"res/mandelbrot.png",
-                "style":{"width":"800px","height":"600px","size":"contain","corner-radius":"8","border":"solid-2px-#333"}
+                "style":{"width":"800px","height":"500px","size":"contain","corner-radius":"8","border":"solid-2px-#333"}
             }
         },
         "label":{
             "id":"/mandelbrot/status","text":"",
             "style":{"width":"100%","height":"3%","text-align":"center","font-size":"10pt","fgcolor":"#ccc"}
-        },
-        "view":{
-            "id":"/mandelbrot/controls",
-            "style":{"padding":"4px","margin":"none","width":"100%","height":"6%",
-                "flex":{"flow":"row","justify-content":"center","align-items":"center","align-content":"center"},
-                "font-size":"11pt"
-            },
-            "button":{
-                "id":"/mandelbrot/play","text":"play",
-                "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/pause","text":"pause",
-                "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/reset","text":"reset",
-                "style":{"width":"75px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/left","text":"left",
-                "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/right","text":"right",
-                "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/up","text":"up",
-                "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            },
-            "button":{
-                "id":"/mandelbrot/down","text":"down",
-                "style":{"width":"60px","height":"36px","font-size":"11pt","fgcolor":"#fff","bgcolor":"#2a2a2a","border":"solid-1px-#555","corner-radius":"4"}
-            }
-        },
-        "view":{
-            "id":"/mandelbrot/speed_row",
-            "style":{"padding":"2px","margin":"none","width":"100%","height":"5%",
-                "flex":{"flow":"row","justify-content":"center","align-items":"center","align-content":"center"}
-            },
-            "label":{
-                "id":"/mandelbrot/speed_label","text":"Speed:",
-                "style":{"width":"50px","height":"100%","text-align":"right","font-size":"11pt","fgcolor":"#aaa"}
-            },
-            "button":{
-                "id":"/mandelbrot/speed_slider","text":"","type":"slider","min":1,"max":20,"value":5,
-                "style":{"width":"200px","height":"80%","fgcolor":"#4a9eff","bgcolor":"#444"}
-            }
         }
     }
 }

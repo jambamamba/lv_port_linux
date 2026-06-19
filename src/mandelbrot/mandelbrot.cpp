@@ -71,7 +71,63 @@ double mandelbrotIteration(Complex c, int max_iterations, double escape_radius_s
     return 0.0;
 }
 
-std::vector<uint8_t> toBGR(const std::vector<double> &data, int width, int height) {
+struct Palette {
+    const double *stops;
+    const uint8_t (*colors)[3];
+    int n_stops;
+};
+
+static const double fire_stops[] = {0.00, 0.20, 0.40, 0.60, 0.80, 1.00};
+static const uint8_t fire_colors[][3] = {
+    {60, 0, 0},      // dark red
+    {255, 30, 0},    // bright red
+    {255, 120, 0},   // orange
+    {255, 210, 0},   // orange-yellow
+    {255, 255, 120}, // yellow-white
+    {255, 255, 255}, // white
+};
+
+static const double classic_stops[] = {0.00, 0.20, 0.40, 0.60, 0.80, 1.00};
+static const uint8_t classic_colors[][3] = {
+    {0, 0, 0},       // black
+    {30, 0, 120},    // deep blue
+    {0, 100, 255},   // blue
+    {0, 255, 200},   // cyan
+    {200, 255, 50},  // lime
+    {255, 255, 255}, // white
+};
+
+static const double rainbow_stops[] = {0.00, 0.15, 0.30, 0.45, 0.60, 0.75, 0.90, 1.00};
+static const uint8_t rainbow_colors[][3] = {
+    {0, 0, 0},       // black
+    {120, 0, 200},   // violet
+    {0, 60, 255},    // blue
+    {0, 200, 80},    // green
+    {100, 255, 0},   // lime
+    {255, 200, 0},   // yellow
+    {255, 50, 0},    // red
+    {255, 255, 255}, // white
+};
+
+static const double electric_stops[] = {0.00, 0.20, 0.40, 0.60, 0.80, 1.00};
+static const uint8_t electric_colors[][3] = {
+    {0, 0, 0},       // black
+    {0, 255, 255},   // cyan
+    {255, 0, 255},   // magenta
+    {255, 255, 0},   // yellow
+    {0, 255, 128},   // spring green
+    {255, 255, 255}, // white
+};
+
+static const Palette palettes[] = {
+    {classic_stops, classic_colors, sizeof(classic_stops) / sizeof(classic_stops[0])},
+    {fire_stops, fire_colors, sizeof(fire_stops) / sizeof(fire_stops[0])},
+    {rainbow_stops, rainbow_colors, sizeof(rainbow_stops) / sizeof(rainbow_stops[0])},
+    {electric_stops, electric_colors, sizeof(electric_stops) / sizeof(electric_stops[0])},
+};
+
+std::vector<uint8_t> toBGR(const std::vector<double> &data, int width, int height,
+                           Mandelbrot::ColorScheme color_scheme) {
     if(data.empty()) {
         LOG(WARNING, MANDEL, "No mandelbrot data to render\n");
         return std::vector<uint8_t>();
@@ -111,17 +167,12 @@ std::vector<uint8_t> toBGR(const std::vector<double> &data, int width, int heigh
         running += v;
     }
 
-    // Fire/heat color gradient stops (r, g, b)
-    static const double stops[] = {0.00, 0.15, 0.30, 0.50, 0.75, 1.00};
-    static const uint8_t colors[][3] = {
-        {0, 0, 0},       // black
-        {200, 40, 0},    // deep red
-        {255, 80, 0},    // orange-red
-        {255, 180, 0},   // orange-yellow
-        {255, 255, 100}, // yellow-white
-        {255, 255, 255}, // white
-    };
-    static const int n_stops = sizeof(stops) / sizeof(stops[0]);
+    int cs = static_cast<int>(color_scheme);
+    if(cs < 0 || cs >= 4) cs = 0;
+    const auto &pal = palettes[cs];
+    const double *stops = pal.stops;
+    const uint8_t (*colors)[3] = pal.colors;
+    int n_stops = pal.n_stops;
 
     std::vector<uint8_t> pixels;
     pixels.reserve(data.size() * 3);
@@ -180,15 +231,16 @@ std::vector<uint8_t> Mandelbrot::generateBGR(
     int width, int height,
     int max_iterations, double escape_radius_sq,
     double real_min, double real_max,
-    double imag_min, double imag_max
+    double imag_min, double imag_max,
+    ColorScheme color_scheme
 ) {
-    LOG(DEBUG, MANDEL, "generateBGR(%dx%d, iter=%d, r=[%0.3f,%0.3f] i=[%0.3f,%0.3f])\n",
-        width, height, max_iterations, real_min, real_max, imag_min, imag_max);
+    LOG(DEBUG, MANDEL, "generateBGR(%dx%d, iter=%d, r=[%0.3f,%0.3f] i=[%0.3f,%0.3f], scheme=%d)\n",
+        width, height, max_iterations, real_min, real_max, imag_min, imag_max, (int)color_scheme);
     auto coords = generateComplexSet(width, height, real_min, real_max, imag_min, imag_max);
     LOG(DEBUG, MANDEL, "generateBGR: generated %zu coords\n", coords.size());
     auto results = pickMethod(coords, max_iterations, escape_radius_sq);
     LOG(DEBUG, MANDEL, "generateBGR: pickMethod returned %zu results\n", results.size());
-    auto bgr = toBGR(results, width, height);
+    auto bgr = toBGR(results, width, height, color_scheme);
     LOG(DEBUG, MANDEL, "generateBGR: returning %zu bytes\n", bgr.size());
     return bgr;
 }
@@ -197,10 +249,11 @@ bool Mandelbrot::generateToFile(
     const std::string &filename, int width, int height,
     int max_iterations, double escape_radius_sq,
     double real_min, double real_max,
-    double imag_min, double imag_max
+    double imag_min, double imag_max,
+    ColorScheme color_scheme
 ) {
     auto bgr = generateBGR(width, height, max_iterations, escape_radius_sq,
-                           real_min, real_max, imag_min, imag_max);
+                           real_min, real_max, imag_min, imag_max, color_scheme);
     if(bgr.empty()) return false;
 
     auto img_dsc = LeleImageConverter::generateImgDsc(width, height, 3);

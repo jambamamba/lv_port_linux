@@ -218,20 +218,40 @@ namespace {
         return PyBool_FromLong(Mandelbrot::hasCuda());
     }
     static PyObject* _mymodule_generateMandelbrot(PyObject *self, PyObject *args) {
-        char *filename = nullptr;
+        const char *filename = nullptr;
         int width = 800, height = 600, max_iterations = 1000;
         double escape_radius_sq = 4.0;
         double real_min = -2.0, real_max = 1.0;
         double imag_min = -1.0, imag_max = 1.0;
-        if(!PyArg_ParseTuple(args, "sii|idddddd",
-            &filename, &width, &height,
-            &max_iterations, &escape_radius_sq,
-            &real_min, &real_max, &imag_min, &imag_max)) {
+        int color_scheme = Mandelbrot::ClassicBlue;
+        Py_ssize_t nargs = PyTuple_Size(args);
+        if(nargs < 1) {
+            LOG(WARNING, LVSIM, "generateMandelbrot: need at least 1 arg\n");
             return PyBool_FromLong(false);
         }
+        PyObject *p0 = PyTuple_GetItem(args, 0);
+        if(!p0 || !PyUnicode_Check(p0)) {
+            LOG(WARNING, LVSIM, "generateMandelbrot: arg 0 must be string\n");
+            return PyBool_FromLong(false);
+        }
+        filename = PyUnicode_AsUTF8(p0);
+        if(nargs >= 2) width        = (int)PyLong_AsLong(PyTuple_GetItem(args, 1));
+        if(nargs >= 3) height       = (int)PyLong_AsLong(PyTuple_GetItem(args, 2));
+        if(nargs >= 4) max_iterations = (int)PyLong_AsLong(PyTuple_GetItem(args, 3));
+        if(nargs >= 5) escape_radius_sq = PyFloat_AsDouble(PyTuple_GetItem(args, 4));
+        if(nargs >= 6) real_min     = PyFloat_AsDouble(PyTuple_GetItem(args, 5));
+        if(nargs >= 7) real_max     = PyFloat_AsDouble(PyTuple_GetItem(args, 6));
+        if(nargs >= 8) imag_min     = PyFloat_AsDouble(PyTuple_GetItem(args, 7));
+        if(nargs >= 9) imag_max     = PyFloat_AsDouble(PyTuple_GetItem(args, 8));
+        if(nargs >= 10) {
+            PyObject *p9 = PyTuple_GetItem(args, 9);
+            if(p9 && PyLong_Check(p9)) color_scheme = (int)PyLong_AsLong(p9);
+        }
+        LOG(DEBUG, LVSIM, "generateMandelbrot: parsed color_scheme=%d\n", color_scheme);
         bool ok = Mandelbrot::generateToFile(
             filename, width, height, max_iterations, escape_radius_sq,
-            real_min, real_max, imag_min, imag_max);
+            real_min, real_max, imag_min, imag_max,
+            static_cast<Mandelbrot::ColorScheme>(color_scheme));
         return PyBool_FromLong(ok);
     }
     static PyObject* _mymodule_handleEvents(PyObject *self, PyObject *args) {
@@ -241,17 +261,34 @@ namespace {
         return PyLong_FromLong(1);
     }
     static PyObject* _mymodule_updateMandelbrotImage(PyObject *self, PyObject *args) {
-        char *img_id = nullptr;
+        const char *img_id = nullptr;
         int max_iterations = 1000;
         double escape_radius_sq = 4.0;
         double real_min = -2.0, real_max = 1.0;
         double imag_min = -1.0, imag_max = 1.0;
-        if(!PyArg_ParseTuple(args, "s|idddddd",
-            &img_id,
-            &max_iterations, &escape_radius_sq,
-            &real_min, &real_max, &imag_min, &imag_max)) {
-            LOG(WARNING, LVSIM, "updateMandelbrotImage: arg parse failed\n");
+        int color_scheme = Mandelbrot::ClassicBlue;
+        // Parse directly from tuple to avoid format string/count issues
+        Py_ssize_t nargs = PyTuple_Size(args);
+        LOG(DEBUG, LVSIM, "updateMandelbrotImage: nargs=%zd\n", nargs);
+        if(nargs < 1) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: need at least 1 arg\n");
             return PyBool_FromLong(false);
+        }
+        PyObject *p0 = PyTuple_GetItem(args, 0);
+        if(!p0 || !PyUnicode_Check(p0)) {
+            LOG(WARNING, LVSIM, "updateMandelbrotImage: arg 0 must be string\n");
+            return PyBool_FromLong(false);
+        }
+        img_id = PyUnicode_AsUTF8(p0);
+        if(nargs >= 2) max_iterations = (int)PyLong_AsLong(PyTuple_GetItem(args, 1));
+        if(nargs >= 3) escape_radius_sq = PyFloat_AsDouble(PyTuple_GetItem(args, 2));
+        if(nargs >= 4) real_min = PyFloat_AsDouble(PyTuple_GetItem(args, 3));
+        if(nargs >= 5) real_max = PyFloat_AsDouble(PyTuple_GetItem(args, 4));
+        if(nargs >= 6) imag_min = PyFloat_AsDouble(PyTuple_GetItem(args, 5));
+        if(nargs >= 7) imag_max = PyFloat_AsDouble(PyTuple_GetItem(args, 6));
+        if(nargs >= 8) {
+            PyObject *p7 = PyTuple_GetItem(args, 7);
+            if(p7 && PyLong_Check(p7)) color_scheme = (int)PyLong_AsLong(p7);
         }
 
         LeleImage *target_img = nullptr;
@@ -271,10 +308,11 @@ namespace {
             return PyBool_FromLong(false);
         }
 
-        LOG(DEBUG, LVSIM, "updateMandelbrotImage: generating %dx%d (real=[%0.3f,%0.3f] imag=[%0.3f,%0.3f])\n",
-            w, h, real_min, real_max, imag_min, imag_max);
+        LOG(DEBUG, LVSIM, "updateMandelbrotImage: generating %dx%d (real=[%0.3f,%0.3f] imag=[%0.3f,%0.3f]) scheme=%d\n",
+            w, h, real_min, real_max, imag_min, imag_max, color_scheme);
         auto bgr = Mandelbrot::generateBGR(w, h, max_iterations, escape_radius_sq,
-                                           real_min, real_max, imag_min, imag_max);
+                                           real_min, real_max, imag_min, imag_max,
+                                           static_cast<Mandelbrot::ColorScheme>(color_scheme));
         if(bgr.empty()) {
             LOG(WARNING, LVSIM, "updateMandelbrotImage: generateBGR returned empty!\n");
             return PyBool_FromLong(false);
@@ -295,11 +333,11 @@ namespace {
         {"loadConfig", _mymodule_loadConfig, METH_VARARGS, "lele.loadConfig(/path/to/config/json)"},
         {"handleEvents", _mymodule_handleEvents, METH_VARARGS, "lele.handleEvents()"},
         {"hasCuda", _mymodule_hasCuda, METH_NOARGS, "lele.hasCuda() -> bool"},
-        {"generateMandelbrot", _mymodule_generateMandelbrot, METH_VARARGS, "lele.generateMandelbrot(filename, width, height, ...) -> bool"},
+        {"generateMandelbrot", _mymodule_generateMandelbrot, METH_VARARGS, "lele.generateMandelbrot(filename, width, height, ..., color_scheme) -> bool"},
         {"addEventHandler", _mymodule_addEventHandler, METH_VARARGS, "lele.addEventHandler(callback)"},
         {"getObjectById", _mymodule_getObjectById, METH_VARARGS, "lele.getObjectById(id)"},
         {"dumpScreenshot", _mymodule_dumpScreenshot, METH_NOARGS, "lele.dumpScreenshot()"},
-        {"updateMandelbrotImage", _mymodule_updateMandelbrotImage, METH_VARARGS, "lele.updateMandelbrotImage(img_id, max_iterations, escape_radius_sq, real_min, real_max, imag_min, imag_max) -> bool"},
+        {"updateMandelbrotImage", _mymodule_updateMandelbrotImage, METH_VARARGS, "lele.updateMandelbrotImage(img_id, max_iterations, escape_radius_sq, real_min, real_max, imag_min, imag_max, color_scheme) -> bool"},
         {nullptr, nullptr, 0, nullptr} // Sentinel
     };
 #ifdef MULTI_PHASE_INIT

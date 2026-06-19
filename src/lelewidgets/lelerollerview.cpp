@@ -1,5 +1,6 @@
 #include "lelerollerview.h"
 
+#include <cstring>
 #include <json/json_helper.h>
 #include <numeric>
 #include <tr/tr.h>
@@ -40,7 +41,6 @@ lv_obj_t *LeleRollerView::createLvObj(LeleObject *lele_parent, lv_obj_t *lv_obj)
 
   setItems(_items);
   lv_roller_set_visible_row_count(_lv_obj, _num_visible_items);
-  lv_obj_center(_lv_obj);
 
   return _lv_obj;
 }
@@ -117,18 +117,20 @@ std::vector<std::string> LeleRollerView::getItems() const {
 
 std::string LeleRollerView::getSelectedItem() const {
   std::string sel_value;
-  sel_value.reserve(_max_item_len);
+  sel_value.resize(_max_item_len);
   int opt_id = lv_roller_get_selected(_lv_obj);
   lv_roller_get_option_str(_lv_obj, opt_id, sel_value.data(), _max_item_len);
+  sel_value.resize(strlen(sel_value.c_str()));
   return sel_value;
 }
 
 void LeleRollerView::setSelectedItem(const std::string &value) {
   std::string sel_value;
-  sel_value.reserve(_max_item_len);
+  sel_value.resize(_max_item_len);
   for(uint32_t idx = 0; idx < _items.size(); ++idx) {
     lv_roller_get_option_str(_lv_obj, idx, sel_value.data(), _max_item_len);
-    if(strcmp(sel_value.c_str(), value.c_str())==0) {
+    sel_value.resize(std::strlen(sel_value.c_str()));
+    if(sel_value == value) {
       lv_roller_set_selected(_lv_obj, idx, LV_ANIM_ON);
       break;
     }

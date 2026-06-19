@@ -9,6 +9,7 @@ play_btn = None
 pause_btn = None
 reset_btn = None
 speed_slider = None
+palette_dropdown = None
 
 has_cuda = False
 playing = False
@@ -18,6 +19,14 @@ center_x = -0.5
 center_y = 0.0
 zoom = 1.0
 frame_count = 0
+color_scheme = 0
+
+palette_map = {
+    "Classic Blue": 0,
+    "Fire Heat": 1,
+    "Rainbow": 2,
+    "Electric": 3,
+}
 
 def updateStatus(text):
     global status_label
@@ -25,7 +34,7 @@ def updateStatus(text):
         status_label.setText(text)
 
 def update_image():
-    global center_x, center_y, zoom
+    global center_x, center_y, zoom, color_scheme
     real_range = 3.0 / zoom
     imag_range = 2.0 / zoom
     real_min = center_x - real_range / 2
@@ -33,7 +42,8 @@ def update_image():
     imag_min = center_y - imag_range / 2
     imag_max = center_y + imag_range / 2
     ok = lele.updateMandelbrotImage("/mandelbrot/image", 1000, 4.0,
-                                    real_min, real_max, imag_min, imag_max)
+                                    real_min, real_max, imag_min, imag_max,
+                                    color_scheme)
     if not ok:
         updateStatus("Failed to render frame")
     return ok
@@ -88,13 +98,17 @@ def on_speed_change(event):
     val = event.value
     speed_factor = 1.0 + val * 0.005
 
+def on_palette_change(event):
+    global color_scheme
+    if palette_dropdown:
+        sel = palette_dropdown.getSelectedItem()
+        if sel in palette_map:
+            color_scheme = palette_map[sel]
+            updateStatus(f"Palette: {sel}")
+            if not playing:
+                update_image()
+
 has_cuda = lele.hasCuda()
-if has_cuda:
-    updateStatus("Generating Mandelbrot set with CUDA...")
-    img_path = os.path.join(os.getcwd(), "res/mandelbrot.png")
-    ok = lele.generateMandelbrot(img_path, 800, 600)
-    if not ok:
-        has_cuda = False
 
 res = lele.loadConfig("mandelbrot.json")
 if not res:
@@ -110,6 +124,7 @@ right_btn = lele.getObjectById("/mandelbrot/right")
 up_btn = lele.getObjectById("/mandelbrot/up")
 down_btn = lele.getObjectById("/mandelbrot/down")
 speed_slider = lele.getObjectById("/mandelbrot/speed_slider")
+palette_dropdown = lele.getObjectById("/mandelbrot/palette")
 
 if play_btn and pause_btn and reset_btn and speed_slider:
     play_btn.addEventHandler(on_play)
@@ -124,16 +139,24 @@ else:
     updateStatus("Warning: some controls not found")
     print("Warning: some controls not found", file=sys.stderr)
 
+if palette_dropdown:
+    palette_dropdown.onValueChanged(on_palette_change)
+
 if has_cuda:
-    updateStatus("Ready - press Play to zoom")
+    updateStatus("Generating Mandelbrot set with CUDA...")
+    img_path = os.path.join(os.getcwd(), "res/mandelbrot.png")
+    ok = lele.generateMandelbrot(img_path, 800, 600)
+    if ok:
+        updateStatus("Ready - press Play to zoom")
+    else:
+        updateStatus("Mandelbrot generation failed")
 else:
-    updateStatus("GPU required - this app needs CUDA to render")
+    updateStatus("GPU is required - this app needs CUDA to run")
 
 print("ENTRY: Entering event loop", flush=True)
 last_frame_time = time.time()
-screenshot_taken = False
+screenshot_count = 0
 while lele.handleEvents():
-    print("EVENT: handleEvents returned True", flush=True)
     if playing and not paused:
         now = time.time()
         dt = now - last_frame_time
@@ -151,9 +174,9 @@ while lele.handleEvents():
                 playing = False
                 updateStatus("Render failed - stopped")
 
-    if not screenshot_taken and time.time() - 4.0 > 3.0:
+    if screenshot_count < 2 and time.time() > 5.0 + screenshot_count * 5.0:
         lele.dumpScreenshot()
-        print("Screenshot taken from main loop")
-        screenshot_taken = True
+        print(f"Screenshot {screenshot_count + 1} taken", flush=True)
+        screenshot_count += 1
 
     time.sleep(0.001)

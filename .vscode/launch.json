@@ -10,7 +10,7 @@
             "${workspaceFolder}/src/examples/${input:example}/${input:example}.json"
         ],
         "env":{
-            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/bin/:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
             "PYTHONHOME":"/usr/local/python3",
             "WAYLAND_DISPLAY":"wayland-1"
         }
@@ -25,7 +25,7 @@
             "${workspaceFolder}/src/examples/${input:example}/${input:example}.py"
         ],
         "env":{
-            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/bin/:/usr/local/lib/:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
+            "LD_LIBRARY_PATH":"${env:LD_LIBRARY_PATH}:${workspaceFolder}/x86-build/src/:${workspaceFolder}/x86-build:${workspaceFolder}/x86-build/lib:${workspaceFolder}/x86-build/bin/:${workspaceFolder}/x86-build/src/lv_image_converter:/repos/utils/x86-build/:/usr/local/lib",
             "PYTHONHOME":"/usr/local/python3",
             "WAYLAND_DISPLAY":"wayland-1"
         }
