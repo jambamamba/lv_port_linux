@@ -15,8 +15,8 @@ has_cuda = False
 playing = False
 paused = False
 speed_factor = 1.03
-center_x = -0.5
-center_y = 0.0
+center_x = -0.7269
+center_y = 0.1889
 zoom = 1.0
 frame_count = 0
 color_scheme = 0
@@ -64,8 +64,8 @@ def on_reset(event):
     global playing, paused, center_x, center_y, zoom, frame_count
     playing = False
     paused = False
-    center_x = -0.5
-    center_y = 0.0
+    center_x = -0.7269
+    center_y = 0.1889
     zoom = 1.0
     frame_count = 0
     updateStatus("Reset")
@@ -96,6 +96,8 @@ def on_down(event):
 def on_speed_change(event):
     global speed_factor
     val = event.value
+    if val <= 0:
+        return  # PRESSED/RELEASED events pass value=0, skip them
     speed_factor = 1.0 + val * 0.005
 
 def on_palette_change(event):
@@ -105,8 +107,7 @@ def on_palette_change(event):
         if sel in palette_map:
             color_scheme = palette_map[sel]
             updateStatus(f"Palette: {sel}")
-            if not playing:
-                update_image()
+            update_image()
 
 has_cuda = lele.hasCuda()
 

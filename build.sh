@@ -52,9 +52,9 @@ cmake -G Ninja\
 
 function run() {
     pushd ${script_dir}
-    local example="restaurant-1" # hello-world | hello-world-international | imageview | messagebox | stackview | tabview | testview | restaurant-1
+    local example="mandelbrot" # hello-world | hello-world-international | imageview | messagebox | stackview | tabview | testview | restaurant-1 | mandelbrot
     local method="elfpy" # elfpy | elf | py
-    local debug="true"
+    local debug="false"
     export LD_LIBRARY_PATH="/usr/local/lib"
 
     parseArgs $@
@@ -72,7 +72,7 @@ function run() {
             ${gdb} ../../../x86-build/bin/lvglsim "${example}.json"
             ;;
         elfpy)
-            PYTHONHOME=../../../x86-build/bin/Python/ ${gdb} ../../../x86-build/bin/lvglsim "${example}.py"
+            WAYLAND_DISPLAY="wayland-1" PYTHONHOME=../../../x86-build/bin/Python/ ${gdb} ../../../x86-build/bin/lvglsim "${example}.py"
             ;;
         py) #needs buildLeleCpython
             LD_LIBRARY_PATH=/usr/local/lib PYTHONPATH=/usr/local/lib ${gdb} python3 "${example}.py"
@@ -84,5 +84,6 @@ function run() {
 }
 
 buildelf $@ |tee x86-build/build.log
-# rdpServer
-# run
+#make sure rdp-server is running already:
+#/repos/utils/share/scripts/rdp-server.sh weston &
+run
