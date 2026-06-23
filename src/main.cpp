@@ -38,6 +38,10 @@
 #include "src/lelewidgets/leleobject.h"
 #include "src/python/python_wrapper.h"
 
+#ifdef HAVE_ATSPI
+#include "src/atspi/atspi_bridge.h"
+#endif
+
 
 LOG_CATEGORY(LVSIM, "LVSIM");
 
@@ -59,6 +63,11 @@ int main(int argc, char **argv) {
         }
         static LeleObject _root(nullptr);
         auto nodes = LeleWidgetFactory::fromConfig(&_root, json_path.string());
+
+#ifdef HAVE_ATSPI
+        AtspiBridge::init();
+#endif
+
         // Let LVGL process events so the display can render
         for(int i = 0; i < 50; i++) {
             if(!GraphicsBackend::getInstance().handleEvents()) break;
@@ -77,6 +86,10 @@ int main(int argc, char **argv) {
         if(!py_dir.empty()) {
             std::filesystem::current_path(py_dir);
         }
+#ifdef HAVE_ATSPI
+        AtspiBridge::init();
+#endif
+
         if(!PythonWrapper::load(py_path.string())) {
             LOG(FATAL, LVSIM, "Failed to run Python module: '%s'\n", py_path.c_str());
         }

@@ -162,6 +162,19 @@ function(buildLvglSim
         ${LV_IMG_DSC_SRC}
         # ${PYTHON_LIB_OUTPUT}
     )
+    if(ATSPI_FOUND)
+        set(atspi_srcs
+            atspi/atspi_constants.h
+            atspi/atspi_dbus.cpp
+            atspi/atspi_dbus.h
+            atspi/accessible_node.cpp
+            atspi/accessible_node.h
+            atspi/atspi_bridge.cpp
+            atspi/atspi_bridge.h
+        )
+        list(APPEND sources ${atspi_srcs})
+        message(STATUS "Added AT-SPI bridge sources")
+    endif()
     set(link_dirs
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}
     )
@@ -178,11 +191,17 @@ function(buildLvglSim
         image_converter
         ${PYTHON_LIB_OUTPUT} crypt pthread dl util m
     )
+    if(ATSPI_FOUND)
+        list(APPEND link_libs ${ATSPI_LIBRARIES} dbus-1)
+    endif()
     set(inc_dirs
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION} #pyconfig.h
         ${CMAKE_BINARY_DIR}/src/Python-${PYTHON_LIB_VERSION}/Include
     )
+    if(ATSPI_FOUND)
+        list(APPEND inc_dirs ${ATSPI_INCLUDE_DIRS})
+    endif()
     if(CUDAToolkit_FOUND)
         list(APPEND inc_dirs "${CUDAToolkit_INCLUDE_DIRS}")
         list(APPEND link_dirs "/usr/local/cuda-12.8/targets/x86_64-linux/lib")
@@ -347,6 +366,18 @@ endfunction()
 if(NOT TARGET utils::utils)
     set(utils_DIR "${CMAKE_PREFIX_PATH}")
     find_package(utils REQUIRED CONFIG)
+endif()
+
+# AT-SPI2 accessibility bridge
+find_package(PkgConfig QUIET)
+if(PkgConfig_FOUND)
+    pkg_check_modules(ATSPI atspi-2)
+endif()
+if(ATSPI_FOUND)
+    add_compile_definitions(HAVE_ATSPI)
+    message(STATUS "AT-SPI2 found: building accessibility bridge")
+else()
+    message(STATUS "AT-SPI2 not found: accessibility bridge disabled")
 endif()
 
 buildFonts(FONTS_OUTPUT)
