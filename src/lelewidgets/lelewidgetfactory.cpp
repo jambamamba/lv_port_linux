@@ -405,7 +405,7 @@ std::vector<std::pair<std::string, Node>> fromConfig(
 
     LOG(DEBUG, LVSIM, "fromConfig: calling GraphicsBackend::load()\n");
     if(!GraphicsBackend::getInstance().load(screen_width, screen_height)) {
-        LOG(FATAL, LVSIM, "Failed to load graphcis backend\n");
+        LOG(WARNING, LVSIM, "Failed to load graphcis backend\n");
         return std::vector<std::pair<std::string, Node>>();
     }
     LOG(DEBUG, LVSIM, "fromConfig: backend loaded, setting language\n");

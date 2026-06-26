@@ -159,7 +159,7 @@ PythonWrapper::~PythonWrapper() {
     unload();
 }
 void PythonWrapper::unload() {
-    if(!_py->_py_module) {
+    if(!_py || !_py->_py_module) {
         return;
     }
     Py_XDECREF(_py->_py_module);

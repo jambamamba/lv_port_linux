@@ -8,7 +8,8 @@
 #include "atspi_dbus.h"
 #include "accessible_node.h"
 
-struct lv_obj_t;
+struct _lv_obj_t;
+typedef struct _lv_obj_t lv_obj_t;
 
 // Top-level singleton that:
 // 1. Connects to AT-SPI D-Bus and registers the application

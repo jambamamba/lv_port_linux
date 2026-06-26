@@ -52,6 +52,7 @@ struct AccessibleNode {
     bool grabFocus();
 
     // --- AT-SPI Action interface ---
+    bool supportsAction() const;
     int getNActions() const;
     std::string getActionName(int index) const;
     std::string getActionDescription(int index) const;
@@ -83,7 +84,4 @@ struct AccessibleNode {
 AtspiRole lvglClassToAtspiRole(const char *lvgl_class_name);
 
 // Extract the widget class name from an LVGL object
-inline const char *widgetClassName(lv_obj_t *obj) {
-    const lv_obj_class_t *cls = lv_obj_get_class(obj);
-    return cls ? cls->name : "unknown";
-}
+const char *widgetClassName(lv_obj_t *obj);

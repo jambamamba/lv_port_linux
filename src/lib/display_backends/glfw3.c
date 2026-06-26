@@ -37,7 +37,7 @@
 /**********************
  *  STATIC PROTOTYPES
  **********************/
-static void run_loop_glfw3(void);
+static bool run_loop_glfw3(bool (*run_step)());
 static lv_display_t *init_glfw3(void);
 
 /**********************
@@ -128,7 +128,7 @@ static lv_display_t *init_glfw3(void)
 /**
  * The run loop of the GLFW3 driver
  */
-void run_loop_glfw3(void)
+bool run_loop_glfw3(bool (*run_step)())
 {
     uint32_t idle_time;
 
@@ -137,8 +137,19 @@ void run_loop_glfw3(void)
 
         /* Returns the time to the next timer execution */
         idle_time = lv_timer_handler();
-        usleep(idle_time * 1000);
+
+        if (!idle_time) {
+            usleep(5000);
+        } else {
+            usleep(idle_time * 1000);
+        }
+
+        if (run_step && !(*run_step)()) {
+            break;
+        }
     }
+
+    return true;
 }
 
 #endif /*#if LV_USE_OPENGLES*/

@@ -86,13 +86,14 @@ int main(int argc, char **argv) {
         if(!py_dir.empty()) {
             std::filesystem::current_path(py_dir);
         }
+        if(!PythonWrapper::load(py_path.string())) {
+            LOG(WARNING, LVSIM, "Failed to run Python module: '%s'\n", py_path.c_str());
+            return -1;
+        }
+
 #ifdef HAVE_ATSPI
         AtspiBridge::init();
 #endif
-
-        if(!PythonWrapper::load(py_path.string())) {
-            LOG(FATAL, LVSIM, "Failed to run Python module: '%s'\n", py_path.c_str());
-        }
     }
     else {
         LOG(FATAL, LVSIM, "Missing python script or config json\n");

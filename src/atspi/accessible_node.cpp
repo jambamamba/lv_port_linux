@@ -6,6 +6,15 @@
 #include <string>
 #include <vector>
 
+// --- LVGL class name helper ---
+
+#include <lvgl/src/core/lv_obj_class_private.h>
+
+const char *widgetClassName(lv_obj_t *obj) {
+    const lv_obj_class_t *cls = lv_obj_get_class(obj);
+    return cls ? cls->name : "unknown";
+}
+
 // --- LVGL class → AT-SPI role mapping ---
 
 AtspiRole lvglClassToAtspiRole(const char *name) {
@@ -27,7 +36,7 @@ AtspiRole lvglClassToAtspiRole(const char *name) {
     if (strstr(name, "lv_switch"))  return AtspiRole::TOGGLE_SWITCH;
     if (strstr(name, "lv_dropdown")) return AtspiRole::COMBO_BOX;
     if (strstr(name, "lv_roller"))  return AtspiRole::LIST;
-    if (strstr(name, "lv_spinbox")) return AtspiRole::SPIN_BUTTON; // 66
+    if (strstr(name, "lv_spinbox")) return AtspiRole::SLIDER; // approximate
     if (strstr(name, "lv_table"))   return AtspiRole::TABLE;
     if (strstr(name, "lv_win") || strstr(name, "lv_window")) return AtspiRole::WINDOW;
 
@@ -37,13 +46,6 @@ AtspiRole lvglClassToAtspiRole(const char *name) {
 // --- AccessibleNode implementation ---
 
 std::string AccessibleNode::getName() const {
-    // Use LVGL object ID if set, otherwise fall back to class name
-    const char *id = lv_obj_get_id(lv_obj);
-    if (id && strlen(id) > 0) return id;
-
-    // Try the Lele widget's ID (set from JSON "id" field)
-    // This is stored as user_data on the LVGL object by our framework
-    // For now, use a heuristic: the `lv_obj_get_user_data` might hold it
     return widgetClassName(lv_obj);
 }
 

@@ -1,8 +1,11 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <vector>
 #include <dbus/dbus.h>
+
+#include "atspi_constants.h"
 
 // Thin wrapper around libdbus-1 for AT-SPI2 protocol needs.
 // Handles: connection to session bus, exporting objects,

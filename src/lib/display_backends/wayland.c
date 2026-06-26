@@ -95,7 +95,8 @@ static lv_display_t *init_wayland(void)
             "LVGL Simulator", NULL);
 
     if (disp == NULL) {
-        die("Failed to initialize Wayland backend\n");
+        LV_LOG_ERROR("Failed to initialize Wayland backend\n");
+        return NULL;
     }
 
     if (settings.fullscreen) {

@@ -171,7 +171,7 @@ bool GraphicsBackend::load(int screen_width, int screen_height) {
     LOG(DEBUG, LVSIM, "GraphicsBackend::load calling driver_backends_init_backend\n");
     _backend = driver_backends_init_backend(selected_backend);
     if(!_backend) {
-        LOG(FATAL, LVSIM, "Failed to initialize display backend\n");
+        LOG(WARNING, LVSIM, "Failed to initialize display backend\n");
         return false;
     }
     return true;

@@ -1,5 +1,6 @@
 #include "atspi_bridge.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -242,7 +243,7 @@ bool AtspiBridge::registerWithRegistry() {
 
 // Generic LVGL event callback that dispatches to AT-SPI
 static void lvgl_atspi_event_cb(lv_event_t *e) {
-    lv_obj_t *obj = lv_event_get_target(e);
+    lv_obj_t *obj = static_cast<lv_obj_t *>(lv_event_get_target(e));
     uint32_t code = lv_event_get_code(e);
 
     switch (code) {
@@ -277,7 +278,7 @@ static bool s_hooks_installed = false;
 
 // Install hooks on all existing and future display screens
 static void screen_load_event_cb(lv_event_t *e) {
-    lv_obj_t *screen = lv_event_get_target(e);
+    lv_obj_t *screen = static_cast<lv_obj_t *>(lv_event_get_target(e));
     if (!screen) return;
 
     // Rebuild accessible tree when screen loads
@@ -772,6 +773,11 @@ bool AtspiBridge::methodHandler(const char *path,
         }
         else if (strcmp(method, "GetAll") == 0) {
             // Minimal GetAll impl — return toolkit info
+            DBusMessageIter iter_getall;
+            dbus_message_iter_init(args, &iter_getall);
+            const char *iface_name = nullptr;
+            iterGetString(&iter_getall, &iface_name);
+
             *reply = dbus_message_new_method_return(args);
             DBusMessageIter reply_iter;
             dbus_message_iter_init_append(*reply, &reply_iter);
@@ -784,7 +790,7 @@ bool AtspiBridge::methodHandler(const char *path,
                 DBUS_DICT_ENTRY_END_CHAR_AS_STRING, &dict_iter);
 
             // Put at least Name
-            if (strcmp(iface_name, ATSPI_INTERFACE_ACCESSIBLE) == 0 && node) {
+            if (iface_name && strcmp(iface_name, ATSPI_INTERFACE_ACCESSIBLE) == 0 && node) {
                 std::string name = node->getName();
                 DBusMessageIter entry, variant;
                 dbus_message_iter_open_container(&dict_iter, DBUS_TYPE_DICT_ENTRY,
